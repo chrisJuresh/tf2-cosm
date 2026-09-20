@@ -19,7 +19,12 @@ jobs.json
 .env.*
 !.env.example
 
-# rendered images and extracted game assets never enter the repo
+# Rendered images and extracted game assets never enter the repo (ADR-0001). `renders/` is
+# the default output root and covers every image the job writes there; point the root
+# somewhere else and it is that folder's job to be ignored. Neither `*.png` nor `*.webp` is
+# ignored repo-wide: both are formats the site and the docs will legitimately want, and the
+# site is the next thing built here. The manifest under `catalogue/` and its schema are
+# tracked: they are what the site builds from.
 renders/
 assets-cache/
 *.mdl

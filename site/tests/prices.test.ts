@@ -3,7 +3,7 @@
  * into money, so this is where Trader Notation, the Metal Value and the dollar
  * conversion are pinned down.
  */
-import type { Metal } from "@tf2-cosm/data/catalogue";
+import type { DollarBases, Metal } from "@tf2-cosm/data/catalogue";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -71,24 +71,46 @@ describe("the Metal Value", () => {
   });
 });
 
+/** A header's Dollar Bases, with only the parts the Steam Market basis reads filled in. */
+function bases(lowest: number | null, median: number | null): DollarBases {
+  const rate = (usdPerKey: number) => ({ usdPerKey, usdPerRefined: usdPerKey / (577 / 9) });
+  return {
+    steamCommunityMarket: {
+      source: "Steam Community Market price overview",
+      takenAt: "2026-09-20T12:00:00.000Z",
+      lowest: lowest === null ? null : rate(lowest),
+      median: median === null ? null : rate(median),
+    },
+    priceSource: null,
+    mannCoStore: { source: "Mann Co. Store constant", rate: rate(2.49) },
+  };
+}
+
 describe("the Steam Community Market Dollar Basis", () => {
-  it("prices one Refined at the Key's dollar price over the Key Rate", () => {
-    const basis = steamMarketBasis(2.49, KEY_RATE);
-    expect(basis.dollarsPerRefined).toBeCloseTo(2.49 / (577 / 9), 10);
+  it("takes its rate from the header, already anchored to the snapshot's Key Rate", () => {
+    const basis = steamMarketBasis(bases(2.29, 2.33));
+    expect(basis?.usdPerKey).toBe(2.29);
+    expect(basis?.usdPerRefined).toBeCloseTo(2.29 / (577 / 9), 10);
+    expect(basis?.label).toBe("Steam Community Market");
   });
 
-  it("refuses a Key price that is not a positive number of dollars", () => {
-    expect(() => steamMarketBasis(0, KEY_RATE)).toThrow(/dollar price/);
-    expect(() => steamMarketBasis(Number.NaN, KEY_RATE)).toThrow(/dollar price/);
+  it("prefers the lowest listing, which is what a viewer would actually pay", () => {
+    expect(steamMarketBasis(bases(2.29, 2.33))?.usdPerKey).toBe(2.29);
   });
 
-  it("refuses a Key Rate of nothing, which would divide by zero", () => {
-    expect(() => steamMarketBasis(2.49, metal(0))).toThrow(/Key Rate/);
+  it("falls back to the median when the Market published no lowest", () => {
+    expect(steamMarketBasis(bases(null, 2.33))?.usdPerKey).toBe(2.33);
+  });
+
+  it("is nothing at all when the snapshot has no rates, or the Market did not answer", () => {
+    expect(steamMarketBasis(null)).toBeNull();
+    expect(steamMarketBasis({ ...bases(2.29, 2.33), steamCommunityMarket: null })).toBeNull();
+    expect(steamMarketBasis(bases(null, null))).toBeNull();
   });
 });
 
 describe("the dollar figure", () => {
-  const basis = steamMarketBasis(2.49, KEY_RATE);
+  const basis = steamMarketBasis(bases(2.49, 2.49));
 
   it("is the Metal Value at the basis rate", () => {
     expect(dollarsFor(metal(577), basis)).toBeCloseTo(2.49, 10);

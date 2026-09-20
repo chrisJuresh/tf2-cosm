@@ -92,6 +92,13 @@ def validate_job_list(document: object) -> None:
                 raise InvalidJobList(f"{where} field {field!r} must be an int, got a bool")
             if not isinstance(value, expected):
                 raise InvalidJobList(f"{where} field {field!r} has type {type(value).__name__}")
+        for field in ("aliases", "hide_bodygroups", "equip_regions"):
+            expected = int if field == "aliases" else str
+            wrong = [value for value in job[field] if not isinstance(value, expected)]
+            if wrong:
+                raise InvalidJobList(
+                    f"{where} field {field!r} holds {type(wrong[0]).__name__}, expected {expected.__name__}"
+                )
         if job["class"] not in ALL_CLASSES:
             raise InvalidJobList(f"{where} has unknown class {job['class']!r}")
         if job["slot"] not in COSMETIC_SLOTS:

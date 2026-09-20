@@ -30,7 +30,9 @@ export function fixtureKeyRate(): Metal {
   return prices.keyRate;
 }
 
-/** A Dollar Basis at a round $2.49 a Key, so the arithmetic in tests is readable. */
+/** The fixture's Steam Community Market basis: its lowest listing, $2.29 a Key. */
 export function fixtureBasis() {
-  return steamMarketBasis(2.49, fixtureKeyRate());
+  const basis = steamMarketBasis(fixtureCatalogue().header.dollarBases);
+  if (basis === null) throw new Error("the fixture catalogue is meant to carry a Steam Market rate");
+  return basis;
 }

@@ -47,12 +47,12 @@ describe("the Cosmetic list", () => {
     const rows = renderList();
     const teamCaptain = rows[3];
     expect(teamCaptain).toBeDefined();
-    expect(cellsOf(teamCaptain!)).toEqual(["", "Team Captain", "2 keys, 19.66 ref", "177 ref", "$5.60"]);
+    expect(cellsOf(teamCaptain!)).toEqual(["", "Team Captain", "2 keys, 19.66 ref", "177 ref", "$5.15"]);
   });
 
   it("writes a price in Metal the same way in both columns", () => {
     const rows = renderList();
-    expect(cellsOf(rows[0]!)).toEqual(["", "Bolt Boy", "1.44 ref", "1.44 ref", "$0.05"]);
+    expect(cellsOf(rows[0]!)).toEqual(["", "Bolt Boy", "1.44 ref", "1.44 ref", "$0.04"]);
   });
 
   it("writes the cheapest price there is rather than rounding it away", () => {

@@ -4,7 +4,8 @@
  *
  * Version 1 carried the Cosmetic list only. Version 2 adds the price snapshot:
  * each Cosmetic's Reference Variant and Price Spread, and the Key Rate they were
- * converted at. The Dollar Basis header (#11) adds to it under a later version.
+ * converted at. Version 3 completes the header with the Dollar Bases — the rate
+ * each dollar figure the site shows is computed from.
  */
 import { z } from "zod";
 
@@ -12,7 +13,7 @@ import { CLASSES, COSMETIC_SLOTS } from "./cosmetic-rule.ts";
 import { PRICE_CURRENCIES, QUALITIES } from "../prices/price-source.ts";
 import { UNPRICED_REASONS } from "../prices/reference-variant.ts";
 
-export const CATALOGUE_SCHEMA_VERSION = 2;
+export const CATALOGUE_SCHEMA_VERSION = 3;
 
 export const COSMETIC_KINDS = ["class-exclusive", "multi-class", "all-class"] as const;
 
@@ -85,6 +86,48 @@ const cosmeticSchema = z.object({
   price: priceSchema.nullable(),
 });
 
+/**
+ * One Dollar Basis's rate, in both denominations, so a site holding either one
+ * never has to know the Key Rate to show a price in dollars.
+ */
+const dollarRateSchema = z.object({
+  usdPerKey: z.number().positive(),
+  usdPerRefined: z.number().positive(),
+});
+
+/**
+ * The three Dollar Bases the site switches between. Null when the run had no
+ * price source: every rate is anchored to the snapshot's own Key Rate, and
+ * without prices there is no Key Rate to anchor it to.
+ */
+const dollarBasesSchema = z
+  .object({
+    /** The Market's key price, both figures it publishes. Null when it did not answer. */
+    steamCommunityMarket: z
+      .object({
+        source: z.string().min(1),
+        takenAt: z.iso.datetime(),
+        lowest: dollarRateSchema.nullable(),
+        median: dollarRateSchema.nullable(),
+      })
+      .nullable(),
+    /**
+     * The price source's own refined-to-dollar estimate. Null when it published
+     * none. The vendor is named in `source`, never in the key: ADR-0002 keeps
+     * the source swappable without a change to this file's shape.
+     */
+    priceSource: z
+      .object({
+        source: z.string().min(1),
+        lastUpdatedAt: z.iso.datetime(),
+        rate: dollarRateSchema,
+      })
+      .nullable(),
+    /** A constant, so always present. */
+    mannCoStore: z.object({ source: z.string().min(1), rate: dollarRateSchema }),
+  })
+  .nullable();
+
 const headerSchema = z.object({
   snapshotTakenAt: z.iso.datetime(),
   sources: z.object({
@@ -121,6 +164,12 @@ const headerSchema = z.object({
       }),
     })
     .nullable(),
+  /**
+   * The rate a dollar price is computed from, one per Dollar Basis. Per-item
+   * dollar figures are not stored: the site multiplies a Cosmetic's Metal Value
+   * by the basis it is showing.
+   */
+  dollarBases: dollarBasesSchema,
 });
 
 export const catalogueSchema = z.object({
@@ -134,6 +183,8 @@ export type Metal = z.infer<typeof metalSchema>;
 export type PricePoint = z.infer<typeof pricePointSchema>;
 export type Price = z.infer<typeof priceSchema>;
 export type PriceHeader = NonNullable<z.infer<typeof headerSchema>["prices"]>;
+export type DollarRate = z.infer<typeof dollarRateSchema>;
+export type DollarBases = NonNullable<z.infer<typeof dollarBasesSchema>>;
 export type Cosmetic = z.infer<typeof cosmeticSchema>;
 export type Catalogue = z.infer<typeof catalogueSchema>;
 

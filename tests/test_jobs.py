@@ -65,6 +65,8 @@ def test_a_malformed_envelope_is_refused(document, message):
         ({"aliases": [999]}, "not an alias"),
         ({"model": "models/player/items/soldier/soldier_officer"}, "not a .mdl path"),
         ({"skin_red": True}, "must be an int"),
+        ({"equip_regions": [{"whole_head": "1"}]}, "holds dict"),
+        ({"hide_bodygroups": [1]}, "holds int"),
     ],
 )
 def test_a_malformed_job_is_refused(job, message):

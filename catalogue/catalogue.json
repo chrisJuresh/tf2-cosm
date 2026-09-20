@@ -1,9 +1,9 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "header": {
-    "snapshotTakenAt": "2026-09-20T20:48:00.045Z",
+    "snapshotTakenAt": "2026-09-20T21:14:24.253Z",
     "sources": {
-      "itemDefinitions": "daily mirror (https://raw.githubusercontent.com/SteamDatabase/GameTracking-TF2/master/tf/scripts/items/items_game.txt)",
+      "itemDefinitions": "local game install (C:/Program Files (x86)/Steam/steamapps/common/Team Fortress 2/tf)",
       "englishNames": "https://api.steampowered.com/IEconItems_440/GetSchemaItems/v0001/ (IEconItems_440/GetSchemaItems v0001)"
     },
     "counts": {
@@ -17,7 +17,7 @@
     },
     "prices": {
       "source": "backpack.tf (IGetPrices v4, IGetCurrencies v1)",
-      "takenAt": "2026-09-20T20:47:59.509Z",
+      "takenAt": "2026-09-20T21:14:21.966Z",
       "keyRate": {
         "scrap": 577,
         "refined": 64.1111,
@@ -34,6 +34,35 @@
         "unpricedByReason": {
           "missing-from-source": 47,
           "no-reference-variant": 1
+        }
+      }
+    },
+    "dollarBases": {
+      "steamCommunityMarket": {
+        "source": "Steam Community Market price overview (Mann Co. Supply Crate Key, USD)",
+        "takenAt": "2026-09-20T21:14:23.941Z",
+        "lowest": {
+          "usdPerKey": 2.27,
+          "usdPerRefined": 0.035407
+        },
+        "median": {
+          "usdPerKey": 2.25,
+          "usdPerRefined": 0.035095
+        }
+      },
+      "priceSource": {
+        "source": "backpack.tf refined-to-dollar estimate (IGetCurrencies v1)",
+        "lastUpdatedAt": "2026-08-12T14:03:56.000Z",
+        "rate": {
+          "usdPerKey": 1.6669,
+          "usdPerRefined": 0.026
+        }
+      },
+      "mannCoStore": {
+        "source": "Mann Co. Store constant ($2.49 a Mann Co. Supply Crate Key)",
+        "rate": {
+          "usdPerKey": 2.49,
+          "usdPerRefined": 0.038839
         }
       }
     }

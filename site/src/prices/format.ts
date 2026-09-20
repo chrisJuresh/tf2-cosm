@@ -7,35 +7,38 @@
  * Trader Notation formatted here and one recorded in the catalogue come out of
  * the same function at the same Key Rate, so the two can never disagree.
  *
- * A Dollar Basis is the key-to-dollar rate a dollar figure is computed from.
- * Only the Steam Community Market one is built here; the switch between all
- * three, fed by the catalogue header, is #14.
+ * A Dollar Basis is the key-to-dollar rate a dollar figure is computed from. The
+ * catalogue's header carries all three, already anchored to the snapshot's own
+ * Key Rate; the site picks one out and does no rate arithmetic of its own. Only
+ * the Steam Community Market one is picked here — the switch between all three
+ * is #14.
  */
-import type { Metal } from "@tf2-cosm/data/catalogue";
+import type { DollarBases, Metal } from "@tf2-cosm/data/catalogue";
 import { formatRefined, scrapToRefined, traderNotation } from "@tf2-cosm/data/prices/metal";
 
 export interface DollarBasis {
   /** What the viewer is told a dollar means here. */
   readonly label: string;
-  readonly dollarsPerRefined: number;
+  /** What a Key costs under this basis, which is how a viewer recognises it. */
+  readonly usdPerKey: number;
+  readonly usdPerRefined: number;
 }
 
 /**
- * The Steam Community Market basis: what a Key sells for there, spread over the
- * Refined a Key trades for. ADR-0002 uses the Market for the Key's dollar price
- * and nothing else, because classic Unique cosmetics are not marketable there.
+ * The Steam Community Market basis, out of the header. ADR-0002 uses the Market
+ * for the Key's dollar price and nothing else, because classic Unique cosmetics
+ * are not marketable there.
+ *
+ * The lowest listing is what a viewer would actually pay, so it is preferred
+ * over the median. Null when the run took no price snapshot, or when the Market
+ * did not answer — a dollar figure nobody can stand behind is worse than none.
  */
-export function steamMarketBasis(keyPriceUsd: number, keyRate: Metal): DollarBasis {
-  if (!Number.isFinite(keyPriceUsd) || keyPriceUsd <= 0) {
-    throw new Error(`a Key's dollar price must be a positive number of dollars, got ${keyPriceUsd}`);
-  }
-  if (!Number.isInteger(keyRate.scrap) || keyRate.scrap <= 0) {
-    throw new Error(`a Key Rate must be a positive whole scrap count, got ${keyRate.scrap}`);
-  }
-  return {
-    label: "Steam Community Market",
-    dollarsPerRefined: keyPriceUsd / scrapToRefined(keyRate.scrap),
-  };
+export function steamMarketBasis(bases: DollarBases | null): DollarBasis | null {
+  const market = bases?.steamCommunityMarket;
+  if (market === undefined || market === null) return null;
+  const rate = market.lowest ?? market.median;
+  if (rate === null) return null;
+  return { label: "Steam Community Market", usdPerKey: rate.usdPerKey, usdPerRefined: rate.usdPerRefined };
 }
 
 /**
@@ -56,7 +59,7 @@ export function formatMetalValue(metal: Metal): string {
 /** The price in dollars under a Dollar Basis, or nothing when there is no basis. */
 export function dollarsFor(metal: Metal, basis: DollarBasis | null): number | null {
   if (basis === null) return null;
-  return scrapToRefined(metal.scrap) * basis.dollarsPerRefined;
+  return scrapToRefined(metal.scrap) * basis.usdPerRefined;
 }
 
 const DOLLARS = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" });

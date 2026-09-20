@@ -2,8 +2,10 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
 import type { CatalogueInputs } from "../src/catalogue/build.ts";
+import type { MarketKeyPrice } from "../src/prices/dollar-basis.ts";
 import type { PriceList } from "../src/prices/price-source.ts";
 import { fetchPriceList, fetchRates } from "../src/sources/backpack-tf.ts";
+import { fetchMarketKeyPrice } from "../src/sources/steam-market.ts";
 import type { WebApiSchemaItem } from "../src/sources/steam-web-api.ts";
 import { parseEnglishTokens, parseItemsGame } from "../src/sources/vdf.ts";
 
@@ -60,6 +62,17 @@ export async function fixturePriceList(): Promise<PriceList> {
   const fetchImpl = fixtureBackpackTfFetch();
   const rates = await fetchRates("fixture-key", fetchImpl);
   return fetchPriceList("fixture-key", rates, FIXTURE_TAKEN_AT, fetchImpl);
+}
+
+/**
+ * The recorded Steam Community Market price overview for a Key, read through the
+ * real adapter so the Dollar Basis is parsed the way a run parses it.
+ */
+export async function fixtureMarketKeyPrice(): Promise<MarketKeyPrice> {
+  const body = readFileSync(here("./fixtures/steam-market-key-priceoverview.json"), "utf8");
+  const fetchImpl = (async () =>
+    new Response(body, { status: 200, headers: { "content-type": "application/json" } })) as typeof fetch;
+  return await fetchMarketKeyPrice(FIXTURE_TAKEN_AT, fetchImpl);
 }
 
 /** Inputs with a fixed snapshot time, so the golden file is a function of the fixtures alone. */

@@ -11,6 +11,7 @@
  * Nothing above this file knows backpack.tf exists (ADR-0002): swapping in
  * pricedb.io means writing another module with the same `load()`.
  */
+import type { SourceDollarEstimate } from "../prices/dollar-basis.ts";
 import {
   type CurrencyQuote,
   indexEntries,
@@ -29,6 +30,9 @@ const CURRENCIES_ENDPOINT = "https://backpack.tf/api/IGetCurrencies/v1/";
 const TF2_APPID = "440";
 
 export const BACKPACK_TF_SOURCE = "backpack.tf (IGetPrices v4, IGetCurrencies v1)";
+
+/** The Dollar Basis backpack.tf publishes: its own estimate of a Refined in dollars. */
+export const BACKPACK_TF_DOLLAR_SOURCE = "backpack.tf refined-to-dollar estimate (IGetCurrencies v1)";
 
 /** One priced entry as backpack.tf writes it. */
 interface RawPrice {
@@ -151,6 +155,26 @@ export async function fetchRates(apiKey: string, fetchImpl: typeof fetch = fetch
   return {
     keyRate: keyRateFromRefined(keysQuote.value, timestamp(keysPrice?.last_update, new Date().toISOString())),
     scrapPerUnit: resolveScrapPerUnit(quotes),
+    dollarEstimate: dollarEstimateOf(body.response?.currencies?.["metal"]?.price),
+  };
+}
+
+/**
+ * backpack.tf's refined-to-dollar estimate, the one currency it quotes in dollars
+ * rather than in Metal.
+ *
+ * Its quoted `value` is the estimate, and is recorded as it stands. The Price
+ * Spread's midpoint rule is not applied here: that rule lets a Reference Price
+ * stand for a range of asking prices, whereas a Dollar Basis is one rate the
+ * site multiplies by, and folding in the range's top would publish a figure the
+ * source never gave.
+ */
+function dollarEstimateOf(price: RawPrice | undefined): SourceDollarEstimate | undefined {
+  if (price?.currency !== "usd" || typeof price.value !== "number" || price.value <= 0) return undefined;
+  return {
+    source: BACKPACK_TF_DOLLAR_SOURCE,
+    usdPerRefined: price.value,
+    lastUpdatedAt: timestamp(price.last_update, new Date().toISOString()),
   };
 }
 
