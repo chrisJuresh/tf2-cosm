@@ -1,0 +1,30 @@
+# dependencies and build output
+node_modules/
+.next/
+out/
+dist/
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# secrets and local config
+.env
+.env.*
+!.env.example
+
+# rendered images and extracted game assets never enter the repo
+renders/
+assets-cache/
+*.mdl
+*.vvd
+*.vtx
+*.vtf
+*.vmt
+*.blend1
+
+# editor and OS noise
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
