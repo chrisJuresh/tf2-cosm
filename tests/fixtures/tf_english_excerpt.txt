@@ -1,0 +1,18 @@
+"lang"
+{
+	"Language"	"English"
+	"Tokens"
+	{
+		"TF_BoltBoy"	"The Bolt Boy"
+		"TF_TeamCaptain"	"The Team Captain"
+		"TF_GhastlyGibus"	"Ghastly Gibus"
+		"TF_TinPot"		"Tin Pot"
+		"TF_TinPot_Style0"	"Closed"
+		"TF_TinPot_Style1"	"Open"
+		"TF_ESL_S1_Gold"	"ESL Season 1 Gold Medal"
+		"TF_YeOldeBakerBoy"	"Ye Olde Baker Boy"
+		"TF_HatPart"	"Scrap Metal Hat Part"
+		"TF_DeadOfNight"	"The Dead of Night"
+		"TF_Scattergun"	"Scattergun"
+	}
+}
