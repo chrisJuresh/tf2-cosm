@@ -46,6 +46,12 @@ def add_render_paths(parser: argparse.ArgumentParser) -> None:
     """Where the game and the cache are, where the output goes, and how big a render is."""
     parser.add_argument("--tf", type=Path, default=DEFAULT_TF, help="the game's tf folder")
     parser.add_argument("--cache", type=Path, default=DEFAULT_CACHE, help="the assets cache")
+    parser.add_argument(
+        "--texture-cache",
+        type=Path,
+        default=None,
+        help="SourceIO's decoded-texture cache; one per process when several render at once",
+    )
     parser.add_argument("--root", type=Path, default=None, help="the output root images live under")
     parser.add_argument("--masters-dir", default=None, help="the image folder holding masters")
     parser.add_argument("--manifest", type=Path, default=None, help="the manifest to write")

@@ -32,6 +32,7 @@ Useful arguments to the batch runner (all optional):
 - `--slug`, `--class`, `--team`, `--style` — render a subset while fixing one item.
 - `--batch-size` — images per Blender process (default 40). Smaller loses less to a crash;
   larger amortises the mount and the Class import over more frames.
+- `--workers` — Blender processes at once (default 1). See below.
 - `--retry-failed` — render the jobs that failed on an earlier run. Without it they are left
   alone, because a second run that repeats yesterday's failures has done nothing.
 - `--trust-manifest` — skip the check that every recorded master is still on disk. The check
@@ -112,6 +113,41 @@ A manifest from an older version of the job is not migrated. It is a record of i
 this disk, every one of which can be rendered again, so the job says so and stops rather
 than carrying a converter for every past shape.
 
+## Running several Blenders at once
+
+`--workers N` hands N batches to N Blender processes at a time. A frame is not what a run
+spends its time on — at 1024 square and 32 EEVEE samples a frame is about a third of a
+second, and the mount, the add-on start-up, the model import and the texture decode around
+it are the rest. Those are single-threaded Python, so on a machine with cores to spare they
+are what another process buys back.
+
+Measured on the full run (12,370 images, 16 logical cores): **0.9s an image at `--workers 1`,
+0.45s at `--workers 6`.** Not six times faster, because the workers contend on disk and each
+starts with a cold texture cache; the gain flattens well before the core count, so there is
+little point going much past six here.
+
+Two things are shared state, and both had to be dealt with before a second process was safe:
+
+- **The manifest.** Each Blender rewrites it whole after every job, so two of them sharing a
+  file means the last writer drops the other's work. Each batch therefore writes a **shard**
+  of its own — a manifest holding only that batch — and the runner merges the shard into the
+  run's manifest when the batch comes back (`Manifest.merge`). This is how it works at one
+  worker too, and it is faster there as well: the child rewrites a file holding forty images
+  rather than one holding twelve thousand, which is a cost that used to grow all run long.
+- **The texture cache.** SourceIO writes each decoded texture in place, so a second process
+  can read one that is half written. Each worker gets its own `texture-cache-w<N>` beside
+  the assets cache; a single-worker run keeps the one shared `texture-cache` it always used.
+  They are caches, so the duplication costs disk and a cold start and nothing else.
+
+The model cache is shared, and safe to share: `render.extract` writes each file to a
+pid-suffixed temporary name and `os.replace`s it into place, so a reader sees a whole model
+or no model. It did not used to, and two workers extracting the same model would have had
+one of them importing a truncated `.mdl`.
+
+What a crash costs is still one batch: the shard is written job by job and merged whatever
+the exit code. What a crash of the *runner* costs is the batches in flight — up to `N` of
+them — which is why the merge happens as each batch lands rather than at the end.
+
 ## Why deriving is a step of its own
 
 Pillow is a compiled package and Blender's Python is not the project venv, so the render
@@ -134,7 +170,8 @@ fifty times as long and saves nothing.
 - SourceIO decodes each texture once and caches the PNG under
   `assets-cache/texture-cache/`, keyed by the texture's path in the game. It is a cache and
   nothing reads it but SourceIO: delete the folder to force a re-decode after a game update.
-  It is inside `assets-cache/`, so it is already gitignored.
+  It is inside `assets-cache/`, so it is already gitignored. A parallel run gives each worker
+  its own (`texture-cache-w<N>`), because the add-on writes each file in place.
 - The game folder is mounted once per process and SourceIO is patched once, so a selection
   of jobs costs one mount and one add-on start-up.
 - The class model and the Cosmetic's model are imported with SourceIO's

@@ -396,3 +396,68 @@ def test_an_invalid_manifest_is_never_written(tmp_path):
         manifest.write(out)
 
     assert not out.exists()
+
+
+# --- merging what several render processes wrote separately -------------------------------
+
+
+def test_merging_adds_the_other_manifests_renders():
+    into, shard = Manifest(), Manifest()
+    into.record(a_job(), "red", path="red.png", width=1024, height=1024, at=AT)
+    shard.record(a_job(), "blu", path="blu.png", width=1024, height=1024, at=AT)
+
+    into.merge(shard)
+
+    assert into.entry("team-captain", "soldier", "red", 0)["master"]["path"] == "red.png"
+    assert into.entry("team-captain", "soldier", "blu", 0)["master"]["path"] == "blu.png"
+
+
+def test_merging_lets_the_other_manifest_win_the_same_job():
+    into, shard = Manifest(), Manifest()
+    into.record(a_job(), "red", path="old.png", width=1024, height=1024, at=AT)
+    shard.record(a_job(), "red", path="new.png", width=1024, height=1024, at=AT)
+
+    into.merge(shard)
+
+    assert into.entry("team-captain", "soldier", "red", 0)["master"]["path"] == "new.png"
+
+
+def test_a_merged_render_clears_an_earlier_failure_for_the_same_job():
+    into, shard = Manifest(), Manifest()
+    into.fail(a_job(), "red", reason=REASON_IMPORT_ERROR, detail="no", at=AT)
+    shard.record(a_job(), "red", path="p.png", width=1024, height=1024, at=AT)
+
+    into.merge(shard)
+
+    assert into.failure("team-captain", "soldier", "red", 0) is None
+    assert into.entry("team-captain", "soldier", "red", 0) is not None
+
+
+def test_a_merged_failure_replaces_an_earlier_render_for_the_same_job():
+    into, shard = Manifest(), Manifest()
+    into.record(a_job(), "red", path="p.png", width=1024, height=1024, at=AT)
+    shard.fail(a_job(), "red", reason=REASON_IMPORT_ERROR, detail="no", at=AT)
+
+    into.merge(shard)
+
+    assert into.entry("team-captain", "soldier", "red", 0) is None
+    assert into.failure("team-captain", "soldier", "red", 0)["reason"] == REASON_IMPORT_ERROR
+
+
+def test_merging_leaves_jobs_the_other_manifest_says_nothing_about_alone():
+    into, shard = Manifest(), Manifest()
+    into.record(a_job(), "red", path="kept.png", width=1024, height=1024, at=AT)
+    shard.record(a_job(**{"class": "scout"}), "red", path="added.png", width=1024, height=1024, at=AT)
+
+    into.merge(shard)
+
+    assert into.entry("team-captain", "soldier", "red", 0)["master"]["path"] == "kept.png"
+    assert into.entry("team-captain", "scout", "red", 0)["master"]["path"] == "added.png"
+
+
+def test_a_merged_manifest_is_still_writable():
+    into, shard = Manifest(), Manifest()
+    shard.record(a_job(), "red", path="p.png", width=1024, height=1024, at=AT)
+    into.merge(shard)
+
+    validate_manifest(into.to_document())

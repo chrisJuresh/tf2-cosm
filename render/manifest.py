@@ -248,6 +248,36 @@ class Manifest:
             if (failure["slug"], failure["class"], failure["team"], failure["style"]) != identity
         ]
 
+    def forget_render(self, slug: str, cls: str, team: str, style: int) -> None:
+        """Drop any render recorded for one job, because it has just been found to fail."""
+        by_style = (
+            self._document["renders"].get(slug, {}).get(cls, {}).get(team)
+        )
+        if by_style is not None:
+            by_style.pop(str(style), None)
+
+    def merge(self, other: "Manifest") -> None:
+        """Fold another manifest into this one, letting `other` win job by job.
+
+        This is what lets several Blender processes run at once. They cannot share a manifest
+        file — each rewrites it whole, so the last writer would drop everyone else's work —
+        so each writes its own small one and the runner folds it in here, one at a time.
+
+        A job appears in `other` as a render or as a failure, never both, and either one
+        replaces whatever this manifest said about that job before: both mean "this is what
+        became of it just now". Jobs `other` says nothing about are left alone, which is why
+        a shard holding one batch can be merged into a manifest holding a whole run.
+        """
+        for slug, cls, team, style, entry in list(other.entries()):
+            by_class = self._document["renders"].setdefault(slug, {}).setdefault(cls, {})
+            by_class.setdefault(team, {})[str(style)] = entry
+            self.forget_failure(slug, cls, team, style)
+        for failure in other._document["failures"]:
+            identity = (failure["slug"], failure["class"], failure["team"], failure["style"])
+            self.forget_failure(*identity)
+            self.forget_render(*identity)
+            self._document["failures"].append(failure)
+
     def write(self, out: Path) -> None:
         """Validate, then replace the file in one step, so a crash never leaves half a manifest.
 
