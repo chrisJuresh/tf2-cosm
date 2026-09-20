@@ -39,7 +39,8 @@ Useful arguments (all optional):
 
 Exit codes: 0 when every image planned was either rendered or recorded as a failure, 1 when
 a Blender process died and took some with it (run it again; it picks up where it stopped),
-2 when the command itself is wrong — no Blender, or a selection that matches no job.
+2 when the command itself is wrong — no Blender, or a selection that matches no job — and
+130 when ctrl-c stopped it, which is the same "run it again" as 1.
 
 To drive one Blender process yourself — debugging an import, mostly — the render step is
 still a command of its own, and takes the same filters:

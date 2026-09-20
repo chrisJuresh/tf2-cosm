@@ -41,11 +41,18 @@ class Batch(NamedTuple):
 
 
 class RunPlan(NamedTuple):
-    """The work left, and what the manifest already accounts for."""
+    """The work left, and what the manifest already accounts for.
+
+    `selected` is every job the filters matched, done or not, because what a run is *about* is
+    wider than what it has left to do: a resumed run whose failures were all recorded
+    yesterday still has to report them.
+    """
 
     work: list[JobWork]
     up_to_date: int
     known_failures: int
+    selected: list[dict]
+    teams: tuple[str, ...]
 
     @property
     def images(self) -> int:
@@ -86,7 +93,7 @@ def plan_run(
                 owed.append(team)
         if owed:
             work.append(JobWork(job, tuple(owed)))
-    return RunPlan(work, up_to_date, known_failures)
+    return RunPlan(work, up_to_date, known_failures, selected, tuple(wanted))
 
 
 def batches(work: Sequence[JobWork], size: int) -> list[Batch]:
@@ -157,8 +164,3 @@ def account_for(manifest: Manifest, batch: Batch) -> Outcome:
             else:
                 lost += 1
     return Outcome(rendered, failed, lost)
-
-
-def image_paths(plan: RunPlan) -> list[str]:
-    """Every image the plan would write, relative to the output root."""
-    return [image_relpath(work.job, team) for work in plan.work for team in work.teams]

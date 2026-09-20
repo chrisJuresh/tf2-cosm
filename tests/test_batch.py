@@ -307,7 +307,30 @@ def test_the_failure_list_is_this_runs_failures_and_not_the_whole_manifest(
     assert "an older run" not in printed
 
 
+def test_a_run_with_nothing_left_to_do_still_reports_the_failures_it_is_standing_on(
+    workspace: Path, capsys
+):
+    """The run after a failing one has no work, and its failures are the whole news in it."""
+    jobs = write_jobs(workspace, KILLER)
+    blender = FakeBlender(workspace / "renders.json", outcomes={"killer-exclusive": "failed"})
+    runner.run(args_for(workspace, jobs), launch=blender)
+    capsys.readouterr()
+
+    runner.run(args_for(workspace, jobs), launch=FakeBlender(workspace / "renders.json"))
+
+    printed = capsys.readouterr().out
+    assert "2 failures" in printed
+    assert "killer-exclusive" in printed
+
+
 # --- the command line -----------------------------------------------------------------------
+
+
+@pytest.mark.parametrize("flag", ["--slug", "--class", "--team", "--style"])
+def test_a_filter_given_no_values_is_refused_rather_than_read_as_everything(flag):
+    """`nargs="*"` would make `--team` with nothing after it mean "no Teams", and render nothing."""
+    with pytest.raises(SystemExit):
+        runner.parse_args(["--jobs", "jobs.json", flag])
 
 
 def test_the_command_line_is_parsed_into_the_settings_a_run_takes():
@@ -329,8 +352,15 @@ def test_the_batch_is_handed_to_blender_as_a_job_list_of_its_own(tmp_path: Path)
     assert command[command.index("--teams") + 1 :] == ["red", "blu"]
 
 
-def test_a_blender_asked_for_by_path_is_never_swapped_for_another_one(tmp_path: Path):
-    assert runner.find_blender(tmp_path / "nowhere.exe") is None
+def test_a_blender_that_is_there_needs_no_explaining(workspace: Path):
+    assert runner.check_blender(workspace / "blender.exe") is None
+
+
+def test_a_blender_that_is_not_there_is_never_swapped_for_another_one(tmp_path: Path):
+    complaint = runner.check_blender(tmp_path / "nowhere.exe")
+
+    assert complaint is not None
+    assert "nowhere.exe" in complaint and "Install Blender" in complaint
 
 
 # --- what a batch came to -----------------------------------------------------------------

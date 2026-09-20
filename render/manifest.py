@@ -112,6 +112,14 @@ class Manifest:
                 return failure
         return None
 
+    def failures_for(self, identities: set[tuple[str, str, str, int]]) -> list[dict]:
+        """Every recorded failure among `identities`, each a (slug, Class, Team, Style) tuple."""
+        return [
+            failure
+            for failure in self._document["failures"]
+            if (failure["slug"], failure["class"], failure["team"], failure["style"]) in identities
+        ]
+
     def record(
         self,
         job: dict,

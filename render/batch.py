@@ -20,11 +20,11 @@ from __future__ import annotations
 
 import argparse
 import json
-import shutil
 import subprocess
 import sys
 import tempfile
 import time
+from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -53,7 +53,7 @@ INSTALL_HINT = (
 )
 
 
-@dataclass
+@dataclass(frozen=True)
 class Settings:
     """Everything a run needs; what the command line is parsed into."""
 
@@ -87,10 +87,10 @@ def parse_args(argv: list[str] | None = None) -> Settings:
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument("--jobs", type=Path, required=True, help="the job list from render.resolve")
-    parser.add_argument("--slug", nargs="*", default=None, help="Cosmetic slugs to render")
-    parser.add_argument("--class", dest="classes", nargs="*", default=None, help="Classes to render")
-    parser.add_argument("--team", dest="teams", nargs="*", default=list(TEAMS), help="Teams to render")
-    parser.add_argument("--style", dest="styles", nargs="*", type=int, default=None, help="Style indices")
+    parser.add_argument("--slug", nargs="+", default=None, help="Cosmetic slugs to render")
+    parser.add_argument("--class", dest="classes", nargs="+", default=None, help="Classes to render")
+    parser.add_argument("--team", dest="teams", nargs="+", default=list(TEAMS), help="Teams to render")
+    parser.add_argument("--style", dest="styles", nargs="+", type=int, default=None, help="Style indices")
     parser.add_argument(
         "--batch-size", type=int, default=DEFAULT_BATCH_SIZE, help="images per Blender process"
     )
@@ -147,18 +147,15 @@ def launch_blender(command: list[str]) -> int:
     return subprocess.run(command, check=False).returncode
 
 
-def find_blender(given: Path) -> Path | None:
-    """The Blender to run: the path given, or one on PATH when the default is not installed.
+def check_blender(given: Path) -> str | None:
+    """Nothing if `given` is there to run, else what to tell the operator about it.
 
-    A path passed on the command line is taken literally — silently running a different
-    Blender than the one asked for is how a run comes out wrong in a way nobody can see.
+    The path is taken literally, including the default: silently running a different Blender
+    than the one asked for is how a run comes out wrong in a way nobody can see.
     """
     if given.exists():
-        return given
-    if given != DEFAULT_BLENDER:
         return None
-    found = shutil.which("blender")
-    return Path(found) if found else None
+    return f"no Blender at {given}. {INSTALL_HINT}"
 
 
 def describe(plan: RunPlan, settings: Settings, *, job_by_job: bool) -> None:
@@ -174,38 +171,32 @@ def describe(plan: RunPlan, settings: Settings, *, job_by_job: bool) -> None:
             job = work.job
             log(f"  {job['slug']:<40} {job['class']:<9} style {job['style']}  {' '.join(work.teams)}")
     else:
-        by_class: dict[str, int] = {}
+        by_class = Counter()
         for work in plan.work:
-            by_class[work.job["class"]] = by_class.get(work.job["class"], 0) + len(work.teams)
+            by_class[work.job["class"]] += len(work.teams)
         for cls, images in sorted(by_class.items()):
             log(f"  {cls:<9} {images} images")
     log(f"masters -> {settings.out}; manifest -> {settings.manifest}")
 
 
-def report_failures(settings: Settings, cut: list[Batch]) -> None:
+def report_failures(settings: Settings, plan: RunPlan) -> None:
     """The failure list a run leaves behind, so it can be reviewed rather than scrolled back to.
 
-    Only this run's own jobs: after rendering one Cosmetic, the other nine hundred failures in
-    the manifest are not news, and burying today's four in them is how they go unread.
+    Scoped to everything the filters selected, not to the batches this run happened to render:
+    a resumed run whose failures were all recorded yesterday would otherwise report none, and
+    the one thing worth reading at the end of a long run would be the thing it left out. The
+    other nine hundred failures in the manifest still stay out of it.
     """
-    mine = {
+    selected = {
         (job["slug"], job["class"], team, job["style"])
-        for batch in cut
-        for job in batch.jobs
-        for team in batch.teams
+        for job in plan.selected
+        for team in plan.teams
     }
-    failures = [
-        failure
-        for failure in load_manifest(settings.manifest).to_document()["failures"]
-        if (failure["slug"], failure["class"], failure["team"], failure["style"]) in mine
-    ]
+    failures = load_manifest(settings.manifest).failures_for(selected)
     if not failures:
         return
-    by_reason: dict[str, int] = {}
-    for failure in failures:
-        by_reason[failure["reason"]] = by_reason.get(failure["reason"], 0) + 1
     log(f"{len(failures)} failures:")
-    for reason, count in sorted(by_reason.items()):
+    for reason, count in sorted(Counter(f["reason"] for f in failures).items()):
         log(f"  {reason:<14} {count}")
     for failure in failures:
         log(
@@ -241,20 +232,23 @@ def run(settings: Settings, *, launch=launch_blender) -> int:
     if settings.dry_run:
         return 0
     if not plan.work:
+        report_failures(settings, plan)
         log("nothing to render; everything selected is already up to date")
         return 0
 
-    blender = find_blender(settings.blender)
-    if blender is None:
-        print(f"[batch] no Blender at {settings.blender}. {INSTALL_HINT}", file=sys.stderr, flush=True)
+    # Before the first batch, not after: an hour of rendering that ends in "no Blender" is an
+    # hour nobody gets back, and a plan printed above a failure reads as though it ran.
+    complaint = check_blender(settings.blender)
+    if complaint is not None:
+        print(f"[batch] {complaint}", file=sys.stderr, flush=True)
         return 2
-    settings.blender = blender
 
-    return _render_batches(settings, batches(plan.work, settings.batch_size), plan.images, launch)
+    return _render_batches(settings, plan, batches(plan.work, settings.batch_size), launch)
 
 
-def _render_batches(settings: Settings, cut: list[Batch], total: int, launch) -> int:
+def _render_batches(settings: Settings, plan: RunPlan, cut: list[Batch], launch) -> int:
     started = time.monotonic()
+    total = plan.images
     done = failed = lost = 0
     stopped = False
     with tempfile.TemporaryDirectory(prefix="tf2-cosm-batch-") as scratch:
@@ -286,7 +280,7 @@ def _render_batches(settings: Settings, cut: list[Batch], total: int, launch) ->
     elapsed = time.monotonic() - started
     log(f"{'stopped' if stopped else 'done'} in {format_duration(elapsed)}: "
         f"{done - failed} rendered, {failed} failed, {lost} lost")
-    report_failures(settings, cut)
+    report_failures(settings, plan)
     if stopped:
         log("run it again to pick up where this stopped")
         return 130
