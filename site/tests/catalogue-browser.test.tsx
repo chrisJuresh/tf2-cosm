@@ -14,6 +14,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { fixtureBasis, fixtureCosmetics, fixtureKeyRate } from "./fixtures.ts";
 
 import { CatalogueBrowser } from "@/components/catalogue-browser";
+import { EMPTY_MANIFEST } from "@/renders/manifest";
 import { CONTROLS_STORAGE_KEY } from "@/browser/remembered-controls";
 
 afterEach(() => {
@@ -21,7 +22,17 @@ afterEach(() => {
 });
 
 function renderBrowser() {
-  render(<CatalogueBrowser cosmetics={fixtureCosmetics()} keyRate={fixtureKeyRate()} basis={fixtureBasis()} />);
+  render(
+    // What these controls do is the same whether a row has a picture or an icon;
+    // the Class View deciding which Class a picture shows is in
+    // `worn-renders.test.tsx`.
+    <CatalogueBrowser
+      cosmetics={fixtureCosmetics()}
+      manifest={EMPTY_MANIFEST}
+      keyRate={fixtureKeyRate()}
+      basis={fixtureBasis()}
+    />,
+  );
   return userEvent.setup();
 }
 

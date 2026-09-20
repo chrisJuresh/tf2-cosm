@@ -34,7 +34,7 @@ function titleCase(token: string): string {
 }
 
 /** A Class as it is spelled in the game: "Scout", "Demoman". */
-function classRead(gameClass: GameClass): string {
+export function classRead(gameClass: GameClass): string {
   return titleCase(gameClass);
 }
 

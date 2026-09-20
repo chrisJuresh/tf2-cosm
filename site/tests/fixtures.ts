@@ -12,8 +12,10 @@
 import { assertValidCatalogue, type Catalogue, type Cosmetic, type Metal } from "@tf2-cosm/data/catalogue";
 
 import document from "../../data/tests/golden/catalogue.json" with { type: "json" };
+import manifest from "./fixtures/renders.json" with { type: "json" };
 
 import { chooseBasis, dollarBases } from "@/prices/format";
+import { assertValidRenderManifest, type RenderManifest } from "@/renders/manifest";
 
 export function fixtureCatalogue(): Catalogue {
   return assertValidCatalogue(structuredClone(document));
@@ -42,4 +44,19 @@ export function fixtureBasis() {
   const basis = chooseBasis(fixtureBases(), null);
   if (basis === null) throw new Error("the fixture catalogue is meant to carry a Steam Market rate");
   return basis;
+}
+
+/**
+ * The fixture Worn Render manifest: one the render job itself wrote, covering
+ * every rung of the fallback chain — a Cosmetic on two Classes, an All-Class
+ * Cosmetic rendered for three of its nine, a Style on one Team and not the
+ * other, a BLU entry that is really the RED image, a master with no web
+ * derivative yet, a Cosmetic whose render failed and one never attempted.
+ *
+ * `tests/test_site_render_manifest.py` reads this same file back through the
+ * render job's own validator, so it cannot drift into a manifest that job would
+ * never write.
+ */
+export function fixtureManifest(): RenderManifest {
+  return assertValidRenderManifest(structuredClone(manifest));
 }
