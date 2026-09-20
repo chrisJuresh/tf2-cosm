@@ -12,12 +12,12 @@
  * out of two different jobs, validate through two different schemas, and a
  * regression in either one would deploy quietly.
  */
-import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 import { test, expect } from "@playwright/test";
 
-import { FIXTURE_MANIFEST, GOLDEN_CATALOGUE, nextBuild, WORK_DIR } from "./fixture-site.mjs";
+import { nextBuild, readFixtureManifest, readGoldenCatalogue, WORK_DIR } from "./fixture-site.mjs";
 
 /** A data folder of this test's own, so the fixture site's is left alone. */
 const BROKEN_DIR = join(WORK_DIR, "broken");
@@ -31,11 +31,11 @@ function dataDir(catalogue: unknown, manifest: unknown): string {
 }
 
 function goldenCatalogue(): { cosmetics: { slug: string }[] } {
-  return JSON.parse(readFileSync(GOLDEN_CATALOGUE, "utf8")) as { cosmetics: { slug: string }[] };
+  return readGoldenCatalogue() as { cosmetics: { slug: string }[] };
 }
 
 function fixtureManifest(): { version: number } {
-  return JSON.parse(readFileSync(FIXTURE_MANIFEST, "utf8")) as { version: number };
+  return readFixtureManifest() as { version: number };
 }
 
 test.afterAll(() => {

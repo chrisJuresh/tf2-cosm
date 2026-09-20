@@ -85,7 +85,12 @@ export function loadDocument<T>(name: string, validate: (document: unknown) => T
   try {
     text = readFileSync(path, "utf8");
   } catch (error) {
-    throw refusal(path, "there is no such file.", detailOf(error));
+    // A missing file is the one that happens — a `CATALOGUE_DIR` pointing
+    // somewhere else, or a data run that never wrote — and it is worth saying
+    // outright. Everything else (a permission, a folder where a file should be)
+    // is rarer and would be a lie under that wording, so it says what it is.
+    const missing = (error as { code?: string }).code === "ENOENT";
+    throw refusal(path, missing ? "there is no such file." : "it could not be read.", detailOf(error));
   }
 
   let document: unknown;

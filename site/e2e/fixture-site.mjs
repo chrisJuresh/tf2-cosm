@@ -18,10 +18,14 @@
  * file is the render job's business, and a suite that needed real renders could
  * not run without Blender and the game installed.
  *
- * Everything this writes lives under `site/.e2e/`, which is ignored. The built
- * site is copied there too rather than served out of `out/`, so running the
- * suite does not quietly replace a developer's own export with a five-Cosmetic
- * one.
+ * Everything this writes lives under `site/.e2e/`, which is ignored, and the
+ * built site is copied there rather than served out of `out/` — so the tree
+ * under test cannot be pulled out from under a running suite by a `next build`
+ * elsewhere, which `build-validation.spec.ts` does twice. Note what that does
+ * *not* protect: `next build` writes `site/out` whatever else happens, so a run
+ * of this suite leaves a developer's own export replaced by an eight-Cosmetic
+ * one, and a failed build leaves `.next` mid-failure. Both are rebuilt by the
+ * next `pnpm build-site`.
  */
 import { execFileSync } from "node:child_process";
 import { cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
@@ -53,16 +57,39 @@ export const FIXTURE_MANIFEST = join(siteRoot, "tests", "fixtures", "renders.jso
 /**
  * A 1×1 image in each of the two formats the render job writes: a PNG master
  * and a WebP derivative. A real render is a 1024px bust; nothing in the site
- * reads a pixel of it, because every width and height on the page comes out of
+ * reads a pixel of one, because every width and height on the page comes out of
  * the manifest.
+ *
+ * The PNG stands in for a Backpack Icon as well — see `e2e/catalogue-page.ts`,
+ * which answers Valve's CDN with it. One blob, so a reader meeting it in either
+ * place finds the same explanation.
  */
+export const PLACEHOLDER_PNG = Buffer.from(
+  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
+  "base64",
+);
+
 const PLACEHOLDER = {
-  ".png": Buffer.from(
-    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
-    "base64",
-  ),
+  ".png": PLACEHOLDER_PNG,
   ".webp": Buffer.from("UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAAwA0JaQAA3AA/vuUAAA=", "base64"),
 };
+
+/**
+ * The two fixture documents as plain JSON.
+ *
+ * `tests/fixtures.ts` reads the same two files and validates them on the way
+ * out, which is right for a suite testing what the site does with a *valid*
+ * pair. These are for the suites that are about the files themselves — the one
+ * that breaks a copy on purpose most of all — so they parse and hand back, and
+ * they live here because this is the module that knows where the two files are.
+ */
+export function readGoldenCatalogue() {
+  return JSON.parse(readFileSync(GOLDEN_CATALOGUE, "utf8"));
+}
+
+export function readFixtureManifest() {
+  return JSON.parse(readFileSync(FIXTURE_MANIFEST, "utf8"));
+}
 
 /** Every image path the manifest names, master and derivative alike. */
 function imagePaths(manifest) {
@@ -100,10 +127,9 @@ export function buildFixtureSite() {
   rmSync(WORK_DIR, { recursive: true, force: true });
   mkdirSync(DATA_DIR, { recursive: true });
 
-  const manifest = JSON.parse(readFileSync(FIXTURE_MANIFEST, "utf8"));
   cpSync(GOLDEN_CATALOGUE, join(DATA_DIR, "catalogue.json"));
   cpSync(FIXTURE_MANIFEST, join(DATA_DIR, "renders.json"));
-  writePlaceholders(manifest);
+  writePlaceholders(readFixtureManifest());
 
   const built = nextBuild(DATA_DIR);
   if (!built.ok) throw new Error(`the fixture site would not build:\n${built.output}`);

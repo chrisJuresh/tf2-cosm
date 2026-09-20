@@ -14,7 +14,7 @@
  */
 import { expect, expectClean, openRow, row, rows, slugs, test } from "./catalogue-page";
 
-/** From the golden catalogue: the Demoman's own hat, and one he shares. */
+/** From the golden catalogue: one Cosmetic of each of the three kinds. */
 const DEMOMAN_ONLY = "scotsman-s-stove-pipe";
 const MULTI_CLASS = "team-captain";
 const ALL_CLASS = "ghastly-gibus";
@@ -53,8 +53,8 @@ test("the page loads and lists every Cosmetic in the catalogue", async ({ catalo
 test("the Class filter narrows the list to what that Class can wear", async ({ catalogue: { page, faults } }) => {
   await page.getByLabel("Class", { exact: true }).selectOption("demoman");
 
-  // The Class View's three rules at once: the Demoman's own hat, the hat he
-  // shares with the Soldier, and the All-Class hat everybody has.
+  // The Class View's three rules at once: the Demoman's own Cosmetic, the
+  // Multi-Class one he shares with the Soldier, and the All-Class one.
   await expect(row(page, DEMOMAN_ONLY)).toBeVisible();
   await expect(row(page, MULTI_CLASS)).toBeVisible();
   await expect(row(page, ALL_CLASS)).toBeVisible();

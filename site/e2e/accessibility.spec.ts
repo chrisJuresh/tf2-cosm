@@ -85,17 +85,52 @@ test("the controls are reachable from the keyboard, and visible once focused", a
   }
   expect(reached).toEqual([...CONTROLS]);
 
-  // And focus is something you can see. Tailwind draws it as an outline; what
-  // matters is that the browser computes one rather than `none`.
-  await search.focus();
-  await page.keyboard.press("Tab");
-  const outline = await page.evaluate(() => {
-    const style = getComputedStyle(document.activeElement as Element);
-    return { style: style.outlineStyle, width: style.outlineWidth };
-  });
-  expect(outline.style).not.toBe("none");
-  expect(Number.parseFloat(outline.width)).toBeGreaterThan(0);
+  // And focus is something you can see, on every control the page has and not
+  // only on the bar: the Dollar Basis switch, and the two an open row gains.
+  // Tailwind draws it as an outline; what matters is that the browser computes
+  // one rather than `none`. The Dollar Basis radios are `sr-only` and their
+  // label carries the outline, which is why the check walks up from whatever
+  // has the focus rather than reading only that element.
+  await openRow(page, STYLED);
+  const focusable = [
+    page.getByLabel("Search by name", { exact: true }),
+    page.getByLabel("Sort by", { exact: true }),
+    page.getByRole("radiogroup", { name: "Dollar Basis" }).getByRole("radio").first(),
+    row(page, STYLED).getByRole("button"),
+    page.getByRole("group", { name: "Style" }).getByRole("button", { name: "Open" }),
+    page.getByRole("group", { name: "Team" }).getByRole("button", { name: "BLU" }),
+  ];
+  for (const control of focusable) {
+    // Focused *as a keyboard viewer focuses it*, because that is the whole
+    // distinction `:focus-visible` draws: a programmatic focus on a radio or a
+    // button does not match it, and the outline a mouse user is spared is
+    // exactly the outline this test is here to find. Tabbing away and back is
+    // the shortest way to arrive by keyboard at an arbitrary control.
+    await control.focus();
+    await page.keyboard.press("Tab");
+    await page.keyboard.press("Shift+Tab");
+    await expect(control).toBeFocused();
+    expect(await visibleFocus(page), await control.evaluate((element) => element.outerHTML)).toBe(true);
+  }
 });
+
+/**
+ * Whether the focus can be seen: an outline the browser actually computes, on
+ * whatever has the focus or on the element drawing it on that thing's behalf.
+ * Two levels up is enough for `has-focus-visible:` on a label wrapping an
+ * `sr-only` input, which is the only place the page does that.
+ */
+async function visibleFocus(page: import("@playwright/test").Page): Promise<boolean> {
+  return page.evaluate(() => {
+    let element: Element | null = document.activeElement;
+    for (let up = 0; up < 3 && element !== null; up += 1) {
+      const style = getComputedStyle(element);
+      if (style.outlineStyle !== "none" && Number.parseFloat(style.outlineWidth) > 0) return true;
+      element = element.parentElement;
+    }
+    return false;
+  });
+}
 
 test("a row opens, closes and gives the focus back, without a mouse", async ({ catalogue: { page } }) => {
   const toggle = row(page, STYLED).getByRole("button");

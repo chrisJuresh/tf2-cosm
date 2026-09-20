@@ -18,14 +18,10 @@
  */
 import { expect, test as base, type Page, type Request } from "@playwright/test";
 
+import { PLACEHOLDER_PNG } from "./fixture-site.mjs";
+
 /** Valve's icon CDN, the page's only legitimate outside request. */
 const ICON_HOST = "steamcdn-a.akamaihd.net";
-
-/** A 1×1 PNG, standing in for an icon nobody can fetch. */
-const PLACEHOLDER_ICON = Buffer.from(
-  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
-  "base64",
-);
 
 export interface PageFaults {
   readonly consoleErrors: string[];
@@ -52,7 +48,7 @@ export const test = base.extend<{ catalogue: { page: Page; faults: PageFaults } 
         return;
       }
       if (new URL(url).hostname === ICON_HOST) {
-        await route.fulfill({ status: 200, contentType: "image/png", body: PLACEHOLDER_ICON });
+        await route.fulfill({ status: 200, contentType: "image/png", body: PLACEHOLDER_PNG });
         return;
       }
       faults.offSiteRequests.push(describeRequest(route.request(), "the page should talk to nobody but the icon CDN"));

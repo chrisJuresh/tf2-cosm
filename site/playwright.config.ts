@@ -19,6 +19,13 @@ import { BASE_URL } from "./e2e/fixture-site.mjs";
 /** A build plus an export; generous, because a cold one compiles from scratch. */
 const BUILD_TIMEOUT = 5 * 60 * 1000;
 
+/**
+ * A test that only drives an already-built page. Short on purpose: the whole
+ * suite's slowness is the builds, and a hung page test that took five minutes
+ * to admit it would hide behind them.
+ */
+const PAGE_TIMEOUT = 30 * 1000;
+
 export default defineConfig({
   testDir: "./e2e",
   fullyParallel: false,
@@ -26,14 +33,16 @@ export default defineConfig({
   forbidOnly: Boolean(process.env.CI),
   retries: 0,
   reporter: process.env.CI === undefined ? "list" : "github",
-  timeout: BUILD_TIMEOUT,
+  timeout: PAGE_TIMEOUT,
   use: {
     baseURL: BASE_URL,
     trace: "retain-on-failure",
   },
   projects: [
-    // The build's own behaviour, which needs no browser and no server.
-    { name: "build", testMatch: /build-validation\.spec\.ts/ },
+    // The build's own behaviour, which needs no browser and no server — and is
+    // the only thing here that runs a build of its own, so it is the only thing
+    // here that needs a build's worth of time.
+    { name: "build", testMatch: /build-validation\.spec\.ts/, timeout: BUILD_TIMEOUT },
     {
       name: "desktop",
       testIgnore: /build-validation\.spec\.ts/,
