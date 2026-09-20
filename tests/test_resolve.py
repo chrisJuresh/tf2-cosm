@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import pytest
 
-from render.cosmetics import ALL_CLASSES
+from render.cosmetics import ALL_CLASSES, equip_regions
 from render.model_index import InMemoryModelIndex
 from render.resolve import Cosmetic, CosmeticNameCollision, resolve
 from tests.conftest import FIXTURE_MODELS
@@ -93,6 +93,18 @@ def test_items_worn_below_the_head_carry_their_equip_regions_and_paintability(sc
     assert job["slot"] == "misc"
     assert job["equip_regions"] == ["medal", "shirt"]
     assert job["paintable"] is True
+
+
+def test_an_item_writing_its_one_equip_region_as_a_block_still_reads_as_region_names():
+    """A few live items spell `equip_region` as a block; the render step frames on these names."""
+    assert equip_regions({"equip_region": {"whole_head": "1", "head_skin": "1"}}) == [
+        "head_skin",
+        "whole_head",
+    ]
+
+
+def test_an_item_with_no_equip_region_at_all_has_none():
+    assert equip_regions({}) == []
 
 
 def test_medals_never_tradable_items_and_modelless_items_are_excluded_with_a_reason(

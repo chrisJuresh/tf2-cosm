@@ -107,12 +107,16 @@ def hidden_bodygroups(item: dict, style: dict | None) -> list[str]:
     return sorted(hidden)
 
 
+def _region_names(source: object) -> set[str]:
+    """Either spelling: a block of region names, or one name — which a few items write as a block."""
+    if isinstance(source, dict):
+        return {str(name) for name in source}
+    return {source} if isinstance(source, str) and source else set()
+
+
 def equip_regions(item: dict) -> list[str]:
-    regions = item.get("equip_regions")
-    if isinstance(regions, dict) and regions:
-        return sorted(regions.keys())
-    single = item.get("equip_region")
-    return [single] if single else []
+    """Where on the Class the item is worn; it drives the render's framing."""
+    return sorted(_region_names(item.get("equip_regions")) | _region_names(item.get("equip_region")))
 
 
 def team_skins(item: dict, style: dict | None) -> tuple[int, int]:

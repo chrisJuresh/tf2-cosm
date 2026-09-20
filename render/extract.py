@@ -50,6 +50,46 @@ def extract(archive: vpk.VPK, index: dict[str, str], model_path: str, cache: Pat
     return written
 
 
+class ModelNotInArchive(Exception):
+    """The game archive holds no such model, so no render can be made from it."""
+
+
+class ModelCache:
+    """The assets cache, filled one model at a time as the render step asks for them.
+
+    The render step runs inside Blender and cannot know up front which models a run will
+    touch, so it asks for each job's models as it reaches them; a model already on disk costs
+    nothing. The archive is read through the same path list the resolve step matched against,
+    so a job's spelling is mapped to the archive's own before anything is written.
+    """
+
+    def __init__(self, cache: Path, *, archive) -> None:
+        self.cache = Path(cache)
+        self.archive = archive
+        self._index = {self._key(path): path for path in archive}
+        self._extracted: set[str] = set()
+
+    @classmethod
+    def for_game(cls, tf: Path, cache: Path) -> "ModelCache":
+        return cls(cache, archive=vpk.open(str(Path(tf) / "tf2_misc_dir.vpk")))
+
+    @staticmethod
+    def _key(path: str) -> str:
+        """Source is case-insensitive and treats both slashes alike (see render.model_index)."""
+        return path.lower().replace("\\", "/")
+
+    def ensure(self, model_path: str) -> Path:
+        """The cached .mdl for `model_path`, extracting it and its siblings on first ask."""
+        found = self._index.get(self._key(model_path))
+        if found is None:
+            raise ModelNotInArchive(f"the game archive has no {model_path}")
+        if found not in self._extracted:
+            if not extract(self.archive, self._index, found, self.cache):
+                raise ModelNotInArchive(f"the game archive has no files for {model_path}")
+            self._extracted.add(found)
+        return self.cache / "tf" / found
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("models", nargs="*", help="archive-relative model paths, e.g. models/player/soldier.mdl")
