@@ -77,6 +77,12 @@ The key-to-dollar rate a dollar price is computed from. One is active at a time.
 **Class View**:
 The catalogue filtered to one Class: its Class-Exclusive Cosmetics, the Multi-Class Cosmetics it can wear, and, unless hidden, every All-Class Cosmetic.
 
+**Slug**:
+The URL-safe identifier derived from a Cosmetic's name, and its stable public name: it addresses a row in the page and names it in the URL, and a later wishlist references it (ADR-0003).
+
+**Alias**:
+One of the other defindexes Valve's schema carries under a Cosmetic's name, folded into the single Cosmetic that name identifies (ADR-0003). The catalogue records them; the site shows them so the merge is visible rather than silent.
+
 ### Images
 
 **Worn Render**:

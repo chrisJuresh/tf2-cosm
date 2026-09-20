@@ -9,17 +9,21 @@
  */
 import type { Cosmetic, Price } from "@tf2-cosm/data/catalogue";
 
+type GameClass = Cosmetic["classes"][number];
 type PricedVariant = Extract<Price, { state: "priced" }>["referenceVariant"];
 type UnpricedReason = Extract<Price, { state: "unpriced" }>["reason"];
 
 /**
- * The Qualities whose English name is not simply their token capitalised. Only
- * the Reference Variant rule's own shortlist needs an entry; anything else falls
- * through to the general rule, which is right for Unique, Genuine and the rest.
+ * The Qualities whose English name is not simply their token capitalised.
+ *
+ * Only one of the Qualities the Reference Variant rule can choose needs an
+ * entry: the rule tries Unique, then the item's Native Quality, then Genuine,
+ * Vintage, Haunted, Strange and Collector's, and every one of those but the last
+ * is its own token capitalised. Keyed on the Quality union, so a token that is
+ * not a Quality at all cannot be quietly added here.
  */
-const QUALITY_NAMES: Partial<Record<string, string>> = {
+const QUALITY_NAMES: Partial<Record<PricedVariant["quality"], string>> = {
   collectors: "Collector's",
-  "self-made": "Self-Made",
 };
 
 function titleCase(token: string): string {
@@ -30,7 +34,7 @@ function titleCase(token: string): string {
 }
 
 /** A Class as it is spelled in the game: "Scout", "Demoman". */
-export function className(gameClass: string): string {
+function classRead(gameClass: GameClass): string {
   return titleCase(gameClass);
 }
 
@@ -41,7 +45,7 @@ export function className(gameClass: string): string {
  */
 export function classesRead(cosmetic: Cosmetic): string {
   if (cosmetic.kind === "all-class") return "All nine Classes";
-  const names = cosmetic.classes.map(className);
+  const names = cosmetic.classes.map(classRead);
   if (names.length === 1) return names[0] ?? "";
   return `${names.slice(0, -1).join(", ")} and ${names.at(-1) ?? ""}`;
 }

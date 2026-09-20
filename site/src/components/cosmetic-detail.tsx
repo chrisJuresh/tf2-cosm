@@ -50,7 +50,12 @@ export function CosmeticDetail({ cosmetic, keyRate, id }: CosmeticDetailProps) {
       id={id}
       className="grid gap-x-6 gap-y-3 px-2 pb-3 text-xs sm:grid-cols-2 sm:px-3 sm:pb-4 sm:text-sm lg:grid-cols-3"
     >
-      {price === null || price.state === "unpriced" ? null : (
+      {/* The three states a price is in, said once: a snapshot built without a
+          price source at all, a source that has no price for this Cosmetic, and
+          a price. */}
+      {price === null ? null : price.state === "unpriced" ? (
+        <Field term="Price">Unpriced. {unpricedReasonRead(price.reason)}</Field>
+      ) : (
         <>
           <Field term="Price Spread">
             <span className="tabular-nums">
@@ -71,9 +76,6 @@ export function CosmeticDetail({ cosmetic, keyRate, id }: CosmeticDetailProps) {
           </Field>
         </>
       )}
-      {price !== null && price.state === "unpriced" ? (
-        <Field term="Price">Unpriced. {unpricedReasonRead(price.reason)}</Field>
-      ) : null}
       <Field term="Classes">{classesRead(cosmetic)}</Field>
       {cosmetic.aliases.length === 0 ? null : (
         // ADR-0003: a Cosmetic is one name, and every other defindex Valve
