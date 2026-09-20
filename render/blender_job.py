@@ -55,16 +55,14 @@ from render.manifest import (  # noqa: E402
     REASON_MODEL_MISSING,
     REASON_NO_SKELETON,
     REASON_RENDER_ERROR,
-    image_relpath,
     load_manifest,
 )
 from render.mdlinfo import read_mdl  # noqa: E402
+from render.output import OutputLayout  # noqa: E402
 from render.selection import select_jobs, selected_teams  # noqa: E402
 from render.sourceio_patch import apply_patches  # noqa: E402
 
 DEFAULT_CACHE = REPO_ROOT / "assets-cache"
-DEFAULT_OUT = REPO_ROOT / "renders" / "masters"
-DEFAULT_MANIFEST = REPO_ROOT / "catalogue" / "renders.json"
 SIZE = 1024
 SAMPLES = 32
 
@@ -96,8 +94,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--teams", nargs="*", default=list(scene_plan.TEAMS))
     parser.add_argument("--tf", type=Path, default=DEFAULT_TF, help="the game's tf folder")
     parser.add_argument("--cache", type=Path, default=DEFAULT_CACHE)
-    parser.add_argument("--out", type=Path, default=DEFAULT_OUT, help="the output root for masters")
-    parser.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST)
+    parser.add_argument(
+        "--out", type=Path, default=None, help="the output root images are written under"
+    )
+    parser.add_argument("--masters-dir", default=None, help="the image folder holding masters")
+    parser.add_argument("--manifest", type=Path, default=None)
     parser.add_argument("--size", type=int, default=SIZE)
     parser.add_argument("--samples", type=int, default=SAMPLES)
     parser.add_argument(
@@ -385,7 +386,9 @@ def set_up_job(job: dict, cache: ModelCache, args: argparse.Namespace) -> Import
     )
 
 
-def render_team(imported: ImportedJob, job: dict, team: str, out_root: Path) -> tuple[str, bool]:
+def render_team(
+    imported: ImportedJob, job: dict, team: str, layout: OutputLayout
+) -> tuple[str, bool]:
     """Render one Team from an already-imported job: its image path, and whether RED stood in."""
     on_class = scene_plan.skin_plan(
         team,
@@ -405,20 +408,23 @@ def render_team(imported: ImportedJob, job: dict, team: str, out_root: Path) -> 
         log(f"  {team}: the Class has no skin family {on_class.requested}, rendering it RED")
     apply_skin(imported.class_objects, on_class.family)
     apply_skin(imported.item_objects, choice.family)
-    relative = image_relpath(job, team)
+    relative = layout.master_relpath(job, team)
     started = time.perf_counter()
-    render_to(out_root / relative)
+    render_to(layout.path_for(relative))
     log(f"  {team}: {relative} in {time.perf_counter() - started:.2f}s")
     return relative, choice.fell_back_to_red or on_class.fell_back_to_red
 
 
 def run(args: argparse.Namespace) -> int:
+    layout = OutputLayout.from_env().overridden(
+        root=args.out, masters_dir=args.masters_dir, manifest=args.manifest
+    )
     document = json.loads(args.jobs.read_text(encoding="utf-8"))
     validate_job_list(document)
     jobs = select_jobs(document, slugs=args.slug, classes=args.classes, styles=args.styles)
     teams = selected_teams(args.teams)
-    manifest = load_manifest(args.manifest)
-    log(f"{len(jobs)} jobs x {len(teams)} teams -> {args.out}")
+    manifest = load_manifest(layout.manifest)
+    log(f"{len(jobs)} jobs x {len(teams)} teams -> {layout.path_for(layout.masters_dir)}")
 
     mount_game(args.tf, args.cache)
     cache = ModelCache.for_game(args.tf, args.cache)
@@ -433,11 +439,11 @@ def run(args: argparse.Namespace) -> int:
             for team in teams:
                 manifest.fail(job, team, reason=failure.reason, detail=failure.detail, at=now())
             failed += len(teams)
-            manifest.write(args.manifest)
+            manifest.write(layout.manifest)
             continue
         for team in teams:
             try:
-                relative, fell_back_to_red = render_team(imported, job, team, args.out)
+                relative, fell_back_to_red = render_team(imported, job, team, layout)
             except Exception as error:  # noqa: BLE001 - as above, per Team
                 failure = as_failure(error, REASON_RENDER_ERROR)
                 manifest.fail(job, team, reason=failure.reason, detail=failure.detail, at=now())
@@ -455,9 +461,12 @@ def run(args: argparse.Namespace) -> int:
                 rendered += 1
         # Once per job, not once per image: the manifest is rewritten whole, and a long run
         # would otherwise spend more time writing it than rendering.
-        manifest.write(args.manifest)
+        manifest.write(layout.manifest)
 
-    log(f"done: {rendered} rendered, {failed} failed; manifest {args.manifest}")
+    log(
+        f"done: {rendered} rendered, {failed} failed; manifest {layout.manifest}. "
+        f"Run `python -m render.derive` for the web sizes."
+    )
     return 1 if rendered == 0 and failed else 0
 
 

@@ -17,6 +17,8 @@ from pathlib import Path
 
 import pytest
 
+from render.derivatives import DERIVATIVE_SIZES
+from render.derive import main as derive_main
 from render.jobs import JOB_LIST_VERSION, job_list, validate_job_list
 from render.manifest import REASON_MODEL_MISSING, validate_manifest
 from render.resolve import resolve_installed_game
@@ -53,7 +55,7 @@ def rendered(tmp_path_factory) -> tuple[dict, Path]:
     Image = pytest.importorskip("PIL.Image")  # noqa: F841 - fail early if Pillow is missing
     workspace = tmp_path_factory.mktemp("render-smoke")
     jobs_file = workspace / "jobs.json"
-    out = workspace / "masters"
+    out = workspace / "images"  # the output root; masters and web sizes sit under it
     manifest_file = workspace / "manifest.json"
 
     resolution = resolve_installed_game(TF, only=NAMES)
@@ -93,6 +95,10 @@ def rendered(tmp_path_factory) -> tuple[dict, Path]:
         timeout=900,
     )
     assert result.returncode == 0, result.stdout[-4000:] + result.stderr[-4000:]
+
+    # The web sizes are a step of their own, outside Blender: this is the whole job.
+    assert derive_main(["--root", str(out), "--manifest", str(manifest_file)]) == 0
+
     document = json.loads(manifest_file.read_text(encoding="utf-8"))
     validate_manifest(document)
     return document, out
@@ -105,11 +111,11 @@ def test_a_known_job_produces_an_image_the_manifest_can_find(rendered, slug, cls
 
     entry = document["renders"][slug][cls][team][str(style)]
 
-    assert entry["width"] == 1024 and entry["height"] == 1024
+    assert entry["master"]["width"] == 1024 and entry["master"]["height"] == 1024
     assert entry["model"].endswith(".mdl")
     assert entry["rendered_at"].startswith("20")
     assert entry["job_version"] == JOB_LIST_VERSION
-    assert (out / entry["path"]).exists()
+    assert (out / entry["master"]["path"]).exists()
 
 
 @pytest.mark.parametrize("slug, cls, style", RENDERED)
@@ -121,7 +127,7 @@ def test_the_image_is_a_transparent_square_with_the_class_in_the_middle(
 
     document, out = rendered
 
-    image = Image.open(out / document["renders"][slug][cls][team][str(style)]["path"])
+    image = Image.open(out / document["renders"][slug][cls][team][str(style)]["master"]["path"])
 
     assert image.size == (1024, 1024)
     assert image.mode == "RGBA"
@@ -146,4 +152,20 @@ def test_a_missing_model_is_recorded_as_a_failure_and_does_not_stop_the_run(rend
     assert {f["reason"] for f in failures} == {REASON_MODEL_MISSING}
     assert all(f["detail"] for f in failures)
     assert "not-in-the-game" not in document["renders"]
-    assert not (out / "not-in-the-game").exists()
+    assert not (out / "masters" / "not-in-the-game").exists()
+
+
+@pytest.mark.parametrize("slug, cls, style", RENDERED)
+def test_every_master_gains_its_web_sizes(rendered, slug, cls, style):
+    from PIL import Image
+
+    document, out = rendered
+
+    derivatives = document["renders"][slug][cls]["red"][str(style)]["derivatives"]
+
+    assert sorted(derivatives) == sorted(str(size) for size in DERIVATIVE_SIZES)
+    for size, record in derivatives.items():
+        assert record["width"] == record["height"] == int(size)
+        with Image.open(out / record["path"]) as image:
+            assert image.size == (int(size), int(size))
+            assert image.convert("RGBA").getpixel((0, 0))[3] == 0
