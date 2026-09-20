@@ -16,7 +16,17 @@ function slugsOf(overrides: Partial<typeof DEFAULT_CONTROLS> = {}): string[] {
 
 describe("with no controls touched", () => {
   it("shows every Cosmetic, most valuable first", () => {
-    expect(slugsOf()).toEqual(["team-captain", "tin-pot", "bolt-boy", "ghastly-gibus", "dead-of-night"]);
+    expect(slugsOf()).toEqual([
+      "team-captain",
+      "tin-pot",
+      "baronial-badge",
+      "bolt-boy",
+      // Two Blanket Prices at the same figure; the name settles the tie.
+      "crocodile-smile",
+      "scotsman-s-stove-pipe",
+      "ghastly-gibus",
+      "dead-of-night",
+    ]);
   });
 });
 
@@ -66,11 +76,12 @@ describe("hiding All-Class Cosmetics", () => {
 describe("the slot filter", () => {
   it("keeps only head Cosmetics", () => {
     expect(slugsOf({ slot: "head" })).not.toContain("dead-of-night");
-    expect(slugsOf({ slot: "head" })).toHaveLength(4);
+    expect(slugsOf({ slot: "head" })).not.toContain("baronial-badge");
+    expect(slugsOf({ slot: "head" })).toHaveLength(6);
   });
 
   it("keeps only miscs", () => {
-    expect(slugsOf({ slot: "misc" })).toEqual(["dead-of-night"]);
+    expect(slugsOf({ slot: "misc" })).toEqual(["baronial-badge", "dead-of-night"]);
   });
 
   it("narrows a Class View rather than replacing it", () => {
@@ -86,17 +97,22 @@ describe("hiding Unpriced Cosmetics", () => {
   it("keeps a Cosmetic whose snapshot carried no prices at all, which is not the same thing", () => {
     const priceless = fixtureCosmetics().map((cosmetic) => ({ ...cosmetic, price: null }));
     const visible = visibleCosmetics(priceless, { ...DEFAULT_CONTROLS, hideUnpriced: true });
-    expect(visible).toHaveLength(5);
+    expect(visible).toHaveLength(8);
   });
 });
 
 describe("the sort orders", () => {
   it("puts the highest Metal Value first by default", () => {
-    expect(slugsOf().slice(0, 3)).toEqual(["team-captain", "tin-pot", "bolt-boy"]);
+    expect(slugsOf().slice(0, 3)).toEqual(["team-captain", "tin-pot", "baronial-badge"]);
   });
 
   it("puts the lowest first the other way round", () => {
-    expect(slugsOf({ sort: "metal-value-low" }).slice(0, 3)).toEqual(["ghastly-gibus", "bolt-boy", "tin-pot"]);
+    expect(slugsOf({ sort: "metal-value-low" }).slice(0, 4)).toEqual([
+      "ghastly-gibus",
+      "crocodile-smile",
+      "scotsman-s-stove-pipe",
+      "bolt-boy",
+    ]);
   });
 
   it("leaves an Unpriced Cosmetic at the end whichever way the value sorts", () => {
@@ -106,9 +122,12 @@ describe("the sort orders", () => {
 
   it("sorts by name, Unpriced Cosmetics among the rest", () => {
     expect(slugsOf({ sort: "name" })).toEqual([
+      "baronial-badge",
       "bolt-boy",
+      "crocodile-smile",
       "dead-of-night",
       "ghastly-gibus",
+      "scotsman-s-stove-pipe",
       "team-captain",
       "tin-pot",
     ]);

@@ -45,7 +45,7 @@ describe("the Class View picker", () => {
   it("starts on the whole catalogue", async () => {
     renderBrowser();
     expect(screen.getByRole("combobox", CLASS_PICKER)).toHaveValue("");
-    await waitFor(() => expect(namesShown()).toHaveLength(5));
+    await waitFor(() => expect(namesShown()).toHaveLength(8));
   });
 
   it("narrows to a Class's own items, the Multi-Class items it wears and the All-Class items", async () => {
@@ -100,14 +100,14 @@ describe("the slot filter", () => {
   it("shows only miscs", async () => {
     const user = renderBrowser();
     await user.selectOptions(screen.getByRole("combobox", SLOT_PICKER), "misc");
-    expect(namesShown()).toEqual(["Dead of Night"]);
+    expect(namesShown()).toEqual(["Baronial Badge", "Dead of Night"]);
   });
 
   it("shows only heads", async () => {
     const user = renderBrowser();
     await user.selectOptions(screen.getByRole("combobox", SLOT_PICKER), "head");
     expect(namesShown()).not.toContain("Dead of Night");
-    expect(namesShown()).toHaveLength(4);
+    expect(namesShown()).toHaveLength(6);
   });
 });
 
@@ -145,7 +145,16 @@ describe("the sort", () => {
   it("sorts by name", async () => {
     const user = renderBrowser();
     await user.selectOptions(screen.getByRole("combobox", SORT_PICKER), "name");
-    expect(namesShown()).toEqual(["Bolt Boy", "Dead of Night", "Ghastly Gibus", "Team Captain", "Tin Pot"]);
+    expect(namesShown()).toEqual([
+      "Baronial Badge",
+      "Bolt Boy",
+      "Crocodile Smile",
+      "Dead of Night",
+      "Ghastly Gibus",
+      "Scotsman's Stove Pipe",
+      "Team Captain",
+      "Tin Pot",
+    ]);
   });
 });
 
@@ -168,9 +177,9 @@ describe("the name search", () => {
 
   it("counts what is left against the whole catalogue", async () => {
     const user = renderBrowser();
-    expect(screen.getByRole("status")).toHaveTextContent("5 Cosmetics");
+    expect(screen.getByRole("status")).toHaveTextContent("8 Cosmetics");
     await user.type(screen.getByRole("searchbox", SEARCH_BOX), "bolt");
-    expect(screen.getByRole("status")).toHaveTextContent("1 of 5 Cosmetics");
+    expect(screen.getByRole("status")).toHaveTextContent("1 of 8 Cosmetics");
   });
 });
 
@@ -198,7 +207,7 @@ describe("what the browser remembers", () => {
 
     cleanup();
     renderBrowser();
-    await waitFor(() => expect(namesShown()).toHaveLength(5));
+    await waitFor(() => expect(namesShown()).toHaveLength(8));
     expect(screen.getByRole("searchbox", SEARCH_BOX)).toHaveValue("");
   });
 
@@ -211,7 +220,7 @@ describe("what the browser remembers", () => {
     cleanup();
     renderBrowser();
 
-    await waitFor(() => expect(namesShown()).toHaveLength(5));
+    await waitFor(() => expect(namesShown()).toHaveLength(8));
     expect(screen.getByRole("combobox", CLASS_PICKER)).toHaveValue("");
   });
 });
