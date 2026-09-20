@@ -9,6 +9,7 @@
  * Item names are the key because ADR-0003 already makes the English display name
  * a Cosmetic's identity, and every price source keys its list the same way.
  */
+import type { SourceDollarEstimate } from "./dollar-basis.ts";
 import { SCRAP_PER_REFINED, unitsToScrap } from "./metal.ts";
 
 /**
@@ -66,6 +67,13 @@ export interface Rates {
   readonly keyRate: KeyRate;
   /** One unit of each currency the source quotes, in scrap. Metal is nine by definition. */
   readonly scrapPerUnit: ReadonlyMap<string, number>;
+  /**
+   * The source's own refined-to-dollar estimate, when it publishes one. It
+   * converts nothing here — a Metal Value never passes through dollars — but it
+   * is a Dollar Basis for the header, and it arrives in the same call the Key
+   * Rate does. Undefined when the source quotes Metal in something else.
+   */
+  readonly usdPerRefined?: SourceDollarEstimate | undefined;
 }
 
 /** The rate for a currency, or undefined when the snapshot cannot convert it. */

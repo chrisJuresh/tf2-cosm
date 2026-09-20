@@ -2,16 +2,24 @@
  * `pnpm build-catalogue` — the one command that builds the catalogue.
  *
  * Fetches the source payloads, hands them to the pure builder, validates the
- * result against the catalogue schema and writes it. The Dollar Basis header
- * (#11) hangs off the same command later.
+ * result against the catalogue schema, holds it against the committed file and
+ * writes it. Every decision worth testing lives under `src/`; this file is the
+ * fetching, the printing and the writing.
  */
+import { readFile } from "node:fs/promises";
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { buildCatalogue } from "./catalogue/build.ts";
 import { CATALOGUE_SCHEMA_VERSION, catalogueJsonSchema } from "./catalogue/schema.ts";
+import {
+  type CommittedCatalogue,
+  DEFAULT_WRITE_GUARD_LIMITS,
+  writeRefusal,
+} from "./catalogue/write-guard.ts";
 import { loadDotEnv, requireEnv } from "./env.ts";
+import type { DollarRate, MarketKeyPrice } from "./prices/dollar-basis.ts";
 import type { PriceList } from "./prices/price-source.ts";
 import { backpackTfPriceSource } from "./sources/backpack-tf.ts";
 import {
@@ -20,6 +28,7 @@ import {
   loadFromMirror,
   MIRROR_URL,
 } from "./sources/item-definitions.ts";
+import { fetchMarketKeyPrice } from "./sources/steam-market.ts";
 import { fetchSchemaItems, STEAM_WEB_API_SOURCE, type WebApiSchemaItem } from "./sources/steam-web-api.ts";
 
 const REPO_ROOT = fileURLToPath(new URL("../../", import.meta.url));
@@ -32,17 +41,13 @@ const REPO_ROOT = fileURLToPath(new URL("../../", import.meta.url));
  */
 const RENDER_RESOLVE_COSMETICS = 1833;
 
-/**
- * Below this many priced Cosmetics the snapshot is not worth committing: it
- * means the price list came back partial, or the names stopped matching.
- */
-const MINIMUM_PRICED_COSMETICS = 1780;
-
 interface Options {
   readonly tfPath: string | undefined;
   readonly mirror: boolean;
   readonly skipWebApi: boolean;
   readonly skipPrices: boolean;
+  readonly skipMarket: boolean;
+  readonly maxDrop: number;
   readonly out: string;
   readonly dryRun: boolean;
 }
@@ -53,6 +58,8 @@ function parseArgs(argv: readonly string[]): Options {
     mirror: false,
     skipWebApi: false,
     skipPrices: false,
+    skipMarket: false,
+    maxDrop: DEFAULT_WRITE_GUARD_LIMITS.maxCosmeticDropFraction,
     out: join(REPO_ROOT, "catalogue/catalogue.json"),
     dryRun: false,
   };
@@ -71,6 +78,17 @@ function parseArgs(argv: readonly string[]): Options {
       case "--skip-prices":
         options.skipPrices = true;
         break;
+      case "--skip-market":
+        options.skipMarket = true;
+        break;
+      case "--max-drop": {
+        const fraction = Number(argv[++index]);
+        if (!Number.isFinite(fraction) || fraction < 0 || fraction >= 1) {
+          throw new Error(`--max-drop takes a fraction between 0 and 1, got ${argv[index]}`);
+        }
+        options.maxDrop = fraction;
+        break;
+      }
       case "--out":
         options.out = resolve(argv[++index] ?? "");
         break;
@@ -86,6 +104,10 @@ function parseArgs(argv: readonly string[]): Options {
             "  --skip-web-api   skip Valve's Web API and report the Cosmetic list from the",
             "                   local install alone, writing nothing (no key needed)",
             "  --skip-prices    build the Cosmetic list with no prices in it at all",
+            "  --skip-market    skip the Steam Market key price; that Dollar Basis is",
+            "                   then recorded as missing",
+            "  --max-drop <f>   the fraction of the committed Cosmetic count a run may",
+            `                   lose before it refuses to write (default ${DEFAULT_WRITE_GUARD_LIMITS.maxCosmeticDropFraction})`,
             "  --out <path>     where to write the catalogue",
             "  --dry-run        build and report, write nothing",
           ].join("\n"),
@@ -118,6 +140,47 @@ async function loadPrices(options: Options): Promise<PriceList | undefined> {
   return backpackTfPriceSource(requireEnv("BPTF_API_KEY")).load();
 }
 
+/**
+ * The Steam Market's key price, one Dollar Basis of three. The Market rate-limits
+ * an unauthenticated caller, and one missing basis is not worth failing a whole
+ * run over, so a failure becomes a warning and that basis is recorded as missing.
+ */
+async function loadMarketKeyPrice(options: Options, warnings: string[]): Promise<MarketKeyPrice | undefined> {
+  if (options.skipMarket) return undefined;
+  try {
+    return await fetchMarketKeyPrice(new Date().toISOString());
+  } catch (error) {
+    warnings.push(
+      "the Steam Community Market key price did not arrive, so that Dollar Basis is missing: " +
+        `${error instanceof Error ? error.message : String(error)}`,
+    );
+    return undefined;
+  }
+}
+
+/** The committed catalogue the guard holds this run against, if there is one yet. */
+async function loadCommittedCatalogue(path: string): Promise<CommittedCatalogue | null> {
+  let text: string;
+  try {
+    text = await readFile(path, "utf8");
+  } catch {
+    return null; // the first run has nothing to compare against
+  }
+  try {
+    const previous = JSON.parse(text) as { header?: { counts?: { cosmetics?: unknown } } };
+    const cosmetics = previous.header?.counts?.cosmetics;
+    return typeof cosmetics === "number" ? { path, cosmetics } : null;
+  } catch {
+    // An unreadable file is not a count that dropped; the guard has nothing to say.
+    return null;
+  }
+}
+
+/** A Dollar Basis as the summary prints it: what a Key and a Refined cost. */
+function dollarLine(rate: DollarRate): string {
+  return `$${rate.usdPerKey.toFixed(2)} a Key, $${rate.usdPerRefined.toFixed(4)} a Refined`;
+}
+
 async function main(): Promise<number> {
   loadDotEnv(join(REPO_ROOT, ".env"));
   const options = parseArgs(process.argv.slice(2));
@@ -130,16 +193,21 @@ async function main(): Promise<number> {
   }
   const webApi = await loadWebApiItems(options);
   const prices = await loadPrices(options);
+  const runWarnings: string[] = [];
+  // A Dollar Basis is anchored to the Key Rate, so with no prices there is none to fetch.
+  const marketKeyPrice = prices === undefined ? undefined : await loadMarketKeyPrice(options, runWarnings);
 
-  const { catalogue, exclusions, warnings } = buildCatalogue({
+  const { catalogue, exclusions, warnings: buildWarnings } = buildCatalogue({
     itemsGame: definitions.itemsGame,
     webApiItems: webApi.items,
     englishTokens: definitions.englishTokens,
     prices,
+    marketKeyPrice,
     snapshotTakenAt: new Date().toISOString(),
     sources: { itemDefinitions: definitions.description, englishNames: webApi.description },
   });
 
+  const warnings = [...runWarnings, ...buildWarnings];
   const counts = catalogue.header.counts;
   const excludedByReason = new Map<string, number>();
   for (const exclusion of exclusions) {
@@ -172,10 +240,34 @@ async function main(): Promise<number> {
     for (const [variant, count] of Object.entries(priceHeader.counts.byReferenceVariant)) {
       console.log(`      ${variant.padEnd(22)} ${count}`);
     }
+    // Anything but a Unique craftable copy is the Reference Variant rule falling
+    // through, which is worth a figure of its own rather than a line to add up.
+    const fallbacks = Object.entries(priceHeader.counts.byReferenceVariant)
+      .filter(([variant]) => variant !== "unique-craftable")
+      .reduce((total, [, count]) => total + count, 0);
+    console.log(`    fallbacks used   ${fallbacks}`);
     console.log(`    Unpriced         ${priceHeader.counts.unpriced}`);
     for (const [reason, count] of Object.entries(priceHeader.counts.unpricedByReason)) {
       console.log(`      ${reason.padEnd(22)} ${count}`);
     }
+  }
+
+  const bases = catalogue.header.dollarBases;
+  if (bases === null) {
+    console.log("  Dollar Bases       none (no Key Rate to anchor them to)");
+  } else {
+    console.log("  Dollar Bases");
+    const market = bases.steamCommunityMarket;
+    console.log(
+      `    Steam Market     ${
+        market === null
+          ? "missing"
+          : `${market.lowest ? `lowest ${dollarLine(market.lowest)}` : "no lowest"}; ` +
+            `${market.median ? `median ${dollarLine(market.median)}` : "no median"}`
+      }`,
+    );
+    console.log(`    price source     ${bases.backpackTf ? dollarLine(bases.backpackTf.rate) : "missing"}`);
+    console.log(`    Mann Co. Store   ${dollarLine(bases.mannCoStore.rate)}`);
   }
 
   if (warnings.length > 0) {
@@ -191,14 +283,13 @@ async function main(): Promise<number> {
     return 0;
   }
 
-  if (priceHeader !== null && priceHeader.counts.priced < MINIMUM_PRICED_COSMETICS) {
-    // Committing a snapshot that priced a fraction of the catalogue would read as
-    // thousands of Cosmetics suddenly going Unpriced, so it stops here instead.
-    throw new Error(
-      `only ${priceHeader.counts.priced} Cosmetics were priced, under the ${MINIMUM_PRICED_COSMETICS} a whole ` +
-        `snapshot carries. The price list came back partial, or the names stopped matching; nothing was written.`,
-    );
-  }
+  // The committed file is what the site serves, so a run that lost Cosmetics or
+  // prices reports why and leaves the good snapshot in place.
+  const refusal = writeRefusal(catalogue, await loadCommittedCatalogue(options.out), {
+    ...DEFAULT_WRITE_GUARD_LIMITS,
+    maxCosmeticDropFraction: options.maxDrop,
+  });
+  if (refusal !== undefined) throw new Error(refusal);
 
   await mkdir(dirname(options.out), { recursive: true });
   await writeFile(options.out, `${JSON.stringify(catalogue, null, 2)}\n`, "utf8");

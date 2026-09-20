@@ -29,7 +29,7 @@ Single-context: `CONTEXT.md` and `docs/adr/` at the repo root. See `docs/agents/
 ## Running things locally
 
 - Node env: pnpm workspace at the repo root, package `data`. Secrets come from `.env` at the root (copy `.env.example`); never commit it.
-- Build the catalogue: `pnpm build-catalogue` (add `--dry-run` to write nothing, `--skip-web-api` to check the Cosmetic count without a Steam Web API key, `--skip-prices` to build the list without a backpack.tf key). Tests: `pnpm test`; types: `pnpm typecheck`.
+- Build the catalogue: `pnpm build-catalogue` (add `--dry-run` to write nothing, `--skip-web-api` to check the Cosmetic count without a Steam Web API key, `--skip-prices` to build the list without a backpack.tf key, `--skip-market` to leave out the Steam Market Dollar Basis). A run refuses to overwrite the committed catalogue when it loses more than 2% of its Cosmetics or prices too few of them; `--max-drop <fraction>` raises the first allowance. Tests: `pnpm test`; types: `pnpm typecheck`.
 - Python env: `.venv` (Python 3.14) with `vdf`, `vpk`, `pillow`, `pytest` (`render/requirements.txt`). Use `./.venv/Scripts/python.exe`. Run the render modules as modules (`-m render.resolve`), not as file paths, so the package imports resolve.
 - Tests: `./.venv/Scripts/python.exe -m pytest`. Everything but the render smoke test runs without the game or Blender.
 - Blender 5.2 at `C:/Program Files/Blender Foundation/Blender 5.2/blender.exe` (bundled Python 3.13). SourceIO 5.5.4 is installed as a legacy add-on at `%APPDATA%/Blender Foundation/Blender/5.2/scripts/addons/SourceIO` and enabled per run by the script.

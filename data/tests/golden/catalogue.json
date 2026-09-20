@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "header": {
     "snapshotTakenAt": "2026-09-20T12:00:00.000Z",
     "sources": {
@@ -34,6 +34,35 @@
         },
         "unpricedByReason": {
           "missing-from-source": 1
+        }
+      }
+    },
+    "dollarBases": {
+      "steamCommunityMarket": {
+        "source": "Steam Community Market price overview (Mann Co. Supply Crate Key, USD)",
+        "takenAt": "2026-09-20T12:00:00.000Z",
+        "lowest": {
+          "usdPerKey": 2.29,
+          "usdPerRefined": 0.02911
+        },
+        "median": {
+          "usdPerKey": 2.33,
+          "usdPerRefined": 0.029619
+        }
+      },
+      "backpackTf": {
+        "source": "backpack.tf refined-to-dollar estimate (IGetCurrencies v1)",
+        "lastUpdatedAt": "2026-09-08T20:40:00.000Z",
+        "rate": {
+          "usdPerKey": 3.1467,
+          "usdPerRefined": 0.04
+        }
+      },
+      "mannCoStore": {
+        "source": "Mann Co. Store constant ($2.49 a Mann Co. Supply Crate Key)",
+        "rate": {
+          "usdPerKey": 2.49,
+          "usdPerRefined": 0.031653
         }
       }
     }

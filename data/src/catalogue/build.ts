@@ -30,6 +30,7 @@ import {
   type PriceHeader,
   type Style,
 } from "./schema.ts";
+import { dollarBasesOf, type MarketKeyPrice } from "../prices/dollar-basis.ts";
 import { keyRateMetal, priceOf } from "../prices/price-spread.ts";
 import { type PriceList, type Quality, variantsFor } from "../prices/price-source.ts";
 import { referenceVariantLabel, type UnpricedReason } from "../prices/reference-variant.ts";
@@ -51,6 +52,12 @@ export interface CatalogueInputs {
    * without a price source key produces.
    */
   readonly prices?: PriceList | undefined;
+  /**
+   * The Steam Community Market's key price, one of the header's Dollar Bases.
+   * Leaving it out records that basis as null rather than guessing a rate, which
+   * is what a run the Market did not answer produces.
+   */
+  readonly marketKeyPrice?: MarketKeyPrice | undefined;
   readonly snapshotTakenAt: string;
   readonly sources: { readonly itemDefinitions: string; readonly englishNames: string };
 }
@@ -297,6 +304,15 @@ export function buildCatalogue(inputs: CatalogueInputs): BuildResult {
         withoutBackpackIcon: cosmetics.filter((one) => one.backpackIcon === null).length,
       },
       prices: tally.header(inputs.prices),
+      // Every dollar rate is anchored to the snapshot's own Key Rate, so without
+      // a price source there is no Key Rate and no basis to record.
+      dollarBases: inputs.prices
+        ? dollarBasesOf({
+            keyRate: inputs.prices.rates.keyRate,
+            marketKeyPrice: inputs.marketKeyPrice,
+            sourceUsdPerRefined: inputs.prices.rates.usdPerRefined,
+          })
+        : null,
     },
     cosmetics,
   } satisfies Catalogue);
