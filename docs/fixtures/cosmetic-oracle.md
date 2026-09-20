@@ -56,7 +56,12 @@ five Cosmetics, from `data/tests/fixtures/backpack-tf-prices.json`:
 | Bolt Boy | Unique | Unique craftable, in Metal | The ordinary case, quoted in Metal |
 | Ghastly Gibus | Unique | Unique non-craftable | No craftable Unique is priced |
 | Tin Pot | Genuine | Genuine craftable | A promo with no Unique at all; its Unusuals are never a Reference Variant |
-| Dead of Night | Unique | none — Unpriced | The price list has no entry under the name |
+| Dead of Night | Unique | none — Unpriced | The price list has no entry for it |
+
+The fixture also pins how a price entry finds its Cosmetic. The entry for Bolt Boy is
+named `Bolt-Boy`, which is not the catalogue's name for it, and is joined by its defindex;
+the entry for the Team Captain claims no defindex at all and is joined by its name; the
+Ghastly Gibus entry claims both 103 and 104, so either half of the alias pair finds it.
 
 ## What the render job additionally asserts
 

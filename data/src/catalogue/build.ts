@@ -31,8 +31,8 @@ import {
   type Style,
 } from "./schema.ts";
 import { keyRateMetal, priceOf } from "../prices/price-spread.ts";
-import { priceKey, type PriceList, type Quality } from "../prices/price-source.ts";
-import type { UnpricedReason } from "../prices/reference-variant.ts";
+import { type PriceList, type Quality, variantsFor } from "../prices/price-source.ts";
+import { referenceVariantLabel, type UnpricedReason } from "../prices/reference-variant.ts";
 import { backpackIconOf, nativeQualityOf, type WebApiSchemaItem } from "../sources/steam-web-api.ts";
 
 export interface CatalogueInputs {
@@ -146,25 +146,40 @@ function collisionDifference(candidates: readonly Candidate[]): CollisionDiffere
   return undefined;
 }
 
-/** The price snapshot's header, or null when the run had no price source. */
-function priceHeader(
-  prices: PriceList | undefined,
-  cosmetics: readonly Cosmetic[],
-  byReferenceVariant: ReadonlyMap<string, number>,
-  unpricedByReason: ReadonlyMap<UnpricedReason, number>,
-): PriceHeader | null {
-  if (!prices) return null;
-  return {
-    source: prices.source,
-    takenAt: prices.takenAt,
-    keyRate: { ...keyRateMetal(prices.keyRate), lastUpdatedAt: prices.keyRate.lastUpdatedAt },
-    counts: {
-      priced: cosmetics.filter((one) => one.price?.state === "priced").length,
-      unpriced: cosmetics.filter((one) => one.price?.state === "unpriced").length,
-      byReferenceVariant: Object.fromEntries([...byReferenceVariant].sort()),
-      unpricedByReason: Object.fromEntries([...unpricedByReason].sort()),
-    },
-  };
+/** What the run made of the price list, accumulated one Cosmetic at a time. */
+class PriceTally {
+  private priced = 0;
+  private unpriced = 0;
+  private readonly byReferenceVariant = new Map<string, number>();
+  private readonly unpricedByReason = new Map<UnpricedReason, number>();
+
+  record(price: Cosmetic["price"]): void {
+    if (price === null) return;
+    if (price.state === "priced") {
+      this.priced++;
+      const label = referenceVariantLabel(price.referenceVariant.quality, price.referenceVariant.craftable);
+      this.byReferenceVariant.set(label, (this.byReferenceVariant.get(label) ?? 0) + 1);
+    } else {
+      this.unpriced++;
+      this.unpricedByReason.set(price.reason, (this.unpricedByReason.get(price.reason) ?? 0) + 1);
+    }
+  }
+
+  /** The price snapshot's header, or null when the run had no price source. */
+  header(prices: PriceList | undefined): PriceHeader | null {
+    if (!prices) return null;
+    return {
+      source: prices.source,
+      takenAt: prices.takenAt,
+      keyRate: { ...keyRateMetal(prices.rates.keyRate), lastUpdatedAt: prices.rates.keyRate.lastUpdatedAt },
+      counts: {
+        priced: this.priced,
+        unpriced: this.unpriced,
+        byReferenceVariant: Object.fromEntries([...this.byReferenceVariant].sort()),
+        unpricedByReason: Object.fromEntries([...this.unpricedByReason].sort()),
+      },
+    };
+  }
 }
 
 export function buildCatalogue(inputs: CatalogueInputs): BuildResult {
@@ -219,8 +234,7 @@ export function buildCatalogue(inputs: CatalogueInputs): BuildResult {
   let aliasesMerged = 0;
   const cosmetics: Cosmetic[] = [];
   const slugs = new Map<string, string>();
-  const byReferenceVariant = new Map<string, number>();
-  const unpricedByReason = new Map<UnpricedReason, number>();
+  const tally = new PriceTally();
 
   for (const [name, group] of byName) {
     const difference = collisionDifference(group);
@@ -238,18 +252,18 @@ export function buildCatalogue(inputs: CatalogueInputs): BuildResult {
     if (taken !== undefined) throw new SlugCollisionError(name, taken, slug);
     slugs.set(slug, name);
 
-    // Every defindex under one name is the same Cosmetic, and the price source
-    // keys its list by that name too, so one lookup prices the whole group.
+    // Every defindex under one name is the same Cosmetic, so any of them finding
+    // the price entry prices the whole group. The source's own defindex list is
+    // the join; the name is what is left when it claims none.
     const nativeQuality = primary.nativeQuality;
     const price = inputs.prices
-      ? priceOf(inputs.prices.items.get(priceKey(name)), nativeQuality, inputs.prices.keyRate)
+      ? priceOf(
+          variantsFor(inputs.prices, [primary.defindex, ...aliases], name),
+          nativeQuality,
+          inputs.prices.rates,
+        )
       : null;
-    if (price?.state === "priced") {
-      const variant = `${price.referenceVariant.quality}-${price.referenceVariant.craftable ? "craftable" : "non-craftable"}`;
-      byReferenceVariant.set(variant, (byReferenceVariant.get(variant) ?? 0) + 1);
-    } else if (price?.state === "unpriced") {
-      unpricedByReason.set(price.reason, (unpricedByReason.get(price.reason) ?? 0) + 1);
-    }
+    tally.record(price);
 
     cosmetics.push({
       slug,
@@ -262,7 +276,6 @@ export function buildCatalogue(inputs: CatalogueInputs): BuildResult {
       paintable: primary.paintable,
       styles: [...primary.styles],
       backpackIcon: primary.backpackIcon ?? group.find((one) => one.backpackIcon)?.backpackIcon ?? null,
-      nativeQuality,
       price,
     });
   }
@@ -283,7 +296,7 @@ export function buildCatalogue(inputs: CatalogueInputs): BuildResult {
         withoutWebApiEntry,
         withoutBackpackIcon: cosmetics.filter((one) => one.backpackIcon === null).length,
       },
-      prices: priceHeader(inputs.prices, cosmetics, byReferenceVariant, unpricedByReason),
+      prices: tally.header(inputs.prices),
     },
     cosmetics,
   } satisfies Catalogue);

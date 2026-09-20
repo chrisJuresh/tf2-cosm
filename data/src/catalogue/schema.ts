@@ -81,11 +81,6 @@ const cosmeticSchema = z.object({
   backpackIcon: z
     .object({ small: z.url(), large: z.url() })
     .nullable(),
-  /**
-   * The Quality this Cosmetic is issued in, which decides the Reference Variant
-   * when no Unique copy is priced.
-   */
-  nativeQuality: z.enum(QUALITIES),
   /** Null exactly when the run had no price source; then `header.prices` is null too. */
   price: priceSchema.nullable(),
 });

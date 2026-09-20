@@ -23,9 +23,9 @@ function assertScrap(scrap: number, what: string): void {
   }
 }
 
-function assertKeyRate(scrapPerKey: number): void {
-  if (!Number.isInteger(scrapPerKey) || scrapPerKey <= 0) {
-    throw new Error(`Key Rate must be a positive whole scrap count, got ${scrapPerKey}`);
+function assertRate(scrapPerUnit: number): void {
+  if (!Number.isInteger(scrapPerUnit) || scrapPerUnit <= 0) {
+    throw new Error(`a Key Rate, or any currency's rate, must be a positive whole scrap count, got ${scrapPerUnit}`);
   }
 }
 
@@ -43,13 +43,17 @@ export function scrapToRefined(scrap: number): number {
   return scrap / SCRAP_PER_REFINED;
 }
 
-/** Keys to scrap at the snapshot's Key Rate, snapped to the nearest ninth. */
-export function keysToScrap(keys: number, scrapPerKey: number): number {
-  assertKeyRate(scrapPerKey);
-  if (!Number.isFinite(keys) || keys < 0) {
-    throw new Error(`a price in Keys must be a non-negative number, got ${keys}`);
+/**
+ * A count of some currency to scrap, at that currency's rate, snapped to the
+ * nearest ninth. For Keys the rate is the Key Rate; the source quotes a few
+ * other units (a Random Craft Hat, Earbuds) the same way.
+ */
+export function unitsToScrap(units: number, scrapPerUnit: number): number {
+  assertRate(scrapPerUnit);
+  if (!Number.isFinite(units) || units < 0) {
+    throw new Error(`a price must be a non-negative number of its currency, got ${units}`);
   }
-  return Math.round(keys * scrapPerKey);
+  return Math.round(units * scrapPerUnit);
 }
 
 /** A scrap count as traders write Refined: "24.44", "1", "0.11". No unit suffix. */
@@ -66,7 +70,7 @@ export function formatRefined(scrap: number): string {
  */
 export function traderNotation(scrap: number, scrapPerKey: number): string {
   assertScrap(scrap, "a Metal Value");
-  assertKeyRate(scrapPerKey);
+  assertRate(scrapPerKey);
   const keys = Math.floor(scrap / scrapPerKey);
   const remainder = scrap % scrapPerKey;
   const parts: string[] = [];

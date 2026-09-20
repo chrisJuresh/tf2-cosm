@@ -3,12 +3,19 @@ import { describe, expect, it } from "vitest";
 import { buildCatalogue } from "../src/catalogue/build.ts";
 import type { Price } from "../src/catalogue/schema.ts";
 import { refinedToScrap } from "../src/prices/metal.ts";
-import type { KeyRate, PricedVariant } from "../src/prices/price-source.ts";
+import type { PricedVariant, Rates } from "../src/prices/price-source.ts";
 import { priceOf } from "../src/prices/price-spread.ts";
 import { chooseReferenceVariant } from "../src/prices/reference-variant.ts";
 import { fixtureInputs, fixturePricedInputs } from "./fixtures.ts";
 
-const KEY_RATE: KeyRate = { scrapPerKey: refinedToScrap(78.66), lastUpdatedAt: "2026-09-20T00:00:00.000Z" };
+const RATES: Rates = {
+  keyRate: { scrapPerKey: refinedToScrap(78.66), lastUpdatedAt: "2026-09-20T00:00:00.000Z" },
+  scrapPerUnit: new Map([
+    ["metal", 9],
+    ["hat", 12],
+    ["keys", refinedToScrap(78.66)],
+  ]),
+};
 
 const variant = (overrides: Partial<PricedVariant> = {}): PricedVariant => ({
   quality: "unique",
@@ -33,6 +40,7 @@ describe("the Price Spread of each fixture Cosmetic", () => {
   };
 
   it("prices a Cosmetic quoted in Keys, converting at the snapshot's Key Rate", async () => {
+    // The fixture's entry claims no defindex, so this one joins on the name.
     const price = await priceBySlug("team-captain");
     expect(price).toMatchObject({
       state: "priced",
@@ -47,7 +55,8 @@ describe("the Price Spread of each fixture Cosmetic", () => {
     expect(price.spread.high.metal).toEqual({ scrap: 1770, refined: 196.6667, notation: "2 keys, 39.33 ref" });
   });
 
-  it("prices a Cosmetic quoted in Metal", async () => {
+  it("prices a Cosmetic quoted in Metal, matched by defindex although the names differ", async () => {
+    // The fixture calls it "Bolt-Boy", which is not the catalogue's name for it.
     const price = await priceBySlug("bolt-boy");
     if (price.state !== "priced") throw new Error("bolt-boy should be priced");
     expect(price.currency).toBe("metal");
@@ -118,40 +127,65 @@ describe("choosing the Reference Variant", () => {
     const chosen = chooseReferenceVariant(
       [variant({ quality: "genuine" }), variant({ craftable: false }), variant()],
       "genuine",
+      RATES,
     );
-    expect(chosen).toEqual({ variant: variant() });
+    expect(chosen).toEqual({ variant: variant(), currency: "metal", scrapPerUnit: 9 });
   });
 
   it("prefers a Unique copy over the Native Quality even when the Unique is non-craftable", () => {
-    const chosen = chooseReferenceVariant([variant({ quality: "genuine" }), variant({ craftable: false })], "genuine");
-    expect(chosen).toEqual({ variant: variant({ craftable: false }) });
+    const chosen = chooseReferenceVariant(
+      [variant({ quality: "genuine" }), variant({ craftable: false })],
+      "genuine",
+      RATES,
+    );
+    expect(chosen).toEqual({ variant: variant({ craftable: false }), currency: "metal", scrapPerUnit: 9 });
+  });
+
+  it("finds the Genuine promo price even when Valve's schema calls the item Unique", () => {
+    // The ten Cosmetics with no Unique price are Genuine promos, and the schema
+    // does not mark all of them, so the fallback chain runs regardless.
+    const chosen = chooseReferenceVariant([variant({ quality: "genuine" })], "unique", RATES);
+    expect(chosen).toEqual({ variant: variant({ quality: "genuine" }), currency: "metal", scrapPerUnit: 9 });
+  });
+
+  it("falls through the Native Qualities in the order the spec fixes", () => {
+    const priced = (["collectors", "strange", "haunted", "vintage", "genuine"] as const).map((quality) =>
+      variant({ quality }),
+    );
+    const order: string[] = [];
+    for (let remaining = [...priced]; remaining.length > 0; remaining = remaining.slice(0, -1)) {
+      const chosen = chooseReferenceVariant(remaining, "unique", RATES);
+      if (!("variant" in chosen)) throw new Error("should be priced");
+      order.push(chosen.variant.quality);
+    }
+    expect(order).toEqual(["genuine", "vintage", "haunted", "strange", "collectors"]);
   });
 
   it("never takes an Unusual, even when it is the Native Quality", () => {
-    expect(chooseReferenceVariant([variant({ quality: "unusual" })], "unusual")).toEqual({
+    expect(chooseReferenceVariant([variant({ quality: "unusual" })], "unusual", RATES)).toEqual({
       unpriced: "no-reference-variant",
     });
   });
 
   it("reports an item the source never listed as missing from it", () => {
-    expect(chooseReferenceVariant(undefined, "unique")).toEqual({ unpriced: "missing-from-source" });
+    expect(chooseReferenceVariant(undefined, "unique", RATES)).toEqual({ unpriced: "missing-from-source" });
   });
 
   it("reports an item priced only in a Quality the rule does not accept", () => {
-    expect(chooseReferenceVariant([variant({ quality: "strange" })], "unique")).toEqual({
+    expect(chooseReferenceVariant([variant({ quality: "self-made" })], "unique", RATES)).toEqual({
       unpriced: "no-reference-variant",
     });
   });
 
   it("refuses to quietly drop to a lesser Quality when the Reference Variant is in dollars", () => {
-    const chosen = chooseReferenceVariant([variant({ currency: "usd" }), variant({ quality: "genuine" })], "genuine");
+    const chosen = chooseReferenceVariant([variant({ currency: "usd" }), variant({ quality: "genuine" })], "genuine", RATES);
     expect(chosen).toEqual({ unpriced: "unsupported-currency" });
   });
 });
 
 describe("the Price Spread", () => {
   it("makes low, mid and high one figure when the source quotes one", () => {
-    const price = priceOf([variant({ low: 1.33, high: 1.33 })], "unique", KEY_RATE);
+    const price = priceOf([variant({ low: 1.33, high: 1.33 })], "unique", RATES);
     if (price.state !== "priced") throw new Error("should be priced");
     expect([price.spread.low, price.spread.mid, price.spread.high].map((point) => point.metal.scrap)).toEqual([
       12, 12, 12,
@@ -159,7 +193,7 @@ describe("the Price Spread", () => {
   });
 
   it("keeps the midpoint between the two ends after rounding to the nearest scrap", () => {
-    const price = priceOf([variant({ low: 1, high: 2 })], "unique", KEY_RATE);
+    const price = priceOf([variant({ low: 1, high: 2 })], "unique", RATES);
     if (price.state !== "priced") throw new Error("should be priced");
     const { low, mid, high } = price.spread;
     expect(low.metal.scrap).toBeLessThanOrEqual(mid.metal.scrap);
@@ -168,8 +202,37 @@ describe("the Price Spread", () => {
   });
 
   it("reads a spread the source quoted backwards in the order the catalogue wants", () => {
-    const price = priceOf([variant({ low: 3, high: 1 })], "unique", KEY_RATE);
+    const price = priceOf([variant({ low: 3, high: 1 })], "unique", RATES);
     if (price.state !== "priced") throw new Error("should be priced");
     expect([price.spread.low.value, price.spread.high.value]).toEqual([1, 3]);
+  });
+
+  it("converts a price quoted in Random Craft Hats, which is how cheap Cosmetics are priced", () => {
+    const price = priceOf([variant({ currency: "hat", low: 1, high: 2 })], "unique", RATES);
+    if (price.state !== "priced") throw new Error("should be priced");
+    expect(price.currency).toBe("hat");
+    // A Craft Hat is 1.33 ref, so twelve scrap.
+    expect(price.spread.low.metal).toEqual({ scrap: 12, refined: 1.3333, notation: "1.33 ref" });
+    expect(price.spread.high.metal).toEqual({ scrap: 24, refined: 2.6667, notation: "2.66 ref" });
+  });
+
+  it("takes the unrounded Metal figure over the rounded one the source displays", () => {
+    // 0.115 ref rounds to 0.11 for display but is a scrap either way; the point
+    // is that the unrounded figure is what the arithmetic runs on.
+    const price = priceOf([variant({ low: 1.33, high: 1.33, lowRefined: 1.4444, highRefined: 1.4444 })], "unique", RATES);
+    if (price.state !== "priced") throw new Error("should be priced");
+    expect(price.spread.low.value).toBe(1.33);
+    expect(price.spread.low.metal.scrap).toBe(13);
+  });
+
+  it("converts a Key price with the snapshot's Key Rate, not with the source's own", () => {
+    const price = priceOf(
+      // The source's unrounded figures say 100 ref a Key; the snapshot says 78.66.
+      [variant({ currency: "keys", low: 1, high: 1, lowRefined: 100, highRefined: 100 })],
+      "unique",
+      RATES,
+    );
+    if (price.state !== "priced") throw new Error("should be priced");
+    expect(price.spread.low.metal.scrap).toBe(708);
   });
 });

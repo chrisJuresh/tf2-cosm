@@ -115,7 +115,7 @@ async function loadWebApiItems(options: Options): Promise<{ items: WebApiSchemaI
 /** The price snapshot, from the one source seam ADR-0002 puts every price behind. */
 async function loadPrices(options: Options): Promise<PriceList | undefined> {
   if (options.skipPrices) return undefined;
-  return backpackTfPriceSource(requireEnv("BACKPACK_TF_API_KEY")).load();
+  return backpackTfPriceSource(requireEnv("BPTF_API_KEY")).load();
 }
 
 async function main(): Promise<number> {

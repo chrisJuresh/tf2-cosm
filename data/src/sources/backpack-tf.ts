@@ -12,12 +12,15 @@
  * pricedb.io means writing another module with the same `load()`.
  */
 import {
-  indexByName,
-  type KeyRate,
+  type CurrencyQuote,
+  indexEntries,
   type PriceList,
+  type PriceListEntry,
   type PricedVariant,
   type PriceSource,
   qualityFromId,
+  type Rates,
+  resolveScrapPerUnit,
 } from "../prices/price-source.ts";
 import { keyRateFromRefined } from "../prices/price-spread.ts";
 
@@ -58,9 +61,8 @@ interface CurrenciesResponse {
   readonly response?: {
     readonly success?: number;
     readonly message?: string;
-    readonly currencies?: {
-      readonly keys?: { readonly price?: RawPrice };
-    };
+    /** "metal", "keys", "hat", "earbuds" — each priced in one of the others. */
+    readonly currencies?: Readonly<Record<string, { readonly price?: RawPrice } | undefined>>;
   };
 }
 
@@ -125,19 +127,36 @@ async function getJson<T>(endpoint: string, apiKey: string, params: Record<strin
   return (await response.json()) as T;
 }
 
-export async function fetchKeyRate(apiKey: string, fetchImpl: typeof fetch = fetch): Promise<KeyRate> {
+/**
+ * The whole currency table, not just the Key Rate: backpack.tf prices a cheap
+ * cosmetic in Random Craft Hats and an expensive one in Earbuds, and both need a
+ * rate before they can become a Metal Value.
+ */
+export async function fetchRates(apiKey: string, fetchImpl: typeof fetch = fetch): Promise<Rates> {
   const body = await getJson<CurrenciesResponse>(CURRENCIES_ENDPOINT, apiKey, { appid: TF2_APPID }, fetchImpl);
   checkSuccess("IGetCurrencies", body.response);
-  const price = body.response?.currencies?.keys?.price;
-  if (price?.currency !== "metal" || typeof price.value !== "number") {
+
+  const quotes = new Map<string, CurrencyQuote>();
+  for (const [name, currency] of Object.entries(body.response?.currencies ?? {})) {
+    const price = currency?.price;
+    if (typeof price?.currency !== "string" || typeof price.value !== "number") continue;
+    quotes.set(name, { currency: price.currency, value: price.value });
+  }
+
+  const keysQuote = quotes.get("keys");
+  const keysPrice = body.response?.currencies?.["keys"]?.price;
+  if (keysQuote?.currency !== "metal") {
     throw new Error("backpack.tf IGetCurrencies did not price a Key in Metal");
   }
-  return keyRateFromRefined(price.value, timestamp(price.last_update, new Date().toISOString()));
+  return {
+    keyRate: keyRateFromRefined(keysQuote.value, timestamp(keysPrice?.last_update, new Date().toISOString())),
+    scrapPerUnit: resolveScrapPerUnit(quotes),
+  };
 }
 
 export async function fetchPriceList(
   apiKey: string,
-  keyRate: KeyRate,
+  rates: Rates,
   takenAt: string,
   fetchImpl: typeof fetch = fetch,
 ): Promise<PriceList> {
@@ -148,14 +167,16 @@ export async function fetchPriceList(
     fetchImpl,
   );
   checkSuccess("IGetPrices", body.response);
-  const entries: [string, PricedVariant[]][] = [];
+  const entries: PriceListEntry[] = [];
   for (const [name, item] of Object.entries(body.response?.items ?? {})) {
     if (item === undefined) continue;
     const variants = variantsOf(item, takenAt);
-    if (variants.length > 0) entries.push([name, variants]);
+    if (variants.length === 0) continue;
+    const defindexes = (item.defindex ?? []).filter((one) => Number.isInteger(one) && one > 0);
+    entries.push({ name, defindexes, variants });
   }
   if (entries.length === 0) throw new Error("backpack.tf IGetPrices returned an empty price list");
-  return { source: BACKPACK_TF_SOURCE, takenAt, keyRate, items: indexByName(entries) };
+  return { source: BACKPACK_TF_SOURCE, takenAt, rates, ...indexEntries(entries) };
 }
 
 /** The price source ADR-0002 names, behind the one interface the catalogue sees. */
@@ -164,8 +185,8 @@ export function backpackTfPriceSource(apiKey: string, fetchImpl: typeof fetch = 
     description: BACKPACK_TF_SOURCE,
     async load() {
       const takenAt = new Date().toISOString();
-      const keyRate = await fetchKeyRate(apiKey, fetchImpl);
-      return fetchPriceList(apiKey, keyRate, takenAt, fetchImpl);
+      const rates = await fetchRates(apiKey, fetchImpl);
+      return fetchPriceList(apiKey, rates, takenAt, fetchImpl);
     },
   };
 }

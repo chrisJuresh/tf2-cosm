@@ -12,7 +12,7 @@ pnpm build-catalogue
 ```
 
 Configuration comes from the environment only — copy `.env.example` to `.env` at
-the repo root and fill in `STEAM_WEB_API_KEY` and `BACKPACK_TF_API_KEY`.
+the repo root and fill in `STEAM_WEB_API_KEY` and `BPTF_API_KEY`.
 
 | flag | what it does |
 | --- | --- |
@@ -47,6 +47,22 @@ it directly and every adapter around it stays thin.
   Values; `price-source.ts` is the one interface every price crosses (ADR-0002),
   so swapping backpack.tf for pricedb.io means writing one adapter and nothing
   else.
+
+  Two rules in there are worth knowing before reading the code. A price entry is
+  joined to a Cosmetic **by defindex first** — the source asserts its defindex
+  list, where a name only has to survive both sides spelling it the same way —
+  and by name when the entry claims no defindex. And when no Unique copy is
+  priced, the fallback runs down the Native Qualities in a fixed order (Genuine,
+  Vintage, Haunted, Strange, Collector's) whether or not Valve's schema marked
+  the item — because it never does. `GetSchemaItems` reports quality 6 (Unique)
+  for every cosmetic and never once reports Genuine, so the chain, not the
+  declared Native Quality, is what finds a Genuine-only promo's price.
+
+  Prices arrive in four currencies, not two: backpack.tf quotes a cheap cosmetic
+  in Random Craft Hats and an expensive one in Earbuds. Every currency's rate
+  comes from the same `IGetCurrencies` call as the Key Rate, and a currency with
+  no rate (a price in dollars) leaves the Cosmetic Unpriced rather than converted
+  on a guess.
 - `src/sources/` — the adapters: item definitions (local install or mirror),
   Valve's Web API, backpack.tf, and the KeyValues reader they share.
 

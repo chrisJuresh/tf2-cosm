@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url";
 
 import type { CatalogueInputs } from "../src/catalogue/build.ts";
 import type { PriceList } from "../src/prices/price-source.ts";
-import { fetchKeyRate, fetchPriceList } from "../src/sources/backpack-tf.ts";
+import { fetchPriceList, fetchRates } from "../src/sources/backpack-tf.ts";
 import type { WebApiSchemaItem } from "../src/sources/steam-web-api.ts";
 import { parseEnglishTokens, parseItemsGame } from "../src/sources/vdf.ts";
 
@@ -53,13 +53,13 @@ export function fixtureBackpackTfFetch(): typeof fetch {
 
 /**
  * The recorded price list: a Key at 78.66 ref, a Cosmetic priced in Keys, one in
- * Metal, a Genuine-only promo, a non-craftable-only Unique, and one Cosmetic the
- * list does not mention at all.
+ * Metal, one in Random Craft Hats, a Genuine-only promo, a non-craftable-only
+ * Unique, and one Cosmetic the list does not mention at all.
  */
 export async function fixturePriceList(): Promise<PriceList> {
   const fetchImpl = fixtureBackpackTfFetch();
-  const keyRate = await fetchKeyRate("fixture-key", fetchImpl);
-  return fetchPriceList("fixture-key", keyRate, FIXTURE_TAKEN_AT, fetchImpl);
+  const rates = await fetchRates("fixture-key", fetchImpl);
+  return fetchPriceList("fixture-key", rates, FIXTURE_TAKEN_AT, fetchImpl);
 }
 
 /** Inputs with a fixed snapshot time, so the golden file is a function of the fixtures alone. */

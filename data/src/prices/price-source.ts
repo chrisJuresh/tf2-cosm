@@ -9,6 +9,7 @@
  * Item names are the key because ADR-0003 already makes the English display name
  * a Cosmetic's identity, and every price source keys its list the same way.
  */
+import { SCRAP_PER_REFINED, unitsToScrap } from "./metal.ts";
 
 /**
  * The Qualities a copy of an item carries, by Valve's schema ids — the same ids
@@ -45,13 +46,31 @@ export function qualityFromId(id: number | undefined): Quality | undefined {
   return QUALITIES_BY_ID[id as keyof typeof QUALITIES_BY_ID];
 }
 
-/** The currencies a price can be quoted in that the catalogue knows how to convert. */
-export const PRICE_CURRENCIES = ["metal", "keys"] as const;
+/**
+ * The currencies the catalogue can express a price in. backpack.tf quotes prices
+ * in all four — a cheap cosmetic is priced in Random Craft Hats, not in Metal —
+ * and each has a rate in `Rates`. Anything else (a price in dollars) leaves the
+ * Cosmetic Unpriced rather than converted on a guess.
+ */
+export const PRICE_CURRENCIES = ["metal", "keys", "hat", "earbuds"] as const;
 
 export type PriceCurrency = (typeof PRICE_CURRENCIES)[number];
 
 export function isPriceCurrency(currency: string): currency is PriceCurrency {
   return (PRICE_CURRENCIES as readonly string[]).includes(currency);
+}
+
+/** What the snapshot converts a source's figure into a Metal Value with. */
+export interface Rates {
+  /** Singled out from `scrapPerUnit` because the header records it and Trader Notation splits on it. */
+  readonly keyRate: KeyRate;
+  /** One unit of each currency the source quotes, in scrap. Metal is nine by definition. */
+  readonly scrapPerUnit: ReadonlyMap<string, number>;
+}
+
+/** The rate for a currency, or undefined when the snapshot cannot convert it. */
+export function rateFor(rates: Rates, currency: string): number | undefined {
+  return isPriceCurrency(currency) ? rates.scrapPerUnit.get(currency) : undefined;
 }
 
 /**
@@ -86,9 +105,11 @@ export interface PriceList {
   /** What the catalogue header records about where the prices came from. */
   readonly source: string;
   readonly takenAt: string;
-  readonly keyRate: KeyRate;
-  /** Tradable variants per item, keyed by `priceKey(name)`. */
-  readonly items: ReadonlyMap<string, readonly PricedVariant[]>;
+  readonly rates: Rates;
+  /** Tradable variants by every defindex the source's entry claims — the primary join. */
+  readonly byDefindex: ReadonlyMap<number, readonly PricedVariant[]>;
+  /** The same variants by `priceKey(name)`, for an entry that claims no defindex. */
+  readonly byName: ReadonlyMap<string, readonly PricedVariant[]>;
 }
 
 export interface PriceSource {
@@ -108,15 +129,83 @@ export function priceKey(name: string): string {
     .toLowerCase();
 }
 
-/** Every variant of an item, indexed the way `priceKey` spells its name. */
-export function indexByName(entries: Iterable<readonly [string, readonly PricedVariant[]]>): Map<string, readonly PricedVariant[]> {
-  const items = new Map<string, readonly PricedVariant[]>();
-  for (const [name, variants] of entries) {
-    const key = priceKey(name);
-    const existing = items.get(key);
-    // Two source names reducing to one key (say "The Gibus" and "Gibus") are the
-    // same Cosmetic to ADR-0003, so their variants pool rather than one winning.
-    items.set(key, existing ? [...existing, ...variants] : variants);
+/** One currency's price as the source quotes it: so many of some other currency. */
+export interface CurrencyQuote {
+  readonly currency: string;
+  readonly value: number;
+}
+
+/**
+ * Every currency's rate in scrap, from the source's own currency table.
+ *
+ * A currency may be quoted in another currency rather than in Metal — Earbuds
+ * are priced in Keys — so this resolves until nothing new lands. Metal is the
+ * base and is not taken from the table: its own quote is in dollars, which is
+ * the Dollar Basis's business, not this one's.
+ */
+export function resolveScrapPerUnit(quotes: ReadonlyMap<string, CurrencyQuote>): Map<string, number> {
+  const scrapPerUnit = new Map<string, number>([["metal", SCRAP_PER_REFINED]]);
+  for (let pass = 0; pass <= quotes.size; pass++) {
+    let landedSomething = false;
+    for (const [name, quote] of quotes) {
+      if (scrapPerUnit.has(name)) continue;
+      const base = scrapPerUnit.get(quote.currency);
+      if (base === undefined) continue;
+      scrapPerUnit.set(name, unitsToScrap(quote.value, base));
+      landedSomething = true;
+    }
+    if (!landedSomething) break;
   }
-  return items;
+  return scrapPerUnit;
+}
+
+/** One entry of a price list: what it is priced as, and which items it claims. */
+export interface PriceListEntry {
+  readonly name: string;
+  /** The defindexes the source says this entry prices. Empty when it names none. */
+  readonly defindexes: readonly number[];
+  readonly variants: readonly PricedVariant[];
+}
+
+/**
+ * The two indexes a `PriceList` joins on. Defindex is primary because it is what
+ * the source actually asserts; a name only has to survive both sides spelling it
+ * the same way. Two entries claiming one defindex, or reducing to one name key,
+ * are ambiguous and are dropped from that index rather than merged — a quiet
+ * merge would price one item with another's variants.
+ */
+export function indexEntries(entries: Iterable<PriceListEntry>): Pick<PriceList, "byDefindex" | "byName"> {
+  const byDefindex = new Map<number, readonly PricedVariant[]>();
+  const byName = new Map<string, readonly PricedVariant[]>();
+  const ambiguousDefindexes = new Set<number>();
+  const ambiguousNames = new Set<string>();
+
+  for (const entry of entries) {
+    for (const defindex of entry.defindexes) {
+      if (byDefindex.has(defindex)) ambiguousDefindexes.add(defindex);
+      byDefindex.set(defindex, entry.variants);
+    }
+    const key = priceKey(entry.name);
+    if (byName.has(key)) ambiguousNames.add(key);
+    byName.set(key, entry.variants);
+  }
+  for (const defindex of ambiguousDefindexes) byDefindex.delete(defindex);
+  for (const key of ambiguousNames) byName.delete(key);
+  return { byDefindex, byName };
+}
+
+/**
+ * A Cosmetic's variants: by any defindex it or its aliases carry, else by name.
+ * Undefined means the source prices no copy of this Cosmetic at all.
+ */
+export function variantsFor(
+  prices: PriceList,
+  defindexes: readonly number[],
+  name: string,
+): readonly PricedVariant[] | undefined {
+  for (const defindex of defindexes) {
+    const matched = prices.byDefindex.get(defindex);
+    if (matched) return matched;
+  }
+  return prices.byName.get(priceKey(name));
 }

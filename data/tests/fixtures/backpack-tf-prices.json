@@ -3,8 +3,10 @@
     "success": 1,
     "current_time": 1789000000,
     "items": {
-      "Bolt Boy": {
-        "defindex": [101],
+      "Bolt-Boy": {
+        "defindex": [
+          101
+        ],
         "prices": {
           "6": {
             "Tradable": {
@@ -24,7 +26,6 @@
         }
       },
       "The Team Captain": {
-        "defindex": [102],
         "prices": {
           "6": {
             "Tradable": {
@@ -49,13 +50,22 @@
               ]
             },
             "Non-Tradable": {
-              "Craftable": [{ "currency": "metal", "value": 0.11, "last_update": 1788700000 }]
+              "Craftable": [
+                {
+                  "currency": "metal",
+                  "value": 0.11,
+                  "last_update": 1788700000
+                }
+              ]
             }
           }
         }
       },
       "Ghastly Gibus": {
-        "defindex": [103, 104],
+        "defindex": [
+          103,
+          104
+        ],
         "prices": {
           "6": {
             "Tradable": {
@@ -72,7 +82,9 @@
         }
       },
       "Tin Pot": {
-        "defindex": [105],
+        "defindex": [
+          105
+        ],
         "prices": {
           "1": {
             "Tradable": {
@@ -91,19 +103,36 @@
           "5": {
             "Tradable": {
               "Craftable": {
-                "13": { "currency": "keys", "value": 40, "value_high": 45, "last_update": 1788400000 },
-                "17": { "currency": "keys", "value": 55, "last_update": 1788400000 }
+                "13": {
+                  "currency": "keys",
+                  "value": 40,
+                  "value_high": 45,
+                  "last_update": 1788400000
+                },
+                "17": {
+                  "currency": "keys",
+                  "value": 55,
+                  "last_update": 1788400000
+                }
               }
             }
           }
         }
       },
       "Mann Co. Supply Crate Key": {
-        "defindex": [5021],
+        "defindex": [
+          5021
+        ],
         "prices": {
           "6": {
             "Tradable": {
-              "Craftable": [{ "currency": "metal", "value": 78.66, "last_update": 1788900000 }]
+              "Craftable": [
+                {
+                  "currency": "metal",
+                  "value": 78.66,
+                  "last_update": 1788900000
+                }
+              ]
             }
           }
         }

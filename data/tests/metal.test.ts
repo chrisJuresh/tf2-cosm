@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   formatRefined,
-  keysToScrap,
+  unitsToScrap,
   refinedToScrap,
   SCRAP_PER_REFINED,
   scrapToRefined,
@@ -64,17 +64,17 @@ describe("Metal in ninths", () => {
 
 describe("converting Keys at a Key Rate", () => {
   it("converts whole Keys", () => {
-    expect(keysToScrap(1, KEY_RATE)).toBe(708);
-    expect(keysToScrap(3, KEY_RATE)).toBe(2124);
+    expect(unitsToScrap(1, KEY_RATE)).toBe(708);
+    expect(unitsToScrap(3, KEY_RATE)).toBe(2124);
   });
 
   it("converts a fractional Key to the nearest scrap", () => {
-    expect(keysToScrap(1.5, KEY_RATE)).toBe(1062);
-    expect(keysToScrap(0.11, KEY_RATE)).toBe(78);
+    expect(unitsToScrap(1.5, KEY_RATE)).toBe(1062);
+    expect(unitsToScrap(0.11, KEY_RATE)).toBe(78);
   });
 
-  it("refuses a Key Rate of zero, which would make every price meaningless", () => {
-    expect(() => keysToScrap(1, 0)).toThrow(/Key Rate/);
+  it("refuses a rate of zero, which would make every price meaningless", () => {
+    expect(() => unitsToScrap(1, 0)).toThrow(/must be a positive whole scrap count/);
   });
 });
 
