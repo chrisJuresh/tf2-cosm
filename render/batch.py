@@ -361,8 +361,18 @@ def _render_batches(
                         pool.submit(take, assigned, worker)
                         for worker, assigned in enumerate(rounds)
                     ]
-                    for finished in as_completed(running):
-                        finished.result()
+                    try:
+                        for finished in as_completed(running):
+                            finished.result()
+                    except BaseException:
+                        # Set it here, not in the outer handler: leaving this `with` block
+                        # shuts the pool down waiting, and a worker that has not been told
+                        # to stop by then works through every batch it is still holding —
+                        # a ctrl-c that drains the run instead of ending it. The same goes
+                        # for anything else a worker raises, which the serial path would
+                        # have stopped on at once.
+                        stopping.set()
+                        raise
         except KeyboardInterrupt:
             # ctrl-c reaches every Blender in the process group, so the batches in flight are
             # already gone. Stop handing out new ones, let the threads unwind, and leave; the

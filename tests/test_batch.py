@@ -489,6 +489,34 @@ def test_each_worker_gets_a_texture_cache_of_its_own(workspace: Path):
     assert len(caches) == 4
 
 
+def test_ctrl_c_stops_a_parallel_run_rather_than_draining_every_batch(workspace: Path, capsys):
+    """The pool's own shutdown waits for what is queued, so the stop flag has to beat it."""
+    jobs = write_jobs(workspace, *[dict(TEAM_CAPTAIN, slug=f"hat-{n}") for n in range(24)])
+    launched = []
+    lock = threading.Lock()
+
+    def interrupted(command: list[str]) -> int:
+        with lock:
+            launched.append(command)
+            first = len(launched) == 1
+        if first:
+            raise KeyboardInterrupt
+        return 0
+
+    code = runner.run(
+        args_for(workspace, jobs, batch_size=2, workers=3), launch=interrupted
+    )
+
+    assert code == 130
+    assert "run it again" in capsys.readouterr().out
+    # 24 batches over 3 workers. Stopping promptly means each worker gives up at its next
+    # batch, so only what was already in flight is launched — not the eight apiece they were
+    # each holding. A bound of one more than the worker count is generous about the race.
+    assert len(launched) <= 4, (
+        f"ctrl-c drained {len(launched)} batches instead of stopping the run"
+    )
+
+
 def test_a_single_worker_keeps_the_one_shared_texture_cache(workspace: Path):
     settings = args_for(workspace, workspace / "jobs.json", workers=1)
 
