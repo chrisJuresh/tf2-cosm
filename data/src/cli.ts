@@ -261,6 +261,9 @@ async function main(): Promise<number> {
       .filter(([variant]) => variant !== "unique-craftable")
       .reduce((total, [, count]) => total + count, 0);
     console.log(`    fallbacks used   ${fallbacks}`);
+    // A Blanket Price is the source's craft-hat default rather than a figure it
+    // observed, so it is worth a count of its own however many take it (ADR-0004).
+    console.log(`    Blanket Prices   ${priceHeader.counts.blanketPriced}`);
     console.log(`    Unpriced         ${priceHeader.counts.unpriced}`);
     for (const [reason, count] of Object.entries(priceHeader.counts.unpricedByReason)) {
       console.log(`      ${reason.padEnd(22)} ${count}`);

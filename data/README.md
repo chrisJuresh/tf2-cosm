@@ -72,6 +72,12 @@ it directly and every adapter around it stays thin.
   comes from the same `IGetCurrencies` call as the Key Rate, and a currency with
   no rate (a price in dollars) leaves the Cosmetic Unpriced rather than converted
   on a guess.
+
+  The Random Craft Hat is also the one currency that call marks as a *blanket*: a
+  figure applied to every cheap hat rather than observed for one. It stands as a
+  Reference Price everywhere but for a Promo-Only Cosmetic, where it prices a
+  Unique copy Valve never issued — `src/catalogue/issued-in-play.ts` is the half
+  of that test the game files answer, and ADR-0004 is the whole rule.
 - `src/prices/dollar-basis.ts` — the Dollar Bases the header carries: the Steam
   Market's key price (lowest and median), the price source's own refined-to-dollar
   estimate, and the Mann Co. Store constant. The header names that middle one
@@ -98,7 +104,9 @@ shape shows up as a diff. Rewrite it deliberately with `UPDATE_GOLDEN=1 pnpm tes
 and read what changed.
 
 The price fixtures (`tests/fixtures/backpack-tf-*.json`) are read through the real
-adapter, not around it, and between them cover the five cases the price rules have
+adapter, not around it, and between them cover the eight cases the price rules have
 to get right: a Cosmetic priced in Keys, one priced in Metal, a Genuine-only promo
-taking the Native Quality fallback, a Unique priced only non-craftable, and one the
-price list does not mention at all.
+taking the Native Quality fallback, a Unique priced only non-craftable, one the
+price list does not mention at all, and three quoted at one Random Craft Hat — one
+that drops, one a loot list hands out, and one Promo-Only, which is the only one of
+the three whose blanket figure is passed over.

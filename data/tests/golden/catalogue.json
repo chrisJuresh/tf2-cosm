@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "header": {
     "snapshotTakenAt": "2026-09-20T12:00:00.000Z",
     "sources": {
@@ -7,8 +7,8 @@
       "englishNames": "fixtures: ISteamEconomy/GetSchemaItems"
     },
     "counts": {
-      "cosmetics": 5,
-      "classExclusive": 3,
+      "cosmetics": 8,
+      "classExclusive": 6,
       "multiClass": 1,
       "allClass": 1,
       "aliasesMerged": 1,
@@ -25,13 +25,14 @@
         "lastUpdatedAt": "2026-09-08T20:40:00.000Z"
       },
       "counts": {
-        "priced": 4,
+        "priced": 7,
         "unpriced": 1,
         "byReferenceVariant": {
-          "genuine-craftable": 1,
-          "unique-craftable": 2,
+          "genuine-craftable": 2,
+          "unique-craftable": 4,
           "unique-non-craftable": 1
         },
+        "blanketPriced": 2,
         "unpricedByReason": {
           "missing-from-source": 1
         }
@@ -69,6 +70,59 @@
   },
   "cosmetics": [
     {
+      "slug": "baronial-badge",
+      "name": "Baronial Badge",
+      "defindex": 113,
+      "aliases": [],
+      "slot": "misc",
+      "classes": [
+        "engineer"
+      ],
+      "kind": "class-exclusive",
+      "paintable": false,
+      "styles": [],
+      "backpackIcon": {
+        "small": "https://steamcdn-a.akamaihd.net/apps/440/icons/baronial_badge.77889900aabbccddeeff112233445566778899aa.png",
+        "large": "https://steamcdn-a.akamaihd.net/apps/440/icons/baronial_badge_large.77889900aabbccddeeff112233445566778899aa.png"
+      },
+      "price": {
+        "state": "priced",
+        "referenceVariant": {
+          "quality": "genuine",
+          "craftable": true
+        },
+        "currency": "metal",
+        "blanket": false,
+        "spread": {
+          "low": {
+            "value": 5.77,
+            "metal": {
+              "scrap": 52,
+              "refined": 5.7778,
+              "notation": "5.77 ref"
+            }
+          },
+          "mid": {
+            "value": 6.105,
+            "metal": {
+              "scrap": 55,
+              "refined": 6.1111,
+              "notation": "6.11 ref"
+            }
+          },
+          "high": {
+            "value": 6.44,
+            "metal": {
+              "scrap": 58,
+              "refined": 6.4444,
+              "notation": "6.44 ref"
+            }
+          }
+        },
+        "lastUpdatedAt": "2026-08-31T18:13:20.000Z"
+      }
+    },
+    {
       "slug": "bolt-boy",
       "name": "Bolt Boy",
       "defindex": 101,
@@ -91,6 +145,7 @@
           "craftable": true
         },
         "currency": "metal",
+        "blanket": false,
         "spread": {
           "low": {
             "value": 1.33,
@@ -118,6 +173,59 @@
           }
         },
         "lastUpdatedAt": "2026-09-08T20:40:00.000Z"
+      }
+    },
+    {
+      "slug": "crocodile-smile",
+      "name": "Crocodile Smile",
+      "defindex": 112,
+      "aliases": [],
+      "slot": "head",
+      "classes": [
+        "sniper"
+      ],
+      "kind": "class-exclusive",
+      "paintable": false,
+      "styles": [],
+      "backpackIcon": {
+        "small": "https://steamcdn-a.akamaihd.net/apps/440/icons/crocodile_smile.99aabbccddeeff00112233445566778899aabbcc.png",
+        "large": "https://steamcdn-a.akamaihd.net/apps/440/icons/crocodile_smile_large.99aabbccddeeff00112233445566778899aabbcc.png"
+      },
+      "price": {
+        "state": "priced",
+        "referenceVariant": {
+          "quality": "unique",
+          "craftable": true
+        },
+        "currency": "hat",
+        "blanket": true,
+        "spread": {
+          "low": {
+            "value": 1,
+            "metal": {
+              "scrap": 12,
+              "refined": 1.3333,
+              "notation": "1.33 ref"
+            }
+          },
+          "mid": {
+            "value": 1,
+            "metal": {
+              "scrap": 12,
+              "refined": 1.3333,
+              "notation": "1.33 ref"
+            }
+          },
+          "high": {
+            "value": 1,
+            "metal": {
+              "scrap": 12,
+              "refined": 1.3333,
+              "notation": "1.33 ref"
+            }
+          }
+        },
+        "lastUpdatedAt": "2026-09-01T22:00:00.000Z"
       }
     },
     {
@@ -174,6 +282,7 @@
           "craftable": false
         },
         "currency": "metal",
+        "blanket": false,
         "spread": {
           "low": {
             "value": 0.11,
@@ -204,6 +313,59 @@
       }
     },
     {
+      "slug": "scotsman-s-stove-pipe",
+      "name": "Scotsman's Stove Pipe",
+      "defindex": 111,
+      "aliases": [],
+      "slot": "head",
+      "classes": [
+        "demoman"
+      ],
+      "kind": "class-exclusive",
+      "paintable": false,
+      "styles": [],
+      "backpackIcon": {
+        "small": "https://steamcdn-a.akamaihd.net/apps/440/icons/stove_pipe.112233445566778899aabbccddeeff0011223344.png",
+        "large": "https://steamcdn-a.akamaihd.net/apps/440/icons/stove_pipe_large.112233445566778899aabbccddeeff0011223344.png"
+      },
+      "price": {
+        "state": "priced",
+        "referenceVariant": {
+          "quality": "unique",
+          "craftable": true
+        },
+        "currency": "hat",
+        "blanket": true,
+        "spread": {
+          "low": {
+            "value": 1,
+            "metal": {
+              "scrap": 12,
+              "refined": 1.3333,
+              "notation": "1.33 ref"
+            }
+          },
+          "mid": {
+            "value": 1,
+            "metal": {
+              "scrap": 12,
+              "refined": 1.3333,
+              "notation": "1.33 ref"
+            }
+          },
+          "high": {
+            "value": 1,
+            "metal": {
+              "scrap": 12,
+              "refined": 1.3333,
+              "notation": "1.33 ref"
+            }
+          }
+        },
+        "lastUpdatedAt": "2026-09-01T22:00:00.000Z"
+      }
+    },
+    {
       "slug": "team-captain",
       "name": "Team Captain",
       "defindex": 102,
@@ -227,6 +389,7 @@
           "craftable": true
         },
         "currency": "keys",
+        "blanket": false,
         "spread": {
           "low": {
             "value": 2,
@@ -288,6 +451,7 @@
           "craftable": true
         },
         "currency": "metal",
+        "blanket": false,
         "spread": {
           "low": {
             "value": 18.66,

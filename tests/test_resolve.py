@@ -118,9 +118,12 @@ def test_medals_never_tradable_items_and_modelless_items_are_excluded_with_a_rea
         (108, "Scrap Metal Hat Part", "no-model"),
     ]
     assert [c.name for c in result.cosmetics] == [
+        "Baronial Badge",
         "Bolt Boy",
+        "Crocodile Smile",
         "Dead of Night",
         "Ghastly Gibus",
+        "Scotsman's Stove Pipe",
         "Team Captain",
         "Tin Pot",
     ]
@@ -133,11 +136,11 @@ def test_the_dry_run_counts_jobs_by_class_and_exclusions_by_reason(schema, token
         "scout": 2,
         "soldier": 4,
         "pyro": 1,
-        "demoman": 2,
+        "demoman": 3,
         "heavy": 1,
-        "engineer": 1,
+        "engineer": 2,
         "medic": 1,
-        "sniper": 1,
+        "sniper": 2,
         "spy": 2,
     }
     assert sum(result.jobs_by_class.values()) == len(result.jobs)

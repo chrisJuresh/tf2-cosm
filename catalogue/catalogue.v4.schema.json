@@ -1,12 +1,12 @@
 {
-  "$id": "https://github.com/chrisJuresh/tf2-cosm/catalogue/v3",
-  "title": "TF2 Cosmetics catalogue v3",
+  "$id": "https://github.com/chrisJuresh/tf2-cosm/catalogue/v4",
+  "title": "TF2 Cosmetics catalogue v4",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
   "properties": {
     "schemaVersion": {
       "type": "number",
-      "const": 3
+      "const": 4
     },
     "header": {
       "type": "object",
@@ -152,6 +152,11 @@
                         "maximum": 9007199254740991
                       }
                     },
+                    "blanketPriced": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
                     "unpricedByReason": {
                       "type": "object",
                       "propertyNames": {
@@ -173,6 +178,7 @@
                     "priced",
                     "unpriced",
                     "byReferenceVariant",
+                    "blanketPriced",
                     "unpricedByReason"
                   ],
                   "additionalProperties": false
@@ -537,6 +543,9 @@
                           "earbuds"
                         ]
                       },
+                      "blanket": {
+                        "type": "boolean"
+                      },
                       "spread": {
                         "type": "object",
                         "properties": {
@@ -672,6 +681,7 @@
                       "state",
                       "referenceVariant",
                       "currency",
+                      "blanket",
                       "spread",
                       "lastUpdatedAt"
                     ],

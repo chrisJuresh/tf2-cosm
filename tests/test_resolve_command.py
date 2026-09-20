@@ -21,9 +21,9 @@ def test_the_dry_run_reports_counts_and_every_excluded_item(schema, tokens, mode
     print_dry_run(resolve(schema, tokens, model_index))
     printed = capsys.readouterr().out
 
-    assert reported(printed, "Cosmetics:")[-1] == "5"
+    assert reported(printed, "Cosmetics:")[-1] == "8"
     assert reported(printed, "All-Class:")[-1] == "1"
-    assert reported(printed, "jobs:")[-1] == "15"
+    assert reported(printed, "jobs:")[-1] == "18"
     assert reported(printed, "  soldier ") == ["soldier", "4"]
     assert reported(printed, "ESL Season 1 Gold Medal")[-1] == "medal"
     assert reported(printed, "Ye Olde Baker Boy")[-1] == "never-tradable"

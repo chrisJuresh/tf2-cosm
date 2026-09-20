@@ -14,6 +14,7 @@ import {
   wornModels,
 } from "./cosmetic-rule.ts";
 import { displayName, slugify } from "./identity.ts";
+import { issuedInPlay } from "./issued-in-play.ts";
 import {
   block,
   type ItemDefinition,
@@ -109,6 +110,8 @@ interface Candidate {
   readonly styles: readonly Style[];
   readonly backpackIcon: Cosmetic["backpackIcon"];
   readonly nativeQuality: Quality;
+  /** Whether the game hands this defindex out in play, which decides a Blanket Price (ADR-0004). */
+  readonly issuedInPlay: boolean;
   /** Every model this defindex is worn as; two defindexes of one Cosmetic share them. */
   readonly models: readonly string[];
 }
@@ -156,6 +159,7 @@ function collisionDifference(candidates: readonly Candidate[]): CollisionDiffere
 /** What the run made of the price list, accumulated one Cosmetic at a time. */
 class PriceTally {
   private priced = 0;
+  private blanketPriced = 0;
   private unpriced = 0;
   private readonly byReferenceVariant = new Map<string, number>();
   private readonly unpricedByReason = new Map<UnpricedReason, number>();
@@ -164,6 +168,7 @@ class PriceTally {
     if (price === null) return;
     if (price.state === "priced") {
       this.priced++;
+      if (price.blanket) this.blanketPriced++;
       const label = referenceVariantLabel(price.referenceVariant.quality, price.referenceVariant.craftable);
       this.byReferenceVariant.set(label, (this.byReferenceVariant.get(label) ?? 0) + 1);
     } else {
@@ -183,6 +188,7 @@ class PriceTally {
         priced: this.priced,
         unpriced: this.unpriced,
         byReferenceVariant: Object.fromEntries([...this.byReferenceVariant].sort()),
+        blanketPriced: this.blanketPriced,
         unpricedByReason: Object.fromEntries([...this.unpricedByReason].sort()),
       },
     };
@@ -227,6 +233,7 @@ export function buildCatalogue(inputs: CatalogueInputs): BuildResult {
       styles: styleNames(item, webApiItem, englishTokens),
       backpackIcon: backpackIconOf(webApiItem),
       nativeQuality: nativeQualityOf(webApiItem),
+      issuedInPlay: issuedInPlay(item, inputs.itemsGame.lootListItems),
       models: wornModels(item, classes),
     });
   }
@@ -262,11 +269,15 @@ export function buildCatalogue(inputs: CatalogueInputs): BuildResult {
     // Every defindex under one name is the same Cosmetic, so any of them finding
     // the price entry prices the whole group. The source's own defindex list is
     // the join; the name is what is left when it claims none.
-    const nativeQuality = primary.nativeQuality;
     const price = inputs.prices
       ? priceOf(
           variantsFor(inputs.prices, [primary.defindex, ...aliases], name),
-          nativeQuality,
+          {
+            nativeQuality: primary.nativeQuality,
+            // Any defindex under the name being issued in play makes the
+            // Cosmetic one: they are the same item worn the same way (ADR-0003).
+            issuedInPlay: group.some((one) => one.issuedInPlay),
+          },
           inputs.prices.rates,
         )
       : null;
