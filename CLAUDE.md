@@ -6,6 +6,8 @@
 
 Issues live in GitHub Issues at `chrisJuresh/tf2-cosm`, managed with the `gh` CLI. See `docs/agents/issue-tracker.md`.
 
+Every pull request closes its issue from its **body** — `Closes #<n>.` on the first line, or `No issue: <why>` when it genuinely closes none. An issue number in the title closes nothing. A hook denies `gh pr create` and `land.py` otherwise.
+
 ### Triage labels
 
 The five canonical triage roles are used verbatim as label strings. See `docs/agents/triage-labels.md`.

@@ -15,6 +15,21 @@
             "statusMessage": "Checking this change is in its own worktree"
           }
         ]
+      },
+      {
+        "matcher": "Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python",
+            "args": [
+              "-S",
+              "${CLAUDE_PROJECT_DIR}/.claude/hooks/pr-closes-issue.py"
+            ],
+            "timeout": 15,
+            "statusMessage": "Checking this pull request closes its issue"
+          }
+        ]
       }
     ],
     "SessionStart": [
