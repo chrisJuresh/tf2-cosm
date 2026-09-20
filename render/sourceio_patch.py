@@ -37,9 +37,10 @@ def collapse_slashes(path: str) -> str:
 
 
 def suffix_of(path: str) -> str:
-    """The suffix of a path's last component, as `pathlib` reads it.
+    """The suffix of the last component of a `/`-separated path.
 
     `a.b/c` has no suffix, and a leading dot names a dotfile rather than starting one.
+    `TinyPath` turns every separator into `/` in `__new__`, so splitting on it is enough.
     """
     name = path[path.rindex("/") + 1 :] if "/" in path else path
     dot = name.rfind(".")
