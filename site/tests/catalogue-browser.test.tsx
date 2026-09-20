@@ -14,7 +14,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { fixtureBasis, fixtureCosmetics, fixtureKeyRate } from "./fixtures.ts";
 
 import { CatalogueBrowser } from "@/components/catalogue-browser";
-import { CONTROLS_STORAGE_KEY } from "@/browsing/storage";
+import { CONTROLS_STORAGE_KEY } from "@/browser/remembered-controls";
 
 afterEach(() => {
   localStorage.clear();

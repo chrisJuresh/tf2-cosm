@@ -4,7 +4,7 @@
  */
 import { afterEach, describe, expect, it } from "vitest";
 
-import { CONTROLS_STORAGE_KEY, readControls, writeControls } from "@/browsing/storage";
+import { CONTROLS_STORAGE_KEY, readControls, writeControls } from "@/browser/remembered-controls";
 import { DEFAULT_CONTROLS } from "@/browsing/controls";
 
 afterEach(() => {

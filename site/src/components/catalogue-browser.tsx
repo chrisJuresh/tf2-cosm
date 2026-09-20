@@ -13,7 +13,7 @@ import type { Cosmetic, Metal } from "@tf2-cosm/data/catalogue";
 import { useMemo } from "react";
 
 import { visibleCosmetics } from "@/browsing/controls";
-import { useRememberedControls } from "@/browsing/use-remembered-controls";
+import { useRememberedControls } from "@/browser/remembered-controls";
 import { BrowsingControlsBar } from "@/components/browsing-controls";
 import { CosmeticList } from "@/components/cosmetic-list";
 import type { DollarBasis } from "@/prices/format";

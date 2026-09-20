@@ -1,22 +1,25 @@
+"use client";
+
 /**
- * The controls, remembered in this browser.
+ * The browsing controls, remembered in this browser — `remembered.ts` next door,
+ * but for a whole document rather than one string.
  *
- * This is a per-viewer convenience and nothing more: it never leaves the
- * machine, it is never read back by anything but this page, and the page has to
- * work perfectly without it. A private window, blocked site data or a viewer who
- * cleared their storage all arrive here as "nothing stored", which is the same
- * thing as a first visit — so every read that could throw is caught and answered
- * with the defaults rather than with an error.
+ * The terms are that file's: a per-viewer convenience that never leaves the
+ * machine, guarded at every access because a private window, blocked site data
+ * or cleared storage makes the accessor throw rather than answer nothing, and
+ * read after mount because the static markup React hydrates was built with
+ * nobody's preference in it.
  *
- * What is stored is validated field by field on the way back in. The stored
- * document outlives the build that wrote it: a Class that was renamed or a sort
- * order that was dropped would otherwise come back as a control nothing on the
- * page can represent, and one stale field is not a reason to throw away the
- * rest.
+ * What a whole document adds is that it has to be checked on the way back in. A
+ * stored control outlives the build that wrote it: a Class that was renamed or a
+ * sort order that was dropped would come back as a control nothing on the page
+ * can represent. Each field is read on its own, so one stale field costs its own
+ * default and not the rest.
  */
 import { CLASSES, COSMETIC_SLOTS, type ClassName, type CosmeticSlot } from "@tf2-cosm/data/catalogue";
+import { useCallback, useEffect, useState } from "react";
 
-import { DEFAULT_CONTROLS, SORT_ORDERS, type BrowsingControls, type SortOrder } from "./controls.ts";
+import { DEFAULT_CONTROLS, SORT_ORDERS, type BrowsingControls, type SortOrder } from "@/browsing/controls";
 
 /**
  * Versioned in the key rather than in the document: when the shape changes past
@@ -81,4 +84,39 @@ export function writeControls(storage: Storage | null, controls: BrowsingControl
     // A full or blocked storage costs the viewer their settings next visit and
     // nothing else. There is nothing here worth interrupting them over.
   }
+}
+
+/** This browser's storage, or nothing at all — which is a state, not a failure. */
+function browserStorage(): Storage | null {
+  try {
+    return typeof window === "undefined" ? null : window.localStorage;
+  } catch {
+    return null;
+  }
+}
+
+export function useRememberedControls(): readonly [BrowsingControls, (change: Partial<BrowsingControls>) => void] {
+  const [state, setState] = useState<{ controls: BrowsingControls; restored: boolean }>({
+    controls: DEFAULT_CONTROLS,
+    restored: false,
+  });
+
+  useEffect(() => {
+    setState({ controls: readControls(browserStorage()), restored: true });
+  }, []);
+
+  // Only the remembered fields are watched. The search is not one of them, and
+  // waking this up on every keystroke to write the same bytes back is work for
+  // nothing.
+  const { classView, hideAllClass, slot, hideUnpriced, sort } = state.controls;
+  useEffect(() => {
+    if (!state.restored) return;
+    writeControls(browserStorage(), { ...DEFAULT_CONTROLS, classView, hideAllClass, slot, hideUnpriced, sort });
+  }, [state.restored, classView, hideAllClass, slot, hideUnpriced, sort]);
+
+  const change = useCallback((patch: Partial<BrowsingControls>) => {
+    setState((previous) => ({ ...previous, controls: { ...previous.controls, ...patch } }));
+  }, []);
+
+  return [state.controls, change] as const;
 }
