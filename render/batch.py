@@ -28,7 +28,13 @@ from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
 
-from render.extract import DEFAULT_TF
+from render.cli import (
+    DEFAULT_MANIFEST,
+    DEFAULT_OUT,
+    DEFAULT_SITE_PACKAGES,
+    add_job_filters,
+    add_render_paths,
+)
 from render.jobs import job_list, validate_job_list
 from render.manifest import load_manifest
 from render.plan import Batch, RunPlan, account_for, batches, plan_run
@@ -39,10 +45,6 @@ from render.selection import NothingSelected
 REPO_ROOT = Path(__file__).resolve().parent.parent
 BLENDER_SCRIPT = REPO_ROOT / "render" / "blender_job.py"
 DEFAULT_BLENDER = Path("C:/Program Files/Blender Foundation/Blender 5.2/blender.exe")
-DEFAULT_CACHE = REPO_ROOT / "assets-cache"
-DEFAULT_OUT = REPO_ROOT / "renders" / "masters"
-DEFAULT_MANIFEST = REPO_ROOT / "catalogue" / "renders.json"
-DEFAULT_SITE_PACKAGES = REPO_ROOT / ".venv" / "Lib" / "site-packages"
 
 #: Images per Blender process. Small enough that a crash costs minutes rather than hours,
 #: large enough that the mount and add-on start-up (a few seconds) disappear into the run.
@@ -86,11 +88,8 @@ def parse_args(argv: list[str] | None = None) -> Settings:
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    parser.add_argument("--jobs", type=Path, required=True, help="the job list from render.resolve")
-    parser.add_argument("--slug", nargs="+", default=None, help="Cosmetic slugs to render")
-    parser.add_argument("--class", dest="classes", nargs="+", default=None, help="Classes to render")
-    parser.add_argument("--team", dest="teams", nargs="+", default=list(TEAMS), help="Teams to render")
-    parser.add_argument("--style", dest="styles", nargs="+", type=int, default=None, help="Style indices")
+    add_job_filters(parser, teams_flag="--team")
+    parser.set_defaults(teams=list(TEAMS))
     parser.add_argument(
         "--batch-size", type=int, default=DEFAULT_BATCH_SIZE, help="images per Blender process"
     )
@@ -105,14 +104,10 @@ def parse_args(argv: list[str] | None = None) -> Settings:
         action="store_true",
         help="skip the check that each recorded image is still on disk",
     )
-    parser.add_argument("--blender", type=Path, default=DEFAULT_BLENDER)
-    parser.add_argument("--tf", type=Path, default=DEFAULT_TF, help="the game's tf folder")
-    parser.add_argument("--cache", type=Path, default=DEFAULT_CACHE)
-    parser.add_argument("--out", type=Path, default=DEFAULT_OUT, help="the output root for masters")
-    parser.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST)
-    parser.add_argument("--size", type=int, default=1024)
-    parser.add_argument("--samples", type=int, default=32)
-    parser.add_argument("--site-packages", type=Path, default=DEFAULT_SITE_PACKAGES)
+    parser.add_argument(
+        "--blender", type=Path, default=DEFAULT_BLENDER, help="the Blender to run the render step in"
+    )
+    add_render_paths(parser)
     return Settings(**vars(parser.parse_args(argv)))
 
 

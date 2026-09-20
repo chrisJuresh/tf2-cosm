@@ -22,7 +22,8 @@ Shape, version 1:
         }
       },
       "failures": [
-        {"slug", "class", "team", "style", "model", "reason", "detail", "failed_at"}
+        {"slug", "class", "team", "style", "model", "reason", "detail", "failed_at",
+         "job_version"}
       ]
     }
 
@@ -73,6 +74,7 @@ FAILURE_FIELD_TYPES: dict[str, type | tuple[type, ...]] = {
     "reason": str,
     "detail": (str, type(None)),
     "failed_at": str,
+    "job_version": int,
 }
 
 
@@ -164,6 +166,7 @@ class Manifest:
             "reason": reason,
             "detail": detail,
             "failed_at": at,
+            "job_version": JOB_LIST_VERSION,
         }
         self._document["failures"].append(failure)
         return failure

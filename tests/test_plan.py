@@ -93,6 +93,17 @@ def test_a_job_that_failed_before_is_left_alone_so_a_second_run_does_nothing():
     assert plan.known_failures == 1
 
 
+def test_a_job_version_bump_retries_failures_too_so_it_re_renders_everything(monkeypatch):
+    manifest = Manifest()
+    manifest.fail(KILLER, "red", reason=REASON_IMPORT_ERROR, detail="boom", at=AT)
+    monkeypatch.setattr("render.plan.JOB_LIST_VERSION", 2)
+
+    plan = plan_run(a_list(KILLER), manifest, teams=["red"])
+
+    assert [work.teams for work in plan.work] == [("red",)]
+    assert plan.known_failures == 0
+
+
 def test_asking_for_failures_to_be_retried_puts_them_back_in_the_run():
     manifest = Manifest()
     manifest.fail(KILLER, "red", reason=REASON_IMPORT_ERROR, detail="boom", at=AT)

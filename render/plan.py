@@ -137,7 +137,14 @@ def _is_rendered(
 
 
 def _has_failed(manifest: Manifest, job: dict, team: str) -> bool:
-    return manifest.failure(job["slug"], job["class"], team, job["style"]) is not None
+    """Whether this job failed under the job list we are rendering from.
+
+    A failure recorded under an older `JOB_LIST_VERSION` is not news about this one: the bump
+    is what says the job's definition has changed, and a model or a bodygroup that resolves
+    differently now is exactly the thing that might succeed this time.
+    """
+    failure = manifest.failure(job["slug"], job["class"], team, job["style"])
+    return failure is not None and failure["job_version"] == JOB_LIST_VERSION
 
 
 class Outcome(NamedTuple):
