@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -34,6 +35,7 @@ TF = Path(
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SITE_PACKAGES = Path(sys.prefix) / "Lib" / "site-packages"
 CACHE = REPO_ROOT / "assets-cache"
+TEXTURE_CACHE = CACHE / "texture-cache"
 
 #: A bust, a bust whose Style hides two class bodygroups, and a Cosmetic with no BLU skin.
 RENDERED = [
@@ -57,6 +59,10 @@ def rendered(tmp_path_factory) -> tuple[dict, Path]:
     jobs_file = workspace / "jobs.json"
     out = workspace / "images"  # the output root; masters and web sizes sit under it
     manifest_file = workspace / "manifest.json"
+
+    # Rendered cold, so the texture cache has to fill during this run: a warm cache would
+    # let the #32 regression through. The folder is a cache and nothing else reads it.
+    shutil.rmtree(TEXTURE_CACHE, ignore_errors=True)
 
     resolution = resolve_installed_game(TF, only=NAMES)
     jobs = [
@@ -169,3 +175,16 @@ def test_every_master_gains_its_web_sizes(rendered, slug, cls, style):
         with Image.open(out / record["path"]) as image:
             assert image.size == (int(size), int(size))
             assert image.convert("RGBA").getpixel((0, 0))[3] == 0
+
+
+def test_every_texture_is_cached_under_its_own_path(rendered):
+    """SourceIO's decoded textures land in the cache, not on one truncated path (#32).
+
+    `TinyPath.with_suffix` used to cut the path at the first dotted directory, so every
+    texture was written to `<repo root>/.png` and the cache stayed empty of images while
+    still growing the directories. Nested PNGs are what tells the two apart.
+    """
+    cached = sorted(TEXTURE_CACHE.rglob("*.png"))
+    assert cached, f"SourceIO wrote no texture under {TEXTURE_CACHE}"
+    nested = [p for p in cached if p.parent != TEXTURE_CACHE]
+    assert nested, f"no texture kept its path in the game: {[p.name for p in cached]}"
