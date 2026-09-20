@@ -45,7 +45,12 @@ export function DollarBasisSwitch({ offered, active, onChoose }: DollarBasisSwit
       // Three options with their rates are wider than a phone, and stacking them
       // costs more of the screen than the list can spare, so on a narrow screen
       // the switch scrolls sideways instead of growing downwards.
-      className="flex max-w-full shrink-0 gap-1 overflow-x-auto rounded-lg bg-black/5 p-1 dark:bg-white/10"
+      //
+      // `relative` is what keeps that scrolling inside the strip. Each option's
+      // radio is `sr-only`, which is absolutely positioned; with no positioned
+      // ancestor the ones scrolled out of view are laid out against the page
+      // instead, and the page grows sideways to hold them.
+      className="relative flex max-w-full shrink-0 gap-1 overflow-x-auto rounded-lg bg-black/5 p-1 dark:bg-white/10"
     >
       {offered.map((basis) => {
         const checked = basis.id === active.id;

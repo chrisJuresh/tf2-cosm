@@ -43,14 +43,15 @@ the time a run picks it up.
   arrived is not offered at all, rather than guessed at. The price source names
   itself in the header and nowhere in this code, so ADR-0002's swappable source
   stays swappable without an edit here.
-- `src/components/cosmetic-list.tsx` — the list, a client component fed the whole
-  catalogue. Its rows are virtualised, so eighteen hundred of them with a picture
-  each scroll without the browser holding eighteen hundred rows. A phone has room
-  for four columns across rather than five, so it carries the Metal Value on a
-  second line under the Cosmetic's name instead of dropping it. A row opens in
-  place, one at a time; because an open row is taller by an amount that depends
-  on how its panel wraps, rows are measured rather than assumed and the fixed
-  height is only the estimate the list starts from.
+- `src/components/cosmetic-list.tsx` — the list, a client component fed the
+  Cosmetics it is to draw and nothing about why those are the ones. Its rows are
+  virtualised, so eighteen hundred of them with a picture each scroll without the
+  browser holding eighteen hundred rows. A phone has room for four columns across
+  rather than five, so it carries the Metal Value on a second line under the
+  Cosmetic's name instead of dropping it. A row opens in place, one at a time;
+  because an open row is taller by an amount that depends on how its panel wraps,
+  rows are measured rather than assumed and the fixed height is only the estimate
+  the list starts from.
 - `src/components/cosmetic-detail.tsx` — what an open row shows: the Price
   Spread, the Reference Variant the figure is for, when the source last repriced
   it, who can wear it, and the defindexes ADR-0003 folded into it.
@@ -64,6 +65,20 @@ the time a run picks it up.
 - `src/browser/remembered.ts` — a choice remembered in this browser and nowhere
   else. Every access is guarded, the page is right without it, and it is read
   after mount so the static markup React hydrates carries nobody's preference.
+- `src/browsing/controls.ts` — the browsing rules, pure: the Class View's three
+  inclusion rules, the toggles, the slot filter, the sorts and the name search,
+  and the one function that turns the whole catalogue into the rows to draw. The
+  controls are a surface over this file, not the place the rules live.
+- `src/browser/remembered-controls.ts` — those controls as this browser remembers
+  them, on the same terms as `remembered.ts` but for a whole document rather than
+  one string, so every field is checked on the way back in. Everything but the
+  search is kept: a Class, a sort and a set of toggles are where a viewer left the
+  catalogue, and a half-typed name is not.
+- `src/components/browsing-controls.tsx` — the control bar. Plain form controls
+  with real labels, which is what makes them keyboard operable and properly
+  announced without a line of code for either.
+- `src/components/catalogue-browser.tsx` — where the rules and the bar meet: it
+  holds what the viewer picked and hands the list what is left.
 
 The open Cosmetic's slug is the URL hash, so a row can be linked to, and every
 row carries its slug in `data-slug` — the hook the later wishlist and per-item
@@ -83,7 +98,9 @@ Component tests are driven from `data/tests/golden/catalogue.json` — the docum
 the data job builds from the shared Cosmetic oracle, read where it lives rather
 than copied here, so a change to the catalogue's shape reaches these tests the
 moment it lands. Its five Cosmetics cover a price in Metal, a price in Keys, the
-cheapest price there is, Styles and an Unpriced item. The tests assert what a
+cheapest price there is, Styles, an Unpriced item and all three of
+Class-Exclusive, Multi-Class and All-Class — which is what makes them an oracle
+for the Class View rules as well as for the figures. The tests assert what a
 viewer sees: the rows, their order, and the figures as they are written on
 screen. `tests/setup.ts` gives jsdom a fixed 1024×800 viewport, because a
 virtualised list in a DOM that lays nothing out would decide nothing is visible
@@ -107,9 +124,9 @@ not run against 7, so this package pins `typescript@5`. Both are checked by
 
 ## Not here yet
 
-The Class View, filters, sort, search and their remembered state are #13; Worn
-Renders in place of Backpack Icons, and the Style switcher and Team toggle inside
-the open row, are #16.
+Worn Renders in place of Backpack Icons, and the Style switcher and Team toggle
+inside the open row, are #16.
+
 The whole catalogue is handed to the client as one payload, which is what makes
 the exported HTML large; trimming it to the fields a row needs is worth doing
-once those tickets have settled what a row needs.
+now that the tickets have settled what a row needs.

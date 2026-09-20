@@ -16,6 +16,15 @@ import { UNPRICED_REASONS } from "../prices/reference-variant.ts";
 
 export const CATALOGUE_SCHEMA_VERSION = 4;
 
+/**
+ * The vocabularies the fields below are drawn from, re-exported so that a reader
+ * of the catalogue has one import for the file's whole shape. A site offering a
+ * Class filter needs the nine Classes themselves, not only the promise that a
+ * Cosmetic's `classes` are among them.
+ */
+export { CLASSES, COSMETIC_SLOTS, type ClassName, type CosmeticSlot } from "./cosmetic-rule.ts";
+export { UNPRICED_REASONS, type UnpricedReason } from "../prices/reference-variant.ts";
+
 export const COSMETIC_KINDS = ["class-exclusive", "multi-class", "all-class"] as const;
 
 export type CosmeticKind = (typeof COSMETIC_KINDS)[number];
