@@ -1,11 +1,11 @@
 /**
  * The Cosmetic rule, applied to a prefab-resolved item definition.
  *
- * This is the same rule the render job's resolve step applies (issue #4, R1):
+ * This is the same rule the render job's resolve step applies (`render/cosmetics.py`):
  * wearable item class, head or misc slot, not a tournament or community medal,
  * no baked never-tradable attribute, and at least one Class resolves to a worn
- * model at item level or in a Style. `fixtures/cosmetic-rule/` is the shared
- * oracle both implementations are tested against.
+ * model at item level or in a Style. `docs/fixtures/cosmetic-oracle.md` is the
+ * shared oracle both implementations are tested against.
  */
 import { block, type ItemDefinition, scalar } from "./item-definition.ts";
 
@@ -30,7 +30,7 @@ export type CosmeticSlot = (typeof COSMETIC_SLOTS)[number];
 const MEDAL_TYPES = new Set(["#TF_Wearable_TournamentMedal", "#TF_Wearable_CommunityMedal"]);
 
 /** Why an item that is nearly a Cosmetic was left out. */
-export type ExclusionReason = "not-wearable" | "medal" | "never-tradable" | "no-worn-model";
+export type ExclusionReason = "not-wearable" | "medal" | "never-tradable" | "no-model";
 
 /** One Style as items_game defines it, before its name is localised. */
 export interface StyleDefinition {
@@ -130,6 +130,6 @@ export function exclusionReason(item: ItemDefinition): ExclusionReason | undefin
   if (scalar(item, "item_class") !== "tf_wearable" || cosmeticSlotOf(item) === undefined) return "not-wearable";
   if (MEDAL_TYPES.has(scalar(item, "item_type_name") ?? "")) return "medal";
   if (isNeverTradable(item)) return "never-tradable";
-  if (!hasWornModel(item, classesFor(item))) return "no-worn-model";
+  if (!hasWornModel(item, classesFor(item))) return "no-model";
   return undefined;
 }

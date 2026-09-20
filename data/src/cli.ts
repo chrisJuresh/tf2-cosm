@@ -24,12 +24,11 @@ const REPO_ROOT = fileURLToPath(new URL("../../", import.meta.url));
 
 /**
  * What the render job's resolve step counted on 2026-09-20 from the same game
- * files. It counts defindexes; the catalogue counts Cosmetics, which is the same
- * number less the defindexes ADR-0003 merges as aliases. The two implementations
- * apply the same Cosmetic rule, so a delta in the comparable figure is either a
- * schema update or a bug in one of them.
+ * files (`python -m render.resolve --dry-run`). Both apply the same Cosmetic rule
+ * and merge aliases the same way, so a delta is either a schema update or a bug
+ * in one of them.
  */
-const RENDER_RESOLVE_DEFINDEX_COUNT = 1841;
+const RENDER_RESOLVE_COSMETICS = 1833;
 
 interface Options {
   readonly tfPath: string | undefined;
@@ -136,10 +135,9 @@ async function main(): Promise<number> {
   console.log(`  without an icon    ${counts.withoutBackpackIcon}`);
   for (const [reason, count] of [...excludedByReason].sort()) console.log(`  excluded ${reason.padEnd(14)} ${count}`);
 
-  const defindexes = counts.cosmetics + counts.aliasesMerged;
-  const delta = defindexes - RENDER_RESOLVE_DEFINDEX_COUNT;
+  const delta = counts.cosmetics - RENDER_RESOLVE_COSMETICS;
   console.log(
-    `  Cosmetic defindexes ${defindexes} vs render resolve ${RENDER_RESOLVE_DEFINDEX_COUNT}` +
+    `  render resolve     ${RENDER_RESOLVE_COSMETICS} Cosmetics` +
       (delta === 0 ? " (agrees)" : ` (delta ${delta > 0 ? "+" : ""}${delta} — explain before committing)`),
   );
   if (warnings.length > 0) {

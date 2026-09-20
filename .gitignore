@@ -7,6 +7,11 @@ dist/
 venv/
 __pycache__/
 *.pyc
+.pytest_cache/
+.mypy_cache/
+
+# the resolve step's output: regenerated from the installed game, never committed
+jobs.json
 
 # secrets and local config
 .env

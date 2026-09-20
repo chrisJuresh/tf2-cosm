@@ -31,8 +31,9 @@ count next to the render job's own, which must agree.
 in, catalogue out. It touches no network, clock or filesystem, so the tests drive
 it directly and every adapter around it stays thin.
 
-- `src/catalogue/cosmetic-rule.ts` — which items are Cosmetics, shared in spirit
-  with `render/resolve.py` and in fact with `fixtures/cosmetic-rule/`.
+- `src/catalogue/cosmetic-rule.ts` — which items are Cosmetics. The render job
+  decides the same thing in `render/cosmetics.py`; the two are pinned to one
+  fixture, `docs/fixtures/cosmetic-oracle.md`.
 - `src/catalogue/identity.ts` — name and slug, per ADR-0003.
 - `src/catalogue/schema.ts` — the versioned catalogue shape. Nothing is written
   without passing it.
@@ -46,6 +47,6 @@ pnpm test
 pnpm typecheck
 ```
 
-`tests/golden/catalogue.json` is the whole document built from the fixtures, so
-any change to the catalogue's shape shows up as a diff. Rewrite it deliberately
-with `UPDATE_GOLDEN=1 pnpm test` and read what changed.
+`tests/golden/catalogue.json` is the whole document built from the shared oracle
+fixture, so any change to the catalogue's shape shows up as a diff. Rewrite it
+deliberately with `UPDATE_GOLDEN=1 pnpm test` and read what changed.

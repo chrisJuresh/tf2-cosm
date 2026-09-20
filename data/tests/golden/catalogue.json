@@ -3,13 +3,13 @@
   "header": {
     "snapshotTakenAt": "2026-09-20T12:00:00.000Z",
     "sources": {
-      "itemDefinitions": "fixtures/cosmetic-rule/items_game.txt",
+      "itemDefinitions": "tests/fixtures/items_game_excerpt.txt",
       "englishNames": "fixtures: ISteamEconomy/GetSchemaItems"
     },
     "counts": {
       "cosmetics": 5,
-      "classExclusive": 2,
-      "multiClass": 2,
+      "classExclusive": 3,
+      "multiClass": 1,
       "allClass": 1,
       "aliasesMerged": 1,
       "withoutWebApiEntry": 0,
@@ -18,10 +18,46 @@
   },
   "cosmetics": [
     {
-      "slug": "ghastlierest-gibus",
-      "name": "Ghastlierest Gibus",
-      "defindex": 116,
+      "slug": "bolt-boy",
+      "name": "Bolt Boy",
+      "defindex": 101,
       "aliases": [],
+      "slot": "head",
+      "classes": [
+        "scout"
+      ],
+      "kind": "class-exclusive",
+      "paintable": false,
+      "styles": [],
+      "backpackIcon": {
+        "small": "https://steamcdn-a.akamaihd.net/apps/440/icons/boltboy.1a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d.png",
+        "large": "https://steamcdn-a.akamaihd.net/apps/440/icons/boltboy_large.1a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d.png"
+      }
+    },
+    {
+      "slug": "dead-of-night",
+      "name": "Dead of Night",
+      "defindex": 109,
+      "aliases": [],
+      "slot": "misc",
+      "classes": [
+        "spy"
+      ],
+      "kind": "class-exclusive",
+      "paintable": true,
+      "styles": [],
+      "backpackIcon": {
+        "small": "https://steamcdn-a.akamaihd.net/apps/440/icons/dead_of_night.5f0e0bf1d3f3b5d4f2f8a9b0c1d2e3f4a5b6c7d8.png",
+        "large": "https://steamcdn-a.akamaihd.net/apps/440/icons/dead_of_night_large.5f0e0bf1d3f3b5d4f2f8a9b0c1d2e3f4a5b6c7d8.png"
+      }
+    },
+    {
+      "slug": "ghastly-gibus",
+      "name": "Ghastly Gibus",
+      "defindex": 103,
+      "aliases": [
+        104
+      ],
       "slot": "head",
       "classes": [
         "scout",
@@ -35,40 +71,22 @@
         "spy"
       ],
       "kind": "all-class",
-      "paintable": true,
-      "styles": [
-        {
-          "index": 0,
-          "name": "Ghastlier"
-        },
-        {
-          "index": 1,
-          "name": "Ghastly"
-        },
-        {
-          "index": 2,
-          "name": "Ghastlierest"
-        },
-        {
-          "index": 3,
-          "name": "Ghostly"
-        }
-      ],
+      "paintable": false,
+      "styles": [],
       "backpackIcon": {
-        "small": "https://steamcdn-a.akamaihd.net/apps/440/icons/all_domination_b_demo.1a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d.png",
-        "large": "https://steamcdn-a.akamaihd.net/apps/440/icons/all_domination_b_demo_large.1a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d.png"
+        "small": "https://steamcdn-a.akamaihd.net/apps/440/icons/gibus.0011223344556677889900aabbccddeeff001122.png",
+        "large": "https://steamcdn-a.akamaihd.net/apps/440/icons/gibus_large.0011223344556677889900aabbccddeeff001122.png"
       }
     },
     {
       "slug": "team-captain",
       "name": "Team Captain",
-      "defindex": 378,
+      "defindex": 102,
       "aliases": [],
       "slot": "head",
       "classes": [
         "soldier",
-        "heavy",
-        "medic"
+        "demoman"
       ],
       "kind": "multi-class",
       "paintable": false,
@@ -79,26 +97,9 @@
       }
     },
     {
-      "slug": "texas-ten-gallon",
-      "name": "Texas Ten Gallon",
-      "defindex": 94,
-      "aliases": [],
-      "slot": "head",
-      "classes": [
-        "engineer"
-      ],
-      "kind": "class-exclusive",
-      "paintable": true,
-      "styles": [],
-      "backpackIcon": {
-        "small": "https://steamcdn-a.akamaihd.net/apps/440/icons/engineer_cowboy_hat.5f0e0bf1d3f3b5d4f2f8a9b0c1d2e3f4a5b6c7d8.png",
-        "large": "https://steamcdn-a.akamaihd.net/apps/440/icons/engineer_cowboy_hat_large.5f0e0bf1d3f3b5d4f2f8a9b0c1d2e3f4a5b6c7d8.png"
-      }
-    },
-    {
       "slug": "tin-pot",
       "name": "Tin Pot",
-      "defindex": 844,
+      "defindex": 105,
       "aliases": [],
       "slot": "head",
       "classes": [
@@ -109,48 +110,16 @@
       "styles": [
         {
           "index": 0,
-          "name": "Battered"
+          "name": "Closed"
         },
         {
           "index": 1,
-          "name": "Standard Issue"
+          "name": "Open"
         }
       ],
       "backpackIcon": {
-        "small": "https://steamcdn-a.akamaihd.net/apps/440/icons/robot_helmet.aabbccddeeff00112233445566778899aabbccdd.png",
-        "large": "https://steamcdn-a.akamaihd.net/apps/440/icons/robot_helmet_large.aabbccddeeff00112233445566778899aabbccdd.png"
-      }
-    },
-    {
-      "slug": "triad-trinket",
-      "name": "Triad Trinket",
-      "defindex": 814,
-      "aliases": [
-        835
-      ],
-      "slot": "misc",
-      "classes": [
-        "scout",
-        "heavy",
-        "engineer",
-        "sniper",
-        "spy"
-      ],
-      "kind": "multi-class",
-      "paintable": false,
-      "styles": [
-        {
-          "index": 0,
-          "name": "Bare"
-        },
-        {
-          "index": 1,
-          "name": "Bear"
-        }
-      ],
-      "backpackIcon": {
-        "small": "https://steamcdn-a.akamaihd.net/apps/440/icons/sd_shirt.0011223344556677889900aabbccddeeff001122.png",
-        "large": "https://steamcdn-a.akamaihd.net/apps/440/icons/sd_shirt_large.0011223344556677889900aabbccddeeff001122.png"
+        "small": "https://steamcdn-a.akamaihd.net/apps/440/icons/tin_pot.aabbccddeeff00112233445566778899aabbccdd.png",
+        "large": "https://steamcdn-a.akamaihd.net/apps/440/icons/tin_pot_large.aabbccddeeff00112233445566778899aabbccdd.png"
       }
     }
   ]
