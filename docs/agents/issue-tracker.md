@@ -13,7 +13,40 @@ Issues and specs for this repo live as GitHub issues. Use the `gh` CLI for all o
 
 Infer the repo from `git remote -v` — `gh` does this automatically when run inside a clone.
 
-This repo is `chrisJuresh/tf2-cosm` (`git@github.com:chrisJuresh/tf2-cosm.git`). The local working copy is not yet a git clone — until it is, pass `--repo chrisJuresh/tf2-cosm` to `gh` explicitly.
+This repo is `chrisJuresh/tf2-cosm` (`git@github.com:chrisJuresh/tf2-cosm.git`), and the local working copy is a clone, so `gh` infers it. Outside the clone, pass `--repo chrisJuresh/tf2-cosm` explicitly.
+
+## Closing an issue when the work lands
+
+**A pull request closes its issue from its body, and the body is the only place GitHub looks.**
+
+```
+Closes #<n>.
+```
+
+First line of the PR body. `closes`, `fixes` and `resolves` all work, in any tense, and
+`owner/repo#n` works across repositories. A `--fill` body comes from the branch's commit
+messages, so the line can live in the commit instead — `.claude/scripts/land.py` takes that
+route when it is given no `--body-file`.
+
+**An issue number in the PR *title* closes nothing.** That is not a style preference, it is
+what happened: #19 delivered #4 with `(#4)` in its title and no keyword in its body, so #4
+stayed open, and a day later a session set out to build what was already on `main`. #20
+opened with `Closes #9.` and closed its issue on merge.
+
+A pull request that genuinely closes no issue — a guard resync, a dependency bump — says so
+on a line of its own, with a reason:
+
+```
+No issue: syncing the guard from upstream.
+```
+
+`.claude/hooks/pr-closes-issue.py` enforces this: it reads the body the PR would get, by
+whichever route `gh` would take, and denies `gh pr create` and `land.py` when that body
+would close nothing. It fails open on anything it cannot read. `tests/test_pr_closes_issue.py`
+is its suite. The operator's switches are `CLAUDE_PR_CLOSES_ISSUE=off` and `=warn`.
+
+Closing by hand with `gh issue close` stays correct for an issue that no pull request
+delivers — one answered in discussion, or one that turns out to be already done.
 
 ## Pull requests as a triage surface
 
