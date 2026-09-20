@@ -13,9 +13,22 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fixtureBasis, fixtureCosmetics, fixtureKeyRate } from "./fixtures.ts";
 
 import { CosmeticList } from "@/components/cosmetic-list";
+import { EMPTY_MANIFEST } from "@/renders/manifest";
 
 function renderList(overrides: Partial<Parameters<typeof CosmeticList>[0]> = {}) {
-  render(<CosmeticList cosmetics={fixtureCosmetics()} keyRate={fixtureKeyRate()} basis={fixtureBasis()} {...overrides} />);
+  render(
+    <CosmeticList
+      cosmetics={fixtureCosmetics()}
+      // The panel is the same panel with or without a picture in it; the Style
+      // switcher and the Team toggle have a suite of their own in
+      // `worn-renders.test.tsx`.
+      manifest={EMPTY_MANIFEST}
+      classView={null}
+      keyRate={fixtureKeyRate()}
+      basis={fixtureBasis()}
+      {...overrides}
+    />,
+  );
 }
 
 /** The control a viewer clicks or tabs to, which is the Cosmetic's own name. */

@@ -15,6 +15,8 @@
  */
 import type { Catalogue } from "@tf2-cosm/data/catalogue";
 
+import type { RenderManifest } from "@/renders/manifest";
+
 import { useRememberedChoice } from "@/browser/remembered";
 import { CatalogueBrowser } from "@/components/catalogue-browser";
 import { DollarBasisSwitch } from "@/components/dollar-basis-switch";
@@ -44,7 +46,13 @@ function Moment({ iso }: { iso: string }) {
   return <time dateTime={iso}>{`${SNAPSHOT_TIME.format(new Date(iso))} UTC`}</time>;
 }
 
-export function CatalogueView({ catalogue }: { catalogue: Catalogue }) {
+export interface CatalogueViewProps {
+  readonly catalogue: Catalogue;
+  /** Which Worn Renders exist; empty when no run has produced any. */
+  readonly manifest: RenderManifest;
+}
+
+export function CatalogueView({ catalogue, manifest }: CatalogueViewProps) {
   const { header } = catalogue;
   const offered = dollarBases(header.dollarBases);
   const [remembered, remember] = useRememberedChoice(DOLLAR_BASIS_KEY);
@@ -83,7 +91,7 @@ export function CatalogueView({ catalogue }: { catalogue: Catalogue }) {
         {basis === null ? null : <DollarBasisSwitch offered={offered} active={basis} onChoose={(chosen) => remember(chosen.id)} />}
       </header>
       <main className="mx-auto flex w-full max-w-5xl min-h-0 flex-1 flex-col px-4 sm:px-6">
-        <CatalogueBrowser cosmetics={catalogue.cosmetics} keyRate={keyRate} basis={basis} />
+        <CatalogueBrowser cosmetics={catalogue.cosmetics} manifest={manifest} keyRate={keyRate} basis={basis} />
       </main>
     </>
   );
