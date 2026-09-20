@@ -81,6 +81,10 @@ fifty times as long and saves nothing.
 
 ## What one render is
 
+- SourceIO decodes each texture once and caches the PNG under
+  `assets-cache/texture-cache/`, keyed by the texture's path in the game. It is a cache and
+  nothing reads it but SourceIO: delete the folder to force a re-decode after a game update.
+  It is inside `assets-cache/`, so it is already gitignored.
 - The game folder is mounted once per process and SourceIO is patched once, so a selection
   of jobs costs one mount and one add-on start-up.
 - The class model and the Cosmetic's model are imported with SourceIO's
@@ -118,8 +122,20 @@ add-on and must stay replaceable, so nothing is changed inside it.
    detail layer instead. At TF2's detail strengths the layer is invisible anyway.
    `$detailblendmode 6` — almost every TF2 item, at 1 % — is unsupported upstream and
    correctly ignored; its `[ERROR] unhandled Detail mode, got6` lines are harmless.
+3. **`TinyPath.suffix` reads the whole path.** It takes the text after the *last dot
+   anywhere in the path*, not the last dot in the final component, so `with_suffix` on any
+   path with a dotted directory in it throws the rest of the path away. This broke the
+   texture cache: SourceIO saves a decoded texture to
+   `TinyPath(TextureCachePath) / texture`, then calls `with_suffix(".png")` on the joined
+   path. With the cache under a `.claude/worktrees/...` checkout, every texture was written
+   to `<repo root>/.png` — one junk file in the repo root, each texture overwriting the last,
+   and a cache that never hit, so every texture was decoded again on every import. We
+   replace the `suffix` property with `render.sourceio_patch.suffix_of`, which scopes it to
+   the last component the way `pathlib` does; `with_suffix` is built on it and is fixed too.
+   The `TextureCachePath` we set was always correct — it is a directory, and the add-on
+   reads it as one.
 
-Neither of these is ours to fix upstream from here; both are worth reporting.
+None of these is ours to fix upstream from here; all are worth reporting.
 
 ## Things found the hard way
 
