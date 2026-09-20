@@ -19,7 +19,9 @@ violates the schema fails the build rather than deploying.
 The site has no configuration of its own. Every rate it quotes — the Key Rate,
 and each of the three Dollar Bases a dollar figure can be computed from — comes
 out of the catalogue header, so there is nowhere for a number on the page to have
-come from but the snapshot.
+come from but the snapshot. A rate's own date is shown alongside the snapshot's,
+because they are not the same date: a price source's estimate can be weeks old by
+the time a run picks it up.
 
 ## Shape
 
@@ -74,6 +76,11 @@ viewer sees: the rows, their order, and the figures as they are written on
 screen. `tests/setup.ts` gives jsdom a fixed 1024×800 viewport, because a
 virtualised list in a DOM that lays nothing out would decide nothing is visible
 and render no rows.
+
+`tests/page.test.tsx` is the exception: it renders the page against the committed
+catalogue rather than the fixture, because the component suites drive the view
+and the footer apart from each other and neither can see whether the page puts
+them on the same screen.
 
 jsdom applies no stylesheet, so nothing here can assert the responsive layout;
 phone width is checked in a real browser.

@@ -150,9 +150,26 @@ describe("the header", () => {
 
   it("says when the snapshot was taken, in a form a machine can read too", () => {
     renderView();
-    const taken = within(screen.getByRole("banner")).getByText(/20 September 2026/);
-    expect(taken).toHaveAttribute("dateTime", "2026-09-20T12:00:00.000Z");
-    expect(taken.textContent).toContain("UTC");
+    const header = screen.getByRole("banner");
+    expect(header).toHaveTextContent(/Snapshot taken 20 September 2026 at 12:00 UTC/);
+    expect(within(header).getAllByRole("time")[0]).toHaveAttribute("dateTime", "2026-09-20T12:00:00.000Z");
+  });
+
+  it("says when the active basis's own rate was quoted, which can be weeks older", () => {
+    // The snapshot is from 20 September; backpack.tf last repriced a Refined on
+    // the 8th. A viewer told only the snapshot's age would read the rate as
+    // twelve days fresher than it is.
+    renderView();
+    chooseBasisNamed(/backpack\.tf estimate/);
+    const header = screen.getByRole("banner");
+    expect(header).toHaveTextContent(/backpack\.tf estimate rate quoted 08 September 2026 at 20:40 UTC/);
+    expect(within(header).getAllByRole("time")[1]).toHaveAttribute("dateTime", "2026-09-08T20:40:00.000Z");
+  });
+
+  it("claims no such date for the Mann Co. Store, whose constant has none", () => {
+    renderView();
+    chooseBasisNamed(/Mann Co\. Store/);
+    expect(screen.getByRole("banner")).not.toHaveTextContent(/rate quoted/);
   });
 });
 

@@ -11,8 +11,9 @@
  * absolutely positioned rows are not a `<table>`, but they are still a table to
  * anyone reading the page with a screen reader.
  *
- * Filters, sort and search are #13; the Dollar Basis switch is #14; the Worn
- * Render in place of the icon is #16.
+ * The Dollar Basis the dollar column is computed at is chosen above the list and
+ * handed down. Filters, sort and search are #13; the Worn Render in place of the
+ * icon is #16.
  */
 import type { Cosmetic, Metal } from "@tf2-cosm/data/catalogue";
 import { useVirtualizer } from "@tanstack/react-virtual";

@@ -38,6 +38,11 @@ const SNAPSHOT_TIME = new Intl.DateTimeFormat("en-GB", {
   timeZone: "UTC",
 });
 
+/** A moment in the snapshot, written for a reader and marked up for a machine. */
+function Moment({ iso }: { iso: string }) {
+  return <time dateTime={iso}>{`${SNAPSHOT_TIME.format(new Date(iso))} UTC`}</time>;
+}
+
 export function CatalogueView({ catalogue }: { catalogue: Catalogue }) {
   const { header } = catalogue;
   const offered = dollarBases(header.dollarBases);
@@ -61,10 +66,17 @@ export function CatalogueView({ catalogue }: { catalogue: Catalogue }) {
             )}
           </p>
           <p className="text-xs text-black/50 dark:text-white/50">
-            Snapshot taken{" "}
-            <time dateTime={header.snapshotTakenAt}>
-              {`${SNAPSHOT_TIME.format(new Date(header.snapshotTakenAt))} UTC`}
-            </time>
+            Snapshot taken <Moment iso={header.snapshotTakenAt} />
+            {/* When the snapshot was taken is not when the rate it quotes was:
+                a price source's estimate can be weeks old by the time a run
+                picks it up, and a viewer told only the snapshot's age would
+                read the rate as fresher than it is. */}
+            {basis?.quotedAt == null ? null : (
+              <>
+                {" "}
+                · {basis.label} rate quoted <Moment iso={basis.quotedAt} />
+              </>
+            )}
           </p>
         </div>
         {basis === null ? null : <DollarBasisSwitch offered={offered} active={basis} onChoose={(chosen) => remember(chosen.id)} />}

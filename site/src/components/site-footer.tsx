@@ -2,6 +2,12 @@
  * Whose work this page is showing. Nothing on it is the site's own, and every
  * one of these sources is used on terms that ask to be named, so the credit is
  * part of the page rather than a courtesy.
+ *
+ * The price source is named here even though ADR-0002 keeps it swappable, and
+ * `format.ts` takes pains not to name it. A credit needs somewhere to send the
+ * reader and the header carries no link, so swapping the source means editing
+ * this list — which is the one place in the site where naming the vendor is the
+ * whole point.
  */
 interface Credit {
   readonly name: string;

@@ -22,17 +22,24 @@ export interface DollarBasisSwitchProps {
 }
 
 export function DollarBasisSwitch({ offered, active, onChoose }: DollarBasisSwitchProps) {
+  const stripRef = useRef<HTMLDivElement>(null);
   const activeRef = useRef<HTMLLabelElement>(null);
 
   // On a phone the switch is wider than the screen, and a remembered basis is
   // often the one furthest along it, so the option in force is brought into
-  // view rather than left off the edge. `scrollIntoView` is missing in jsdom.
+  // view rather than left off the edge. The strip's own scroll is moved rather
+  // than `scrollIntoView`, which is free to scroll every ancestor as well and
+  // would jerk the page out from under a viewer on load.
   useEffect(() => {
-    activeRef.current?.scrollIntoView?.({ block: "nearest", inline: "nearest" });
+    const strip = stripRef.current;
+    const option = activeRef.current;
+    if (strip === null || option === null) return;
+    strip.scrollLeft = option.offsetLeft - (strip.clientWidth - option.clientWidth) / 2;
   }, [active.id]);
 
   return (
     <div
+      ref={stripRef}
       role="radiogroup"
       aria-label="Dollar Basis"
       // Three options with their rates are wider than a phone, and stacking them

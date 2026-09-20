@@ -19,9 +19,7 @@ import { formatRefined, scrapToRefined, traderNotation } from "@tf2-cosm/data/pr
  * outlive a snapshot — one is remembered in a browser and read back against a
  * later catalogue — so they name the basis's role, never its vendor.
  */
-export const DOLLAR_BASIS_IDS = ["steam-community-market", "price-source", "mann-co-store"] as const;
-
-export type DollarBasisId = (typeof DOLLAR_BASIS_IDS)[number];
+export type DollarBasisId = "steam-community-market" | "price-source" | "mann-co-store";
 
 export interface DollarBasis {
   readonly id: DollarBasisId;
@@ -29,6 +27,12 @@ export interface DollarBasis {
   readonly label: string;
   /** The header's own account of where the rate came from, so a viewer can check it. */
   readonly source: string;
+  /**
+   * When this rate was itself quoted, which is not when the snapshot was taken:
+   * a price source's estimate can be weeks old by the time a run picks it up.
+   * Null for the Mann Co. Store, whose constant has no date.
+   */
+  readonly quotedAt: string | null;
   /** What a Key costs under this basis, which is how a viewer recognises it. */
   readonly usdPerKey: number;
   readonly usdPerRefined: number;
@@ -38,12 +42,21 @@ export interface DollarBasis {
  * The price source names itself in the header and nowhere in this code: ADR-0002
  * keeps the source swappable behind one seam, so a site that spelled the vendor
  * out would have to be edited the day it is swapped. The vendor is the first
- * word of the header's source line — "backpack.tf refined-to-dollar estimate
+ * word of the data job's own phrasing — "backpack.tf refined-to-dollar estimate
  * (IGetCurrencies v1)" is offered as "backpack.tf estimate".
+ *
+ * Reading a name out of a prose sentence is the weak part of this, so the shape
+ * the data job writes is matched exactly and anything else falls back to naming
+ * no vendor at all: a source phrased another way should read as "Price source
+ * estimate", never as a word lifted out of the middle of a sentence. The honest
+ * fix is a vendor field in the header, which is a catalogue schema version —
+ * worth taking the day there is a second source to swap to.
  */
+const VENDOR = /^(\S+) refined-to-dollar estimate/;
+
 function priceSourceLabel(source: string): string {
-  const vendor = source.trim().split(/\s+/)[0];
-  return vendor === undefined || vendor === "" ? "Price source estimate" : `${vendor} estimate`;
+  const vendor = VENDOR.exec(source)?.[1];
+  return vendor === undefined ? "Price source estimate" : `${vendor} estimate`;
 }
 
 /**
@@ -68,6 +81,7 @@ export function dollarBases(bases: DollarBases | null): DollarBasis[] {
       id: "steam-community-market",
       label: "Steam Community Market",
       source: market.source,
+      quotedAt: market.takenAt,
       ...marketRate,
     });
   }
@@ -78,6 +92,7 @@ export function dollarBases(bases: DollarBases | null): DollarBasis[] {
       id: "price-source",
       label: priceSourceLabel(priceSource.source),
       source: priceSource.source,
+      quotedAt: priceSource.lastUpdatedAt,
       ...priceSource.rate,
     });
   }
@@ -86,6 +101,7 @@ export function dollarBases(bases: DollarBases | null): DollarBasis[] {
     id: "mann-co-store",
     label: "Mann Co. Store",
     source: bases.mannCoStore.source,
+    quotedAt: null,
     ...bases.mannCoStore.rate,
   });
 

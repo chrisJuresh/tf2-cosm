@@ -127,6 +127,25 @@ describe("the Dollar Bases a snapshot offers", () => {
     expect(store?.usdPerKey).toBe(2.49);
   });
 
+  it("carries when each rate was quoted, which is not when the snapshot was taken", () => {
+    // The Mann Co. Store's constant is the one rate with no date to carry.
+    expect(dollarBases(bases(2.29, 2.33)).map((basis) => basis.quotedAt)).toEqual([
+      "2026-09-20T12:00:00.000Z",
+      "2026-09-08T20:40:00.000Z",
+      null,
+    ]);
+  });
+
+  it("names no vendor at all when the header phrases its source another way", () => {
+    // Better a label that claims nothing than a word lifted out of a sentence.
+    const header = bases(2.29, 2.33);
+    const reworded = dollarBases({
+      ...header,
+      priceSource: { ...header.priceSource!, source: "Estimated refined-to-dollar rate from backpack.tf" },
+    });
+    expect(reworded[1]?.label).toBe("Price source estimate");
+  });
+
   it("carries what the header says each rate came from, so a viewer can check it", () => {
     expect(dollarBases(bases(2.29, 2.33)).map((basis) => basis.source)).toEqual([
       "Steam Community Market price overview",
