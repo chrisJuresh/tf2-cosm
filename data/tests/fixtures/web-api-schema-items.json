@@ -5,6 +5,7 @@
     "item_class": "tf_wearable",
     "item_type_name": "Hat",
     "item_name": "Bolt Boy",
+    "item_quality": 6,
     "proper_name": true,
     "item_slot": "head",
     "image_url": "https://steamcdn-a.akamaihd.net/apps/440/icons/boltboy.1a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d.png",
@@ -16,6 +17,7 @@
     "item_class": "tf_wearable",
     "item_type_name": "Hat",
     "item_name": "Team Captain",
+    "item_quality": 6,
     "proper_name": true,
     "item_slot": "head",
     "image_url": "https://steamcdn-a.akamaihd.net/apps/440/icons/soldier_officer.9f8e7d6c5b4a39281706f5e4d3c2b1a099887766.png",
@@ -27,6 +29,7 @@
     "item_class": "tf_wearable",
     "item_type_name": "Hat",
     "item_name": "Ghastly Gibus",
+    "item_quality": 6,
     "proper_name": false,
     "item_slot": "head",
     "image_url": "https://steamcdn-a.akamaihd.net/apps/440/icons/gibus.0011223344556677889900aabbccddeeff001122.png",
@@ -38,6 +41,7 @@
     "item_class": "tf_wearable",
     "item_type_name": "Hat",
     "item_name": "Ghastly Gibus",
+    "item_quality": 6,
     "proper_name": false,
     "item_slot": "head",
     "image_url": "https://steamcdn-a.akamaihd.net/apps/440/icons/gibus.0011223344556677889900aabbccddeeff001122.png",
@@ -49,11 +53,19 @@
     "item_class": "tf_wearable",
     "item_type_name": "Hat",
     "item_name": "Tin Pot",
+    "item_quality": 1,
     "proper_name": false,
     "item_slot": "head",
     "image_url": "https://steamcdn-a.akamaihd.net/apps/440/icons/tin_pot.aabbccddeeff00112233445566778899aabbccdd.png",
     "image_url_large": "https://steamcdn-a.akamaihd.net/apps/440/icons/tin_pot_large.aabbccddeeff00112233445566778899aabbccdd.png",
-    "styles": [{ "name": "Closed" }, { "name": "Open" }]
+    "styles": [
+      {
+        "name": "Closed"
+      },
+      {
+        "name": "Open"
+      }
+    ]
   },
   {
     "name": "ESL Season 1 Gold Medal",
@@ -61,6 +73,7 @@
     "item_class": "tf_wearable",
     "item_type_name": "Tournament Medal",
     "item_name": "ESL Season 1 Gold Medal",
+    "item_quality": 6,
     "proper_name": false,
     "item_slot": "misc",
     "image_url": "https://steamcdn-a.akamaihd.net/apps/440/icons/esl_medal.fedcba0987654321fedcba0987654321fedcba09.png",
@@ -72,6 +85,7 @@
     "item_class": "tf_wearable",
     "item_type_name": "Hat",
     "item_name": "Ye Olde Baker Boy",
+    "item_quality": 6,
     "proper_name": false,
     "item_slot": "head",
     "image_url": "https://steamcdn-a.akamaihd.net/apps/440/icons/baker_boy.1234567890abcdef1234567890abcdef12345678.png",
@@ -83,6 +97,7 @@
     "item_class": "tf_wearable",
     "item_type_name": "Crafting Item",
     "item_name": "Scrap Metal Hat Part",
+    "item_quality": 6,
     "proper_name": false,
     "item_slot": "head",
     "image_url": "https://steamcdn-a.akamaihd.net/apps/440/icons/hat_part.00ff11ee22dd33cc44bb55aa66997788aabbccdd.png",
@@ -94,6 +109,7 @@
     "item_class": "tf_wearable",
     "item_type_name": "Cosmetic Item",
     "item_name": "Dead of Night",
+    "item_quality": 6,
     "proper_name": true,
     "item_slot": "misc",
     "image_url": "https://steamcdn-a.akamaihd.net/apps/440/icons/dead_of_night.5f0e0bf1d3f3b5d4f2f8a9b0c1d2e3f4a5b6c7d8.png",

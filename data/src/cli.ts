@@ -2,8 +2,8 @@
  * `pnpm build-catalogue` — the one command that builds the catalogue.
  *
  * Fetches the source payloads, hands them to the pure builder, validates the
- * result against the catalogue schema and writes it. Prices (#10) and the Dollar
- * Basis header (#11) hang off the same command later.
+ * result against the catalogue schema and writes it. The Dollar Basis header
+ * (#11) hangs off the same command later.
  */
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
@@ -12,6 +12,8 @@ import { fileURLToPath } from "node:url";
 import { buildCatalogue } from "./catalogue/build.ts";
 import { CATALOGUE_SCHEMA_VERSION, catalogueJsonSchema } from "./catalogue/schema.ts";
 import { loadDotEnv, requireEnv } from "./env.ts";
+import type { PriceList } from "./prices/price-source.ts";
+import { backpackTfPriceSource } from "./sources/backpack-tf.ts";
 import {
   type ItemDefinitionSource,
   loadFromGameInstall,
@@ -30,10 +32,17 @@ const REPO_ROOT = fileURLToPath(new URL("../../", import.meta.url));
  */
 const RENDER_RESOLVE_COSMETICS = 1833;
 
+/**
+ * Below this many priced Cosmetics the snapshot is not worth committing: it
+ * means the price list came back partial, or the names stopped matching.
+ */
+const MINIMUM_PRICED_COSMETICS = 1780;
+
 interface Options {
   readonly tfPath: string | undefined;
   readonly mirror: boolean;
   readonly skipWebApi: boolean;
+  readonly skipPrices: boolean;
   readonly out: string;
   readonly dryRun: boolean;
 }
@@ -43,6 +52,7 @@ function parseArgs(argv: readonly string[]): Options {
     tfPath: process.env["TF2_INSTALL_PATH"],
     mirror: false,
     skipWebApi: false,
+    skipPrices: false,
     out: join(REPO_ROOT, "catalogue/catalogue.json"),
     dryRun: false,
   };
@@ -58,6 +68,9 @@ function parseArgs(argv: readonly string[]): Options {
       case "--skip-web-api":
         options.skipWebApi = true;
         break;
+      case "--skip-prices":
+        options.skipPrices = true;
+        break;
       case "--out":
         options.out = resolve(argv[++index] ?? "");
         break;
@@ -72,6 +85,7 @@ function parseArgs(argv: readonly string[]): Options {
             "  --mirror         read item definitions from the daily mirror instead",
             "  --skip-web-api   skip Valve's Web API and report the Cosmetic list from the",
             "                   local install alone, writing nothing (no key needed)",
+            "  --skip-prices    build the Cosmetic list with no prices in it at all",
             "  --out <path>     where to write the catalogue",
             "  --dry-run        build and report, write nothing",
           ].join("\n"),
@@ -98,6 +112,12 @@ async function loadWebApiItems(options: Options): Promise<{ items: WebApiSchemaI
   return { items, description: STEAM_WEB_API_SOURCE };
 }
 
+/** The price snapshot, from the one source seam ADR-0002 puts every price behind. */
+async function loadPrices(options: Options): Promise<PriceList | undefined> {
+  if (options.skipPrices) return undefined;
+  return backpackTfPriceSource(requireEnv("BACKPACK_TF_API_KEY")).load();
+}
+
 async function main(): Promise<number> {
   loadDotEnv(join(REPO_ROOT, ".env"));
   const options = parseArgs(process.argv.slice(2));
@@ -109,11 +129,13 @@ async function main(): Promise<number> {
     throw new Error("--skip-web-api needs a local game install for its names; pass --tf or drop --mirror");
   }
   const webApi = await loadWebApiItems(options);
+  const prices = await loadPrices(options);
 
   const { catalogue, exclusions, warnings } = buildCatalogue({
     itemsGame: definitions.itemsGame,
     webApiItems: webApi.items,
     englishTokens: definitions.englishTokens,
+    prices,
     snapshotTakenAt: new Date().toISOString(),
     sources: { itemDefinitions: definitions.description, englishNames: webApi.description },
   });
@@ -140,6 +162,22 @@ async function main(): Promise<number> {
     `  render resolve     ${RENDER_RESOLVE_COSMETICS} Cosmetics` +
       (delta === 0 ? " (agrees)" : ` (delta ${delta > 0 ? "+" : ""}${delta} — explain before committing)`),
   );
+  const priceHeader = catalogue.header.prices;
+  if (priceHeader === null) {
+    console.log("  prices             skipped (--skip-prices)");
+  } else {
+    console.log(`  prices             ${priceHeader.source}`);
+    console.log(`    Key Rate         ${priceHeader.keyRate.notation} (${priceHeader.keyRate.lastUpdatedAt})`);
+    console.log(`    priced           ${priceHeader.counts.priced}`);
+    for (const [variant, count] of Object.entries(priceHeader.counts.byReferenceVariant)) {
+      console.log(`      ${variant.padEnd(22)} ${count}`);
+    }
+    console.log(`    Unpriced         ${priceHeader.counts.unpriced}`);
+    for (const [reason, count] of Object.entries(priceHeader.counts.unpricedByReason)) {
+      console.log(`      ${reason.padEnd(22)} ${count}`);
+    }
+  }
+
   if (warnings.length > 0) {
     console.log(`  warnings           ${warnings.length}`);
     for (const warning of warnings.slice(0, 10)) console.log(`    ${warning}`);
@@ -151,6 +189,15 @@ async function main(): Promise<number> {
     // Backpack Icons, so --skip-web-api reports and never writes.
     console.log(options.dryRun ? "dry run: nothing written" : "--skip-web-api: reported only, nothing written");
     return 0;
+  }
+
+  if (priceHeader !== null && priceHeader.counts.priced < MINIMUM_PRICED_COSMETICS) {
+    // Committing a snapshot that priced a fraction of the catalogue would read as
+    // thousands of Cosmetics suddenly going Unpriced, so it stops here instead.
+    throw new Error(
+      `only ${priceHeader.counts.priced} Cosmetics were priced, under the ${MINIMUM_PRICED_COSMETICS} a whole ` +
+        `snapshot carries. The price list came back partial, or the names stopped matching; nothing was written.`,
+    );
   }
 
   await mkdir(dirname(options.out), { recursive: true });

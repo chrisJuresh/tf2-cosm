@@ -1,0 +1,20 @@
+{
+  "response": {
+    "success": 1,
+    "name": "Team Fortress 2",
+    "currencies": {
+      "metal": {
+        "name": "Refined Metal",
+        "quality": 6,
+        "defindex": 5002,
+        "price": { "currency": "usd", "value": 0.03, "value_high": 0.05, "last_update": 1788900000 }
+      },
+      "keys": {
+        "name": "Mann Co. Supply Crate Key",
+        "quality": 6,
+        "defindex": 5021,
+        "price": { "currency": "metal", "value": 78.66, "value_high": 79, "last_update": 1788900000 }
+      }
+    }
+  }
+}

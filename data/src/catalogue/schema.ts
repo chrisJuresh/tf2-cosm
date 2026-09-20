@@ -2,14 +2,17 @@
  * The catalogue file's shape, versioned. The site and the render job read this
  * file, so every change to it is a schema version change.
  *
- * Version 1 carries the Cosmetic list only; prices (#10) and the Dollar Basis
- * header (#11) add to it under later versions.
+ * Version 1 carried the Cosmetic list only. Version 2 adds the price snapshot:
+ * each Cosmetic's Reference Variant and Price Spread, and the Key Rate they were
+ * converted at. The Dollar Basis header (#11) adds to it under a later version.
  */
 import { z } from "zod";
 
 import { CLASSES, COSMETIC_SLOTS } from "./cosmetic-rule.ts";
+import { PRICE_CURRENCIES, QUALITIES } from "../prices/price-source.ts";
+import { UNPRICED_REASONS } from "../prices/reference-variant.ts";
 
-export const CATALOGUE_SCHEMA_VERSION = 1;
+export const CATALOGUE_SCHEMA_VERSION = 2;
 
 export const COSMETIC_KINDS = ["class-exclusive", "multi-class", "all-class"] as const;
 
@@ -19,6 +22,43 @@ const styleSchema = z.object({
   index: z.int().nonnegative(),
   name: z.string().min(1),
 });
+
+/**
+ * A Metal figure, three ways: the exact scrap count the catalogue sorts and does
+ * arithmetic on, the same thing in Refined, and Trader Notation for display.
+ */
+const metalSchema = z.object({
+  scrap: z.int().nonnegative(),
+  refined: z.number().nonnegative(),
+  notation: z.string().min(1),
+});
+
+/** One end of the Price Spread: the source's own figure, and its Metal Value. */
+const pricePointSchema = z.object({
+  /** In the Reference Variant's currency, exactly as the source quotes it. */
+  value: z.number().nonnegative(),
+  metal: metalSchema,
+});
+
+const priceSchema = z.discriminatedUnion("state", [
+  z.object({
+    state: z.literal("priced"),
+    /** Which Quality and craftability this price is for. */
+    referenceVariant: z.object({
+      quality: z.enum(QUALITIES),
+      craftable: z.boolean(),
+    }),
+    currency: z.enum(PRICE_CURRENCIES),
+    /** Low, midpoint and high. `mid` is the midpoint of the source's two figures. */
+    spread: z.object({ low: pricePointSchema, mid: pricePointSchema, high: pricePointSchema }),
+    /** When the source last repriced this variant, not when the snapshot was taken. */
+    lastUpdatedAt: z.iso.datetime(),
+  }),
+  z.object({
+    state: z.literal("unpriced"),
+    reason: z.enum(UNPRICED_REASONS),
+  }),
+]);
 
 const cosmeticSchema = z.object({
   slug: z.string().regex(/^[a-z0-9]+(-[a-z0-9]+)*$/),
@@ -41,6 +81,13 @@ const cosmeticSchema = z.object({
   backpackIcon: z
     .object({ small: z.url(), large: z.url() })
     .nullable(),
+  /**
+   * The Quality this Cosmetic is issued in, which decides the Reference Variant
+   * when no Unique copy is priced.
+   */
+  nativeQuality: z.enum(QUALITIES),
+  /** Null exactly when the run had no price source; then `header.prices` is null too. */
+  price: priceSchema.nullable(),
 });
 
 const headerSchema = z.object({
@@ -59,6 +106,26 @@ const headerSchema = z.object({
     withoutWebApiEntry: z.int().nonnegative(),
     withoutBackpackIcon: z.int().nonnegative(),
   }),
+  /**
+   * The price snapshot's own header, or null when the run had no price source —
+   * then every Cosmetic's `price` is null as well.
+   */
+  prices: z
+    .object({
+      source: z.string().min(1),
+      takenAt: z.iso.datetime(),
+      /** The rate every Key figure in this file was converted at. */
+      keyRate: metalSchema.extend({ lastUpdatedAt: z.iso.datetime() }),
+      counts: z.object({
+        priced: z.int().nonnegative(),
+        unpriced: z.int().nonnegative(),
+        /** How many Cosmetics took each Reference Variant, e.g. "genuine-craftable". */
+        byReferenceVariant: z.record(z.string(), z.int().nonnegative()),
+        /** Only the reasons that actually occurred; a reason nobody hit is absent. */
+        unpricedByReason: z.partialRecord(z.enum(UNPRICED_REASONS), z.int().nonnegative()),
+      }),
+    })
+    .nullable(),
 });
 
 export const catalogueSchema = z.object({
@@ -68,6 +135,10 @@ export const catalogueSchema = z.object({
 });
 
 export type Style = z.infer<typeof styleSchema>;
+export type Metal = z.infer<typeof metalSchema>;
+export type PricePoint = z.infer<typeof pricePointSchema>;
+export type Price = z.infer<typeof priceSchema>;
+export type PriceHeader = NonNullable<z.infer<typeof headerSchema>["prices"]>;
 export type Cosmetic = z.infer<typeof cosmeticSchema>;
 export type Catalogue = z.infer<typeof catalogueSchema>;
 

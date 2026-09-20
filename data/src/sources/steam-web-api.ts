@@ -6,10 +6,14 @@
  * items_game, which is why this leg exists at all.
  */
 
+import { DEFAULT_NATIVE_QUALITY, type Quality, qualityFromId } from "../prices/price-source.ts";
+
 export interface WebApiSchemaItem {
   readonly defindex: number;
   /** The internal name, e.g. "The Team Captain". */
   readonly name: string;
+  /** Valve's quality id for the Quality the item is issued in: 6 Unique, 1 Genuine, 13 Haunted. */
+  readonly item_quality?: number;
   /** The English display name, e.g. "Team Captain". */
   readonly item_name?: string;
   readonly proper_name?: boolean;
@@ -28,6 +32,16 @@ export function backpackIconOf(
   const small = item?.image_url;
   const large = item?.image_url_large;
   return small && large ? { small, large } : null;
+}
+
+/**
+ * The Native Quality: the Quality the item is issued in. Valve's schema is the
+ * only place that records it — items_game leaves `item_quality` off almost every
+ * cosmetic — and it is what sends a Genuine-only promo to its Genuine price.
+ * Unique when the schema has no entry, which is what all but a few hundred are.
+ */
+export function nativeQualityOf(item: WebApiSchemaItem | undefined): Quality {
+  return qualityFromId(item?.item_quality) ?? DEFAULT_NATIVE_QUALITY;
 }
 
 interface GetSchemaItemsResponse {
