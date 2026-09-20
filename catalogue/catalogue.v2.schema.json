@@ -1,0 +1,559 @@
+{
+  "$id": "https://github.com/chrisJuresh/tf2-cosm/catalogue/v2",
+  "title": "TF2 Cosmetics catalogue v2",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "type": "number",
+      "const": 2
+    },
+    "header": {
+      "type": "object",
+      "properties": {
+        "snapshotTakenAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+        },
+        "sources": {
+          "type": "object",
+          "properties": {
+            "itemDefinitions": {
+              "type": "string",
+              "minLength": 1
+            },
+            "englishNames": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "itemDefinitions",
+            "englishNames"
+          ],
+          "additionalProperties": false
+        },
+        "counts": {
+          "type": "object",
+          "properties": {
+            "cosmetics": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "classExclusive": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "multiClass": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "allClass": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "aliasesMerged": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "withoutWebApiEntry": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "withoutBackpackIcon": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "cosmetics",
+            "classExclusive",
+            "multiClass",
+            "allClass",
+            "aliasesMerged",
+            "withoutWebApiEntry",
+            "withoutBackpackIcon"
+          ],
+          "additionalProperties": false
+        },
+        "prices": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "source": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "takenAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                },
+                "keyRate": {
+                  "type": "object",
+                  "properties": {
+                    "scrap": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    "refined": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "notation": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "lastUpdatedAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                    }
+                  },
+                  "required": [
+                    "scrap",
+                    "refined",
+                    "notation",
+                    "lastUpdatedAt"
+                  ],
+                  "additionalProperties": false
+                },
+                "counts": {
+                  "type": "object",
+                  "properties": {
+                    "priced": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    "unpriced": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    "byReferenceVariant": {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string"
+                      },
+                      "additionalProperties": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
+                      }
+                    },
+                    "unpricedByReason": {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string",
+                        "enum": [
+                          "missing-from-source",
+                          "no-reference-variant",
+                          "unsupported-currency"
+                        ]
+                      },
+                      "additionalProperties": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
+                      }
+                    }
+                  },
+                  "required": [
+                    "priced",
+                    "unpriced",
+                    "byReferenceVariant",
+                    "unpricedByReason"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "source",
+                "takenAt",
+                "keyRate",
+                "counts"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "snapshotTakenAt",
+        "sources",
+        "counts",
+        "prices"
+      ],
+      "additionalProperties": false
+    },
+    "cosmetics": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "defindex": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "aliases": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          "slot": {
+            "type": "string",
+            "enum": [
+              "head",
+              "misc"
+            ]
+          },
+          "classes": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "scout",
+                "soldier",
+                "pyro",
+                "demoman",
+                "heavy",
+                "engineer",
+                "medic",
+                "sniper",
+                "spy"
+              ]
+            }
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "class-exclusive",
+              "multi-class",
+              "all-class"
+            ]
+          },
+          "paintable": {
+            "type": "boolean"
+          },
+          "styles": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "index": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "index",
+                "name"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "backpackIcon": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "small": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "large": {
+                    "type": "string",
+                    "format": "uri"
+                  }
+                },
+                "required": [
+                  "small",
+                  "large"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "price": {
+            "anyOf": [
+              {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "state": {
+                        "type": "string",
+                        "const": "priced"
+                      },
+                      "referenceVariant": {
+                        "type": "object",
+                        "properties": {
+                          "quality": {
+                            "type": "string",
+                            "enum": [
+                              "normal",
+                              "genuine",
+                              "rarity2",
+                              "vintage",
+                              "rarity3",
+                              "unusual",
+                              "unique",
+                              "community",
+                              "valve",
+                              "self-made",
+                              "customized",
+                              "strange",
+                              "completed",
+                              "haunted",
+                              "collectors",
+                              "decorated"
+                            ]
+                          },
+                          "craftable": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "quality",
+                          "craftable"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "currency": {
+                        "type": "string",
+                        "enum": [
+                          "metal",
+                          "keys",
+                          "hat",
+                          "earbuds"
+                        ]
+                      },
+                      "spread": {
+                        "type": "object",
+                        "properties": {
+                          "low": {
+                            "type": "object",
+                            "properties": {
+                              "value": {
+                                "type": "number",
+                                "minimum": 0
+                              },
+                              "metal": {
+                                "type": "object",
+                                "properties": {
+                                  "scrap": {
+                                    "type": "integer",
+                                    "minimum": 0,
+                                    "maximum": 9007199254740991
+                                  },
+                                  "refined": {
+                                    "type": "number",
+                                    "minimum": 0
+                                  },
+                                  "notation": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  }
+                                },
+                                "required": [
+                                  "scrap",
+                                  "refined",
+                                  "notation"
+                                ],
+                                "additionalProperties": false
+                              }
+                            },
+                            "required": [
+                              "value",
+                              "metal"
+                            ],
+                            "additionalProperties": false
+                          },
+                          "mid": {
+                            "type": "object",
+                            "properties": {
+                              "value": {
+                                "type": "number",
+                                "minimum": 0
+                              },
+                              "metal": {
+                                "type": "object",
+                                "properties": {
+                                  "scrap": {
+                                    "type": "integer",
+                                    "minimum": 0,
+                                    "maximum": 9007199254740991
+                                  },
+                                  "refined": {
+                                    "type": "number",
+                                    "minimum": 0
+                                  },
+                                  "notation": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  }
+                                },
+                                "required": [
+                                  "scrap",
+                                  "refined",
+                                  "notation"
+                                ],
+                                "additionalProperties": false
+                              }
+                            },
+                            "required": [
+                              "value",
+                              "metal"
+                            ],
+                            "additionalProperties": false
+                          },
+                          "high": {
+                            "type": "object",
+                            "properties": {
+                              "value": {
+                                "type": "number",
+                                "minimum": 0
+                              },
+                              "metal": {
+                                "type": "object",
+                                "properties": {
+                                  "scrap": {
+                                    "type": "integer",
+                                    "minimum": 0,
+                                    "maximum": 9007199254740991
+                                  },
+                                  "refined": {
+                                    "type": "number",
+                                    "minimum": 0
+                                  },
+                                  "notation": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  }
+                                },
+                                "required": [
+                                  "scrap",
+                                  "refined",
+                                  "notation"
+                                ],
+                                "additionalProperties": false
+                              }
+                            },
+                            "required": [
+                              "value",
+                              "metal"
+                            ],
+                            "additionalProperties": false
+                          }
+                        },
+                        "required": [
+                          "low",
+                          "mid",
+                          "high"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "lastUpdatedAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                      }
+                    },
+                    "required": [
+                      "state",
+                      "referenceVariant",
+                      "currency",
+                      "spread",
+                      "lastUpdatedAt"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "state": {
+                        "type": "string",
+                        "const": "unpriced"
+                      },
+                      "reason": {
+                        "type": "string",
+                        "enum": [
+                          "missing-from-source",
+                          "no-reference-variant",
+                          "unsupported-currency"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "state",
+                      "reason"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "slug",
+          "name",
+          "defindex",
+          "aliases",
+          "slot",
+          "classes",
+          "kind",
+          "paintable",
+          "styles",
+          "backpackIcon",
+          "price"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "header",
+    "cosmetics"
+  ],
+  "additionalProperties": false
+}
