@@ -10,7 +10,12 @@ import {
   resolveScrapPerUnit,
   variantsFor,
 } from "../src/prices/price-source.ts";
-import { backpackTfPriceSource, fetchPriceList, fetchRates } from "../src/sources/backpack-tf.ts";
+import {
+  BACKPACK_TF_DOLLAR_SOURCE,
+  backpackTfPriceSource,
+  fetchPriceList,
+  fetchRates,
+} from "../src/sources/backpack-tf.ts";
 import { fixtureBackpackTfFetch, FIXTURE_TAKEN_AT, fixturePriceList } from "./fixtures.ts";
 
 const respondWith = (body: unknown, status = 200): typeof fetch =>
@@ -53,6 +58,27 @@ describe("the currency table", () => {
     const scrapPerUnit = resolveScrapPerUnit(quotes);
     expect(scrapPerUnit.get("keys")).toBe(708);
     expect(scrapPerUnit.has("doubloons")).toBe(false);
+  });
+
+  it("carries the source's own refined-to-dollar estimate as the source quotes it", async () => {
+    const rates = await fetchRates("fixture-key", fixtureBackpackTfFetch());
+    // The recorded payload quotes a Refined at $0.03; the $0.05 top of its range
+    // is not averaged in, which would publish a figure the source never gave.
+    expect(rates.dollarEstimate).toEqual({
+      source: BACKPACK_TF_DOLLAR_SOURCE,
+      usdPerRefined: 0.03,
+      lastUpdatedAt: "2026-09-08T20:40:00.000Z",
+    });
+  });
+
+  it("leaves the dollar estimate out when Metal is not quoted in dollars", async () => {
+    const fetchImpl = respondWith({
+      response: {
+        success: 1,
+        currencies: { keys: { price: { currency: "metal", value: 78.66 } } },
+      },
+    });
+    expect((await fetchRates("fixture-key", fetchImpl)).dollarEstimate).toBeUndefined();
   });
 
   it("fails loudly when the Key is not priced in Metal", async () => {

@@ -11,12 +11,15 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
 import subprocess
 import sys
 from pathlib import Path
 
 import pytest
 
+from render.derivatives import DERIVATIVE_SIZES
+from render.derive import main as derive_main
 from render.jobs import JOB_LIST_VERSION, job_list, validate_job_list
 from render.manifest import REASON_MODEL_MISSING, validate_manifest
 from render.resolve import resolve_installed_game
@@ -32,6 +35,7 @@ TF = Path(
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SITE_PACKAGES = Path(sys.prefix) / "Lib" / "site-packages"
 CACHE = REPO_ROOT / "assets-cache"
+TEXTURE_CACHE = CACHE / "texture-cache"
 
 #: A bust, a bust whose Style hides two class bodygroups, and a Cosmetic with no BLU skin.
 RENDERED = [
@@ -53,8 +57,12 @@ def rendered(tmp_path_factory) -> tuple[dict, Path]:
     Image = pytest.importorskip("PIL.Image")  # noqa: F841 - fail early if Pillow is missing
     workspace = tmp_path_factory.mktemp("render-smoke")
     jobs_file = workspace / "jobs.json"
-    out = workspace / "masters"
+    out = workspace / "images"  # the output root; masters and web sizes sit under it
     manifest_file = workspace / "manifest.json"
+
+    # Rendered cold, so the texture cache has to fill during this run: a warm cache would
+    # let the #32 regression through. The folder is a cache and nothing else reads it.
+    shutil.rmtree(TEXTURE_CACHE, ignore_errors=True)
 
     resolution = resolve_installed_game(TF, only=NAMES)
     jobs = [
@@ -84,7 +92,7 @@ def rendered(tmp_path_factory) -> tuple[dict, Path]:
             "--teams", "red", "blu",
             "--tf", str(TF),
             "--cache", str(CACHE),
-            "--out", str(out),
+            "--root", str(out),
             "--manifest", str(manifest_file),
             "--site-packages", str(SITE_PACKAGES),
         ],
@@ -93,6 +101,10 @@ def rendered(tmp_path_factory) -> tuple[dict, Path]:
         timeout=900,
     )
     assert result.returncode == 0, result.stdout[-4000:] + result.stderr[-4000:]
+
+    # The web sizes are a step of their own, outside Blender: this is the whole job.
+    assert derive_main(["--root", str(out), "--manifest", str(manifest_file)]) == 0
+
     document = json.loads(manifest_file.read_text(encoding="utf-8"))
     validate_manifest(document)
     return document, out
@@ -105,11 +117,11 @@ def test_a_known_job_produces_an_image_the_manifest_can_find(rendered, slug, cls
 
     entry = document["renders"][slug][cls][team][str(style)]
 
-    assert entry["width"] == 1024 and entry["height"] == 1024
+    assert entry["master"]["width"] == 1024 and entry["master"]["height"] == 1024
     assert entry["model"].endswith(".mdl")
     assert entry["rendered_at"].startswith("20")
     assert entry["job_version"] == JOB_LIST_VERSION
-    assert (out / entry["path"]).exists()
+    assert (out / entry["master"]["path"]).exists()
 
 
 @pytest.mark.parametrize("slug, cls, style", RENDERED)
@@ -121,7 +133,7 @@ def test_the_image_is_a_transparent_square_with_the_class_in_the_middle(
 
     document, out = rendered
 
-    image = Image.open(out / document["renders"][slug][cls][team][str(style)]["path"])
+    image = Image.open(out / document["renders"][slug][cls][team][str(style)]["master"]["path"])
 
     assert image.size == (1024, 1024)
     assert image.mode == "RGBA"
@@ -146,4 +158,33 @@ def test_a_missing_model_is_recorded_as_a_failure_and_does_not_stop_the_run(rend
     assert {f["reason"] for f in failures} == {REASON_MODEL_MISSING}
     assert all(f["detail"] for f in failures)
     assert "not-in-the-game" not in document["renders"]
-    assert not (out / "not-in-the-game").exists()
+    assert not (out / "masters" / "not-in-the-game").exists()
+
+
+@pytest.mark.parametrize("slug, cls, style", RENDERED)
+def test_every_master_gains_its_web_sizes(rendered, slug, cls, style):
+    from PIL import Image
+
+    document, out = rendered
+
+    derivatives = document["renders"][slug][cls]["red"][str(style)]["derivatives"]
+
+    assert sorted(derivatives) == sorted(str(size) for size in DERIVATIVE_SIZES)
+    for size, record in derivatives.items():
+        assert record["width"] == record["height"] == int(size)
+        with Image.open(out / record["path"]) as image:
+            assert image.size == (int(size), int(size))
+            assert image.convert("RGBA").getpixel((0, 0))[3] == 0
+
+
+def test_every_texture_is_cached_under_its_own_path(rendered):
+    """SourceIO's decoded textures land in the cache, not on one truncated path (#32).
+
+    `TinyPath.with_suffix` used to cut the path at the first dotted directory, so every
+    texture was written to `<repo root>/.png` and the cache stayed empty of images while
+    still growing the directories. Nested PNGs are what tells the two apart.
+    """
+    cached = sorted(TEXTURE_CACHE.rglob("*.png"))
+    assert cached, f"SourceIO wrote no texture under {TEXTURE_CACHE}"
+    nested = [p for p in cached if p.parent != TEXTURE_CACHE]
+    assert nested, f"no texture kept its path in the game: {[p.name for p in cached]}"

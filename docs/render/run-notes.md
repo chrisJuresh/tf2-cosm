@@ -5,7 +5,7 @@ The spike that established these facts is gone; this is what replaced it.
 
 ## Running it
 
-Resolve first, then run the batch runner. These two commands are the whole job:
+Three commands are the whole job: resolve, render, derive.
 
 ```bash
 ./.venv/Scripts/python.exe -m render.resolve --out jobs.json
@@ -15,25 +15,29 @@ Resolve first, then run the batch runner. These two commands are the whole job:
 ./.venv/Scripts/python.exe -m render.batch --jobs jobs.json
 ```
 
-The second one renders everything the manifest does not already have, a batch of jobs per
+```bash
+./.venv/Scripts/python.exe -m render.derive
+```
+
+The middle one renders everything the manifest does not already have, a batch of jobs per
 Blender process, and prints progress and an estimate of time remaining as it goes. Run it
 again and it renders only what is still missing, so stopping it with ctrl-c, a crash or a
 power cut costs the batch that was in flight and nothing more. A run over work that is
 already done opens Blender not at all.
 
-Useful arguments (all optional):
+Useful arguments to the batch runner (all optional):
 
 - `--dry-run` — list what would be rendered and open nothing. Check the counts after a game
   update.
 - `--slug`, `--class`, `--team`, `--style` — render a subset while fixing one item.
 - `--batch-size` — images per Blender process (default 40). Smaller loses less to a crash;
-  larger amortises the mount and the class import over more frames.
+  larger amortises the mount and the Class import over more frames.
 - `--retry-failed` — render the jobs that failed on an earlier run. Without it they are left
   alone, because a second run that repeats yesterday's failures has done nothing.
-- `--trust-manifest` — skip the check that every recorded image is still on disk. The check
+- `--trust-manifest` — skip the check that every recorded master is still on disk. The check
   costs one `stat` an image and is what makes a deleted or moved image come back.
-- `--out` (masters, default `renders/masters`), `--manifest` (default
-  `catalogue/renders.json`), `--blender`, `--tf`, `--cache`, `--size`, `--samples`.
+- `--blender` when Blender is not at the documented path, `--tf`, `--cache`, `--size`,
+  `--samples`, and the layout arguments below.
 - `--site-packages` when the venv is not at `.venv/` beside the script — a worktree, for
   instance, where it is the main checkout's.
 
@@ -41,6 +45,11 @@ Exit codes: 0 when every image planned was either rendered or recorded as a fail
 a Blender process died and took some with it (run it again; it picks up where it stopped),
 2 when the command itself is wrong — no Blender, or a selection that matches no job — and
 130 when ctrl-c stopped it, which is the same "run it again" as 1.
+
+`--root`, `--masters-dir` and `--manifest` override the layout (`render.output`), and mean
+the same thing to every command that takes them — `render.batch` passes them on to the
+render step as settled paths, so the child never resolves the layout a second time.
+`render.derive` also takes `--derivatives-dir`, plus `--dry-run`, `--force` and `--sizes`.
 
 To drive one Blender process yourself — debugging an import, mostly — the render step is
 still a command of its own, and takes the same filters:
@@ -53,26 +62,79 @@ The render step extracts each job's models into the assets cache itself; `render
 stays a command for filling the cache ahead of time.
 
 Failures never stop a run. Each one lands in the manifest as `{reason, detail}` —
-`model-missing`, `import-error`, `no-skeleton` or `render-error` — and the site falls back
-to the Backpack Icon for it (ADR-0001). The runner prints the whole failure list, grouped by
-reason, when it finishes.
+`model-missing`, `import-error`, `no-skeleton`, `render-error` or `derive-error` — and the
+site falls back to the Backpack Icon for it (ADR-0001). The batch runner prints the failure
+list, grouped by reason, when it finishes — for everything the run selected, not just what
+this invocation rendered, so a resumed run still ends on the whole picture.
 
 ## What resuming is decided from
 
 `render.plan` decides, from the job list and the manifest alone, what a run still owes:
 
 - An image is **done** when the manifest has an entry for it whose `job_version` is the
-  current `JOB_LIST_VERSION` and — unless `--trust-manifest` — the file it names is on disk.
-  Bumping `JOB_LIST_VERSION` therefore re-renders everything, which is the point of it.
-- An image that **failed** before is left alone until `--retry-failed`.
+  current `JOB_LIST_VERSION` and — unless `--trust-manifest` — the master it names is on
+  disk. Bumping `JOB_LIST_VERSION` therefore re-renders everything, which is the point of it.
+- An image that **failed** before is left alone until `--retry-failed`. A failure records the
+  `job_version` it happened under, so a bump retries failures too: the bump is what says the
+  job's definition has changed, and a model that resolves differently now is exactly the
+  thing that might succeed this time.
 - Everything else is work, and the unit of work is one image: a job whose RED is rendered and
   whose BLU is not goes back to Blender for BLU only.
 
 Jobs wanting different Teams are never batched together, because a Blender process renders
 every job in its batch on every Team it is given.
 
+A batch is what one Blender process takes on and what a crash costs, so its size is counted
+in images. The child writes the manifest once per job, so a batch boundary is a floor on what
+a crash can cost, not the only save point.
+
+## Where the output goes
+
+`render/output.py` is the only place a path is decided, and the storage seam the spec asks
+for (user story 22). Everything the manifest records is *relative to the output root*:
+
+```
+<root>/<masters_dir>/<slug>/<class>-<team>-<style>.png            1024 PNG, kept locally
+<root>/<derivatives_dir>/<slug>/<class>-<team>-<style>@<size>.webp  a web size
+```
+
+An image folder may be nested (`images/masters`); what it may not be is absolute or a path
+that climbs out of the root. The root, both image folders and the manifest's own path are
+configuration —
+`RENDER_OUTPUT_ROOT`, `RENDER_MASTERS_DIR`, `RENDER_DERIVATIVES_DIR`, `RENDER_MANIFEST` in
+the environment, each beaten by the matching command-line argument. The day the folder
+becomes a bucket, an uploader walks the manifest and pushes each relative path; nothing else
+in the job changes. The manifest and its JSON Schema are committed under `catalogue/`; the
+images never are — `renders/` is ignored, and a root pointed anywhere else inside the
+repository has to be ignored too.
+
+A manifest from an older version of the job is not migrated. It is a record of images on
+this disk, every one of which can be rendered again, so the job says so and stops rather
+than carrying a converter for every past shape.
+
+## Why deriving is a step of its own
+
+Pillow is a compiled package and Blender's Python is not the project venv, so the render
+step cannot make the web sizes itself — it appends the venv's `site-packages` for `vdf` and
+`vpk`, which are pure Python, and that trick does not work twice. It is the better seam
+anyway: derivatives come from masters, so the rule in `render/derivatives.py` can change and
+every image can be remade without re-rendering a frame.
+
+A derivative is the master on a **consistent trimmed canvas**: the transparent margin is cut
+away, what is left is centred on a square with a 4 % margin, and that square is resized to
+512 and to 256 as WebP with alpha. The trade-off is deliberate — trimming normalises each
+item to its own silhouette, so a pin and a top hat fill their thumbnails equally rather than
+at true relative scale. The master keeps the true scale for a detail view.
+
+The WebP encoder's `method` is 4, not the maximum 6: measured on these images 6 costs about
+fifty times as long and saves nothing.
+
 ## What one render is
 
+- SourceIO decodes each texture once and caches the PNG under
+  `assets-cache/texture-cache/`, keyed by the texture's path in the game. It is a cache and
+  nothing reads it but SourceIO: delete the folder to force a re-decode after a game update.
+  It is inside `assets-cache/`, so it is already gitignored.
 - The game folder is mounted once per process and SourceIO is patched once, so a selection
   of jobs costs one mount and one add-on start-up.
 - The class model and the Cosmetic's model are imported with SourceIO's
@@ -110,8 +172,20 @@ add-on and must stay replaceable, so nothing is changed inside it.
    detail layer instead. At TF2's detail strengths the layer is invisible anyway.
    `$detailblendmode 6` — almost every TF2 item, at 1 % — is unsupported upstream and
    correctly ignored; its `[ERROR] unhandled Detail mode, got6` lines are harmless.
+3. **`TinyPath.suffix` reads the whole path.** It takes the text after the *last dot
+   anywhere in the path*, not the last dot in the final component, so `with_suffix` on any
+   path with a dotted directory in it throws the rest of the path away. This broke the
+   texture cache: SourceIO saves a decoded texture to
+   `TinyPath(TextureCachePath) / texture`, then calls `with_suffix(".png")` on the joined
+   path. With the cache under a `.claude/worktrees/...` checkout, every texture was written
+   to `<repo root>/.png` — one junk file in the repo root, each texture overwriting the last,
+   and a cache that never hit, so every texture was decoded again on every import. We
+   replace the `suffix` property with `render.sourceio_patch.suffix_of`, which scopes it to
+   the last component the way `pathlib` does; `with_suffix` is built on it and is fixed too.
+   The `TextureCachePath` we set was always correct — it is a directory, and the add-on
+   reads it as one.
 
-Neither of these is ours to fix upstream from here; both are worth reporting.
+None of these is ours to fix upstream from here; all are worth reporting.
 
 ## Things found the hard way
 

@@ -4,7 +4,6 @@ from __future__ import annotations
 import pytest
 
 from render.jobs import job_list
-from render.manifest import image_relpath
 from render.selection import NothingSelected, select_jobs, selected_teams
 from tests.test_manifest import a_job
 
@@ -51,7 +50,3 @@ def test_the_teams_are_rendered_in_the_order_asked_for():
 def test_an_unknown_team_is_refused():
     with pytest.raises(ValueError, match="unknown Team"):
         selected_teams(["green"])
-
-
-def test_an_image_path_says_cosmetic_class_team_and_style():
-    assert image_relpath(BATTERS, "blu") == "batters-helmet/scout-blu-1.png"

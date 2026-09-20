@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import { expect, it } from "vitest";
 
 import { buildCatalogue } from "../src/catalogue/build.ts";
-import { fixturePricedInputs } from "./fixtures.ts";
+import { fixtureMarketKeyPrice, fixturePricedInputs } from "./fixtures.ts";
 
 const GOLDEN = fileURLToPath(new URL("./golden/catalogue.json", import.meta.url));
 
@@ -13,7 +13,8 @@ const GOLDEN = fileURLToPath(new URL("./golden/catalogue.json", import.meta.url)
  * Run with UPDATE_GOLDEN=1 to rewrite it, then read the diff before committing.
  */
 it("builds the catalogue the golden file records", async () => {
-  const built = `${JSON.stringify(buildCatalogue(await fixturePricedInputs()).catalogue, null, 2)}\n`;
+  const inputs = await fixturePricedInputs({ marketKeyPrice: await fixtureMarketKeyPrice() });
+  const built = `${JSON.stringify(buildCatalogue(inputs).catalogue, null, 2)}\n`;
   if (process.env["UPDATE_GOLDEN"] === "1") writeFileSync(GOLDEN, built, "utf8");
   // `.gitattributes` pins this file to LF; the normalisation is for a checkout
   // made before that line existed, where the shape is still what is under test.

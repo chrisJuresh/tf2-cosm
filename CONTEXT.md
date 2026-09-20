@@ -70,7 +70,7 @@ The community way of writing a price as Keys plus fractional Refined, for exampl
 A price expressed wholly in Refined by converting Keys at the Key Rate. The catalogue's sort order.
 
 **Dollar Basis**:
-The key-to-dollar rate a dollar price is computed from. One is active at a time: Steam Community Market, Mann Co. Store, or a cash marketplace.
+The key-to-dollar rate a dollar price is computed from. One is active at a time. The catalogue carries three: the Steam Community Market's key price (which publishes two figures, its lowest asking price and its median sale), the price source's own refined-to-dollar estimate, and the Mann Co. Store constant. Each is recorded both per Key and per Refined, converted at the snapshot's Key Rate.
 
 ### Catalogue
 

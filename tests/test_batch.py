@@ -8,10 +8,11 @@ import pytest
 
 from render import batch as runner
 from render.jobs import job_list
-from render.manifest import REASON_IMPORT_ERROR, Manifest, image_relpath, load_manifest
+from render.manifest import REASON_IMPORT_ERROR, Manifest, load_manifest
+from render.output import OutputLayout
 from render.plan import Batch, JobWork, account_for
 from tests.test_manifest import AT, a_job
-from tests.test_plan import BATTERS, KILLER, TEAM_CAPTAIN
+from tests.test_plan import BATTERS, KILLER, TEAM_CAPTAIN, master_relpath
 
 
 @pytest.fixture
@@ -40,7 +41,8 @@ def args_for(workspace: Path, jobs: Path, **overrides) -> object:
         "blender": workspace / "blender.exe",
         "tf": workspace / "tf",
         "cache": workspace / "cache",
-        "out": workspace / "masters",
+        "root": workspace / "out",
+        "masters_dir": "masters",
         "manifest": workspace / "renders.json",
         "size": 1024,
         "samples": 32,
@@ -67,7 +69,7 @@ class FakeBlender:
     def __call__(self, command: list[str]) -> int:
         self.commands.append(command)
         given = command[command.index("--jobs") + 1]
-        out = Path(command[command.index("--out") + 1])
+        root = Path(command[command.index("--root") + 1])
         teams = command[command.index("--teams") + 1 :]
         document = json.loads(Path(given).read_text(encoding="utf-8"))
         self.batch_sizes.append(len(document["jobs"]))
@@ -82,8 +84,8 @@ class FakeBlender:
                 if outcome == "failed":
                     manifest.fail(job, team, reason=REASON_IMPORT_ERROR, detail="no", at=AT)
                 else:
-                    relative = image_relpath(job, team)
-                    image = out / relative
+                    relative = master_relpath(job, team)
+                    image = root / relative
                     image.parent.mkdir(parents=True, exist_ok=True)
                     image.write_bytes(b"PNG")
                     manifest.record(
@@ -104,7 +106,7 @@ def test_a_run_renders_every_job_and_writes_the_manifest(workspace: Path):
 
     assert code == 0
     manifest = load_manifest(workspace / "renders.json")
-    assert manifest.entry("team-captain", "soldier", "red", 0)["width"] == 1024
+    assert manifest.entry("team-captain", "soldier", "red", 0)["master"]["width"] == 1024
     assert manifest.entry("batters-helmet", "scout", "blu", 1) is not None
 
 
@@ -270,7 +272,7 @@ def test_an_image_the_manifest_claims_but_disk_has_lost_is_rendered_again(worksp
     jobs = write_jobs(workspace, TEAM_CAPTAIN)
     blender = FakeBlender(workspace / "renders.json")
     runner.run(args_for(workspace, jobs), launch=blender)
-    for image in (workspace / "masters").rglob("*.png"):
+    for image in (workspace / "out").rglob("*.png"):
         image.unlink()
 
     again = FakeBlender(workspace / "renders.json")
@@ -344,12 +346,18 @@ def test_the_command_line_is_parsed_into_the_settings_a_run_takes():
 
 def test_the_batch_is_handed_to_blender_as_a_job_list_of_its_own(tmp_path: Path):
     settings = runner.parse_args(["--jobs", "jobs.json"])
+    layout = OutputLayout.from_env({"RENDER_OUTPUT_ROOT": str(tmp_path / "out")})
 
-    command = runner.blender_command(settings, tmp_path / "batch-1.json", Batch((), ("red", "blu")))
+    command = runner.blender_command(
+        settings, layout, tmp_path / "batch-1.json", Batch((), ("red", "blu"))
+    )
 
     assert command[1:5] == ["-b", "--factory-startup", "--python", str(runner.BLENDER_SCRIPT)]
     assert command[command.index("--jobs") + 1] == str(tmp_path / "batch-1.json")
     assert command[command.index("--teams") + 1 :] == ["red", "blu"]
+    # settled paths, not the flags that were typed: the child must not resolve the layout again
+    assert command[command.index("--root") + 1] == str(tmp_path / "out")
+    assert command[command.index("--masters-dir") + 1] == layout.masters_dir
 
 
 def test_a_blender_that_is_there_needs_no_explaining(workspace: Path):

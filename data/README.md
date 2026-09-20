@@ -1,8 +1,9 @@
 # Catalogue data job
 
 Builds the catalogue file the site reads: every Cosmetic, with identity, Classes,
-slot, paintable flag, Styles, Backpack Icons and its Reference Price. The Dollar
-Basis header (#11) comes later; the catalogue's schema is versioned so it can.
+slot, paintable flag, Styles, Backpack Icons and its Reference Price, under a
+header that records the snapshot time, the Key Rate, the three Dollar Bases and
+the counts. The catalogue's schema is versioned; this is version 3.
 
 ## Running it
 
@@ -20,14 +21,22 @@ the repo root and fill in `STEAM_WEB_API_KEY` and `BPTF_API_KEY`.
 | `--mirror` | read them from the community daily mirror instead — no game install needed |
 | `--skip-web-api` | skip Valve's Web API and report the Cosmetic list from the local install alone, writing nothing. For checking the Cosmetic count without a key |
 | `--skip-prices` | build the Cosmetic list with no prices in it at all. For working on the list without a backpack.tf key |
+| `--skip-market` | skip the Steam Community Market key price; that Dollar Basis is recorded as missing |
+| `--max-drop <f>` | the fraction of the committed Cosmetic count a run may lose before it refuses to write (default `0.02`) |
 | `--out <path>` | where to write (default `catalogue/catalogue.json`) |
 | `--dry-run` | build and report, write nothing |
 
 The run prints the counts, the exclusions by reason, the Cosmetic defindex count
-next to the render job's own, which must agree, and what every Cosmetic's
-Reference Variant turned out to be. A run that prices fewer than 1,780 Cosmetics
-writes nothing: that means the price list came back partial or the names stopped
-matching, and committing it would read as thousands of Cosmetics going Unpriced.
+next to the render job's own, which must agree, what every Cosmetic's Reference
+Variant turned out to be, how many took a fallback, the three Dollar Bases and
+the warnings.
+
+Two things stop it writing, both in `src/catalogue/write-guard.ts`: a run that
+prices fewer than 1,780 Cosmetics, which means the price list came back partial
+or the names stopped matching, and a run that finds more than 2% fewer Cosmetics
+than the committed file already holds. Either would read as most of the site
+breaking at once, so the good snapshot stays in place and the run explains
+itself.
 
 ## Shape
 
@@ -63,8 +72,18 @@ it directly and every adapter around it stays thin.
   comes from the same `IGetCurrencies` call as the Key Rate, and a currency with
   no rate (a price in dollars) leaves the Cosmetic Unpriced rather than converted
   on a guess.
+- `src/prices/dollar-basis.ts` — the Dollar Bases the header carries: the Steam
+  Market's key price (lowest and median), the price source's own refined-to-dollar
+  estimate, and the Mann Co. Store constant. The header names that middle one
+  `priceSource`, not the vendor, so swapping backpack.tf for pricedb.io (ADR-0002)
+  leaves the file's shape alone. Each is recorded both per Key and
+  per Refined, converted at the snapshot's own Key Rate like every other figure in
+  the file, so a site never needs the Key Rate to show a price in dollars. No
+  dollar figure is stored per Cosmetic: the site multiplies a Metal Value by the
+  basis it is showing.
 - `src/sources/` — the adapters: item definitions (local install or mirror),
-  Valve's Web API, backpack.tf, and the KeyValues reader they share.
+  Valve's Web API, backpack.tf, the Steam Market price overview (the Key's dollar
+  price and nothing else, per ADR-0002), and the KeyValues reader they share.
 
 ## Tests
 

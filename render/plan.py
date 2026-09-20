@@ -11,14 +11,15 @@ set of jobs *and* the Teams wanted from each; jobs wanting different Teams go in
 batches rather than costing an unwanted render each.
 
 Nothing here touches Blender or the disk. `image_exists` is the one door to the filesystem and
-the caller decides what goes behind it.
+the caller decides what goes behind it — it is handed the master's path as the manifest
+records it, relative to the output root (`render.output`).
 """
 from __future__ import annotations
 
 from typing import Callable, Iterable, NamedTuple, Sequence
 
 from render.jobs import JOB_LIST_VERSION
-from render.manifest import Manifest, image_relpath
+from render.manifest import Manifest
 from render.selection import select_jobs, selected_teams
 
 
@@ -133,7 +134,7 @@ def _is_rendered(
     entry = manifest.entry(job["slug"], job["class"], team, job["style"])
     if entry is None or entry["job_version"] != JOB_LIST_VERSION:
         return False
-    return image_exists is None or image_exists(entry["path"])
+    return image_exists is None or image_exists(entry["master"]["path"])
 
 
 def _has_failed(manifest: Manifest, job: dict, team: str) -> bool:

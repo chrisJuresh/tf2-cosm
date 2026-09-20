@@ -4,7 +4,7 @@ from __future__ import annotations
 import pytest
 
 from render.jobs import job_list
-from render.manifest import REASON_IMPORT_ERROR, Manifest, image_relpath
+from render.manifest import REASON_IMPORT_ERROR, Manifest
 from render.plan import Batch, JobWork, batches, plan_run
 from render.selection import NothingSelected
 from tests.test_manifest import AT, a_job
@@ -18,9 +18,13 @@ def a_list(*jobs: dict) -> dict:
     return job_list(list(jobs), source="tests")
 
 
+def master_relpath(job: dict, team: str) -> str:
+    return f"masters/{job['slug']}/{job['class']}-{team}-{job['style']}.png"
+
+
 def rendered(manifest: Manifest, job: dict, team: str, **overrides) -> None:
     manifest.record(
-        job, team, path=image_relpath(job, team), width=1024, height=1024, at=AT, **overrides
+        job, team, path=master_relpath(job, team), width=1024, height=1024, at=AT, **overrides
     )
 
 

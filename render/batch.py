@@ -28,15 +28,10 @@ from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
 
-from render.cli import (
-    DEFAULT_MANIFEST,
-    DEFAULT_OUT,
-    DEFAULT_SITE_PACKAGES,
-    add_job_filters,
-    add_render_paths,
-)
+from render.cli import add_job_filters, add_render_paths
 from render.jobs import job_list, validate_job_list
 from render.manifest import load_manifest
+from render.output import OutputLayout
 from render.plan import Batch, RunPlan, account_for, batches, plan_run
 from render.progress import format_duration, progress_line
 from render.scene import TEAMS
@@ -71,8 +66,9 @@ class Settings:
     blender: Path
     tf: Path
     cache: Path
-    out: Path
-    manifest: Path
+    root: Path | None
+    masters_dir: str | None
+    manifest: Path | None
     size: int
     samples: int
     site_packages: Path
@@ -111,12 +107,16 @@ def parse_args(argv: list[str] | None = None) -> Settings:
     return Settings(**vars(parser.parse_args(argv)))
 
 
-def blender_command(settings: Settings, jobs_file: Path, batch: Batch) -> list[str]:
+def blender_command(settings: Settings, layout: OutputLayout, jobs_file: Path, batch: Batch) -> list[str]:
     """The render step, told to render exactly this batch and nothing else.
 
     The batch is handed over as a job list of its own rather than as filters: the child then
     has one job to do per job in the file, and needs to know nothing about the manifest,
     resuming or what the rest of the run is doing.
+
+    The layout is passed as settled paths, not as the flags that were typed: the runner has
+    already let the command line beat the environment, and the child must not resolve it a
+    second time and possibly differently.
     """
     return [
         str(settings.blender),
@@ -128,8 +128,9 @@ def blender_command(settings: Settings, jobs_file: Path, batch: Batch) -> list[s
         "--jobs", str(jobs_file),
         "--tf", str(settings.tf),
         "--cache", str(settings.cache),
-        "--out", str(settings.out),
-        "--manifest", str(settings.manifest),
+        "--root", str(layout.root),
+        "--masters-dir", layout.masters_dir,
+        "--manifest", str(layout.manifest),
         "--size", str(settings.size),
         "--samples", str(settings.samples),
         "--site-packages", str(settings.site_packages),
@@ -153,7 +154,7 @@ def check_blender(given: Path) -> str | None:
     return f"no Blender at {given}. {INSTALL_HINT}"
 
 
-def describe(plan: RunPlan, settings: Settings, *, job_by_job: bool) -> None:
+def describe(plan: RunPlan, layout: OutputLayout, *, job_by_job: bool) -> None:
     """What the run is about to do: by Class, or job by job when that is what was asked for.
 
     A full run is six thousand jobs, so listing them all is `--dry-run`'s job; a run that is
@@ -171,10 +172,10 @@ def describe(plan: RunPlan, settings: Settings, *, job_by_job: bool) -> None:
             by_class[work.job["class"]] += len(work.teams)
         for cls, images in sorted(by_class.items()):
             log(f"  {cls:<9} {images} images")
-    log(f"masters -> {settings.out}; manifest -> {settings.manifest}")
+    log(f"masters -> {layout.path_for(layout.masters_dir)}; manifest -> {layout.manifest}")
 
 
-def report_failures(settings: Settings, plan: RunPlan) -> None:
+def report_failures(layout: OutputLayout, plan: RunPlan) -> None:
     """The failure list a run leaves behind, so it can be reviewed rather than scrolled back to.
 
     Scoped to everything the filters selected, not to the batches this run happened to render:
@@ -187,7 +188,7 @@ def report_failures(settings: Settings, plan: RunPlan) -> None:
         for job in plan.selected
         for team in plan.teams
     }
-    failures = load_manifest(settings.manifest).failures_for(selected)
+    failures = load_manifest(layout.manifest).failures_for(selected)
     if not failures:
         return
     log(f"{len(failures)} failures:")
@@ -202,11 +203,14 @@ def report_failures(settings: Settings, plan: RunPlan) -> None:
 
 def run(settings: Settings, *, launch=launch_blender) -> int:
     """Render what is missing. 0 when everything planned was accounted for, 1 when work was lost."""
+    layout = OutputLayout.from_env().overridden(
+        root=settings.root, masters_dir=settings.masters_dir, manifest=settings.manifest
+    )
     document = json.loads(settings.jobs.read_text(encoding="utf-8"))
     validate_job_list(document)
-    manifest = load_manifest(settings.manifest)
+    manifest = load_manifest(layout.manifest)
 
-    exists = None if settings.trust_manifest else lambda path: (settings.out / path).exists()
+    exists = None if settings.trust_manifest else lambda path: layout.path_for(path).exists()
     try:
         plan = plan_run(
             document,
@@ -223,11 +227,11 @@ def run(settings: Settings, *, launch=launch_blender) -> int:
         print(f"[batch] {error}", file=sys.stderr, flush=True)
         return 2
 
-    describe(plan, settings, job_by_job=settings.dry_run)
+    describe(plan, layout, job_by_job=settings.dry_run)
     if settings.dry_run:
         return 0
     if not plan.work:
-        report_failures(settings, plan)
+        report_failures(layout, plan)
         log("nothing to render; everything selected is already up to date")
         return 0
 
@@ -238,10 +242,12 @@ def run(settings: Settings, *, launch=launch_blender) -> int:
         print(f"[batch] {complaint}", file=sys.stderr, flush=True)
         return 2
 
-    return _render_batches(settings, plan, batches(plan.work, settings.batch_size), launch)
+    return _render_batches(settings, layout, plan, batches(plan.work, settings.batch_size), launch)
 
 
-def _render_batches(settings: Settings, plan: RunPlan, cut: list[Batch], launch) -> int:
+def _render_batches(
+    settings: Settings, layout: OutputLayout, plan: RunPlan, cut: list[Batch], launch
+) -> int:
     started = time.monotonic()
     total = plan.images
     done = failed = lost = 0
@@ -254,13 +260,13 @@ def _render_batches(settings: Settings, plan: RunPlan, cut: list[Batch], launch)
                 json.dumps(job_list(list(batch.jobs), source=str(settings.jobs))), encoding="utf-8"
             )
             try:
-                code = launch(blender_command(settings, jobs_file, batch))
+                code = launch(blender_command(settings, layout, jobs_file, batch))
             except KeyboardInterrupt:
                 # ctrl-c reaches Blender too, so the batch in flight is already gone. Say what
                 # the run got to and leave; the next run starts from the manifest.
                 code, stopped = 130, True
 
-            outcome = account_for(load_manifest(settings.manifest), batch)
+            outcome = account_for(load_manifest(layout.manifest), batch)
             done += outcome.rendered + outcome.failed
             failed += outcome.failed
             lost += outcome.lost
@@ -275,7 +281,7 @@ def _render_batches(settings: Settings, plan: RunPlan, cut: list[Batch], launch)
     elapsed = time.monotonic() - started
     log(f"{'stopped' if stopped else 'done'} in {format_duration(elapsed)}: "
         f"{done - failed} rendered, {failed} failed, {lost} lost")
-    report_failures(settings, plan)
+    report_failures(layout, plan)
     if stopped:
         log("run it again to pick up where this stopped")
         return 130
