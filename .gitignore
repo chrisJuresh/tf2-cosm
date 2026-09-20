@@ -28,3 +28,12 @@ assets-cache/
 Thumbs.db
 .vscode/
 .idea/
+
+# Every change gets its own worktree under here, so each one is a checkout of this
+# repository inside itself -- a `git add -A` that catches one commits it as a gitlink
+# no clone can resolve. settings.local.json is this machine's permission mode, which
+# is nobody else's. The guard itself stays TRACKED: .claude/settings.json,
+# .claude/hooks/ and .claude/worktree-per-change.json, because a worktree only gets a
+# file if git puts it there.
+.claude/worktrees/
+.claude/settings.local.json

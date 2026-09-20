@@ -1,0 +1,511 @@
+#!/usr/bin/env python3
+"""Land the change in the worktree this is run from: push, PR, merge, verify.
+
+A repository can name branches it will not merge into — `protectedMergeTargets` in
+`.claude/worktree-per-change.json`, empty by default. Those are pushed to and opened
+against, then left for a person, because a trunk that takes reviewed PRs is one where
+the PR *is* the review. See the refusal in `land()` for why that check sits at the
+merge step and not in `preflight`.
+
+This exists to be *allowlisted*, and everything about it is shaped by that.
+
+The protocol's last three steps — push, open a PR, merge it — are the ones a
+permission layer stops, because they are the ones that reach outside the machine.
+Left stopped, the rule collapses into "the agent does the work and a human finishes
+it", which is the failure the `Stop` hook already refuses: a branch that exists only
+on this disk is not a delivered change. So the steps have to be grantable.
+
+The obvious grant is `Bash(gh pr merge:*)`, and it is far too wide: it merges any PR
+in any repository the machine is authenticated to, on any base. This script is the
+narrow alternative. It takes **no PR number and no branch** — it merges the PR whose
+head is the branch checked out in the worktree it was run from, into the integration
+branch that repository recorded, and refuses everything else. One allowlist entry for
+this file grants exactly the protocol and nothing beside it.
+
+What it is NOT is a way around a permission decision. It runs `gh` and `git` under
+their own names and prints every command before running it; a machine that has not
+allowed it is a machine where it does not run. Wrapping the same commands to make them
+unrecognisable would be a different program with a different purpose, and it would also
+not work for long.
+
+It stops before removing the worktree, because nothing can remove the tree it is
+standing in — see SKILL.md step 4 for the two commands that follow, and the allowlist
+entries that let them run.
+
+It refuses a branch that has already merged, before pushing anything. That is not a
+nicety: after a change lands there is no remote branch and no open PR, so every later
+check reads like a change that was never delivered, and running this twice opens a
+second PR whose diff is empty and merges it.
+
+Where several changes are in flight against one integration branch, each one that lands
+moves the base under the others, and the forge then refuses their PRs for a conflict —
+after the push, from the far side of an API call, with nothing set up locally to fix it.
+`mergeIntegrationBeforeLanding` in `.claude/worktree-per-change.json` (or
+`--merge-integration`) brings the integration branch down into the topic branch first, so
+a clean merge costs nothing and a conflicting one stops here, in a tree already set up for
+the resolution. It is **off by default**: in a repo where changes land one at a time it is
+a fetch and a merge commit that buy nothing.
+
+Usage:
+    python .claude/scripts/land.py              push, PR if needed, merge, verify
+    python .claude/scripts/land.py --dry-run    print the sequence, run none of it
+    python .claude/scripts/land.py --merge-integration   ... merge the base down first
+    python .claude/scripts/land.py --title T --body-file B    ... for the PR it creates
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import subprocess
+import sys
+from pathlib import Path
+
+CONFIG_FILENAME = "worktree-per-change.json"
+DEFAULT_INTEGRATION_BRANCH = "development"
+
+# Branches this script pushes to and opens against, but will not merge.
+#
+# **Empty by default, and that is deliberate.** For most repositories the integration
+# branch *is* `development` or `main`, squash-merging into it is the whole protocol, and a
+# hard-coded list here would break them. The repositories that need this are the ones whose
+# trunk takes reviewed PRs — where the PR into it *is* the review, so merging it is a
+# person's decision rather than this script's.
+#
+# Turned on per repository with `protectedMergeTargets` in `.claude/worktree-per-change.json`:
+#
+#     "protectedMergeTargets": ["develop", "main"]
+#
+# Note which direction the config runs. It can only ever ADD a refusal — there is no key
+# that removes one and no environment variable that turns this off, so a repository that
+# has opted in cannot be talked out of it by a later `CLAUDE_INTEGRATION_BRANCH` or by a
+# session editing the branch name.
+DEFAULT_PROTECTED_MERGE_TARGETS: frozenset[str] = frozenset()
+
+
+def protected_targets(main_root: Path) -> frozenset[str]:
+    """What this repository refuses to merge into. Read from the MAIN checkout.
+
+    Same source and same reason as `integration_branch`: every worktree of a repo has to
+    agree, and `.claude/` is checked out separately in each of them.
+    """
+    extra = config(main_root).get("protectedMergeTargets")
+    if isinstance(extra, list):
+        names = {str(n).strip().lower() for n in extra if str(n).strip()}
+        return DEFAULT_PROTECTED_MERGE_TARGETS | frozenset(names)
+    return DEFAULT_PROTECTED_MERGE_TARGETS
+
+
+def is_protected(branch: str, protected: frozenset[str]) -> bool:
+    """Match on the bare branch name, `origin/`-qualified or not, case-insensitively.
+
+    Normalised rather than compared literally so that `Develop`, `origin/develop` and
+    `refs/heads/develop` cannot each be a way past the check.
+    """
+    name = (branch or "").strip().lower()
+    for prefix in ("refs/heads/", "refs/remotes/"):
+        if name.startswith(prefix):
+            name = name[len(prefix) :]
+    if "/" in name:
+        name = name.rsplit("/", 1)[-1]
+    return name in protected
+
+
+class Refused(Exception):
+    """A precondition of the protocol is not met. The message says which."""
+
+
+# ----------------------------------------------------------------- running things
+
+
+def run(argv: list[str], cwd: Path, dry_run: bool = False, capture: bool = True):
+    """Run `argv`, echoing it first.
+
+    Echoing is not decoration. This script is allowlisted, which means a human agreed to
+    it once and is not watching each run; the transcript of what it actually did is the
+    only remaining record, and a silent wrapper around `gh pr merge` is precisely the
+    thing nobody should install.
+    """
+    print("  $ " + " ".join(argv))
+    if dry_run:
+        return subprocess.CompletedProcess(argv, 0, "", "")
+    return subprocess.run(argv, cwd=str(cwd), capture_output=capture, text=True)
+
+
+def git(cwd: Path, *args: str) -> str | None:
+    result = subprocess.run(
+        ["git", "-C", str(cwd), *args], capture_output=True, text=True, timeout=30
+    )
+    return result.stdout.strip() if result.returncode == 0 else None
+
+
+# ------------------------------------------------------------------- where are we
+
+
+def locate(start: Path) -> tuple[Path, Path]:
+    """Return (worktree root, main checkout root), or refuse.
+
+    `.git` is a file in a linked worktree and a directory in the main checkout, which is
+    the same one-stat test the guard uses. Sharing the test matters more than sharing the
+    code: a script that thought it was in a worktree where the guard thought otherwise
+    would push from a directory the guard had just refused to let anyone edit.
+    """
+    for directory in [start, *start.parents]:
+        marker = directory / ".git"
+        if marker.is_dir():
+            raise Refused(
+                f"{directory} is the MAIN CHECKOUT, and nothing is landed from here.\n"
+                "Every change is made in its own worktree and landed from inside it. "
+                "If the change you meant to land is in a worktree, run this from there."
+            )
+        if marker.is_file():
+            text = marker.read_text(encoding="utf-8", errors="replace").strip()
+            if not text.startswith("gitdir:"):
+                continue
+            git_dir = Path(text.split(":", 1)[1].strip())
+            if not git_dir.is_absolute():
+                git_dir = directory / git_dir
+            git_dir = Path(os.path.normpath(str(git_dir)))
+            common = git_dir
+            pointer = git_dir / "commondir"
+            if pointer.is_file():
+                target = Path(pointer.read_text(encoding="utf-8").strip())
+                common = Path(
+                    os.path.normpath(
+                        str(git_dir / target if not target.is_absolute() else target)
+                    )
+                )
+            main_root = common.parent if common.name == ".git" else directory
+            return directory, main_root
+    raise Refused(f"{start} is not inside a git repository.")
+
+
+def config(main_root: Path) -> dict:
+    """This repository's record, or an empty one. Read from the MAIN checkout.
+
+    Every worktree of the repo has to agree about the integration branch, and `.claude/`
+    is checked out separately in each of them — so the main checkout is the only copy
+    there is one of.
+    """
+    try:
+        blob = json.loads(
+            (main_root / ".claude" / CONFIG_FILENAME).read_text(encoding="utf-8")
+        )
+        return blob if isinstance(blob, dict) else {}
+    except (OSError, ValueError):
+        return {}
+
+
+def integration_branch(main_root: Path) -> str:
+    """The branch this repository's PRs target.
+
+    Read from the repository rather than guessed, and read from the *main checkout* so
+    that every worktree of it agrees. The environment override is the operator's, and
+    exists for the same reason it does in the guard.
+
+    The fallback is a fallback, not a default anyone should reach: `install.py` asks and
+    records the answer, so a repo arriving here without a record is one where the guard
+    was installed by hand. Landing into the wrong branch is not recoverable by rerunning,
+    so this says which branch it is about to use, every time.
+    """
+    override = (os.environ.get("CLAUDE_INTEGRATION_BRANCH") or "").strip()
+    if override:
+        return override
+    name = config(main_root).get("integrationBranch")
+    if isinstance(name, str) and name.strip():
+        return name.strip()
+    return DEFAULT_INTEGRATION_BRANCH
+
+
+# ------------------------------------------------------------------------- checks
+
+
+def preflight(tree: Path, branch: str) -> str:
+    """Refuse anything that is not "this worktree's own finished change"."""
+    topic = git(tree, "rev-parse", "--abbrev-ref", "HEAD")
+    if not topic or topic == "HEAD":
+        raise Refused(
+            "This worktree is on a detached HEAD, so there is no branch to open a PR "
+            "from. `git switch -c <short-topic-name>` first."
+        )
+    if topic == branch:
+        raise Refused(
+            f"This worktree is sitting on `{branch}`, the branch changes merge INTO. "
+            f"A PR from `{branch}` to `{branch}` is not a change.\n"
+            "`git switch -c <short-topic-name>` first — the guard denies edits here for "
+            "the same reason."
+        )
+    dirty = git(tree, "status", "--porcelain") or ""
+    if dirty.strip():
+        names = "\n".join(f"    {line}" for line in dirty.splitlines()[:10])
+        more = "" if len(dirty.splitlines()) <= 10 else f"\n    ... and {len(dirty.splitlines()) - 10} more"
+        raise Refused(
+            "This worktree has uncommitted changes, and landing would leave them "
+            f"behind on a branch about to be deleted:\n{names}{more}\n"
+            "Commit them (`git add <paths> && git commit`) or discard them, then run "
+            "this again."
+        )
+    return topic
+
+
+# -------------------------------------------------------------------------- steps
+
+
+def merge_integration(tree: Path, branch: str, dry_run: bool) -> None:
+    """Bring `origin/<branch>` down into this topic branch before anything is pushed.
+
+    This is for the case the protocol creates rather than an unusual one: several changes
+    in flight against one integration branch, each landing one moving the base under the
+    rest. Without it, the conflict is discovered by the FORGE, after the push, and what
+    comes back is `gh pr merge` failing on a PR that is now unmergeable — a state with no
+    local setup for fixing it and an exit code that says nothing about which half went
+    wrong.
+
+    Done here, a clean merge is invisible and a conflicting one stops with the conflict in
+    the working tree, which is where it has to be resolved anyway. The guard permits that:
+    an unfinished merge outranks the spent marker precisely so conflict resolution stays
+    editable.
+
+    Refusing rather than resolving is the whole design. Choosing between two versions of
+    someone's code is the work, and a script that guessed would land the guess.
+    """
+    print(f"merge {branch} down first")
+    fetched = run(["git", "fetch", "origin", branch], tree, dry_run)
+    if not dry_run and fetched.returncode != 0:
+        raise Refused(
+            f"could not fetch origin/{branch}, so there is no way to tell whether this "
+            f"branch is behind it:\n{(fetched.stderr or '').strip()}"
+        )
+    # Asked even in a dry run. It changes nothing, and a dry run that skipped it would
+    # print a merge for a branch that needs none — which is the one thing a dry run is for.
+    behind = subprocess.run(
+        ["git", "-C", str(tree), "merge-base", "--is-ancestor", f"origin/{branch}", "HEAD"],
+        capture_output=True, text=True,
+    )
+    if behind.returncode == 0:
+        print(f"  already contains origin/{branch}")
+        return
+    merged = run(["git", "merge", "--no-edit", f"origin/{branch}"], tree, dry_run)
+    if dry_run:
+        return
+    if merged.returncode != 0:
+        raise Refused(
+            f"`{branch}` has moved since this branch was cut, and merging it down "
+            f"conflicts:\n{(merged.stdout or '').strip()}\n{(merged.stderr or '').strip()}\n"
+            "The conflict is in this worktree now, which is where it has to be settled — "
+            "resolve the files, `git add` them, `git commit`, then run this again.\n"
+            "Nothing has been pushed, no PR has been opened, and the change is intact."
+        )
+    print(f"  merged origin/{branch}")
+
+
+def head_pr(tree: Path, topic: str, state: str) -> int | None:
+    """The PR whose head is `topic` and whose state is `state`, if there is one.
+
+    Asked by head branch, never by number: the number is the input that would let this
+    script merge something that has nothing to do with the worktree it was run from,
+    which is the whole reason it is narrow enough to allowlist.
+    """
+    result = subprocess.run(
+        ["gh", "pr", "list", "--head", topic, "--state", state,
+         "--json", "number", "--jq", ".[0].number"],
+        cwd=str(tree), capture_output=True, text=True,
+    )
+    value = (result.stdout or "").strip()
+    return int(value) if value.isdigit() else None
+
+
+def land(tree: Path, main_root: Path, branch: str, topic: str, args) -> int:
+    print(f"repository:  {main_root}")
+    print(f"worktree:    {tree}")
+    print(f"branch:      {topic}  ->  {branch}")
+    # Said before anything runs, not just at the merge step, because the whole reason to
+    # read a dry run is to find out what it is about to do to which branch.
+    if is_protected(branch, protected_targets(main_root)):
+        print(f"merge:       NO — `{branch}` is protected; this will push and open a PR only")
+    print()
+
+    # Asked BEFORE the push, because the push is what makes this undetectable. A landed
+    # change leaves no remote branch and no *open* PR, so every check after the push
+    # reads exactly like a change that has not been delivered yet: `git push -u origin
+    # HEAD` recreates the deleted branch and succeeds, the search for an open PR finds
+    # nothing, and a second PR is opened from a branch whose content is already on the
+    # integration branch. It merges, because an empty diff is a mergeable one.
+    #
+    # Measured 2026-08-15: this script run twice against one worktree put `(#55)` and
+    # `(#56)` on `main` for one change, the second changing no files. The push-failure
+    # branch below was written expecting to catch this and cannot -- the push is the
+    # step that succeeds.
+    #
+    # Refusing is right rather than merely safe: the protocol is one worktree, one
+    # branch, one change, so a branch that has already merged has nothing left to
+    # deliver. A second change gets a new worktree.
+    landed = head_pr(tree, topic, "merged")
+    if landed is not None:
+        raise Refused(
+            f"#{landed} has already merged `{topic}`, so this change is finished and "
+            "nothing here is undelivered.\n"
+            "Take this worktree down and cut a new one for the next change:\n"
+            f"    git worktree remove {tree}\n"
+            f"    git branch -D {topic}"
+        )
+
+    if args.merge_integration:
+        merge_integration(tree, branch, args.dry_run)
+        print()
+
+    print("push")
+    pushed = run(["git", "push", "-u", "origin", "HEAD"], tree, args.dry_run)
+    if pushed.returncode != 0:
+        # This used to say "if this branch has already merged, the change is finished",
+        # which was the right diagnosis attached to the wrong step: a merged branch is
+        # deleted, so pushing it back up succeeds. The check above catches that case now,
+        # and what is left here is the remote refusing the push on its own terms -- a
+        # protected branch, a rejected non-fast-forward, no credentials.
+        raise Refused(
+            f"the push was refused:\n{(pushed.stderr or '').strip()}"
+        )
+
+    number = None if args.dry_run else head_pr(tree, topic, "open")
+    print("\npull request")
+    if number is None:
+        create = ["gh", "pr", "create", "--base", branch]
+        create += ["--title", args.title] if args.title else []
+        create += ["--body-file", args.body_file] if args.body_file else []
+        if not args.title and not args.body_file:
+            create += ["--fill"]
+        created = run(create, tree, args.dry_run)
+        if not args.dry_run:
+            if created.returncode != 0:
+                raise Refused(f"gh pr create failed:\n{(created.stderr or '').strip()}")
+            number = head_pr(tree, topic, "open")
+            if number is None:
+                raise Refused(
+                    "the PR was created but cannot be found by head branch, so this "
+                    "will not merge something it has not identified. Merge it by hand."
+                )
+            print(f"  opened #{number}")
+    else:
+        print(f"  #{number} is already open for {topic}")
+
+    # No `--delete-branch`, deliberately. It makes `gh` do local git work after the API
+    # call — it checks out the base branch to delete the merged one — and under this
+    # protocol that always fails, because the main checkout is permanently sitting on the
+    # integration branch:
+    #
+    #     failed to run git: fatal: 'main' is already used by worktree at '…'
+    #
+    # Measured 2026-08-15, landing this script's own first change. The merge had already
+    # happened on the forge; only the cleanup failed. So the flag cannot do the one thing
+    # it is for here, and asking it to leaves the remote branch standing while returning
+    # an error — the worst of both. The deletion is done explicitly below instead, where
+    # it is one API call that cannot be confused by what this checkout has checked out.
+    print("\nmerge")
+    target = str(number) if number is not None else "<n>"
+
+    # The one step this script will not take. Everything above it — push, open — is
+    # delivery and happens unasked; merging into a shared trunk is a person's call, and
+    # the PR that is now open is how they make it.
+    #
+    # Placed here rather than in `preflight` on purpose: refusing at the top would abort
+    # before the push and leave the change undelivered, which is the failure this whole
+    # script exists to prevent. Refusing *here* means the branch is pushed, the PR is
+    # open, and the only thing that did not happen is the thing that should not.
+    if is_protected(branch, protected_targets(main_root)):
+        print(f"  NOT MERGING — `{branch}` is a protected branch.")
+        print(f"  #{target} is open and waiting for a human to merge it.")
+        print()
+        print(f"  This is not a failure: the change is delivered. `{branch}` takes")
+        print("  reviewed pull requests, so the review is the point and merging it is")
+        print("  not this script's to do.")
+        print()
+        print("  The branch is left on the remote, because deleting it would close the")
+        print("  PR's head before anyone has read it.")
+        print()
+        print(f"  Merge it yourself when it has been reviewed, or point this at a batch")
+        print("  branch you own — `integrationBranch` in .claude/worktree-per-change.json")
+        print("  — which is the case squash-merging without review was written for.")
+        return 0
+
+    merged = run(["gh", "pr", "merge", target, "--squash"], tree, args.dry_run)
+
+    # A non-zero exit is a question, not an answer. `gh` can merge the PR and then fail on
+    # something afterwards, and the two are indistinguishable from the exit code — which is
+    # exactly how the run above ended: exit 1, a git error, and a merged PR. Refusing on
+    # the exit code alone reports a change as unlanded while it is sitting on the
+    # integration branch, and sends the next session to redo it.
+    print("\nverify")
+    if args.dry_run:
+        run(["gh", "pr", "view", target, "--json", "state", "--jq", ".state"], tree, True)
+        run(["git", "push", "origin", "--delete", topic], tree, True)
+        print("  (dry run — nothing was pushed, opened, merged or deleted)")
+        return 0
+
+    state = run(["gh", "pr", "view", str(number), "--json", "state", "--jq", ".state"], tree)
+    landed = (state.stdout or "").strip()
+    if landed != "MERGED":
+        raise Refused(
+            f"the forge reports #{number} as {landed or 'unknown'}, not MERGED"
+            + (f", and gh reported:\n{(merged.stderr or '').strip()}" if merged.returncode else "")
+            + "\nThe branch has NOT been deleted and the change has not landed."
+        )
+    if merged.returncode:
+        # Worth saying out loud rather than swallowing: the merge landed, something after
+        # it did not, and the next person to read this transcript should know which.
+        print(f"  gh exited {merged.returncode} after the merge — {(merged.stderr or '').strip()}")
+    print(f"  #{number} is MERGED")
+
+    # The branch is deleted here, from the forge, for the reason in the comment above and
+    # one more: a merged branch left standing is a live push target after the PR that
+    # reviewed it has closed, and a commit pushed there looks like ordinary work and
+    # reaches the integration branch never.
+    deleted = run(["git", "push", "origin", "--delete", topic], tree)
+    run(["git", "fetch", "origin", "--prune"], tree)
+    remote = git(tree, "ls-remote", "--heads", "origin", topic) or ""
+    if remote.strip():
+        print(f"  ! {topic} is STILL on the remote: {(deleted.stderr or '').strip()}")
+        print(f"  ! delete it by hand — `git push origin --delete {topic}`")
+    else:
+        print(f"  {topic} is gone from the remote")
+
+    print(f"\n#{number} is merged. This worktree is finished; take it down from the main")
+    print("checkout, because nothing can remove the tree it is standing in:")
+    print(f"    git worktree remove {tree}")
+    print(f"    git branch -D {topic}")
+    return 0
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--dry-run", action="store_true", help="print the sequence, run none of it")
+    parser.add_argument("--title", metavar="TEXT", help="title for the PR, if one is created")
+    parser.add_argument("--body-file", metavar="PATH", help="body file for the PR, if one is created")
+    # Three states, not two: the repo's recorded answer is the default, and either flag
+    # overrides it for one run. A plain boolean would make "the repo says yes" and "this
+    # run says no" indistinguishable.
+    parser.add_argument("--merge-integration", action="store_true", default=None,
+                        help="merge origin/<integration> down before pushing")
+    parser.add_argument("--no-merge-integration", dest="merge_integration",
+                        action="store_false", help="skip it, whatever the repo records")
+    args = parser.parse_args()
+
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+    except (AttributeError, OSError):
+        pass
+
+    try:
+        tree, main_root = locate(Path.cwd().resolve())
+        branch = integration_branch(main_root)
+        if args.merge_integration is None:
+            args.merge_integration = bool(config(main_root).get("mergeIntegrationBeforeLanding"))
+        topic = preflight(tree, branch)
+        return land(tree, main_root, branch, topic, args)
+    except Refused as refusal:
+        print(f"refused: {refusal}", file=sys.stderr)
+        return 2
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
