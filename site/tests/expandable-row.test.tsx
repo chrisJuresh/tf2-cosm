@@ -250,15 +250,18 @@ describe("the table an open row leaves behind", () => {
     renderList();
     await user.click(toggleFor("Ghastly Gibus"));
 
-    expect(screen.getByRole("table")).toHaveAttribute("aria-rowcount", "7");
+    expect(screen.getByRole("table")).toHaveAttribute("aria-rowcount", "10");
     const [, body] = screen.getAllByRole("rowgroup");
     expect(within(body!).getAllByRole("row").map((row) => row.getAttribute("aria-rowindex"))).toEqual([
-      "2", // Bolt Boy
-      "3", // Dead of Night
-      "4", // Ghastly Gibus
-      "5", // its panel
-      "6", // Team Captain
-      "7", // Tin Pot
+      "2", // Baronial Badge
+      "3", // Bolt Boy
+      "4", // Crocodile Smile
+      "5", // Dead of Night
+      "6", // Ghastly Gibus
+      "7", // its panel
+      "8", // Scotsman's Stove Pipe
+      "9", // Team Captain
+      "10", // Tin Pot
     ]);
   });
 

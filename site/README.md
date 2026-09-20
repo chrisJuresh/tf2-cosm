@@ -17,15 +17,19 @@ it against the catalogue schema before rendering a row of it — a catalogue tha
 violates the schema fails the build rather than deploying.
 
 The site has no configuration of its own. Every rate it quotes — the Key Rate,
-and the Steam Community Market's key price the dollar figures are computed from —
-comes out of the catalogue header, so there is nowhere for a number on the page
-to have come from but the snapshot.
+and each of the three Dollar Bases a dollar figure can be computed from — comes
+out of the catalogue header, so there is nowhere for a number on the page to have
+come from but the snapshot. A rate's own date is shown alongside the snapshot's,
+because they are not the same date: a price source's estimate can be weeks old by
+the time a run picks it up.
 
 ## Shape
 
 - `src/app/page.tsx` — the page. A server component: it reads the catalogue at
-  build time, picks the Dollar Basis out of its header, and hands both to the
-  list.
+  build time and hands it to the view.
+- `src/components/catalogue-view.tsx` — the header, the Dollar Basis switch and
+  the list. The active basis lives here because it is the one thing the header
+  and every row have to agree on.
 - `src/catalogue/load.ts` — the catalogue, imported as a module so the whole
   document is baked into the static output, and validated before use.
 - `src/prices/format.ts` — the pure price module: Trader Notation, the Metal
@@ -33,9 +37,12 @@ to have come from but the snapshot.
   their own, and the tests drive this module directly. The Metal arithmetic
   underneath is the data job's `@tf2-cosm/data/prices/metal`, so a notation
   written here and one recorded in the catalogue come out of the same function.
-  The Dollar Basis is picked out of the header rather than computed: the data job
+  A Dollar Basis is picked out of the header rather than computed: the data job
   anchored all three rates to the snapshot's own Key Rate, and recomputing one
-  here would be a second opinion on a settled number.
+  here would be a second opinion on a settled number. A basis whose rate never
+  arrived is not offered at all, rather than guessed at. The price source names
+  itself in the header and nowhere in this code, so ADR-0002's swappable source
+  stays swappable without an edit here.
 - `src/components/cosmetic-list.tsx` — the list, a client component fed the whole
   catalogue. Its rows are virtualised, so eighteen hundred of them with a picture
   each scroll without the browser holding eighteen hundred rows. A phone has room
@@ -47,8 +54,16 @@ to have come from but the snapshot.
 - `src/components/cosmetic-detail.tsx` — what an open row shows: the Price
   Spread, the Reference Variant the figure is for, when the source last repriced
   it, who can wear it, and the defindexes ADR-0003 folded into it.
+- `src/components/dollar-basis-switch.tsx` — the switch, as native radios so a
+  keyboard walks it and a screen reader announces it without being told to. Each
+  option carries its own rate, because that is the whole point of the choice.
+- `src/components/site-footer.tsx` — the credits. Nothing on the page is the
+  site's own.
 - `src/catalogue/describe.ts` — the pure module that writes the catalogue's own
   tokens out in English: a Class, a Quality, an Unpriced reason, a date.
+- `src/browser/remembered.ts` — a choice remembered in this browser and nowhere
+  else. Every access is guarded, the page is right without it, and it is read
+  after mount so the static markup React hydrates carries nobody's preference.
 
 The open Cosmetic's slug is the URL hash, so a row can be linked to, and every
 row carries its slug in `data-slug` — the hook the later wishlist and per-item
@@ -75,6 +90,11 @@ virtualised list in a DOM that lays nothing out would decide nothing is visible
 and render no rows, and an element a `scrollTo` to call, because jsdom implements
 no scrolling at all.
 
+`tests/page.test.tsx` is the exception: it renders the page against the committed
+catalogue rather than the fixture, because the component suites drive the view
+and the footer apart from each other and neither can see whether the page puts
+them on the same screen.
+
 jsdom applies no stylesheet, so nothing here can assert the responsive layout;
 phone width is checked in a real browser.
 
@@ -87,10 +107,9 @@ not run against 7, so this package pins `typescript@5`. Both are checked by
 
 ## Not here yet
 
-The Class View, filters, sort, search and remembered controls are #13; the Dollar
-Basis switch, the header rates and the credits footer are #14; Worn Renders in
-place of Backpack Icons, and the Style switcher and Team toggle inside the open
-row, are #16.
+The Class View, filters, sort, search and their remembered state are #13; Worn
+Renders in place of Backpack Icons, and the Style switcher and Team toggle inside
+the open row, are #16.
 The whole catalogue is handed to the client as one payload, which is what makes
 the exported HTML large; trimming it to the fields a row needs is worth doing
 once those tickets have settled what a row needs.

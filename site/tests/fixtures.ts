@@ -13,7 +13,7 @@ import { assertValidCatalogue, type Catalogue, type Cosmetic, type Metal } from 
 
 import document from "../../data/tests/golden/catalogue.json" with { type: "json" };
 
-import { steamMarketBasis } from "@/prices/format";
+import { chooseBasis, dollarBases } from "@/prices/format";
 
 export function fixtureCatalogue(): Catalogue {
   return assertValidCatalogue(structuredClone(document));
@@ -30,9 +30,16 @@ export function fixtureKeyRate(): Metal {
   return prices.keyRate;
 }
 
-/** The fixture's Steam Community Market basis: its lowest listing, $2.29 a Key. */
+/** The fixture's three Dollar Bases: $2.29, $2.36 and $2.49 a Key. */
+export function fixtureBases() {
+  const bases = dollarBases(fixtureCatalogue().header.dollarBases);
+  if (bases.length === 0) throw new Error("the fixture catalogue is meant to carry Dollar Bases");
+  return bases;
+}
+
+/** The fixture's default basis: the Steam Community Market's lowest listing, $2.29 a Key. */
 export function fixtureBasis() {
-  const basis = steamMarketBasis(fixtureCatalogue().header.dollarBases);
+  const basis = chooseBasis(fixtureBases(), null);
   if (basis === null) throw new Error("the fixture catalogue is meant to carry a Steam Market rate");
   return basis;
 }

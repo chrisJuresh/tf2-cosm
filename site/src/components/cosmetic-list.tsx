@@ -16,9 +16,9 @@
  * on how the panel wraps, so rows are measured rather than assumed: the fixed
  * height is only the estimate the list starts from.
  *
- * Filters, sort and search are #13; the Dollar Basis switch is #14; the Worn
- * Render in place of the icon, and the Style and Team controls inside the
- * expanded row, are #16.
+ * The Dollar Basis the dollar column is computed at is chosen above the list and
+ * handed down. Filters, sort and search are #13; the Worn Render in place of the
+ * icon, and the Style and Team controls inside the expanded row, are #16.
  */
 import type { Cosmetic, Metal } from "@tf2-cosm/data/catalogue";
 import { useVirtualizer } from "@tanstack/react-virtual";
