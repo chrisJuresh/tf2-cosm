@@ -102,7 +102,8 @@ def hidden_bodygroups(item: dict, style: dict | None) -> list[str]:
     visuals = item.get("visuals") or {}
     hidden = {k for k, v in (visuals.get("player_bodygroups") or {}).items() if str(v) == "1"}
     if style:
-        hidden |= set((style.get("additional_hidden_bodygroups") or {}).keys())
+        additional = style.get("additional_hidden_bodygroups") or {}
+        hidden |= {k for k, v in additional.items() if str(v) == "1"}
     return sorted(hidden)
 
 

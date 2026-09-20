@@ -8,7 +8,7 @@ import pytest
 
 from render.cosmetics import ALL_CLASSES
 from render.model_index import InMemoryModelIndex
-from render.resolve import CosmeticNameCollision, resolve
+from render.resolve import Cosmetic, CosmeticNameCollision, resolve
 from tests.conftest import FIXTURE_MODELS
 
 
@@ -53,7 +53,18 @@ def test_all_class_cosmetic_renders_on_every_class(schema, tokens, model_index):
     jobs = jobs_named(result, "Ghastly Gibus")
 
     assert [j["class"] for j in jobs] == list(ALL_CLASSES)
-    assert result.all_class_cosmetics == ["Ghastly Gibus"]
+    assert [c.name for c in result.all_class_cosmetics] == ["Ghastly Gibus"]
+
+
+def test_an_all_class_cosmetic_stays_all_class_when_a_model_is_missing(schema, tokens):
+    index = InMemoryModelIndex(
+        [p for p in FIXTURE_MODELS if p != "models/player/items/all_class/gibus_pyro.mdl"]
+    )
+
+    result = resolve(schema, tokens, index)
+
+    assert [j["class"] for j in jobs_named(result, "Ghastly Gibus")] != list(ALL_CLASSES)
+    assert [c.name for c in result.all_class_cosmetics] == ["Ghastly Gibus"]
 
 
 def test_defindexes_sharing_a_name_become_one_cosmetic_with_aliases(schema, tokens, model_index):
@@ -94,7 +105,13 @@ def test_medals_never_tradable_items_and_modelless_items_are_excluded_with_a_rea
         (107, "Ye Olde Baker Boy", "never-tradable"),
         (108, "Scrap Metal Hat Part", "no-model"),
     ]
-    assert result.cosmetics == ["Bolt Boy", "Dead of Night", "Ghastly Gibus", "Team Captain", "Tin Pot"]
+    assert [c.name for c in result.cosmetics] == [
+        "Bolt Boy",
+        "Dead of Night",
+        "Ghastly Gibus",
+        "Team Captain",
+        "Tin Pot",
+    ]
 
 
 def test_the_dry_run_counts_jobs_by_class_and_exclusions_by_reason(schema, tokens, model_index):
@@ -118,8 +135,17 @@ def test_the_dry_run_counts_jobs_by_class_and_exclusions_by_reason(schema, token
 def test_only_keeps_the_named_cosmetics_without_changing_the_exclusions(schema, tokens, model_index):
     result = resolve(schema, tokens, model_index, only={"tin pot"})
 
-    assert result.cosmetics == ["Tin Pot"]
+    assert [c.name for c in result.cosmetics] == ["Tin Pot"]
     assert len(result.exclusions) == 3
+
+
+def test_a_cosmetic_records_its_slug_aliases_and_classes(schema, tokens, model_index):
+    by_name = {c.name: c for c in resolve(schema, tokens, model_index).cosmetics}
+
+    assert by_name["Ghastly Gibus"] == Cosmetic(
+        name="Ghastly Gibus", slug="ghastly-gibus", aliases=[103, 104], classes=list(ALL_CLASSES)
+    )
+    assert by_name["Team Captain"].classes == ["soldier", "demoman"]
 
 
 def test_two_different_items_sharing_a_name_fail_loudly(tokens, model_index):
@@ -159,17 +185,23 @@ def test_a_model_the_game_archive_lacks_is_excluded_not_emitted(schema, tokens):
     ] == [("Team Captain", "no-model", "demoman style 0: models/player/items/demo/demo_officer.mdl")]
 
 
-def test_a_demoman_model_filed_under_the_demoman_folder_still_resolves(schema, tokens):
-    index = InMemoryModelIndex(
-        [
-            "models/player/items/demoman/demoman_officer.mdl" if p.endswith("demo/demo_officer.mdl") else p
-            for p in FIXTURE_MODELS
-        ]
-    )
+def test_two_different_items_sharing_a_name_fail_loudly_even_when_no_model_resolves(tokens):
+    def hat(model: str) -> dict:
+        return {
+            "item_class": "tf_wearable",
+            "item_slot": "head",
+            "item_name": "#TF_BoltBoy",
+            "used_by_classes": {"Scout": "1"},
+            "model_player": model,
+        }
 
-    result = resolve(schema, tokens, index)
+    schema = {
+        "prefabs": {},
+        "items": {
+            "201": hat("models/player/items/scout/one.mdl"),
+            "202": hat("models/player/items/scout/another.mdl"),
+        },
+    }
 
-    assert [(j["class"], j["model"]) for j in jobs_named(result, "Team Captain")] == [
-        ("soldier", "models/player/items/soldier/soldier_officer.mdl"),
-        ("demoman", "models/player/items/demoman/demoman_officer.mdl"),
-    ]
+    with pytest.raises(CosmeticNameCollision, match="Bolt Boy"):
+        resolve(schema, tokens, InMemoryModelIndex([]))

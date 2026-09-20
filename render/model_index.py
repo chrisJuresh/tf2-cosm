@@ -2,7 +2,7 @@
 
 The resolve step must not discover a missing model mid-render, so every path it emits is
 checked against an index first. Two implementations: the game's VPK archive in production,
-a set of paths in tests.
+a list of paths in tests.
 """
 from __future__ import annotations
 
@@ -16,23 +16,24 @@ class ModelIndex(Protocol):
 
 
 class InMemoryModelIndex:
-    """A model index over a fixed list of paths."""
+    """A model index over a list of archive paths, matched the way Source matches them."""
 
     def __init__(self, paths: Iterable[str]) -> None:
-        self._by_lower = {p.lower().replace("\\", "/"): p for p in paths}
+        self._by_lower = {self._key(p): p for p in paths}
+
+    @staticmethod
+    def _key(path: str) -> str:
+        """Source is case-insensitive and treats both slashes alike."""
+        return path.lower().replace("\\", "/")
 
     def resolve(self, path: str) -> str | None:
-        return self._by_lower.get(path.lower().replace("\\", "/"))
+        return self._by_lower.get(self._key(path))
 
 
-class VpkModelIndex:
-    """A model index over the game's tf2_misc_dir.vpk."""
+class VpkModelIndex(InMemoryModelIndex):
+    """A model index over the game's tf2_misc_dir.vpk: its whole path list, read once."""
 
     def __init__(self, vpk_path: Path) -> None:
         import vpk as vpk_module
 
-        archive = vpk_module.open(str(vpk_path))
-        self._by_lower = {p.lower().replace("\\", "/"): p for p in archive}
-
-    def resolve(self, path: str) -> str | None:
-        return self._by_lower.get(path.lower().replace("\\", "/"))
+        super().__init__(vpk_module.open(str(vpk_path)))

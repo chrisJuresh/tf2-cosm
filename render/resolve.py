@@ -36,7 +36,7 @@ from render.cosmetics import (
 )
 from render.items_game import iter_items, load_items_game, load_tokens, localized_name
 from render.jobs import job_list, validate_job_list
-from render.model_index import ModelIndex
+from render.model_index import ModelIndex, VpkModelIndex
 
 DEFAULT_TF = Path("C:/Program Files (x86)/Steam/steamapps/common/Team Fortress 2/tf")
 
@@ -59,24 +59,29 @@ class Exclusion:
 
 
 @dataclass(frozen=True)
+class Cosmetic:
+    """One Cosmetic as the resolve step sees it: a name, its aliases and the Classes wearing it."""
+
+    name: str
+    slug: str
+    aliases: list[int]
+    classes: list[str]
+
+    @property
+    def is_all_class(self) -> bool:
+        return len(self.classes) == len(ALL_CLASSES)
+
+
+@dataclass(frozen=True)
 class Resolution:
     jobs: list[dict] = field(default_factory=list)
     exclusions: list[Exclusion] = field(default_factory=list)
+    cosmetics: list[Cosmetic] = field(default_factory=list)
 
     @property
-    def cosmetics(self) -> list[str]:
-        """The display names that produced at least one job, in the order they were emitted."""
-        seen: dict[str, None] = {}
-        for job in self.jobs:
-            seen.setdefault(job["name"], None)
-        return list(seen)
-
-    @property
-    def all_class_cosmetics(self) -> list[str]:
-        by_name: dict[str, set[str]] = {}
-        for job in self.jobs:
-            by_name.setdefault(job["name"], set()).add(job["class"])
-        return [name for name, classes in by_name.items() if len(classes) == len(ALL_CLASSES)]
+    def all_class_cosmetics(self) -> list[Cosmetic]:
+        """All-Class by wearability (CONTEXT.md), not by how many models happened to resolve."""
+        return [cosmetic for cosmetic in self.cosmetics if cosmetic.is_all_class]
 
     @property
     def jobs_by_class(self) -> dict[str, int]:
@@ -89,26 +94,31 @@ class Resolution:
         return {reason: counts.get(reason, 0) for reason in REASONS}
 
 
-def _resolve_model_path(path: str, cls: str, index: ModelIndex) -> str | None:
-    """The archive's spelling of a model path, allowing for the demo/demoman folder split."""
-    found = index.resolve(path)
-    if found or cls != "demoman":
-        return found
-    alias = path.lower().replace("/demo/", "/demoman/").replace("demo_", "demoman_")
-    return index.resolve(alias)
-
-
 def _style_name(style: dict | None, tokens: dict[str, str]) -> str | None:
     """A Style's English name; the schema names it with a localisation token."""
     return (localized_name(style, tokens) or None) if style else None
 
 
-def _jobs_for_item(
+@dataclass(frozen=True)
+class _Candidate:
+    """What one defindex would contribute: its jobs, the models the game lacks, and all it wants."""
+
+    jobs: list[dict]
+    missing: list[Exclusion]
+    wanted_models: set[str]
+
+    @property
+    def is_complete(self) -> bool:
+        return bool(self.jobs) and not self.missing
+
+
+def _candidate_for_item(
     item: dict, name: str, defindex: int, index: ModelIndex, tokens: dict[str, str]
-) -> tuple[list[dict], list[Exclusion]]:
+) -> _Candidate:
     """Every job one item definition would produce, plus an exclusion per model the game lacks."""
     jobs: list[dict] = []
     missing: list[Exclusion] = []
+    wanted_models: set[str] = set()
     classes = classes_for(item)
     regions = equip_regions(item)
     paintable = is_paintable(item)
@@ -118,7 +128,9 @@ def _jobs_for_item(
         hidden = hidden_bodygroups(item, style)
         for cls in classes:
             wanted = model_for(source, cls)
-            found = _resolve_model_path(wanted, cls, index) if wanted else None
+            if wanted:
+                wanted_models.add(wanted.lower())
+            found = index.resolve(wanted) if wanted else None
             if not found:
                 missing.append(
                     Exclusion(
@@ -147,12 +159,16 @@ def _jobs_for_item(
                     "paintable": paintable,
                 }
             )
-    return jobs, missing
+    return _Candidate(jobs, missing, wanted_models)
 
 
-def _check_for_collision(name: str, candidates: dict[int, list[dict]]) -> None:
-    """Defindexes sharing a name are aliases only if they wear something in common (ADR-0003)."""
-    models = {defindex: {job["model"].lower() for job in jobs} for defindex, jobs in candidates.items() if jobs}
+def _check_for_collision(name: str, candidates: dict[int, _Candidate]) -> None:
+    """Defindexes sharing a name are aliases only if they wear something in common (ADR-0003).
+
+    The comparison is on the models the definitions ask for, not the ones the archive has, so
+    two different items keep colliding loudly even when the game is missing their models.
+    """
+    models = {defindex: candidate.wanted_models for defindex, candidate in candidates.items()}
     defindexes = sorted(models)
     for left in defindexes:
         for right in defindexes:
@@ -184,32 +200,33 @@ def resolve(schema: dict, tokens: dict[str, str], index: ModelIndex, only: set[s
         by_name.setdefault(name, {})[defindex] = item
 
     jobs: list[dict] = []
+    cosmetics: list[Cosmetic] = []
     for name in sorted(by_name):
         aliases = sorted(by_name[name])
         candidates = {
-            defindex: _jobs_for_item(by_name[name][defindex], name, defindex, index, tokens)
+            defindex: _candidate_for_item(by_name[name][defindex], name, defindex, index, tokens)
             for defindex in aliases
         }
-        _check_for_collision(name, {defindex: pair[0] for defindex, pair in candidates.items()})
-        # ADR-0003: render the first alias whose models resolve; fall back to the least incomplete.
-        chosen = min(aliases, key=lambda d: (len(candidates[d][1]), d))
-        chosen_jobs, chosen_missing = candidates[chosen]
+        _check_for_collision(name, candidates)
+        # ADR-0003: render the first alias whose models resolve, else the least incomplete one.
+        complete = [d for d in aliases if candidates[d].is_complete]
+        chosen = complete[0] if complete else min(aliases, key=lambda d: (len(candidates[d].missing), d))
+        chosen_jobs, chosen_missing = candidates[chosen].jobs, candidates[chosen].missing
         if not chosen_jobs:
             exclusions.append(Exclusion(chosen, name, REASON_NO_MODEL, "no model resolves in the game archive"))
             continue
         exclusions.extend(chosen_missing)
         if only is not None and name.lower() not in only:
             continue
+        cosmetics.append(Cosmetic(name, slug(name), aliases, classes_for(by_name[name][chosen])))
         for job in chosen_jobs:
             job["aliases"] = aliases
         jobs.extend(chosen_jobs)
 
-    return Resolution(jobs, exclusions)
+    return Resolution(jobs, exclusions, cosmetics)
 
 
 def resolve_installed_game(tf: Path, only: set[str] | None = None) -> Resolution:
-    from render.model_index import VpkModelIndex
-
     schema = load_items_game(tf / "scripts/items/items_game.txt")
     tokens = load_tokens(tf / "resource/tf_english.txt")
     return resolve(schema, tokens, VpkModelIndex(tf / "tf2_misc_dir.vpk"), only)

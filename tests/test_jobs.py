@@ -60,6 +60,7 @@ def test_a_malformed_envelope_is_refused(document, message):
     [
         ({"style": "0"}, "field 'style' has type str"),
         ({"class": "demo"}, "unknown class"),
+        ({"slot": "primary"}, "no Cosmetic occupies"),
         ({"slug": ""}, "empty slug"),
         ({"aliases": [999]}, "not an alias"),
         ({"model": "models/player/items/soldier/soldier_officer"}, "not a .mdl path"),

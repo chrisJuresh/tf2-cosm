@@ -9,17 +9,25 @@ from render.jobs import InvalidJobList
 from render.resolve import Resolution, print_dry_run, resolve, write_job_list
 
 
+def reported(printed: str, label: str) -> list[str]:
+    """The words of the first reported line mentioning `label`, whatever the spacing."""
+    for line in printed.splitlines():
+        if label in line:
+            return line.split()
+    raise AssertionError(f"nothing reported for {label!r} in:\n{printed}")
+
+
 def test_the_dry_run_reports_counts_and_every_excluded_item(schema, tokens, model_index, capsys):
     print_dry_run(resolve(schema, tokens, model_index))
     printed = capsys.readouterr().out
 
-    assert "Cosmetics:  5" in printed
-    assert "All-Class:  1" in printed
-    assert "jobs:       15" in printed
-    assert "soldier   4" in printed
-    assert "ESL Season 1 Gold Medal" in printed and "medal" in printed
-    assert "Ye Olde Baker Boy" in printed and "never-tradable" in printed
-    assert "Scrap Metal Hat Part" in printed and "no-model" in printed
+    assert reported(printed, "Cosmetics:")[-1] == "5"
+    assert reported(printed, "All-Class:")[-1] == "1"
+    assert reported(printed, "jobs:")[-1] == "15"
+    assert reported(printed, "  soldier ") == ["soldier", "4"]
+    assert reported(printed, "ESL Season 1 Gold Medal")[-1] == "medal"
+    assert reported(printed, "Ye Olde Baker Boy")[-1] == "never-tradable"
+    assert "no-model" in " ".join(reported(printed, "Scrap Metal Hat Part"))
 
 
 def test_writing_a_job_list_round_trips_through_json(schema, tokens, model_index, tmp_path):

@@ -29,7 +29,7 @@ Nothing downstream should reach past this shape into items_game.
 """
 from __future__ import annotations
 
-from render.cosmetics import ALL_CLASSES
+from render.cosmetics import ALL_CLASSES, COSMETIC_SLOTS
 
 JOB_LIST_VERSION = 1
 
@@ -94,6 +94,8 @@ def validate_job_list(document: object) -> None:
                 raise InvalidJobList(f"{where} field {field!r} has type {type(value).__name__}")
         if job["class"] not in ALL_CLASSES:
             raise InvalidJobList(f"{where} has unknown class {job['class']!r}")
+        if job["slot"] not in COSMETIC_SLOTS:
+            raise InvalidJobList(f"{where} has slot {job['slot']!r}, which no Cosmetic occupies")
         if not job["slug"]:
             raise InvalidJobList(f"{where} has an empty slug")
         if job["defindex"] not in job["aliases"]:
