@@ -1,0 +1,245 @@
+// A hand-written excerpt of the game's items_game.txt, small enough to read.
+// The items in here are the shared Cosmetic oracle: see docs/fixtures/cosmetic-oracle.md.
+// Keep the two files in step — the catalogue data job resolves the same fixture.
+"items_game"
+{
+	"prefabs"
+	{
+		"base_wearable"
+		{
+			"item_class"	"tf_wearable"
+			"craft_class"	"hat"
+			"capabilities"
+			{
+				"nameable"	"1"
+			}
+		}
+		"hat"
+		{
+			"prefab"		"base_wearable"
+			"item_slot"		"head"
+			"item_type_name"	"#TF_Wearable_Hat"
+			"equip_region"	"hat"
+		}
+		"misc"
+		{
+			"prefab"		"base_wearable"
+			"item_slot"		"misc"
+			"item_type_name"	"#TF_Wearable_Cosmetic"
+		}
+		"tournament_medal"
+		{
+			"prefab"		"misc"
+			"item_type_name"	"#TF_Wearable_TournamentMedal"
+			"attributes"
+			{
+				"cannot trade"
+				{
+					"attribute_class"	"cannot_trade"
+					"value"		"1"
+				}
+			}
+		}
+	}
+
+	"items"
+	{
+		"default"
+		{
+			"name"		"Default Item"
+			"item_class"	"tf_wearable"
+			"item_slot"		"head"
+		}
+
+		// Class-Exclusive Cosmetic: one class, one model, hides the class's hat bodygroup.
+		"101"
+		{
+			"name"		"Bolt Boy"
+			"prefab"		"hat"
+			"item_name"		"#TF_BoltBoy"
+			"used_by_classes"
+			{
+				"Scout"		"1"
+			}
+			"model_player"	"models/player/items/scout/boltboy.mdl"
+			"visuals"
+			{
+				"player_bodygroups"
+				{
+					"hat"		"1"
+				}
+			}
+		}
+
+		// Multi-Class Cosmetic with a per-class basename: the Demoman substitution case.
+		"102"
+		{
+			"name"		"Team Captain"
+			"prefab"		"hat"
+			"item_name"		"#TF_TeamCaptain"
+			"used_by_classes"
+			{
+				"Soldier"	"1"
+				"Demoman"	"1"
+			}
+			"model_player_per_class"
+			{
+				"basename"	"models/player/items/%s/%s_officer.mdl"
+			}
+			"visuals"
+			{
+				"player_bodygroups"
+				{
+					"hat"		"1"
+				}
+			}
+		}
+
+		// All-Class Cosmetic: no used_by_classes at all.
+		"103"
+		{
+			"name"		"Ghastly Gibus"
+			"prefab"		"hat"
+			"item_name"		"#TF_GhastlyGibus"
+			"model_player_per_class"
+			{
+				"basename"	"models/player/items/all_class/gibus_%s.mdl"
+			}
+			"visuals"
+			{
+				"player_bodygroups"
+				{
+					"hat"		"1"
+				}
+			}
+		}
+
+		// An alias of 103 under ADR-0003: same name, same models, a second defindex.
+		"104"
+		{
+			"name"		"Ghastly Gibus 2"
+			"prefab"		"hat"
+			"item_name"		"#TF_GhastlyGibus"
+			"model_player_per_class"
+			{
+				"basename"	"models/player/items/all_class/gibus_%s.mdl"
+			}
+			"visuals"
+			{
+				"player_bodygroups"
+				{
+					"hat"		"1"
+				}
+			}
+		}
+
+		// Tin Pot: no model at item level, a model in each Style.
+		"105"
+		{
+			"name"		"Tin Pot"
+			"prefab"		"hat"
+			"item_name"		"#TF_TinPot"
+			"used_by_classes"
+			{
+				"Soldier"	"1"
+			}
+			"visuals"
+			{
+				"player_bodygroups"
+				{
+					"hat"		"1"
+				}
+				"styles"
+				{
+					"0"
+					{
+						"name"		"#TF_TinPot_Style0"
+						"model_player"	"models/player/items/soldier/tin_pot.mdl"
+						"skin_red"	"0"
+						"skin_blu"	"1"
+					}
+					"1"
+					{
+						"name"		"#TF_TinPot_Style1"
+						"model_player"	"models/player/items/soldier/tin_pot_open.mdl"
+						"skin_red"	"2"
+						"skin_blu"	"3"
+						"additional_hidden_bodygroups"
+						{
+							"medal"		"1"
+						}
+					}
+				}
+			}
+		}
+
+		// Medal: misc slot, never tradable, a tournament award. Not a Cosmetic.
+		"106"
+		{
+			"name"		"ESL Season 1 Gold Medal"
+			"prefab"		"tournament_medal"
+			"item_name"		"#TF_ESL_S1_Gold"
+			"model_player"	"models/workshop/player/items/all_class/esl_medal/esl_medal.mdl"
+		}
+
+		// Achievement hat with the 'cannot trade' attribute baked in. Not a Cosmetic.
+		"107"
+		{
+			"name"		"Ye Olde Baker Boy"
+			"prefab"		"hat"
+			"item_name"		"#TF_YeOldeBakerBoy"
+			"used_by_classes"
+			{
+				"Scout"		"1"
+			}
+			"model_player"	"models/player/items/scout/baker_boy.mdl"
+			"static_attrs"
+			{
+				"cannot trade"	"1"
+			}
+		}
+
+		// Craft component: a wearable item class with nothing to wear. Not a Cosmetic.
+		"108"
+		{
+			"name"		"Scrap Metal Hat Part"
+			"prefab"		"hat"
+			"item_name"		"#TF_HatPart"
+			"used_by_classes"
+			{
+				"Scout"		"1"
+			}
+		}
+
+		// Misc-slot Cosmetic worn below the head, with two equip regions.
+		"109"
+		{
+			"name"		"Dead of Night"
+			"prefab"		"misc"
+			"item_name"		"#TF_DeadOfNight"
+			"used_by_classes"
+			{
+				"Spy"		"1"
+			}
+			"model_player"	"models/player/items/spy/dead_of_night.mdl"
+			"equip_regions"
+			{
+				"shirt"		"1"
+				"medal"		"1"
+			}
+			"capabilities"
+			{
+				"paintable"	"1"
+			}
+		}
+
+		// A weapon: not a wearable at all, never seen by the resolve step.
+		"110"
+		{
+			"name"		"Scattergun"
+			"item_class"	"tf_weapon_scattergun"
+			"item_slot"		"primary"
+			"item_name"		"#TF_Scattergun"
+		}
+	}
+}

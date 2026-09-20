@@ -19,10 +19,13 @@ from pathlib import Path
 
 import vpk
 
+from render.cosmetics import ALL_CLASSES, model_class_token
+from render.jobs import validate_job_list
+
 DEFAULT_TF = Path("C:/Program Files (x86)/Steam/steamapps/common/Team Fortress 2/tf")
 CLASS_MODELS = {
-    cls: f"models/player/{'demo' if cls == 'demoman' else cls}.mdl"
-    for cls in ("scout", "soldier", "pyro", "demoman", "heavy", "engineer", "medic", "sniper", "spy")
+    cls: f"models/player/{model_class_token(cls)}.mdl"
+    for cls in ALL_CLASSES
 }
 
 
@@ -58,7 +61,9 @@ def main() -> int:
 
     wanted = list(args.models)
     if args.jobs:
-        wanted += sorted({j["model"] for j in json.loads(args.jobs.read_text(encoding="utf-8"))})
+        document = json.loads(args.jobs.read_text(encoding="utf-8"))
+        validate_job_list(document)
+        wanted += sorted({job["model"] for job in document["jobs"]})
     if args.classes:
         wanted += list(CLASS_MODELS.values())
     if not wanted:
