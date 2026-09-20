@@ -11,7 +11,7 @@
  * catalogue's header carries all three, already anchored to the snapshot's own
  * Key Rate; the site picks one out and does no rate arithmetic of its own.
  */
-import type { DollarBases, Metal } from "@tf2-cosm/data/catalogue";
+import type { DollarBases, Metal, UnpricedReason } from "@tf2-cosm/data/catalogue";
 import { formatRefined, scrapToRefined, traderNotation } from "@tf2-cosm/data/prices/metal";
 
 /**
@@ -145,6 +145,24 @@ export function formatMetalValue(metal: Metal): string {
 export function dollarsFor(metal: Metal, basis: DollarBasis | null): number | null {
   if (basis === null) return null;
   return scrapToRefined(metal.scrap) * basis.usdPerRefined;
+}
+
+/**
+ * Why a Cosmetic is Unpriced, short enough to sit under the word "Unpriced" in
+ * the price column.
+ *
+ * An Unpriced Cosmetic with an empty column beside it reads as a page that does
+ * not know; saying which of the three reasons it is says that the snapshot
+ * looked and this is what it found.
+ */
+const UNPRICED_REASON_LABELS: Record<UnpricedReason, string> = {
+  "missing-from-source": "not listed",
+  "no-reference-variant": "no priced Quality",
+  "unsupported-currency": "currency unknown",
+};
+
+export function unpricedReasonLabel(reason: UnpricedReason): string {
+  return UNPRICED_REASON_LABELS[reason];
 }
 
 const DOLLARS = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" });

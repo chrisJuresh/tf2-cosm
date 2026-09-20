@@ -17,8 +17,10 @@
  * height is only the estimate the list starts from.
  *
  * The Dollar Basis the dollar column is computed at is chosen above the list and
- * handed down. Filters, sort and search are #13; the Worn Render in place of the
- * icon, and the Style and Team controls inside the expanded row, are #16.
+ * handed down, and which Cosmetics these are, and in what order, is settled
+ * before they get here — see `@/components/catalogue-browser`. The Worn Render
+ * in place of the icon, and the Style and Team controls inside the expanded row,
+ * are #16.
  */
 import type { Cosmetic, Metal } from "@tf2-cosm/data/catalogue";
 import { useVirtualizer } from "@tanstack/react-virtual";
@@ -43,6 +45,7 @@ import {
   formatDollars,
   formatMetalValue,
   formatTraderNotation,
+  unpricedReasonLabel,
 } from "@/prices/format";
 
 /** What a figure reads as when there is nothing to put there. */
@@ -108,14 +111,23 @@ export interface CosmeticListProps {
 /** The three price figures a row shows, already written out. */
 interface Figures {
   readonly notation: string;
+  /** Why an Unpriced Cosmetic has no figures, under the word "Unpriced". */
+  readonly reason: string | null;
   readonly metalValue: string;
   readonly dollars: string;
 }
 
 function figuresFor(cosmetic: Cosmetic, keyRate: Metal | null, basis: DollarBasis | null): Figures {
   const { price } = cosmetic;
-  if (price === null) return { notation: NOTHING, metalValue: NOTHING, dollars: NOTHING };
-  if (price.state === "unpriced") return { notation: "Unpriced", metalValue: NOTHING, dollars: NOTHING };
+  if (price === null) return { notation: NOTHING, reason: null, metalValue: NOTHING, dollars: NOTHING };
+  if (price.state === "unpriced") {
+    return {
+      notation: "Unpriced",
+      reason: unpricedReasonLabel(price.reason),
+      metalValue: NOTHING,
+      dollars: NOTHING,
+    };
+  }
   const metal = price.spread.mid.metal;
   const dollars = dollarsFor(metal, basis);
   // A Blanket Price is the source's figure for every cheap hat rather than for
@@ -123,6 +135,7 @@ function figuresFor(cosmetic: Cosmetic, keyRate: Metal | null, basis: DollarBasi
   const written = (figure: string) => (price.blanket ? approximately(figure) : figure);
   return {
     notation: written(formatTraderNotation(metal, keyRate)),
+    reason: null,
     metalValue: written(formatMetalValue(metal)),
     dollars: dollars === null ? NOTHING : written(formatDollars(dollars)),
   };
@@ -260,7 +273,12 @@ function CosmeticRow({
             {cosmetic.name}
           </button>
         </Cell>
-        <Cell column={2}>{figures.notation}</Cell>
+        <Cell column={2}>
+          {figures.notation}
+          {figures.reason === null ? null : (
+            <div className="text-[0.6875rem] leading-tight text-black/55 dark:text-white/55">{figures.reason}</div>
+          )}
+        </Cell>
         <Cell column={3}>{figures.metalValue}</Cell>
         <Cell column={4}>{figures.dollars}</Cell>
       </div>
@@ -394,6 +412,13 @@ export function CosmeticList({ cosmetics, keyRate, basis }: CosmeticListProps) {
         </div>
       </div>
       <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto">
+        {/* A list narrowed to nothing has to say so: an empty scroller reads as a
+            page that has broken rather than as a filter that matched nothing. */}
+        {cosmetics.length === 0 ? (
+          <p className="px-3 py-8 text-center text-sm text-black/60 dark:text-white/60">
+            No Cosmetic matches these controls.
+          </p>
+        ) : null}
         <div role="rowgroup" style={{ height: virtualiser.getTotalSize(), position: "relative" }}>
           {virtualiser.getVirtualItems().map((item) => {
             const cosmetic = cosmetics[item.index];
