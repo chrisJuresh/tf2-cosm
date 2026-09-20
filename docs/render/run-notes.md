@@ -5,38 +5,88 @@ The spike that established these facts is gone; this is what replaced it.
 
 ## Running it
 
-Resolve first, then render the jobs you want:
+Three commands are the whole job: resolve, render, derive.
 
 ```bash
 ./.venv/Scripts/python.exe -m render.resolve --out jobs.json
 ```
 
 ```bash
-"C:/Program Files/Blender Foundation/Blender 5.2/blender.exe" -b --factory-startup --python render/blender_job.py -- --jobs jobs.json --slug team-captain --teams red blu
+./.venv/Scripts/python.exe -m render.batch --jobs jobs.json
 ```
-
-Useful arguments (all optional): `--class`, `--style` to narrow further; `--out` for the
-output root (default `renders/`); `--masters-dir`; `--manifest` (default
-`catalogue/renders.json`); `--tf`, `--cache`, `--size`, `--samples`; `--site-packages` when
-the venv is not at `.venv/` beside the script — a worktree, for instance, where it is the
-main checkout's.
-
-Then make the web sizes, which finishes the manifest:
 
 ```bash
 ./.venv/Scripts/python.exe -m render.derive
 ```
 
-`--dry-run` reports what it would make and writes nothing, `--force` remakes derivatives
-that are already there, `--sizes` asks for a different set, and `--root`, `--masters-dir`,
-`--derivatives-dir` and `--manifest` override the layout.
+The middle one renders everything the manifest does not already have, a batch of jobs per
+Blender process, and prints progress and an estimate of time remaining as it goes. Run it
+again and it renders only what is still missing, so stopping it with ctrl-c, a crash or a
+power cut costs the batch that was in flight and nothing more. A run over work that is
+already done opens Blender not at all.
+
+Useful arguments to the batch runner (all optional):
+
+- `--dry-run` — list what would be rendered and open nothing. Check the counts after a game
+  update.
+- `--slug`, `--class`, `--team`, `--style` — render a subset while fixing one item.
+- `--batch-size` — images per Blender process (default 40). Smaller loses less to a crash;
+  larger amortises the mount and the Class import over more frames.
+- `--retry-failed` — render the jobs that failed on an earlier run. Without it they are left
+  alone, because a second run that repeats yesterday's failures has done nothing.
+- `--trust-manifest` — skip the check that every recorded master is still on disk. The check
+  costs one `stat` an image and is what makes a deleted or moved image come back.
+- `--blender` when Blender is not at the documented path, `--tf`, `--cache`, `--size`,
+  `--samples`, and the layout arguments below.
+- `--site-packages` when the venv is not at `.venv/` beside the script — a worktree, for
+  instance, where it is the main checkout's.
+
+Exit codes: 0 when every image planned was either rendered or recorded as a failure, 1 when
+a Blender process died and took some with it (run it again; it picks up where it stopped),
+2 when the command itself is wrong — no Blender, or a selection that matches no job — and
+130 when ctrl-c stopped it, which is the same "run it again" as 1.
+
+`--root`, `--masters-dir` and `--manifest` override the layout (`render.output`), and mean
+the same thing to every command that takes them — `render.batch` passes them on to the
+render step as settled paths, so the child never resolves the layout a second time.
+`render.derive` also takes `--derivatives-dir`, plus `--dry-run`, `--force` and `--sizes`.
+
+To drive one Blender process yourself — debugging an import, mostly — the render step is
+still a command of its own, and takes the same filters:
+
+```bash
+"C:/Program Files/Blender Foundation/Blender 5.2/blender.exe" -b --factory-startup --python render/blender_job.py -- --jobs jobs.json --slug team-captain --teams red blu
+```
 
 The render step extracts each job's models into the assets cache itself; `render.extract`
 stays a command for filling the cache ahead of time.
 
 Failures never stop a run. Each one lands in the manifest as `{reason, detail}` —
 `model-missing`, `import-error`, `no-skeleton`, `render-error` or `derive-error` — and the
-site falls back to the Backpack Icon for it (ADR-0001).
+site falls back to the Backpack Icon for it (ADR-0001). The batch runner prints the failure
+list, grouped by reason, when it finishes — for everything the run selected, not just what
+this invocation rendered, so a resumed run still ends on the whole picture.
+
+## What resuming is decided from
+
+`render.plan` decides, from the job list and the manifest alone, what a run still owes:
+
+- An image is **done** when the manifest has an entry for it whose `job_version` is the
+  current `JOB_LIST_VERSION` and — unless `--trust-manifest` — the master it names is on
+  disk. Bumping `JOB_LIST_VERSION` therefore re-renders everything, which is the point of it.
+- An image that **failed** before is left alone until `--retry-failed`. A failure records the
+  `job_version` it happened under, so a bump retries failures too: the bump is what says the
+  job's definition has changed, and a model that resolves differently now is exactly the
+  thing that might succeed this time.
+- Everything else is work, and the unit of work is one image: a job whose RED is rendered and
+  whose BLU is not goes back to Blender for BLU only.
+
+Jobs wanting different Teams are never batched together, because a Blender process renders
+every job in its batch on every Team it is given.
+
+A batch is what one Blender process takes on and what a crash costs, so its size is counted
+in images. The child writes the manifest once per job, so a batch boundary is a floor on what
+a crash can cost, not the only save point.
 
 ## Where the output goes
 

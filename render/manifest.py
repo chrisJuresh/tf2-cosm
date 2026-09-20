@@ -30,7 +30,8 @@ Shape, version 2:
         }
       },
       "failures": [
-        {"slug", "class", "team", "style", "model", "reason", "detail", "failed_at"}
+        {"slug", "class", "team", "style", "model", "reason", "detail", "failed_at",
+         "job_version"}
       ]
     }
 
@@ -94,6 +95,7 @@ FAILURE_FIELD_TYPES: dict[str, type | tuple[type, ...]] = {
     "reason": str,
     "detail": (str, type(None)),
     "failed_at": str,
+    "job_version": int,
 }
 
 
@@ -123,6 +125,22 @@ class Manifest:
             .get(team, {})
             .get(str(style))
         )
+
+    def failure(self, slug: str, cls: str, team: str, style: int) -> dict | None:
+        """Why one job produced no image last time, or None if it has never been tried."""
+        identity = (slug, cls, team, style)
+        for failure in self._document["failures"]:
+            if (failure["slug"], failure["class"], failure["team"], failure["style"]) == identity:
+                return failure
+        return None
+
+    def failures_for(self, identities: set[tuple[str, str, str, int]]) -> list[dict]:
+        """Every recorded failure among `identities`, each a (slug, Class, Team, Style) tuple."""
+        return [
+            failure
+            for failure in self._document["failures"]
+            if (failure["slug"], failure["class"], failure["team"], failure["style"]) in identities
+        ]
 
     def entries(self) -> Iterator[tuple[str, str, str, int, dict]]:
         """Every recorded render, as (slug, Class, Team, Style, entry) — what `render.derive` walks."""
@@ -216,6 +234,7 @@ class Manifest:
             "reason": reason,
             "detail": detail,
             "failed_at": at,
+            "job_version": JOB_LIST_VERSION,
         }
         self._document["failures"].append(failure)
         return failure

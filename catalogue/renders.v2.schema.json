@@ -32,6 +32,9 @@
           "failed_at": {
             "type": "string"
           },
+          "job_version": {
+            "type": "integer"
+          },
           "model": {
             "type": "string"
           },
@@ -63,6 +66,7 @@
           "class",
           "detail",
           "failed_at",
+          "job_version",
           "model",
           "reason",
           "slug",
