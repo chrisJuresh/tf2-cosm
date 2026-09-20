@@ -1,0 +1,4 @@
+# The golden catalogue is compared byte for byte with what the builder produces,
+# which always ends its lines with \n. Without this, a Windows checkout rewrites
+# it to CRLF and the golden test fails on a machine rather than on a change.
+data/tests/golden/*.json eol=lf

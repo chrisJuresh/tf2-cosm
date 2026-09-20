@@ -1,0 +1,32 @@
+{
+  "response": {
+    "success": 1,
+    "name": "Team Fortress 2",
+    "currencies": {
+      "metal": {
+        "name": "Refined Metal",
+        "quality": 6,
+        "defindex": 5002,
+        "price": { "currency": "usd", "value": 0.03, "value_high": 0.05, "last_update": 1788900000 }
+      },
+      "hat": {
+        "name": "Random Craft Hat",
+        "quality": 6,
+        "defindex": -2,
+        "price": { "currency": "metal", "value": 1.33, "value_high": 1.44, "last_update": 1788800000 }
+      },
+      "keys": {
+        "name": "Mann Co. Supply Crate Key",
+        "quality": 6,
+        "defindex": 5021,
+        "price": { "currency": "metal", "value": 78.66, "value_high": 79, "last_update": 1788900000 }
+      },
+      "earbuds": {
+        "name": "Earbuds",
+        "quality": 6,
+        "defindex": 143,
+        "price": { "currency": "keys", "value": 9.1, "value_high": 9.8, "last_update": 1788700000 }
+      }
+    }
+  }
+}
