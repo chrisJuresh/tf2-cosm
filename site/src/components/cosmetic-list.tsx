@@ -21,6 +21,7 @@ import { type CSSProperties, type ReactNode, useRef } from "react";
 import { secureIconUrl } from "@/catalogue/icon";
 
 import {
+  approximately,
   type DollarBasis,
   dollarsFor,
   formatDollars,
@@ -101,10 +102,13 @@ function figuresFor(cosmetic: Cosmetic, keyRate: Metal | null, basis: DollarBasi
   if (price.state === "unpriced") return { notation: "Unpriced", metalValue: NOTHING, dollars: NOTHING };
   const metal = price.spread.mid.metal;
   const dollars = dollarsFor(metal, basis);
+  // A Blanket Price is the source's figure for every cheap hat rather than for
+  // this one, so all three columns say about (ADR-0004).
+  const written = (figure: string) => (price.blanket ? approximately(figure) : figure);
   return {
-    notation: formatTraderNotation(metal, keyRate),
-    metalValue: formatMetalValue(metal),
-    dollars: dollars === null ? NOTHING : formatDollars(dollars),
+    notation: written(formatTraderNotation(metal, keyRate)),
+    metalValue: written(formatMetalValue(metal)),
+    dollars: dollars === null ? NOTHING : written(formatDollars(dollars)),
   };
 }
 

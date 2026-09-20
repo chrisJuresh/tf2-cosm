@@ -5,7 +5,8 @@
  * Version 1 carried the Cosmetic list only. Version 2 adds the price snapshot:
  * each Cosmetic's Reference Variant and Price Spread, and the Key Rate they were
  * converted at. Version 3 completes the header with the Dollar Bases — the rate
- * each dollar figure the site shows is computed from.
+ * each dollar figure the site shows is computed from. Version 4 marks a price
+ * the source quoted in a blanket currency (ADR-0004).
  */
 import { z } from "zod";
 
@@ -13,7 +14,7 @@ import { CLASSES, COSMETIC_SLOTS } from "./cosmetic-rule.ts";
 import { PRICE_CURRENCIES, QUALITIES } from "../prices/price-source.ts";
 import { UNPRICED_REASONS } from "../prices/reference-variant.ts";
 
-export const CATALOGUE_SCHEMA_VERSION = 3;
+export const CATALOGUE_SCHEMA_VERSION = 4;
 
 export const COSMETIC_KINDS = ["class-exclusive", "multi-class", "all-class"] as const;
 
@@ -50,6 +51,13 @@ const priceSchema = z.discriminatedUnion("state", [
       craftable: z.boolean(),
     }),
     currency: z.enum(PRICE_CURRENCIES),
+    /**
+     * Whether this is a Blanket Price: a figure the source applies to a whole
+     * class of items rather than one it observed for this Cosmetic. True of
+     * every price quoted in Random Craft Hats, and worth showing as an order of
+     * magnitude rather than as a quote (ADR-0004).
+     */
+    blanket: z.boolean(),
     /** Low, midpoint and high. `mid` is the midpoint of the source's two figures. */
     spread: z.object({ low: pricePointSchema, mid: pricePointSchema, high: pricePointSchema }),
     /** When the source last repriced this variant, not when the snapshot was taken. */
@@ -159,6 +167,8 @@ const headerSchema = z.object({
         unpriced: z.int().nonnegative(),
         /** How many Cosmetics took each Reference Variant, e.g. "genuine-craftable". */
         byReferenceVariant: z.record(z.string(), z.int().nonnegative()),
+        /** How many of the priced ones ended up on a Blanket Price. */
+        blanketPriced: z.int().nonnegative(),
         /** Only the reasons that actually occurred; a reason nobody hit is absent. */
         unpricedByReason: z.partialRecord(z.enum(UNPRICED_REASONS), z.int().nonnegative()),
       }),

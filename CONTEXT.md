@@ -39,8 +39,15 @@ The grade stamped on a specific copy of an item: Unique, Strange, Genuine, Vinta
 **Native Quality**:
 The Quality a Cosmetic is issued in when it first enters the game. Unique for most, Genuine for many promotional items, Haunted for some Halloween items.
 
+**Issued in Play**:
+A Cosmetic the game itself hands out: it drops, or a crate or case can contain it. One that is not was only ever given away, so no Unique copy of it exists.
+
+**Promo-Only Cosmetic**:
+A Cosmetic that is not Issued in Play and that a price source prices in Genuine — the Quality Valve stamps on a promotional copy and on nothing else. Its only copies are the ones Valve gave away.
+_Avoid_: promo item (which also covers promos that later dropped)
+
 **Reference Variant**:
-The single Quality and craftability combination whose price stands for the Cosmetic in the catalogue. Unique craftable if it exists, else Unique non-craftable, else the Native Quality.
+The single Quality and craftability combination whose price stands for the Cosmetic in the catalogue. Unique craftable if it exists, else Unique non-craftable, else the Native Quality. A Blanket Price is not offered to this rule for a Promo-Only Cosmetic (ADR-0004).
 
 **Reference Price**:
 The price of a Cosmetic's Reference Variant.
@@ -62,6 +69,12 @@ _Avoid_: ref/rec/scrap as separate currencies (they are one currency in three co
 
 **Key Rate**:
 How much Metal one Key trades for, expressed in Refined. It floats over time.
+
+**Blanket Currency**:
+A currency a price source quotes a whole class of items in by default, rather than pricing each of them. backpack.tf marks one: the Random Craft Hat, worth about one Refined and a third, which stands for every cheap hat in the game.
+
+**Blanket Price**:
+A price quoted in a Blanket Currency. It is an order of magnitude rather than a quote, and the catalogue records which prices are one.
 
 **Trader Notation**:
 The community way of writing a price as Keys plus fractional Refined, for example "2 keys, 1.33 ref". Fractions of Refined are always ninths.

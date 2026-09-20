@@ -32,6 +32,7 @@ const RATES: Rates = {
     ["metal", 9],
     ["keys", 708],
   ]),
+  blanketCurrencies: new Set(["hat"]),
 };
 
 describe("the currency table", () => {
@@ -48,6 +49,20 @@ describe("the currency table", () => {
     expect(rates.scrapPerUnit.get("keys")).toBe(708);
     // Earbuds are quoted in Keys, so their rate only lands once the Key's has.
     expect(rates.scrapPerUnit.get("earbuds")).toBe(Math.round(9.1 * 708));
+  });
+
+  it("reads which currencies the source marks as a blanket, and takes its word for it", async () => {
+    // The Random Craft Hat is the only one, and what makes its figure a Blanket
+    // Price rather than a quote (ADR-0004).
+    const rates = await fetchRates("fixture-key", fixtureBackpackTfFetch());
+    expect([...rates.blanketCurrencies]).toEqual(["hat"]);
+  });
+
+  it("marks no currency at all when the source stops saying which are blankets", async () => {
+    const fetchImpl = respondWith({
+      response: { success: 1, currencies: { keys: { price: { currency: "metal", value: 78.66 } } } },
+    });
+    expect([...(await fetchRates("fixture-key", fetchImpl)).blanketCurrencies]).toEqual([]);
   });
 
   it("leaves a currency it cannot chain back to Metal unrated rather than guessing", () => {
@@ -92,11 +107,16 @@ describe("the currency table", () => {
 describe("reading the price list", () => {
   it("indexes an entry under every defindex it claims, and under its name", async () => {
     const prices = await fixturePriceList();
-    expect([...prices.byDefindex.keys()].sort((left, right) => left - right)).toEqual([101, 103, 104, 105, 5021]);
+    expect([...prices.byDefindex.keys()].sort((left, right) => left - right)).toEqual([
+      101, 103, 104, 105, 111, 112, 113, 5021,
+    ]);
     expect([...prices.byName.keys()].sort()).toEqual([
+      "baronial badge",
       "bolt-boy",
+      "crocodile smile",
       "ghastly gibus",
       "mann co. supply crate key",
+      "scotsman's stove pipe",
       "team captain",
       "tin pot",
     ]);
@@ -161,7 +181,7 @@ describe("the price source seam", () => {
     const prices = await source.load();
     expect(source.description).toBe(prices.source);
     expect(prices.rates.keyRate.scrapPerKey).toBe(708);
-    expect(prices.byName.size).toBe(5);
+    expect(prices.byName.size).toBe(8);
   });
 });
 

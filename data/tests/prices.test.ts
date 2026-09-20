@@ -3,9 +3,9 @@ import { describe, expect, it } from "vitest";
 import { buildCatalogue } from "../src/catalogue/build.ts";
 import type { Price } from "../src/catalogue/schema.ts";
 import { refinedToScrap } from "../src/prices/metal.ts";
-import type { PricedVariant, Rates } from "../src/prices/price-source.ts";
+import type { PricedVariant, Quality, Rates } from "../src/prices/price-source.ts";
 import { priceOf } from "../src/prices/price-spread.ts";
-import { chooseReferenceVariant } from "../src/prices/reference-variant.ts";
+import { chooseReferenceVariant, type ReferenceVariantContext } from "../src/prices/reference-variant.ts";
 import { fixtureInputs, fixturePricedInputs } from "./fixtures.ts";
 
 const RATES: Rates = {
@@ -15,7 +15,18 @@ const RATES: Rates = {
     ["hat", 12],
     ["keys", refinedToScrap(78.66)],
   ]),
+  // The Random Craft Hat is the one currency backpack.tf marks as a blanket.
+  blanketCurrencies: new Set(["hat"]),
 };
+
+/**
+ * The Cosmetic side of the rule. Nothing is Issued in Play unless a test says
+ * so, which is the reading that makes a Blanket Price have to justify itself.
+ */
+const cosmetic = (nativeQuality: Quality, issuedInPlay = false): ReferenceVariantContext => ({
+  nativeQuality,
+  issuedInPlay,
+});
 
 const variant = (overrides: Partial<PricedVariant> = {}): PricedVariant => ({
   quality: "unique",
@@ -107,9 +118,12 @@ describe("the price snapshot's header", () => {
         lastUpdatedAt: "2026-09-08T20:40:00.000Z",
       },
       counts: {
-        priced: 4,
+        priced: 7,
         unpriced: 1,
-        byReferenceVariant: { "genuine-craftable": 1, "unique-craftable": 2, "unique-non-craftable": 1 },
+        byReferenceVariant: { "genuine-craftable": 2, "unique-craftable": 4, "unique-non-craftable": 1 },
+        // The Stove Pipe and the Crocodile Smile; the Baronial Badge took its
+        // Genuine price instead of the blanket one (ADR-0004).
+        blanketPriced: 2,
         unpricedByReason: { "missing-from-source": 1 },
       },
     });
@@ -126,26 +140,36 @@ describe("choosing the Reference Variant", () => {
   it("prefers Unique craftable over everything else", () => {
     const chosen = chooseReferenceVariant(
       [variant({ quality: "genuine" }), variant({ craftable: false }), variant()],
-      "genuine",
+      cosmetic("genuine"),
       RATES,
     );
-    expect(chosen).toEqual({ variant: variant(), currency: "metal", scrapPerUnit: 9 });
+    expect(chosen).toEqual({ variant: variant(), currency: "metal", scrapPerUnit: 9, blanket: false });
   });
 
   it("prefers a Unique copy over the Native Quality even when the Unique is non-craftable", () => {
     const chosen = chooseReferenceVariant(
       [variant({ quality: "genuine" }), variant({ craftable: false })],
-      "genuine",
+      cosmetic("genuine"),
       RATES,
     );
-    expect(chosen).toEqual({ variant: variant({ craftable: false }), currency: "metal", scrapPerUnit: 9 });
+    expect(chosen).toEqual({
+      variant: variant({ craftable: false }),
+      currency: "metal",
+      scrapPerUnit: 9,
+      blanket: false,
+    });
   });
 
   it("finds the Genuine promo price even when Valve's schema calls the item Unique", () => {
     // The ten Cosmetics with no Unique price are Genuine promos, and the schema
     // does not mark all of them, so the fallback chain runs regardless.
-    const chosen = chooseReferenceVariant([variant({ quality: "genuine" })], "unique", RATES);
-    expect(chosen).toEqual({ variant: variant({ quality: "genuine" }), currency: "metal", scrapPerUnit: 9 });
+    const chosen = chooseReferenceVariant([variant({ quality: "genuine" })], cosmetic("unique"), RATES);
+    expect(chosen).toEqual({
+      variant: variant({ quality: "genuine" }),
+      currency: "metal",
+      scrapPerUnit: 9,
+      blanket: false,
+    });
   });
 
   it("falls through the Native Qualities in the order the spec fixes", () => {
@@ -154,7 +178,7 @@ describe("choosing the Reference Variant", () => {
     );
     const order: string[] = [];
     for (let remaining = [...priced]; remaining.length > 0; remaining = remaining.slice(0, -1)) {
-      const chosen = chooseReferenceVariant(remaining, "unique", RATES);
+      const chosen = chooseReferenceVariant(remaining, cosmetic("unique"), RATES);
       if (!("variant" in chosen)) throw new Error("should be priced");
       order.push(chosen.variant.quality);
     }
@@ -162,30 +186,30 @@ describe("choosing the Reference Variant", () => {
   });
 
   it("never takes an Unusual, even when it is the Native Quality", () => {
-    expect(chooseReferenceVariant([variant({ quality: "unusual" })], "unusual", RATES)).toEqual({
+    expect(chooseReferenceVariant([variant({ quality: "unusual" })], cosmetic("unusual"), RATES)).toEqual({
       unpriced: "no-reference-variant",
     });
   });
 
   it("reports an item the source never listed as missing from it", () => {
-    expect(chooseReferenceVariant(undefined, "unique", RATES)).toEqual({ unpriced: "missing-from-source" });
+    expect(chooseReferenceVariant(undefined, cosmetic("unique"), RATES)).toEqual({ unpriced: "missing-from-source" });
   });
 
   it("reports an item priced only in a Quality the rule does not accept", () => {
-    expect(chooseReferenceVariant([variant({ quality: "self-made" })], "unique", RATES)).toEqual({
+    expect(chooseReferenceVariant([variant({ quality: "self-made" })], cosmetic("unique"), RATES)).toEqual({
       unpriced: "no-reference-variant",
     });
   });
 
   it("refuses to quietly drop to a lesser Quality when the Reference Variant is in dollars", () => {
-    const chosen = chooseReferenceVariant([variant({ currency: "usd" }), variant({ quality: "genuine" })], "genuine", RATES);
+    const chosen = chooseReferenceVariant([variant({ currency: "usd" }), variant({ quality: "genuine" })], cosmetic("genuine"), RATES);
     expect(chosen).toEqual({ unpriced: "unsupported-currency" });
   });
 });
 
 describe("the Price Spread", () => {
   it("makes low, mid and high one figure when the source quotes one", () => {
-    const price = priceOf([variant({ low: 1.33, high: 1.33 })], "unique", RATES);
+    const price = priceOf([variant({ low: 1.33, high: 1.33 })], cosmetic("unique"), RATES);
     if (price.state !== "priced") throw new Error("should be priced");
     expect([price.spread.low, price.spread.mid, price.spread.high].map((point) => point.metal.scrap)).toEqual([
       12, 12, 12,
@@ -193,7 +217,7 @@ describe("the Price Spread", () => {
   });
 
   it("keeps the midpoint between the two ends after rounding to the nearest scrap", () => {
-    const price = priceOf([variant({ low: 1, high: 2 })], "unique", RATES);
+    const price = priceOf([variant({ low: 1, high: 2 })], cosmetic("unique"), RATES);
     if (price.state !== "priced") throw new Error("should be priced");
     const { low, mid, high } = price.spread;
     expect(low.metal.scrap).toBeLessThanOrEqual(mid.metal.scrap);
@@ -202,13 +226,13 @@ describe("the Price Spread", () => {
   });
 
   it("reads a spread the source quoted backwards in the order the catalogue wants", () => {
-    const price = priceOf([variant({ low: 3, high: 1 })], "unique", RATES);
+    const price = priceOf([variant({ low: 3, high: 1 })], cosmetic("unique"), RATES);
     if (price.state !== "priced") throw new Error("should be priced");
     expect([price.spread.low.value, price.spread.high.value]).toEqual([1, 3]);
   });
 
   it("converts a price quoted in Random Craft Hats, which is how cheap Cosmetics are priced", () => {
-    const price = priceOf([variant({ currency: "hat", low: 1, high: 2 })], "unique", RATES);
+    const price = priceOf([variant({ currency: "hat", low: 1, high: 2 })], cosmetic("unique"), RATES);
     if (price.state !== "priced") throw new Error("should be priced");
     expect(price.currency).toBe("hat");
     // A Craft Hat is 1.33 ref, so twelve scrap.
@@ -219,7 +243,7 @@ describe("the Price Spread", () => {
   it("takes the unrounded Metal figure over the rounded one the source displays", () => {
     // 0.115 ref rounds to 0.11 for display but is a scrap either way; the point
     // is that the unrounded figure is what the arithmetic runs on.
-    const price = priceOf([variant({ low: 1.33, high: 1.33, lowRefined: 1.4444, highRefined: 1.4444 })], "unique", RATES);
+    const price = priceOf([variant({ low: 1.33, high: 1.33, lowRefined: 1.4444, highRefined: 1.4444 })], cosmetic("unique"), RATES);
     if (price.state !== "priced") throw new Error("should be priced");
     expect(price.spread.low.value).toBe(1.33);
     expect(price.spread.low.metal.scrap).toBe(13);
@@ -229,10 +253,68 @@ describe("the Price Spread", () => {
     const price = priceOf(
       // The source's unrounded figures say 100 ref a Key; the snapshot says 78.66.
       [variant({ currency: "keys", low: 1, high: 1, lowRefined: 100, highRefined: 100 })],
-      "unique",
+      cosmetic("unique"),
       RATES,
     );
     if (price.state !== "priced") throw new Error("should be priced");
     expect(price.spread.low.metal.scrap).toBe(708);
+  });
+});
+
+/**
+ * A Blanket Price is the Random Craft Hat figure backpack.tf lays over every
+ * craft hat. For a craft hat it is the plainest true thing anyone can say; for a
+ * Promo-Only Cosmetic it prices a Unique copy that was never issued (ADR-0004).
+ */
+describe("a Blanket Price", () => {
+  const blanket = variant({ currency: "hat", low: 1, high: 1 });
+  const genuine = variant({ quality: "genuine", low: 5.77, high: 6.44 });
+
+  it("gives way to the Native Quality for a promo the game does not issue in play", () => {
+    const chosen = chooseReferenceVariant([blanket, genuine], cosmetic("unique", false), RATES);
+    expect(chosen).toMatchObject({ variant: genuine, currency: "metal", blanket: false });
+  });
+
+  it("stands for a promo the game does issue in play, whose Unique copies are real", () => {
+    // The Scotsman's Stove Pipe: a Genuine price, and a craft hat that drops.
+    const chosen = chooseReferenceVariant([blanket, genuine], cosmetic("unique", true), RATES);
+    expect(chosen).toMatchObject({ variant: blanket, currency: "hat", blanket: true });
+  });
+
+  it("stands for a Cosmetic with no Genuine price, whatever the game does with it", () => {
+    // A case Cosmetic, which items_game puts in no loot list it carries. Nothing
+    // says it was ever issued as anything but Unique, so its blanket figure
+    // prices a copy that exists — and must not give way to a Strange one.
+    const strange = variant({ quality: "strange", low: 26.66 });
+    const chosen = chooseReferenceVariant([blanket, strange], cosmetic("unique", false), RATES);
+    expect(chosen).toMatchObject({ variant: blanket, blanket: true });
+  });
+
+  it("is passed over for a promo even where the Quality below it is further down the chain", () => {
+    const vintage = variant({ quality: "vintage", low: 31.88 });
+    const chosen = chooseReferenceVariant([blanket, genuine, vintage], cosmetic("unique", false), RATES);
+    expect(chosen).toMatchObject({ variant: genuine });
+  });
+
+  it("never gives way to an Unusual, which prices the effect and not the Cosmetic", () => {
+    const unusual = variant({ quality: "unusual", currency: "keys", low: 29 });
+    const chosen = chooseReferenceVariant([blanket, unusual], cosmetic("unique", false), RATES);
+    expect(chosen).toMatchObject({ variant: blanket, blanket: true });
+  });
+
+  it("leaves a promo Unpriced rather than falling back on it when the real price will not convert", () => {
+    // Inherited from the rule that a Reference Variant quoted in something the
+    // snapshot cannot convert is Unpriced rather than quietly demoted: once the
+    // blanket figure is out of the running, there is nothing below it either.
+    const inDollars = variant({ quality: "genuine", currency: "usd", low: 3 });
+    expect(chooseReferenceVariant([blanket, inDollars], cosmetic("unique", false), RATES)).toEqual({
+      unpriced: "unsupported-currency",
+    });
+  });
+
+  it("is marked on the price the catalogue records, so the site can show it as approximate", () => {
+    const price = priceOf([blanket], cosmetic("unique", false), RATES);
+    expect(price).toMatchObject({ state: "priced", blanket: true });
+    expect(priceOf([genuine], cosmetic("unique", false), RATES)).toMatchObject({ blanket: false });
   });
 });

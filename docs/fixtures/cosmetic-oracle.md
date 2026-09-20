@@ -32,10 +32,19 @@ pnpm test                                 # data/tests/build-catalogue.test.ts
 | 108 | Scrap Metal Hat Part | Not a Cosmetic | A wearable with no model to wear |
 | 109 | The Dead of Night | Cosmetic | Misc slot, worn below the head, paintable |
 | 110 | Scattergun | Not a Cosmetic | Not a wearable at all |
+| 111 | The Scotsman's Stove Pipe | Cosmetic (Class-Exclusive) | Demoman; `drop_type` of `drop`, so Issued in Play |
+| 112 | Crocodile Smile | Cosmetic (Class-Exclusive) | Sniper; no drop of its own, but a loot list hands it out |
+| 113 | The Baronial Badge | Cosmetic (Class-Exclusive) | Engineer, misc slot; issued by neither route |
 
 Display names drop a leading "The" (ADR-0003), so the catalogue names are `Bolt Boy`,
-`Team Captain`, `Ghastly Gibus`, `Tin Pot` and `Dead of Night`, with slugs `bolt-boy`,
-`team-captain`, `ghastly-gibus`, `tin-pot`, `dead-of-night`.
+`Team Captain`, `Ghastly Gibus`, `Tin Pot`, `Dead of Night`, `Scotsman's Stove Pipe`,
+`Crocodile Smile` and `Baronial Badge`, with slugs `bolt-boy`, `team-captain`,
+`ghastly-gibus`, `tin-pot`, `dead-of-night`, `scotsman-s-stove-pipe`, `crocodile-smile`
+and `baronial-badge`.
+
+The last three are in the fixture for the price rules alone; the Cosmetic rule has nothing
+to say about them beyond that they are Cosmetics. The file's `client_loot_lists` block is
+there for the same reason, and the render job never reads it.
 
 ## What the catalogue additionally asserts
 
@@ -48,7 +57,7 @@ Identity and the fields the site reads are the catalogue's business:
 - Two items sharing an English name but not their models fail the run loudly (ADR-0003).
 
 Prices are the catalogue's alone — the render job never sees them — and hang off the same
-five Cosmetics, from `data/tests/fixtures/backpack-tf-prices.json`:
+eight Cosmetics, from `data/tests/fixtures/backpack-tf-prices.json`:
 
 | Cosmetic | Native Quality | Reference Variant | Why |
 | --- | --- | --- | --- |
@@ -57,6 +66,9 @@ five Cosmetics, from `data/tests/fixtures/backpack-tf-prices.json`:
 | Ghastly Gibus | Unique | Unique non-craftable | No craftable Unique is priced |
 | Tin Pot | Genuine | Genuine craftable | A promo with no Unique at all; its Unusuals are never a Reference Variant |
 | Dead of Night | Unique | none — Unpriced | The price list has no entry for it |
+| Scotsman's Stove Pipe | Unique | Unique craftable, a Blanket Price | Issued in Play by dropping, so one craft hat is its real price although a Genuine copy is priced too |
+| Crocodile Smile | Unique | Unique craftable, a Blanket Price | The same, reached by the loot list rather than by a drop |
+| Baronial Badge | Unique, as the schema has it | Genuine craftable | Promo-Only: its blanket Unique price is an artefact and is passed over (ADR-0004) |
 
 The fixture also pins how a price entry finds its Cosmetic. The entry for Bolt Boy is
 named `Bolt-Boy`, which is not the catalogue's name for it, and is joined by its defindex;
