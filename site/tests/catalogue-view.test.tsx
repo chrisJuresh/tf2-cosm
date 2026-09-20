@@ -10,9 +10,10 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { fixtureCatalogue } from "./fixtures.ts";
 
 import { CatalogueView } from "@/components/catalogue-view";
+import { EMPTY_MANIFEST } from "@/renders/manifest";
 
 function renderView(catalogue: Catalogue = fixtureCatalogue()) {
-  return render(<CatalogueView catalogue={catalogue} />);
+  return render(<CatalogueView catalogue={catalogue} manifest={EMPTY_MANIFEST} />);
 }
 
 /**

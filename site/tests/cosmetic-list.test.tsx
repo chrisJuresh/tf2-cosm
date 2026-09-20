@@ -9,11 +9,17 @@ import { describe, expect, it } from "vitest";
 import { fixtureBasis, fixtureCosmetics, fixtureKeyRate } from "./fixtures.ts";
 
 import { CosmeticList } from "@/components/cosmetic-list";
+import { EMPTY_MANIFEST } from "@/renders/manifest";
 
 function renderList(overrides: Partial<Parameters<typeof CosmeticList>[0]> = {}) {
   render(
     <CosmeticList
       cosmetics={fixtureCosmetics()}
+      // What a row says is the same whether it has a picture or an icon, so
+      // these are driven against a manifest with nothing in it; the pictures
+      // have a suite of their own in `worn-renders.test.tsx`.
+      manifest={EMPTY_MANIFEST}
+      classView={null}
       keyRate={fixtureKeyRate()}
       basis={fixtureBasis()}
       {...overrides}

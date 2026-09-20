@@ -17,10 +17,10 @@
  * height is only the estimate the list starts from.
  *
  * The Dollar Basis the dollar column is computed at is chosen above the list and
- * handed down. Filters, sort and search are #13; the Worn Render in place of the
- * icon, and the Style and Team controls inside the expanded row, are #16.
+ * handed down, and which Cosmetics these are, and in what order, is settled
+ * before they get here — see `@/components/catalogue-browser`.
  */
-import type { Cosmetic, Metal } from "@tf2-cosm/data/catalogue";
+import type { ClassName, Cosmetic, Metal } from "@tf2-cosm/data/catalogue";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import {
   type CSSProperties,
@@ -33,8 +33,10 @@ import {
   useState,
 } from "react";
 
-import { secureIconUrl } from "@/catalogue/icon";
 import { CosmeticDetail } from "@/components/cosmetic-detail";
+import { WornRender } from "@/components/worn-render";
+import type { RenderManifest } from "@/renders/manifest";
+import { DEFAULT_STYLE, DEFAULT_TEAM, displayedClass } from "@/renders/select";
 
 import {
   approximately,
@@ -43,13 +45,22 @@ import {
   formatDollars,
   formatMetalValue,
   formatTraderNotation,
+  UNPRICED_REASON_LABELS,
 } from "@/prices/format";
 
 /** What a figure reads as when there is nothing to put there. */
 const NOTHING = "—";
 
-/** Tall enough for the icon; a collapsed row is always exactly this. */
+/** Tall enough for the picture; a collapsed row is always exactly this. */
 const ROW_HEIGHT = 56;
+
+/**
+ * How big the list draws a Cosmetic, and which derivative it asks for. A
+ * collapsed row shows the catalogue's own default look on RED: the Style and the
+ * Team are what an open row lets a viewer change, and eighteen hundred rows each
+ * remembering their own would be eighteen hundred pictures nobody asked to see.
+ */
+const LIST_SIZE = 256;
 
 interface Column {
   /** What the column is called, in the header. */
@@ -99,6 +110,14 @@ const GRID =
 
 export interface CosmeticListProps {
   readonly cosmetics: readonly Cosmetic[];
+  /** Which Worn Renders exist; empty when no run has produced any. */
+  readonly manifest: RenderManifest;
+  /**
+   * The Class whose Class View is showing, or null for the whole catalogue. It
+   * decides which Class every picture shows, which is what the view is for where
+   * an All-Class Cosmetic is concerned; the Class filter itself is #13.
+   */
+  readonly classView: ClassName | null;
   /** The snapshot's Key Rate, or null when it carried no prices. */
   readonly keyRate: Metal | null;
   /** The active Dollar Basis, or null when no dollar figure can be computed. */
@@ -108,14 +127,23 @@ export interface CosmeticListProps {
 /** The three price figures a row shows, already written out. */
 interface Figures {
   readonly notation: string;
+  /** Why an Unpriced Cosmetic has no figures, under the word "Unpriced". */
+  readonly reason: string | null;
   readonly metalValue: string;
   readonly dollars: string;
 }
 
 function figuresFor(cosmetic: Cosmetic, keyRate: Metal | null, basis: DollarBasis | null): Figures {
   const { price } = cosmetic;
-  if (price === null) return { notation: NOTHING, metalValue: NOTHING, dollars: NOTHING };
-  if (price.state === "unpriced") return { notation: "Unpriced", metalValue: NOTHING, dollars: NOTHING };
+  if (price === null) return { notation: NOTHING, reason: null, metalValue: NOTHING, dollars: NOTHING };
+  if (price.state === "unpriced") {
+    return {
+      notation: "Unpriced",
+      reason: UNPRICED_REASON_LABELS[price.reason],
+      metalValue: NOTHING,
+      dollars: NOTHING,
+    };
+  }
   const metal = price.spread.mid.metal;
   const dollars = dollarsFor(metal, basis);
   // A Blanket Price is the source's figure for every cheap hat rather than for
@@ -123,6 +151,7 @@ function figuresFor(cosmetic: Cosmetic, keyRate: Metal | null, basis: DollarBasi
   const written = (figure: string) => (price.blanket ? approximately(figure) : figure);
   return {
     notation: written(formatTraderNotation(metal, keyRate)),
+    reason: null,
     metalValue: written(formatMetalValue(metal)),
     dollars: dollars === null ? NOTHING : written(formatDollars(dollars)),
   };
@@ -163,6 +192,9 @@ interface CosmeticRowProps {
   cosmetic: Cosmetic;
   figures: Figures;
   keyRate: Metal | null;
+  manifest: RenderManifest;
+  /** The Class this row's picture shows, settled once by the list. */
+  gameClass: ClassName;
   /** The summary row's own index; an open row's panel is the row after it. */
   rowIndex: number;
   expanded: boolean;
@@ -179,6 +211,8 @@ function CosmeticRow({
   cosmetic,
   figures,
   keyRate,
+  manifest,
+  gameClass,
   rowIndex,
   expanded,
   onToggle,
@@ -231,17 +265,16 @@ function CosmeticRow({
         onClick={onRowClick}
       >
         <Cell column={0}>
-          {cosmetic.backpackIcon === null ? null : (
-            <img
-              src={secureIconUrl(cosmetic.backpackIcon.small)}
-              alt={cosmetic.name}
-              loading="lazy"
-              decoding="async"
-              width={40}
-              height={40}
-              className="max-h-8 max-w-8 object-contain sm:max-h-10 sm:max-w-10"
-            />
-          )}
+          <WornRender
+            cosmetic={cosmetic}
+            manifest={manifest}
+            gameClass={gameClass}
+            team={DEFAULT_TEAM}
+            style={DEFAULT_STYLE}
+            size={LIST_SIZE}
+            icon="small"
+            className="max-h-8 max-w-8 object-contain sm:max-h-10 sm:max-w-10"
+          />
         </Cell>
         <Cell column={1}>
           {/* The whole row takes a click, but only a real button is reachable by
@@ -260,7 +293,12 @@ function CosmeticRow({
             {cosmetic.name}
           </button>
         </Cell>
-        <Cell column={2}>{figures.notation}</Cell>
+        <Cell column={2}>
+          {figures.notation}
+          {figures.reason === null ? null : (
+            <div className="text-[0.6875rem] leading-tight text-black/55 dark:text-white/55">{figures.reason}</div>
+          )}
+        </Cell>
         <Cell column={3}>{figures.metalValue}</Cell>
         <Cell column={4}>{figures.dollars}</Cell>
       </div>
@@ -274,7 +312,13 @@ function CosmeticRow({
           className="border-b border-black/5 text-xs sm:text-sm dark:border-white/10"
         >
           <div role="cell" aria-colindex={1} aria-colspan={COLUMNS.length} className="bg-black/[0.03] dark:bg-white/[0.04]">
-            <CosmeticDetail cosmetic={cosmetic} keyRate={keyRate} id={detailId(slug)} />
+            <CosmeticDetail
+              cosmetic={cosmetic}
+              keyRate={keyRate}
+              manifest={manifest}
+              gameClass={gameClass}
+              id={detailId(slug)}
+            />
           </div>
         </div>
       ) : null}
@@ -282,7 +326,7 @@ function CosmeticRow({
   );
 }
 
-export function CosmeticList({ cosmetics, keyRate, basis }: CosmeticListProps) {
+export function CosmeticList({ cosmetics, manifest, classView, keyRate, basis }: CosmeticListProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const toggles = useRef(new Map<string, HTMLButtonElement>());
   const [expandedSlug, setExpandedSlug] = useState<string | null>(null);
@@ -394,6 +438,13 @@ export function CosmeticList({ cosmetics, keyRate, basis }: CosmeticListProps) {
         </div>
       </div>
       <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto">
+        {/* A list narrowed to nothing has to say so: an empty scroller reads as a
+            page that has broken rather than as a filter that matched nothing. */}
+        {cosmetics.length === 0 ? (
+          <p className="px-3 py-8 text-center text-sm text-black/60 dark:text-white/60">
+            No Cosmetic matches these controls.
+          </p>
+        ) : null}
         <div role="rowgroup" style={{ height: virtualiser.getTotalSize(), position: "relative" }}>
           {virtualiser.getVirtualItems().map((item) => {
             const cosmetic = cosmetics[item.index];
@@ -404,6 +455,8 @@ export function CosmeticList({ cosmetics, keyRate, basis }: CosmeticListProps) {
                 cosmetic={cosmetic}
                 figures={figuresFor(cosmetic, keyRate, basis)}
                 keyRate={keyRate}
+                manifest={manifest}
+                gameClass={displayedClass(cosmetic, classView)}
                 // The header is row one, so the first Cosmetic is row two — and
                 // every Cosmetic below an open one is a further row down,
                 // because that row's panel is a row in its own right.

@@ -4,19 +4,25 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "predev": "node scripts/link-renders.mjs",
     "dev": "next dev",
+    "prebuild": "node scripts/link-renders.mjs",
     "build": "next build",
     "test": "vitest run",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test-e2e": "playwright test"
   },
   "dependencies": {
     "@tanstack/react-virtual": "^3.13.12",
     "@tf2-cosm/data": "workspace:*",
     "next": "^15.5.4",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@playwright/test": "^1.63.0",
     "@tailwindcss/postcss": "^4.1.13",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.0",

@@ -1,0 +1,290 @@
+/**
+ * The pictures, as a viewer meets them: the Worn Render in a row, the icon where
+ * there is no render, the Class the picture shows following the Class View, and
+ * the Style switcher and Team toggle in an open row.
+ *
+ * Driven by the fixture manifest, which the render job itself wrote — see
+ * `tests/fixtures.ts`. Nothing here asserts how the fallback chain is walked;
+ * that is `renders.test.ts`. These are what ends up on the page.
+ */
+import { fireEvent, render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
+
+import { fixtureBasis, fixtureCosmetics, fixtureKeyRate, fixtureManifest } from "./fixtures.ts";
+
+import { CatalogueBrowser } from "@/components/catalogue-browser";
+import { CosmeticList } from "@/components/cosmetic-list";
+
+function renderList(overrides: Partial<Parameters<typeof CosmeticList>[0]> = {}) {
+  return render(
+    <CosmeticList
+      cosmetics={fixtureCosmetics()}
+      manifest={fixtureManifest()}
+      classView={null}
+      keyRate={fixtureKeyRate()}
+      basis={fixtureBasis()}
+      {...overrides}
+    />,
+  );
+}
+
+/**
+ * The whole browser, controls and all — used where what is being asserted is a
+ * viewer working a control rather than a row drawing itself.
+ */
+function renderBrowser() {
+  render(
+    <CatalogueBrowser
+      cosmetics={fixtureCosmetics()}
+      manifest={fixtureManifest()}
+      keyRate={fixtureKeyRate()}
+      basis={fixtureBasis()}
+    />,
+  );
+  return userEvent.setup();
+}
+
+function rowFor(slug: string): HTMLElement {
+  const row = document.querySelector<HTMLElement>(`[role="row"][data-slug="${slug}"]`);
+  if (row === null) throw new Error(`no row for ${slug}`);
+  return row;
+}
+
+/** The picture in a collapsed row. */
+function pictureIn(slug: string): HTMLImageElement {
+  return within(rowFor(slug)).getByRole("img");
+}
+
+function panelFor(slug: string): HTMLElement {
+  const panel = document.getElementById(`cosmetic-detail-${slug}`);
+  if (panel === null) throw new Error(`${slug} is not expanded`);
+  return panel;
+}
+
+/** The picture in an open row, which is the larger one. */
+function pictureInPanel(slug: string): HTMLImageElement {
+  return within(panelFor(slug)).getByRole("img");
+}
+
+beforeEach(() => {
+  window.history.replaceState(null, "", "/");
+});
+
+// The browser remembers the controls, so a Class chosen in one test would still
+// be chosen in the next.
+afterEach(() => {
+  localStorage.clear();
+});
+
+describe("the picture a row shows", () => {
+  it("shows the Worn Render where the manifest has one, at the list's size", () => {
+    renderList();
+    expect(pictureIn("team-captain")).toHaveAttribute("src", "/renders/web/team-captain/soldier-red-0@256.webp");
+  });
+
+  it("names the Cosmetic and the Class wearing it, so the picture reads aloud", () => {
+    renderList();
+    expect(pictureIn("team-captain")).toHaveAccessibleName("Team Captain worn by the Soldier");
+  });
+
+  it("loads every picture lazily, because the list is eighteen hundred rows of them", () => {
+    renderList();
+    expect(pictureIn("team-captain")).toHaveAttribute("loading", "lazy");
+    expect(pictureIn("dead-of-night")).toHaveAttribute("loading", "lazy");
+  });
+
+  it("falls back to the Backpack Icon for a Cosmetic the render job has never rendered", () => {
+    renderList();
+    const icon = pictureIn("dead-of-night");
+    expect(icon.getAttribute("src")).toContain("dead_of_night");
+    expect(icon).toHaveAccessibleName("Dead of Night");
+  });
+
+  it("falls back to the Backpack Icon for a Cosmetic whose render failed", () => {
+    // The fixture manifest records the Bolt Boy as model-missing. A failure and
+    // a Cosmetic nobody has tried are the same picture to a viewer.
+    renderList();
+    expect(pictureIn("bolt-boy").getAttribute("src")).toContain("boltboy");
+  });
+
+  it("shows the master when the derive step has not made a web size yet", () => {
+    renderList();
+    expect(pictureIn("baronial-badge")).toHaveAttribute(
+      "src",
+      "/renders/masters/baronial-badge/engineer-red-0.png",
+    );
+  });
+
+  it("falls back to the icon when a render that ought to exist will not load", () => {
+    // The manifest says an image was written; it does not say it is being
+    // served. A bucket mid-sync or a cleared local folder must not leave a hole.
+    renderList();
+    fireEvent.error(pictureIn("team-captain"));
+    expect(pictureIn("team-captain").getAttribute("src")).toContain("soldier_officer");
+  });
+
+  it("gives up rather than taking turns when the icon will not load either", () => {
+    // Remembering only the last failure would make the render eligible again the
+    // moment the icon failed, and the two would alternate for ever.
+    renderList();
+    fireEvent.error(pictureIn("team-captain"));
+    fireEvent.error(pictureIn("team-captain"));
+    expect(within(rowFor("team-captain")).queryByRole("img")).toBeNull();
+  });
+
+  it("leaves a blank rather than a broken image when there is neither a render nor an icon", () => {
+    const cosmetics = fixtureCosmetics().map((cosmetic) =>
+      cosmetic.slug === "dead-of-night" ? { ...cosmetic, backpackIcon: null } : cosmetic,
+    );
+    renderList({ cosmetics });
+    expect(within(rowFor("dead-of-night")).queryByRole("img")).toBeNull();
+  });
+
+  it("points every picture on screen at the manifest or at Valve, and at nothing else", () => {
+    // Every row the virtualiser has mounted: no row may end up asking for a path
+    // the manifest does not carry. jsdom mounts a screenful, so this is the rows
+    // a viewer can see rather than all eighteen hundred — the sweep over a real
+    // built page, with no failed request, is #17.
+    renderList();
+    const paths = new Set<string>();
+    for (const entries of Object.values(fixtureManifest().renders)) {
+      for (const byTeam of Object.values(entries)) {
+        for (const byStyle of Object.values(byTeam)) {
+          for (const entry of Object.values(byStyle)) {
+            paths.add(`/renders/${entry.master.path}`);
+            for (const image of Object.values(entry.derivatives)) paths.add(`/renders/${image.path}`);
+          }
+        }
+      }
+    }
+    const icons = new Set(
+      fixtureCosmetics().flatMap((cosmetic) =>
+        cosmetic.backpackIcon === null ? [] : [cosmetic.backpackIcon.small, cosmetic.backpackIcon.large],
+      ),
+    );
+    for (const picture of screen.getAllByRole("img")) {
+      const src = picture.getAttribute("src") ?? "";
+      expect(paths.has(src) || icons.has(src.replace("https://", "http://")) || icons.has(src)).toBe(true);
+    }
+  });
+});
+
+describe("the Class the picture shows", () => {
+  it("changes the render an All-Class Cosmetic shows when the viewer switches Class", async () => {
+    const user = renderBrowser();
+    const picker = screen.getByRole("combobox", { name: "Class" });
+
+    await user.selectOptions(picker, "scout");
+    expect(pictureIn("ghastly-gibus")).toHaveAttribute("src", "/renders/web/ghastly-gibus/scout-red-0@256.webp");
+
+    await user.selectOptions(picker, "heavy");
+    expect(pictureIn("ghastly-gibus")).toHaveAttribute("src", "/renders/web/ghastly-gibus/heavy-red-0@256.webp");
+    expect(pictureIn("ghastly-gibus")).toHaveAccessibleName("Ghastly Gibus worn by the Heavy");
+  });
+
+  it("shows an All-Class Cosmetic on its own first Class with no Class chosen", () => {
+    renderList();
+    expect(pictureIn("ghastly-gibus")).toHaveAttribute("src", "/renders/web/ghastly-gibus/scout-red-0@256.webp");
+  });
+
+  it("shows a Multi-Class Cosmetic on the chosen Class when that Class can wear it", () => {
+    renderList({ classView: "demoman" });
+    expect(pictureIn("team-captain")).toHaveAttribute("src", "/renders/web/team-captain/demoman-red-0@256.webp");
+  });
+
+  it("falls back to the Backpack Icon for a Class of an All-Class Cosmetic nobody has rendered", () => {
+    // The fixture has the Gibus on Scout, Soldier and Heavy only. A Medic
+    // looking at it gets the icon, not a Heavy wearing it.
+    renderList({ classView: "medic" });
+    expect(pictureIn("ghastly-gibus").getAttribute("src")).toContain("/gibus.");
+  });
+});
+
+describe("the open row", () => {
+  it("shows the larger derivative", async () => {
+    const user = userEvent.setup();
+    renderList();
+    await user.click(screen.getByRole("button", { name: "Team Captain" }));
+    expect(pictureInPanel("team-captain")).toHaveAttribute(
+      "src",
+      "/renders/web/team-captain/soldier-red-0@512.webp",
+    );
+  });
+
+  it("offers a Style switcher for a Cosmetic with Styles, and changes the picture with it", async () => {
+    const user = userEvent.setup();
+    renderList();
+    await user.click(screen.getByRole("button", { name: "Tin Pot" }));
+    const styles = within(panelFor("tin-pot")).getByRole("group", { name: "Style" });
+    expect(within(styles).getAllByRole("button").map((button) => button.textContent)).toEqual(["Closed", "Open"]);
+
+    await user.click(within(styles).getByRole("button", { name: "Open" }));
+    expect(pictureInPanel("tin-pot")).toHaveAttribute("src", "/renders/web/tin-pot/soldier-red-1@512.webp");
+    expect(within(styles).getByRole("button", { name: "Open" })).toHaveAttribute("aria-pressed", "true");
+  });
+
+  it("offers no Style switcher for a Cosmetic with one look", async () => {
+    const user = userEvent.setup();
+    renderList();
+    await user.click(screen.getByRole("button", { name: "Team Captain" }));
+    expect(within(panelFor("team-captain")).queryByRole("group", { name: "Style" })).toBeNull();
+  });
+
+  it("offers a Team toggle where a BLU render exists, and changes the picture with it", async () => {
+    const user = userEvent.setup();
+    renderList();
+    await user.click(screen.getByRole("button", { name: "Team Captain" }));
+    const teams = within(panelFor("team-captain")).getByRole("group", { name: "Team" });
+    expect(within(teams).getAllByRole("button").map((button) => button.textContent)).toEqual(["RED", "BLU"]);
+
+    await user.click(within(teams).getByRole("button", { name: "BLU" }));
+    expect(pictureInPanel("team-captain")).toHaveAttribute(
+      "src",
+      "/renders/web/team-captain/soldier-blu-0@512.webp",
+    );
+  });
+
+  it("offers no Team toggle for a Cosmetic rendered on RED alone", async () => {
+    const user = userEvent.setup();
+    renderList();
+    await user.click(screen.getByRole("button", { name: "Ghastly Gibus" }));
+    expect(within(panelFor("ghastly-gibus")).queryByRole("group", { name: "Team" })).toBeNull();
+  });
+
+  it("offers no Team toggle when the BLU entry is the RED image under another name", async () => {
+    const user = userEvent.setup();
+    renderList();
+    await user.click(screen.getByRole("button", { name: "Crocodile Smile" }));
+    expect(within(panelFor("crocodile-smile")).queryByRole("group", { name: "Team" })).toBeNull();
+  });
+
+  it("falls back a Style at a time: BLU Style 1 does not exist, so BLU Style 0 shows", async () => {
+    const user = userEvent.setup();
+    renderList();
+    await user.click(screen.getByRole("button", { name: "Tin Pot" }));
+    const panel = panelFor("tin-pot");
+    await user.click(within(panel).getByRole("button", { name: "Open" }));
+    await user.click(within(panel).getByRole("button", { name: "BLU" }));
+    expect(pictureInPanel("tin-pot")).toHaveAttribute("src", "/renders/web/tin-pot/soldier-blu-0@512.webp");
+  });
+
+  it("opens the next Cosmetic on its own default rather than the last one's Style", async () => {
+    const user = userEvent.setup();
+    renderList();
+    await user.click(screen.getByRole("button", { name: "Tin Pot" }));
+    await user.click(within(panelFor("tin-pot")).getByRole("button", { name: "Open" }));
+
+    await user.click(screen.getByRole("button", { name: "Tin Pot" }));
+    await user.click(screen.getByRole("button", { name: "Tin Pot" }));
+    expect(pictureInPanel("tin-pot")).toHaveAttribute("src", "/renders/web/tin-pot/soldier-red-0@512.webp");
+  });
+
+  it("shows the Backpack Icon in the panel too when there is no render at all", async () => {
+    const user = userEvent.setup();
+    renderList();
+    await user.click(screen.getByRole("button", { name: "Dead of Night" }));
+    // The large icon, since the panel draws the Cosmetic bigger than a row does.
+    expect(pictureInPanel("dead-of-night").getAttribute("src")).toContain("dead_of_night_large");
+  });
+});

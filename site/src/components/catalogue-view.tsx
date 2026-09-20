@@ -10,12 +10,15 @@
  * that row's Metal Value. Nothing is computed twice: the basis is picked once
  * and handed down.
  *
- * The Class View and the browsing controls are #13; the expandable row is #15.
+ * Which Cosmetics the list shows, and in what order, is the browser below the
+ * header — see `@/components/catalogue-browser`.
  */
 import type { Catalogue } from "@tf2-cosm/data/catalogue";
 
+import type { RenderManifest } from "@/renders/manifest";
+
 import { useRememberedChoice } from "@/browser/remembered";
-import { CosmeticList } from "@/components/cosmetic-list";
+import { CatalogueBrowser } from "@/components/catalogue-browser";
 import { DollarBasisSwitch } from "@/components/dollar-basis-switch";
 import { chooseBasis, dollarBases, formatDollars, formatMetalValue } from "@/prices/format";
 
@@ -43,7 +46,13 @@ function Moment({ iso }: { iso: string }) {
   return <time dateTime={iso}>{`${SNAPSHOT_TIME.format(new Date(iso))} UTC`}</time>;
 }
 
-export function CatalogueView({ catalogue }: { catalogue: Catalogue }) {
+export interface CatalogueViewProps {
+  readonly catalogue: Catalogue;
+  /** Which Worn Renders exist; empty when no run has produced any. */
+  readonly manifest: RenderManifest;
+}
+
+export function CatalogueView({ catalogue, manifest }: CatalogueViewProps) {
   const { header } = catalogue;
   const offered = dollarBases(header.dollarBases);
   const [remembered, remember] = useRememberedChoice(DOLLAR_BASIS_KEY);
@@ -65,7 +74,7 @@ export function CatalogueView({ catalogue }: { catalogue: Catalogue }) {
               </>
             )}
           </p>
-          <p className="text-xs text-black/50 dark:text-white/50">
+          <p className="text-xs text-black/55 dark:text-white/55">
             Snapshot taken <Moment iso={header.snapshotTakenAt} />
             {/* When the snapshot was taken is not when the rate it quotes was:
                 a price source's estimate can be weeks old by the time a run
@@ -82,7 +91,7 @@ export function CatalogueView({ catalogue }: { catalogue: Catalogue }) {
         {basis === null ? null : <DollarBasisSwitch offered={offered} active={basis} onChoose={(chosen) => remember(chosen.id)} />}
       </header>
       <main className="mx-auto flex w-full max-w-5xl min-h-0 flex-1 flex-col px-4 sm:px-6">
-        <CosmeticList cosmetics={catalogue.cosmetics} keyRate={keyRate} basis={basis} />
+        <CatalogueBrowser cosmetics={catalogue.cosmetics} manifest={manifest} keyRate={keyRate} basis={basis} />
       </main>
     </>
   );

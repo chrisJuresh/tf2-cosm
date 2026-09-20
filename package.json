@@ -7,6 +7,7 @@
     "dev": "pnpm --filter @tf2-cosm/site dev",
     "build-site": "pnpm --filter @tf2-cosm/site build",
     "test": "pnpm --recursive test",
-    "typecheck": "pnpm --recursive typecheck"
+    "typecheck": "pnpm --recursive typecheck",
+    "test-e2e": "pnpm --filter @tf2-cosm/site test-e2e"
   }
 }
