@@ -17,15 +17,17 @@ it against the catalogue schema before rendering a row of it — a catalogue tha
 violates the schema fails the build rather than deploying.
 
 The site has no configuration of its own. Every rate it quotes — the Key Rate,
-and the Steam Community Market's key price the dollar figures are computed from —
-comes out of the catalogue header, so there is nowhere for a number on the page
-to have come from but the snapshot.
+and each of the three Dollar Bases a dollar figure can be computed from — comes
+out of the catalogue header, so there is nowhere for a number on the page to have
+come from but the snapshot.
 
 ## Shape
 
 - `src/app/page.tsx` — the page. A server component: it reads the catalogue at
-  build time, picks the Dollar Basis out of its header, and hands both to the
-  list.
+  build time and hands it to the view.
+- `src/components/catalogue-view.tsx` — the header, the Dollar Basis switch and
+  the list. The active basis lives here because it is the one thing the header
+  and every row have to agree on.
 - `src/catalogue/load.ts` — the catalogue, imported as a module so the whole
   document is baked into the static output, and validated before use.
 - `src/prices/format.ts` — the pure price module: Trader Notation, the Metal
@@ -33,14 +35,25 @@ to have come from but the snapshot.
   their own, and the tests drive this module directly. The Metal arithmetic
   underneath is the data job's `@tf2-cosm/data/prices/metal`, so a notation
   written here and one recorded in the catalogue come out of the same function.
-  The Dollar Basis is picked out of the header rather than computed: the data job
+  A Dollar Basis is picked out of the header rather than computed: the data job
   anchored all three rates to the snapshot's own Key Rate, and recomputing one
-  here would be a second opinion on a settled number.
+  here would be a second opinion on a settled number. A basis whose rate never
+  arrived is not offered at all, rather than guessed at. The price source names
+  itself in the header and nowhere in this code, so ADR-0002's swappable source
+  stays swappable without an edit here.
 - `src/components/cosmetic-list.tsx` — the list, a client component fed the whole
   catalogue. Its rows are virtualised, so eighteen hundred of them with a picture
   each scroll without the browser holding eighteen hundred rows. A phone has room
   for four columns across rather than five, so it carries the Metal Value on a
   second line under the Cosmetic's name instead of dropping it.
+- `src/components/dollar-basis-switch.tsx` — the switch, as native radios so a
+  keyboard walks it and a screen reader announces it without being told to. Each
+  option carries its own rate, because that is the whole point of the choice.
+- `src/components/site-footer.tsx` — the credits. Nothing on the page is the
+  site's own.
+- `src/browser/remembered.ts` — a choice remembered in this browser and nowhere
+  else. Every access is guarded, the page is right without it, and it is read
+  after mount so the static markup React hydrates carries nobody's preference.
 
 Styling is Tailwind utilities. Light and dark both follow the system colour
 scheme; there is no switch and nothing is stored.
@@ -74,9 +87,8 @@ not run against 7, so this package pins `typescript@5`. Both are checked by
 
 ## Not here yet
 
-The Class View, filters, sort, search and remembered controls are #13; the Dollar
-Basis switch, the header rates and the credits footer are #14; the expandable row
-with the Price Spread is #15; Worn Renders in place of Backpack Icons are #16.
+The Class View, filters, sort and search are #13; the expandable row with the
+Price Spread is #15; Worn Renders in place of Backpack Icons are #16.
 The whole catalogue is handed to the client as one payload, which is what makes
 the exported HTML large; trimming it to the fields a row needs is worth doing
 once those tickets have settled what a row needs.

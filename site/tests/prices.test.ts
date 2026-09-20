@@ -1,17 +1,18 @@
 /**
  * The price module is the only place the site turns a Metal figure into words or
- * into money, so this is where Trader Notation, the Metal Value and the dollar
- * conversion are pinned down.
+ * into money, so this is where Trader Notation, the Metal Value, the Dollar
+ * Bases on offer and the dollar conversion are pinned down.
  */
 import type { DollarBases, Metal } from "@tf2-cosm/data/catalogue";
 import { describe, expect, it } from "vitest";
 
 import {
+  chooseBasis,
+  dollarBases,
   dollarsFor,
   formatDollars,
   formatMetalValue,
   formatTraderNotation,
-  steamMarketBasis,
 } from "@/prices/format";
 
 /** A Metal figure the way the catalogue carries it: scrap is the truth. */
@@ -71,7 +72,7 @@ describe("the Metal Value", () => {
   });
 });
 
-/** A header's Dollar Bases, with only the parts the Steam Market basis reads filled in. */
+/** A header's Dollar Bases at a Key Rate of 64.11 ref, with the Market's two figures dialled in. */
 function bases(lowest: number | null, median: number | null): DollarBases {
   const rate = (usdPerKey: number) => ({ usdPerKey, usdPerRefined: usdPerKey / (577 / 9) });
   return {
@@ -81,36 +82,105 @@ function bases(lowest: number | null, median: number | null): DollarBases {
       lowest: lowest === null ? null : rate(lowest),
       median: median === null ? null : rate(median),
     },
-    priceSource: null,
+    priceSource: {
+      source: "backpack.tf refined-to-dollar estimate (IGetCurrencies v1)",
+      lastUpdatedAt: "2026-09-08T20:40:00.000Z",
+      rate: rate(2.36),
+    },
     mannCoStore: { source: "Mann Co. Store constant", rate: rate(2.49) },
   };
 }
 
-describe("the Steam Community Market Dollar Basis", () => {
-  it("takes its rate from the header, already anchored to the snapshot's Key Rate", () => {
-    const basis = steamMarketBasis(bases(2.29, 2.33));
-    expect(basis?.usdPerKey).toBe(2.29);
-    expect(basis?.usdPerRefined).toBeCloseTo(2.29 / (577 / 9), 10);
-    expect(basis?.label).toBe("Steam Community Market");
+describe("the Dollar Bases a snapshot offers", () => {
+  it("offers all three, the Steam Community Market first because it is the default", () => {
+    expect(dollarBases(bases(2.29, 2.33)).map((basis) => basis.id)).toEqual([
+      "steam-community-market",
+      "price-source",
+      "mann-co-store",
+    ]);
   });
 
-  it("prefers the lowest listing, which is what a viewer would actually pay", () => {
-    expect(steamMarketBasis(bases(2.29, 2.33))?.usdPerKey).toBe(2.29);
+  it("names each one the way a viewer would recognise it", () => {
+    expect(dollarBases(bases(2.29, 2.33)).map((basis) => basis.label)).toEqual([
+      "Steam Community Market",
+      "backpack.tf estimate",
+      "Mann Co. Store",
+    ]);
   });
 
-  it("falls back to the median when the Market published no lowest", () => {
-    expect(steamMarketBasis(bases(null, 2.33))?.usdPerKey).toBe(2.33);
+  it("takes the price source's name from the header rather than knowing the vendor itself", () => {
+    // ADR-0002 keeps the price source swappable behind one seam; a site that
+    // spelled the vendor out would have to be edited the day it is swapped.
+    const header = bases(2.29, 2.33);
+    const swapped = dollarBases({
+      ...header,
+      priceSource: { ...header.priceSource!, source: "pricedb.io refined-to-dollar estimate" },
+    });
+    expect(swapped[1]?.label).toBe("pricedb.io estimate");
   });
 
-  it("is nothing at all when the snapshot has no rates, or the Market did not answer", () => {
-    expect(steamMarketBasis(null)).toBeNull();
-    expect(steamMarketBasis({ ...bases(2.29, 2.33), steamCommunityMarket: null })).toBeNull();
-    expect(steamMarketBasis(bases(null, null))).toBeNull();
+  it("carries each basis's rate, already anchored to the snapshot's Key Rate", () => {
+    const [market, source, store] = dollarBases(bases(2.29, 2.33));
+    expect(market?.usdPerKey).toBe(2.29);
+    expect(market?.usdPerRefined).toBeCloseTo(2.29 / (577 / 9), 10);
+    expect(source?.usdPerKey).toBe(2.36);
+    expect(store?.usdPerKey).toBe(2.49);
+  });
+
+  it("carries what the header says each rate came from, so a viewer can check it", () => {
+    expect(dollarBases(bases(2.29, 2.33)).map((basis) => basis.source)).toEqual([
+      "Steam Community Market price overview",
+      "backpack.tf refined-to-dollar estimate (IGetCurrencies v1)",
+      "Mann Co. Store constant",
+    ]);
+  });
+
+  it("prefers the Market's lowest listing, which is what a viewer would actually pay", () => {
+    expect(dollarBases(bases(2.29, 2.33))[0]?.usdPerKey).toBe(2.29);
+  });
+
+  it("falls back to the Market's median when it published no lowest", () => {
+    expect(dollarBases(bases(null, 2.33))[0]?.usdPerKey).toBe(2.33);
+  });
+
+  it("leaves out a basis whose rate never arrived rather than guessing one", () => {
+    // A dollar figure nobody can stand behind is worse than no dollar figure.
+    expect(dollarBases(bases(null, null)).map((basis) => basis.id)).toEqual(["price-source", "mann-co-store"]);
+    expect(dollarBases({ ...bases(2.29, null), steamCommunityMarket: null }).map((basis) => basis.id)).toEqual([
+      "price-source",
+      "mann-co-store",
+    ]);
+    expect(dollarBases({ ...bases(2.29, null), priceSource: null }).map((basis) => basis.id)).toEqual([
+      "steam-community-market",
+      "mann-co-store",
+    ]);
+  });
+
+  it("offers nothing at all when the snapshot took no prices", () => {
+    expect(dollarBases(null)).toEqual([]);
+  });
+});
+
+describe("choosing a Dollar Basis", () => {
+  const offered = dollarBases(bases(2.29, 2.33));
+
+  it("picks the one asked for", () => {
+    expect(chooseBasis(offered, "mann-co-store")?.id).toBe("mann-co-store");
+  });
+
+  it("falls back to the first on offer when the one asked for is not there", () => {
+    // A basis remembered in a browser outlives the snapshot that offered it.
+    expect(chooseBasis(offered, "nonsense")?.id).toBe("steam-community-market");
+    expect(chooseBasis(offered, null)?.id).toBe("steam-community-market");
+  });
+
+  it("is nothing at all when the snapshot offers no basis", () => {
+    expect(chooseBasis([], "mann-co-store")).toBeNull();
   });
 });
 
 describe("the dollar figure", () => {
-  const basis = steamMarketBasis(bases(2.49, 2.49));
+  const basis = dollarBases(bases(2.49, 2.49))[0] ?? null;
 
   it("is the Metal Value at the basis rate", () => {
     expect(dollarsFor(metal(577), basis)).toBeCloseTo(2.49, 10);

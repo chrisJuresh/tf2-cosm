@@ -17,7 +17,9 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className="h-full">
-      <body className="h-full antialiased">{children}</body>
+      {/* The list is the only thing that scrolls, so the header above it and the
+          credits below it stay put while it does. */}
+      <body className="flex h-full flex-col antialiased">{children}</body>
     </html>
   );
 }
