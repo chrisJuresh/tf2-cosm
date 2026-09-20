@@ -19,6 +19,9 @@ FIXTURE_MODELS = [
     "models/player/items/soldier/tin_pot.mdl",
     "models/player/items/soldier/tin_pot_open.mdl",
     "models/player/items/spy/dead_of_night.mdl",
+    "models/player/items/demo/stove_pipe.mdl",
+    "models/player/items/sniper/crocodile_smile.mdl",
+    "models/player/items/engineer/baronial_badge.mdl",
     "models/workshop/player/items/all_class/esl_medal/esl_medal.mdl",
     *[f"models/player/items/all_class/gibus_{token}.mdl" for token in CLASS_TOKENS],
 ]

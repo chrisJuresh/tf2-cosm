@@ -68,6 +68,12 @@ export interface Rates {
   /** One unit of each currency the source quotes, in scrap. Metal is nine by definition. */
   readonly scrapPerUnit: ReadonlyMap<string, number>;
   /**
+   * The currencies the source itself marks as a blanket: a figure it applies to
+   * a whole class of items rather than one it observed for any single item.
+   * backpack.tf marks the Random Craft Hat and nothing else.
+   */
+  readonly blanketCurrencies: ReadonlySet<string>;
+  /**
    * The source's own refined-to-dollar estimate, when it publishes one. It
    * converts nothing here — a Metal Value never passes through dollars — but it
    * is a Dollar Basis for the header, and it arrives in the same call the Key
@@ -79,6 +85,11 @@ export interface Rates {
 /** The rate for a currency, or undefined when the snapshot cannot convert it. */
 export function rateFor(rates: Rates, currency: string): number | undefined {
   return isPriceCurrency(currency) ? rates.scrapPerUnit.get(currency) : undefined;
+}
+
+/** Whether a figure in this currency is a Blanket Price rather than an observed one. */
+export function isBlanketCurrency(rates: Rates, currency: string): boolean {
+  return rates.blanketCurrencies.has(currency);
 }
 
 /**

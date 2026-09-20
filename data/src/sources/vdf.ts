@@ -8,7 +8,12 @@
  */
 import * as vdf from "vdf-parser";
 
-import { type ItemDefinition, type ItemsGameDocument, mergeBlocks } from "../catalogue/item-definition.ts";
+import {
+  type ItemDefinition,
+  type ItemsGameDocument,
+  lootListKey,
+  mergeBlocks,
+} from "../catalogue/item-definition.ts";
 
 type Parsed = Record<string, unknown>;
 
@@ -42,7 +47,53 @@ export function parseItemsGame(text: string): ItemsGameDocument {
   return {
     items: items as Record<string, ItemDefinition>,
     prefabs: (typeof prefabs === "object" && prefabs !== null ? prefabs : {}) as Record<string, ItemDefinition>,
+    lootListItems: lootListItems(root),
   };
+}
+
+/**
+ * Keys that name something other than an item inside a loot list: a job the game
+ * runs over what it rolled, not a thing it can roll.
+ */
+const NOT_AN_ITEM = new Set(["lootlist_job_templates"]);
+
+/**
+ * Every string-valued key beneath a node. In a loot list that is an item name and
+ * its weight, but a list that rolls another list by name lands here too, and so
+ * does anything else written that way. The set is only ever asked whether an item
+ * is in it, and a name that is in it wrongly only keeps a Blanket Price that was
+ * already standing, so erring wide is the safe direction (ADR-0004).
+ */
+function itemNamesUnder(node: unknown, into: Set<string>): void {
+  if (typeof node !== "object" || node === null) return;
+  for (const [key, value] of Object.entries(node)) {
+    if (NOT_AN_ITEM.has(key.toLowerCase())) continue;
+    // A loot list writes "<item name>" "<weight>"; a nested block is a rarity
+    // bucket or a sub-list, and holds item names of its own.
+    if (typeof value === "string") into.add(lootListKey(key));
+    else itemNamesUnder(value, into);
+  }
+}
+
+/**
+ * What the game can hand out: the client loot lists (crates and cases) and the
+ * item collections. An item in neither, and with no `drop_type` of `drop`, never
+ * enters the game by ordinary play — which is how a promo-only Cosmetic is told
+ * apart from a cheap craft hat (ADR-0004).
+ */
+function lootListItems(root: Parsed): ReadonlySet<string> {
+  const names = new Set<string>();
+  itemNamesUnder(root["client_loot_lists"], names);
+  const collections = root["item_collections"];
+  if (typeof collections === "object" && collections !== null) {
+    // Only each collection's own `items`; its name and description are not items.
+    for (const collection of Object.values(collections as Parsed)) {
+      if (typeof collection === "object" && collection !== null) {
+        itemNamesUnder((collection as Parsed)["items"], names);
+      }
+    }
+  }
+  return names;
 }
 
 /** tf_english.txt is UTF-16; Source treats its token names as case-insensitive. */

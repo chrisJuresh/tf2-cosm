@@ -13,6 +13,9 @@
 		"TF_YeOldeBakerBoy"	"Ye Olde Baker Boy"
 		"TF_HatPart"	"Scrap Metal Hat Part"
 		"TF_DeadOfNight"	"The Dead of Night"
+		"TF_StovePipe"	"The Scotsman's Stove Pipe"
+		"TF_CrocodileSmile"	"Crocodile Smile"
+		"TF_BaronialBadge"	"The Baronial Badge"
 		"TF_Scattergun"	"Scattergun"
 	}
 }

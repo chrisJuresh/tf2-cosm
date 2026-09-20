@@ -51,6 +51,15 @@ export function formatTraderNotation(metal: Metal, keyRate: Metal | null): strin
   return traderNotation(metal.scrap, keyRate.scrap);
 }
 
+/**
+ * A Blanket Price written as what it is. The source quotes one figure for a whole
+ * class of items rather than for this one (ADR-0004), so the site says about,
+ * rather than printing it with the confidence of a quote.
+ */
+export function approximately(figure: string): string {
+  return `≈${figure}`;
+}
+
 /** The Metal Value: the same price written wholly in Refined, whatever it is worth in Keys. */
 export function formatMetalValue(metal: Metal): string {
   return `${formatRefined(metal.scrap)} ref`;

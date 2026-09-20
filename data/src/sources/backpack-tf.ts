@@ -66,7 +66,9 @@ interface CurrenciesResponse {
     readonly success?: number;
     readonly message?: string;
     /** "metal", "keys", "hat", "earbuds" — each priced in one of the others. */
-    readonly currencies?: Readonly<Record<string, { readonly price?: RawPrice } | undefined>>;
+    readonly currencies?: Readonly<
+      Record<string, { readonly price?: RawPrice; readonly blanket?: number } | undefined>
+    >;
   };
 }
 
@@ -141,7 +143,11 @@ export async function fetchRates(apiKey: string, fetchImpl: typeof fetch = fetch
   checkSuccess("IGetCurrencies", body.response);
 
   const quotes = new Map<string, CurrencyQuote>();
+  // `blanket` is backpack.tf saying so itself: the Random Craft Hat's figure is
+  // one it applies to every craft hat, not one it observed for any of them.
+  const blanketCurrencies = new Set<string>();
   for (const [name, currency] of Object.entries(body.response?.currencies ?? {})) {
+    if (currency?.blanket === 1) blanketCurrencies.add(name);
     const price = currency?.price;
     if (typeof price?.currency !== "string" || typeof price.value !== "number") continue;
     quotes.set(name, { currency: price.currency, value: price.value });
@@ -155,6 +161,7 @@ export async function fetchRates(apiKey: string, fetchImpl: typeof fetch = fetch
   return {
     keyRate: keyRateFromRefined(keysQuote.value, timestamp(keysPrice?.last_update, new Date().toISOString())),
     scrapPerUnit: resolveScrapPerUnit(quotes),
+    blanketCurrencies,
     dollarEstimate: dollarEstimateOf(body.response?.currencies?.["metal"]?.price),
   };
 }
