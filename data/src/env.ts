@@ -15,9 +15,9 @@ export function loadDotEnv(path: string): void {
   for (const line of text.split(/\r?\n/)) {
     const match = /^\s*([A-Z_][A-Z0-9_]*)\s*=\s*(.*)$/i.exec(line);
     if (!match) continue;
-    const [, name, rawValue] = match as unknown as [string, string, string];
-    if (process.env[name] !== undefined) continue;
-    process.env[name] = rawValue.trim().replace(/^(['"])(.*)\1$/, "$2");
+    const name = match[1];
+    if (name === undefined || process.env[name] !== undefined) continue;
+    process.env[name] = (match[2] ?? "").trim().replace(/^(['"])(.*)\1$/, "$2");
   }
 }
 

@@ -1,6 +1,7 @@
 /**
- * Cosmetic identity, per ADR-0003: the English display name with a leading "The"
- * removed, and a URL-safe slug derived from it.
+ * Cosmetic identity: the English display name and the URL-safe slug derived from
+ * it (ADR-0003). The leading "The" is stripped because traders and the price
+ * sources leave it off, so names match across them and sort sensibly.
  */
 
 /** The English name as the catalogue records it. */

@@ -30,7 +30,13 @@ const cosmeticSchema = z.object({
   slot: z.enum(COSMETIC_SLOTS),
   classes: z.array(z.enum(CLASSES)).min(1),
   kind: z.enum(COSMETIC_KINDS),
+  /** Whether a copy can be painted; the catalogue records it so the site can filter on it. */
   paintable: z.boolean(),
+  /**
+   * The Cosmetic's named Styles, in game order. Every Cosmetic has a default
+   * Style; this list is empty when that default is the only one, so a site shows
+   * a Style switcher exactly when the list is non-empty.
+   */
   styles: z.array(styleSchema),
   backpackIcon: z
     .object({ small: z.url(), large: z.url() })
@@ -63,7 +69,6 @@ export const catalogueSchema = z.object({
 
 export type Style = z.infer<typeof styleSchema>;
 export type Cosmetic = z.infer<typeof cosmeticSchema>;
-export type CatalogueHeader = z.infer<typeof headerSchema>;
 export type Catalogue = z.infer<typeof catalogueSchema>;
 
 export class CatalogueValidationError extends Error {

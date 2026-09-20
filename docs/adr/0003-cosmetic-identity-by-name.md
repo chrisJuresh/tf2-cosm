@@ -4,6 +4,7 @@ Valve's schema occasionally carries several defindexes for what is visibly one i
 
 ## Consequences
 
+- The name is recorded with any leading "The" stripped, because traders and the price sources leave it off; matching them is the point of keying by name.
 - A URL-safe slug derived from the name is the stable public identifier; a later wishlist references that slug.
 - If Valve renames an item the Cosmetic's identity changes. This is rare and is handled by a manual alias entry when it happens.
 - Two genuinely different items with the same display name would collide; none are known today and the data job fails loudly if it finds one.

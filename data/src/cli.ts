@@ -71,8 +71,8 @@ function parseArgs(argv: readonly string[]): Options {
             "build-catalogue [options]",
             "  --tf <path>      read item definitions from this TF2 'tf' directory",
             "  --mirror         read item definitions from the daily mirror instead",
-            "  --skip-web-api   skip Valve's Web API; names come from the local install and",
-            "                   the catalogue carries no Backpack Icons (no key needed)",
+            "  --skip-web-api   skip Valve's Web API and report the Cosmetic list from the",
+            "                   local install alone, writing nothing (no key needed)",
             "  --out <path>     where to write the catalogue",
             "  --dry-run        build and report, write nothing",
           ].join("\n"),
@@ -104,6 +104,11 @@ async function main(): Promise<number> {
   const options = parseArgs(process.argv.slice(2));
 
   const definitions = await loadItemDefinitions(options);
+  if (options.skipWebApi && definitions.englishTokens === undefined) {
+    // Without either source of English names the job would fall back to items_game's
+    // internal names, which differ between the defindexes ADR-0003 merges.
+    throw new Error("--skip-web-api needs a local game install for its names; pass --tf or drop --mirror");
+  }
   const webApi = await loadWebApiItems(options);
 
   const { catalogue, exclusions, warnings } = buildCatalogue({
@@ -143,8 +148,10 @@ async function main(): Promise<number> {
     if (warnings.length > 10) console.log(`    ... and ${warnings.length - 10} more`);
   }
 
-  if (options.dryRun) {
-    console.log("dry run: nothing written");
+  if (options.dryRun || options.skipWebApi) {
+    // A catalogue built without the Web API would carry internal names and no
+    // Backpack Icons, so --skip-web-api reports and never writes.
+    console.log(options.dryRun ? "dry run: nothing written" : "--skip-web-api: reported only, nothing written");
     return 0;
   }
 

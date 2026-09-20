@@ -30,23 +30,19 @@ export function scalar(item: ItemDefinition | undefined, key: string): string | 
   return typeof value === "string" ? value : undefined;
 }
 
-/** items_game writes booleans as "1"/"0". */
-export function isSet(item: ItemDefinition | undefined, key: string): boolean {
-  return scalar(item, key) === "1";
-}
-
-function mergeInto(target: Mutable, source: ItemDefinition): void {
-  for (const [key, value] of Object.entries(source)) {
+/**
+ * The later block laid over the earlier one: blocks merge key by key, scalars
+ * replace. Prefab inheritance and duplicate keys in the file both need this.
+ */
+export function mergeBlocks(earlier: ItemDefinition, later: ItemDefinition): ItemDefinition {
+  const merged: Mutable = { ...(earlier as Record<string, ItemDefinitionValue>) };
+  for (const [key, value] of Object.entries(later)) {
     if (value === undefined) continue;
-    const existing = target[key];
-    if (typeof value === "object" && typeof existing === "object") {
-      const merged: Mutable = { ...(existing as Record<string, ItemDefinitionValue>) };
-      mergeInto(merged, value);
-      target[key] = merged;
-    } else {
-      target[key] = typeof value === "object" ? { ...value } : value;
-    }
+    const existing = merged[key];
+    merged[key] =
+      typeof value === "object" && typeof existing === "object" ? mergeBlocks(existing, value) : value;
   }
+  return merged;
 }
 
 /**
@@ -59,14 +55,13 @@ export function resolvePrefabs(
   prefabs: Readonly<Record<string, ItemDefinition>>,
   seen: ReadonlySet<string> = new Set(),
 ): ItemDefinition {
-  const resolved: Mutable = {};
+  let resolved: ItemDefinition = {};
   for (const name of (scalar(item, "prefab") ?? "").split(/\s+/).filter(Boolean)) {
     const prefab = prefabs[name];
     // A prefab cycle would only come from a corrupt payload, but it must not hang the job.
     if (prefab && !seen.has(name)) {
-      mergeInto(resolved, resolvePrefabs(prefab, prefabs, new Set(seen).add(name)));
+      resolved = mergeBlocks(resolved, resolvePrefabs(prefab, prefabs, new Set(seen).add(name)));
     }
   }
-  mergeInto(resolved, item);
-  return resolved;
+  return mergeBlocks(resolved, item);
 }

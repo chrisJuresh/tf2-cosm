@@ -7,8 +7,21 @@ Python). They must agree. This directory is the fixture both are tested against.
 - `items_game.txt` — a trimmed excerpt of the game's own item definitions, in the
   game's own format, so either language can read it. Prefabs are included as far
   as the kept items' chains reach.
+- `english-tokens.json` — the `tf_english.txt` entries these items' names and
+  Style names resolve through, so neither side needs a game install.
 - `expected-cosmetics.json` — the Cosmetics the rule keeps, and the near-misses it
   drops with the reason for each.
+
+Both sides read them:
+
+```bash
+pnpm test                                        # data/tests/build-catalogue.test.ts
+./.venv/Scripts/python.exe -m pytest render      # render/test_cosmetic_rule.py
+```
+
+The resolve step works per defindex, so a Cosmetic's aliases are separate rows
+there; the catalogue merges them under ADR-0003. That is the one shape difference
+between the two, and the tests account for it.
 
 ## What each item is here to prove
 
@@ -23,9 +36,10 @@ Python). They must agree. This directory is the fixture both are tested against.
 | 844 | Tin Pot | an item whose only model lives inside its Styles |
 | 5606 | Barely-Melted Capacitor | a craft component wearing the wearable item class, with no model |
 
-`expected-cosmetics.json` records names in English. The data job takes them from
-Valve's Web API; the resolve step takes them from the install's `tf_english.txt`.
-Both strip a leading "The" per ADR-0003.
+`expected-cosmetics.json` records names in English. In the real runs the data job
+takes them from Valve's Web API and the resolve step from the install's
+`tf_english.txt`; over the fixture they come from the payload beside it. Both
+strip a leading "The" (ADR-0003).
 
 ## The rule
 

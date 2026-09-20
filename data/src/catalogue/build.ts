@@ -6,11 +6,12 @@
 import {
   type ClassName,
   classesFor,
+  type CosmeticSlot,
   cosmeticSlotOf,
   type ExclusionReason,
   exclusionReason,
-  hasWornModel,
   stylesOf,
+  wornModels,
 } from "./cosmetic-rule.ts";
 import { displayName, slugify } from "./identity.ts";
 import {
@@ -28,7 +29,7 @@ import {
   type CosmeticKind,
   type Style,
 } from "./schema.ts";
-import type { WebApiSchemaItem } from "../sources/steam-web-api.ts";
+import { backpackIconOf, type WebApiSchemaItem } from "../sources/steam-web-api.ts";
 
 export interface CatalogueInputs {
   readonly itemsGame: ItemsGameDocument;
@@ -55,27 +56,42 @@ export interface BuildResult {
   readonly warnings: readonly string[];
 }
 
+/** What two items sharing a display name disagree about, which makes them two items. */
+export type CollisionDifference = "slot" | "classes" | "models";
+
 export class DisplayNameCollisionError extends Error {
-  constructor(name: string, readonly defindexes: readonly number[], difference: string) {
+  constructor(name: string, readonly defindexes: readonly number[], readonly difference: CollisionDifference) {
+    const differences: Record<CollisionDifference, string> = {
+      slot: "the slot they occupy",
+      classes: "the Classes that can wear them",
+      models: "the models they are worn as",
+    };
     super(
       `display name "${name}" is shared by items that are not the same Cosmetic ` +
-        `(defindexes ${defindexes.join(", ")}; they differ in ${difference}). ` +
+        `(defindexes ${defindexes.join(", ")}; they differ in ${differences[difference]}). ` +
         `ADR-0003 merges defindexes that share a name, so this must be resolved by hand.`,
     );
     this.name = "DisplayNameCollisionError";
   }
 }
 
+export class SlugCollisionError extends Error {
+  constructor(name: string, other: string, slug: string) {
+    super(`"${name}" and "${other}" both slug to "${slug}"; one of them needs a distinct name`);
+    this.name = "SlugCollisionError";
+  }
+}
+
 interface Candidate {
   readonly defindex: number;
-  readonly item: ItemDefinition;
   readonly name: string;
-  readonly slot: "head" | "misc";
+  readonly slot: CosmeticSlot;
   readonly classes: readonly ClassName[];
   readonly paintable: boolean;
   readonly styles: readonly Style[];
   readonly backpackIcon: Cosmetic["backpackIcon"];
-  readonly hasModel: boolean;
+  /** Every model this defindex is worn as; two defindexes of one Cosmetic share them. */
+  readonly models: readonly string[];
 }
 
 function kindOf(classes: readonly ClassName[]): CosmeticKind {
@@ -101,22 +117,19 @@ function styleNames(
   });
 }
 
-function iconOf(webApiItem: WebApiSchemaItem | undefined): Cosmetic["backpackIcon"] {
-  const small = webApiItem?.image_url;
-  const large = webApiItem?.image_url_large;
-  return small && large ? { small, large } : null;
-}
-
 /**
  * Two defindexes under one display name are the same Cosmetic (ADR-0003) as long
- * as they are worn the same way. Anything else is a genuine collision.
+ * as they are worn identically — same slot, same Classes, same models. Anything
+ * else is two different items that happen to share a name, and must not merge
+ * silently.
  */
-function collisionDifference(candidates: readonly Candidate[]): string | undefined {
+function collisionDifference(candidates: readonly Candidate[]): CollisionDifference | undefined {
   const [first, ...rest] = candidates;
   if (!first) return undefined;
   for (const other of rest) {
     if (other.slot !== first.slot) return "slot";
-    if (other.classes.join(",") !== first.classes.join(",")) return "the Classes that can wear them";
+    if (other.classes.join(",") !== first.classes.join(",")) return "classes";
+    if (other.models.join(",") !== first.models.join(",")) return "models";
   }
   return undefined;
 }
@@ -152,14 +165,13 @@ export function buildCatalogue(inputs: CatalogueInputs): BuildResult {
     const classes = classesFor(item);
     candidates.push({
       defindex,
-      item,
       name,
       slot,
       classes,
       paintable: scalar(block(item, "capabilities"), "paintable") === "1",
       styles: styleNames(item, webApiItem, englishTokens),
-      backpackIcon: iconOf(webApiItem),
-      hasModel: hasWornModel(item, classes),
+      backpackIcon: backpackIconOf(webApiItem),
+      models: wornModels(item, classes),
     });
   }
 
@@ -179,16 +191,15 @@ export function buildCatalogue(inputs: CatalogueInputs): BuildResult {
     if (difference !== undefined) {
       throw new DisplayNameCollisionError(name, group.map((one) => one.defindex), difference);
     }
-    // The primary is the lowest defindex that actually has a model to render.
-    const primary = group.find((one) => one.hasModel) ?? group[0]!;
-    const aliases = group.filter((one) => one !== primary).map((one) => one.defindex);
+    // The group is in defindex order and every member has a model, so the lowest
+    // defindex is the primary the icon and the renders come from (ADR-0003).
+    const [primary, ...rest] = group as [Candidate, ...Candidate[]];
+    const aliases = rest.map((one) => one.defindex);
     aliasesMerged += aliases.length;
 
     const slug = slugify(name);
     const taken = slugs.get(slug);
-    if (taken !== undefined) {
-      throw new DisplayNameCollisionError(name, group.map((one) => one.defindex), `a slug already used by "${taken}"`);
-    }
+    if (taken !== undefined) throw new SlugCollisionError(name, taken, slug);
     slugs.set(slug, name);
 
     cosmetics.push({

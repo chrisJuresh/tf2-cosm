@@ -32,7 +32,8 @@ const MEDAL_TYPES = new Set(["#TF_Wearable_TournamentMedal", "#TF_Wearable_Commu
 /** Why an item that is nearly a Cosmetic was left out. */
 export type ExclusionReason = "not-wearable" | "medal" | "never-tradable" | "no-worn-model";
 
-export interface Style {
+/** One Style as items_game defines it, before its name is localised. */
+export interface StyleDefinition {
   readonly index: number;
   /** The name as items_game carries it — a localisation token for most Styles. */
   readonly nameToken: string | undefined;
@@ -71,7 +72,7 @@ export function isNeverTradable(item: ItemDefinition): boolean {
   return false;
 }
 
-export function stylesOf(item: ItemDefinition): Style[] {
+export function stylesOf(item: ItemDefinition): StyleDefinition[] {
   const styles = block(item, "visuals")?.["styles"];
   if (typeof styles !== "object") return [];
   return Object.entries(styles)
@@ -107,9 +108,21 @@ export function modelFor(source: ItemDefinition, className: ClassName): string |
  * wear; a Cosmetic has a model for at least one of its Classes, at item level or
  * in one of its Styles.
  */
-export function hasWornModel(item: ItemDefinition, classes: readonly ClassName[]): boolean {
+function hasWornModel(item: ItemDefinition, classes: readonly ClassName[]): boolean {
+  return wornModels(item, classes).length > 0;
+}
+
+/** Every worn model the item resolves to, at item level and in its Styles, sorted. */
+export function wornModels(item: ItemDefinition, classes: readonly ClassName[]): string[] {
   const sources = [item, ...stylesOf(item).map((style) => style.definition)];
-  return sources.some((source) => classes.some((className) => modelFor(source, className) !== undefined));
+  const paths = new Set<string>();
+  for (const source of sources) {
+    for (const className of classes) {
+      const path = modelFor(source, className);
+      if (path !== undefined) paths.add(path.toLowerCase());
+    }
+  }
+  return [...paths].sort();
 }
 
 /** The reason this item is not a Cosmetic, or undefined when it is one. */
@@ -119,8 +132,4 @@ export function exclusionReason(item: ItemDefinition): ExclusionReason | undefin
   if (isNeverTradable(item)) return "never-tradable";
   if (!hasWornModel(item, classesFor(item))) return "no-worn-model";
   return undefined;
-}
-
-export function isCosmetic(item: ItemDefinition): boolean {
-  return exclusionReason(item) === undefined;
 }

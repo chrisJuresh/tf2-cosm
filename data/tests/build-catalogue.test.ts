@@ -10,10 +10,19 @@ const bySlug = (slug: string) => {
 };
 
 describe("the Cosmetic rule over the shared fixture", () => {
-  it("keeps exactly the Cosmetics the shared oracle lists", () => {
+  it("keeps exactly the Cosmetics the shared oracle lists, as the oracle describes them", () => {
     const { catalogue } = buildCatalogue(fixtureInputs());
-    expect(catalogue.cosmetics.map((one) => ({ name: one.name, defindex: one.defindex }))).toEqual(
-      fixtureExpectedCosmetics().cosmetics.map((one) => ({ name: one.name, defindex: one.defindex })),
+    const shape = ({ name, defindex, aliases, slot, classes }: (typeof catalogue.cosmetics)[number]) => ({
+      name,
+      defindex,
+      aliases,
+      slot,
+      classes,
+    });
+    expect(catalogue.cosmetics.map(shape)).toEqual(
+      fixtureExpectedCosmetics()
+        .cosmetics.map(({ name, defindex, aliases, slot, classes }) => ({ name, defindex, aliases, slot, classes }))
+        .sort((left, right) => (left.name < right.name ? -1 : 1)),
     );
   });
 

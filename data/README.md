@@ -18,7 +18,7 @@ the repo root and fill in `STEAM_WEB_API_KEY`.
 | --- | --- |
 | `--tf <path>` | read item definitions from a local TF2 `tf` directory (default: `TF2_INSTALL_PATH`) |
 | `--mirror` | read them from the community daily mirror instead — no game install needed |
-| `--skip-web-api` | skip Valve's Web API: names come from the install's `tf_english.txt` and the catalogue carries no Backpack Icons. For checking the Cosmetic count without a key |
+| `--skip-web-api` | skip Valve's Web API and report the Cosmetic list from the local install alone, writing nothing. For checking the Cosmetic count without a key |
 | `--out <path>` | where to write (default `catalogue/catalogue.json`) |
 | `--dry-run` | build and report, write nothing |
 

@@ -21,6 +21,15 @@ export interface WebApiSchemaItem {
   readonly styles?: readonly { readonly name: string }[];
 }
 
+/** The Backpack Icon pair, or null when Valve published neither or only one. */
+export function backpackIconOf(
+  item: WebApiSchemaItem | undefined,
+): { small: string; large: string } | null {
+  const small = item?.image_url;
+  const large = item?.image_url_large;
+  return small && large ? { small, large } : null;
+}
+
 interface GetSchemaItemsResponse {
   readonly result?: {
     readonly status?: number;

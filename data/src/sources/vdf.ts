@@ -8,7 +8,7 @@
  */
 import * as vdf from "vdf-parser";
 
-import type { ItemDefinition, ItemsGameDocument } from "../catalogue/item-definition.ts";
+import { type ItemDefinition, type ItemsGameDocument, mergeBlocks } from "../catalogue/item-definition.ts";
 
 type Parsed = Record<string, unknown>;
 
@@ -16,7 +16,7 @@ function collapse(node: unknown): unknown {
   if (Array.isArray(node)) {
     const parts = node.map(collapse);
     if (parts.every((part) => typeof part === "object" && part !== null)) {
-      return parts.reduce<Parsed>((merged, part) => mergeBlocks(merged, part as Parsed), {});
+      return parts.reduce<ItemDefinition>((merged, part) => mergeBlocks(merged, part as ItemDefinition), {});
     }
     return parts.at(-1);
   }
@@ -24,18 +24,6 @@ function collapse(node: unknown): unknown {
     return Object.fromEntries(Object.entries(node).map(([key, value]) => [key, collapse(value)]));
   }
   return node;
-}
-
-function mergeBlocks(left: Parsed, right: Parsed): Parsed {
-  const merged: Parsed = { ...left };
-  for (const [key, value] of Object.entries(right)) {
-    const existing = merged[key];
-    merged[key] =
-      typeof value === "object" && value !== null && typeof existing === "object" && existing !== null
-        ? mergeBlocks(existing as Parsed, value as Parsed)
-        : value;
-  }
-  return merged;
 }
 
 function parseKeyValues(text: string): Parsed {

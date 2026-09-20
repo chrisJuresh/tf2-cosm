@@ -80,11 +80,41 @@ def display_name(name: str) -> str:
 
 
 def is_cosmetic(item: dict) -> bool:
-    return (
-        item.get("item_class") == "tf_wearable"
-        and item.get("item_slot") in COSMETIC_SLOTS
-        and item.get("item_type_name") not in MEDAL_TYPES
-    )
+    return exclusion_reason(item) is None
+
+
+def exclusion_reason(item: dict) -> str | None:
+    """Why this item is not a Cosmetic, or None when it is one.
+
+    The reasons are the same strings the catalogue data job reports, so both
+    implementations can be checked against fixtures/cosmetic-rule/.
+    """
+    if item.get("item_class") != "tf_wearable" or item.get("item_slot") not in COSMETIC_SLOTS:
+        return "not-wearable"
+    if item.get("item_type_name") in MEDAL_TYPES:
+        return "medal"
+    if never_tradable(item):
+        return "never-tradable"
+    # Craft components and tokens share the wearable item class but have nothing to wear.
+    if not has_worn_model(item):
+        return "no-worn-model"
+    return None
+
+
+def has_worn_model(item: dict) -> bool:
+    classes = classes_for(item)
+    sources = [item] + [s for _, s in styles_of(item) if s]
+    return any(model_for(src, cls) for src in sources for cls in classes)
+
+
+def classify(ig: dict, tokens: dict[str, str]):
+    """Yield (defindex, item, name, exclusion) for every item definition, prefabs applied."""
+    prefabs = ig["prefabs"]
+    for defindex, raw in ig["items"].items():
+        if defindex == "default":
+            continue
+        item = resolve_prefabs(raw, prefabs)
+        yield defindex, item, display_name(localized_name(item, tokens)), exclusion_reason(item)
 
 
 def never_tradable(item: dict) -> bool:
@@ -100,10 +130,16 @@ def never_tradable(item: dict) -> bool:
 
 
 def classes_for(item: dict) -> list[str]:
+    """The Classes that can wear the item, always in ALL_CLASSES order.
+
+    items_game lists them in no particular order; a fixed order keeps the output
+    stable and lets the catalogue data job be compared with this one.
+    """
     ubc = item.get("used_by_classes")
     if not ubc:
         return list(ALL_CLASSES)
-    return [c.lower() for c in ubc.keys() if c.lower() in ALL_CLASSES]
+    named = {c.lower() for c in ubc.keys()}
+    return [c for c in ALL_CLASSES if c in named]
 
 
 def model_for(source: dict, cls: str) -> str | None:
@@ -148,7 +184,6 @@ def main() -> int:
 
     ig = load_items_game(args.tf / "scripts/items/items_game.txt")
     tokens = load_tokens(args.tf / "resource/tf_english.txt")
-    prefabs = ig["prefabs"]
     misc = vpk.open(str(args.tf / "tf2_misc_dir.vpk"))
     vpk_paths = {p.lower(): p for p in misc}
 
@@ -158,27 +193,16 @@ def main() -> int:
     problems: list[tuple] = []
     by_name: dict[str, list[str]] = {}
 
-    for defindex, raw in ig["items"].items():
-        if defindex == "default":
-            continue
-        item = resolve_prefabs(raw, prefabs)
-        if not is_cosmetic(item):
-            continue
-        stats["cosmetics_incl_never_tradable"] += 1
-        name = display_name(localized_name(item, tokens))
-        if never_tradable(item):
-            stats["never_tradable"] += 1
-            if stats["never_tradable"] <= 8:
-                problems.append(("never-tradable (excluded)", defindex, name))
+    for defindex, item, name, exclusion in classify(ig, tokens):
+        if exclusion is not None:
+            if exclusion == "not-wearable":
+                continue
+            stats[f"{exclusion} (excluded)"] += 1
+            if stats[f"{exclusion} (excluded)"] <= 8:
+                problems.append((f"{exclusion} (excluded)", defindex, name))
             continue
         visuals = item.get("visuals") or {}
         classes = classes_for(item)
-        model_sources = [item] + [s for _, s in styles_of(item) if s]
-        if not any(model_for(src, cls) for src in model_sources for cls in classes):
-            # Craft components and tokens share the wearable item class but have nothing to wear.
-            stats["no_player_model (excluded)"] += 1
-            problems.append(("no player model (excluded)", defindex, name))
-            continue
         stats["cosmetics"] += 1
         by_name.setdefault(name, []).append(defindex)
         if only is not None and name.lower() not in only:
