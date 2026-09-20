@@ -4,7 +4,9 @@
   "type": "module",
   "scripts": {
     "build-catalogue": "pnpm --filter @tf2-cosm/data build-catalogue",
-    "test": "pnpm --filter @tf2-cosm/data test",
-    "typecheck": "pnpm --filter @tf2-cosm/data typecheck"
+    "dev": "pnpm --filter @tf2-cosm/site dev",
+    "build-site": "pnpm --filter @tf2-cosm/site build",
+    "test": "pnpm --recursive test",
+    "typecheck": "pnpm --recursive typecheck"
   }
 }

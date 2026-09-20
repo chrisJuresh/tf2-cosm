@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+/*
+ * Light and dark both follow the system, with no switch and nothing stored:
+ * `color-scheme` hands the browser's own chrome — scrollbars, form controls —
+ * the same scheme the page is painted in, and `light-dark()` picks the two
+ * colours the page itself sets. Everything else is a Tailwind utility with a
+ * `dark:` counterpart.
+ */
+:root {
+  color-scheme: light dark;
+}
+
+body {
+  background-color: light-dark(#ffffff, #101214);
+  color: light-dark(#15171a, #e8eaed);
+}

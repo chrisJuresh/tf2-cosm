@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "exports": {
+    "./catalogue": "./src/catalogue/schema.ts",
+    "./prices/metal": "./src/prices/metal.ts"
+  },
   "scripts": {
     "build-catalogue": "tsx src/cli.ts",
     "test": "vitest run",
