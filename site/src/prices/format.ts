@@ -14,12 +14,7 @@
 import type { Metal } from "@tf2-cosm/data/catalogue";
 import { formatRefined, scrapToRefined, traderNotation } from "@tf2-cosm/data/prices/metal";
 
-export const DOLLAR_BASIS_IDS = ["steam-market"] as const;
-
-export type DollarBasisId = (typeof DOLLAR_BASIS_IDS)[number];
-
 export interface DollarBasis {
-  readonly id: DollarBasisId;
   /** What the viewer is told a dollar means here. */
   readonly label: string;
   readonly dollarsPerRefined: number;
@@ -38,7 +33,6 @@ export function steamMarketBasis(keyPriceUsd: number, keyRate: Metal): DollarBas
     throw new Error(`a Key Rate must be a positive whole scrap count, got ${keyRate.scrap}`);
   }
   return {
-    id: "steam-market",
     label: "Steam Community Market",
     dollarsPerRefined: keyPriceUsd / scrapToRefined(keyRate.scrap),
   };

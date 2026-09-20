@@ -33,7 +33,9 @@ violates the schema fails the build rather than deploying.
   written here and one recorded in the catalogue come out of the same function.
 - `src/components/cosmetic-list.tsx` — the list, a client component fed the whole
   catalogue. Its rows are virtualised, so eighteen hundred of them with a picture
-  each scroll without the browser holding eighteen hundred rows.
+  each scroll without the browser holding eighteen hundred rows. A phone has room
+  for four columns across rather than five, so it carries the Metal Value on a
+  second line under the Cosmetic's name instead of dropping it.
 
 Styling is Tailwind utilities. Light and dark both follow the system colour
 scheme; there is no switch and nothing is stored.
@@ -45,13 +47,18 @@ pnpm test        # from the repo root: this package and the data job
 pnpm typecheck
 ```
 
-`tests/fixtures/catalogue.json` is the site's own copy of the document the data
-job builds from the shared Cosmetic oracle — five Cosmetics covering a price in
-Metal, a price in Keys, the cheapest price there is, Styles and an Unpriced item.
-Component tests render the list from it and assert what a viewer sees: the rows,
-their order, and the figures as they are written on screen. `tests/setup.ts`
-gives jsdom a fixed 1024×800 viewport, because a virtualised list in a DOM that
-lays nothing out would decide nothing is visible and render no rows.
+Component tests are driven from `data/tests/golden/catalogue.json` — the document
+the data job builds from the shared Cosmetic oracle, read where it lives rather
+than copied here, so a change to the catalogue's shape reaches these tests the
+moment it lands. Its five Cosmetics cover a price in Metal, a price in Keys, the
+cheapest price there is, Styles and an Unpriced item. The tests assert what a
+viewer sees: the rows, their order, and the figures as they are written on
+screen. `tests/setup.ts` gives jsdom a fixed 1024×800 viewport, because a
+virtualised list in a DOM that lays nothing out would decide nothing is visible
+and render no rows.
+
+jsdom applies no stylesheet, so nothing here can assert the responsive layout;
+phone width is checked in a real browser.
 
 ## Two TypeScript versions in one repository
 

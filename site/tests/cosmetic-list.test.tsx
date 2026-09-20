@@ -78,6 +78,16 @@ describe("the Cosmetic list", () => {
     ]);
   });
 
+  it("tells a screen reader how many rows there are, counting the header among them", () => {
+    // Only a screenful of rows is ever in the DOM, so the count and each row's
+    // index have to be stated rather than counted off the page — and the last
+    // Cosmetic must not come out as "row 1,834 of 1,833".
+    const rows = renderList();
+    const table = screen.getByRole("table");
+    expect(table).toHaveAttribute("aria-rowcount", "6");
+    expect(rows.map((row) => row.getAttribute("aria-rowindex"))).toEqual(["2", "3", "4", "5", "6"]);
+  });
+
   it("addresses each row by the Cosmetic's slug, so a later per-item page can link to it", () => {
     const rows = renderList();
     expect(rows.map((row) => row.getAttribute("data-slug"))).toEqual([
