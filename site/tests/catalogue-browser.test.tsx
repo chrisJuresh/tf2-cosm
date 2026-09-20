@@ -87,6 +87,13 @@ describe("the hide All-Class toggle", () => {
     await user.click(screen.getByRole("checkbox", HIDE_ALL_CLASS));
     expect(namesShown().toSorted()).toEqual(["Team Captain", "Tin Pot"]);
   });
+
+  it("cannot be worked outside a Class View, where it has nothing to focus", async () => {
+    const user = renderBrowser();
+    await waitFor(() => expect(screen.getByRole("checkbox", HIDE_ALL_CLASS)).toBeDisabled());
+    await user.selectOptions(screen.getByRole("combobox", CLASS_PICKER), "soldier");
+    expect(screen.getByRole("checkbox", HIDE_ALL_CLASS)).toBeEnabled();
+  });
 });
 
 describe("the slot filter", () => {
@@ -212,6 +219,9 @@ describe("what the browser remembers", () => {
 describe("working the controls from the keyboard", () => {
   it("reaches every one of them by tabbing, in the order they are read", async () => {
     const user = renderBrowser();
+    // In a Class View, where all six are live.
+    await user.selectOptions(screen.getByRole("combobox", CLASS_PICKER), "soldier");
+    (document.activeElement as HTMLElement | null)?.blur();
     const inTabOrder = [
       screen.getByRole("searchbox", SEARCH_BOX),
       screen.getByRole("combobox", CLASS_PICKER),

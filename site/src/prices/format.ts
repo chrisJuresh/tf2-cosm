@@ -155,15 +155,11 @@ export function dollarsFor(metal: Metal, basis: DollarBasis | null): number | nu
  * not know; saying which of the three reasons it is says that the snapshot
  * looked and this is what it found.
  */
-const UNPRICED_REASON_LABELS: Record<UnpricedReason, string> = {
+export const UNPRICED_REASON_LABELS: Record<UnpricedReason, string> = {
   "missing-from-source": "not listed",
   "no-reference-variant": "no priced Quality",
   "unsupported-currency": "currency unknown",
 };
-
-export function unpricedReasonLabel(reason: UnpricedReason): string {
-  return UNPRICED_REASON_LABELS[reason];
-}
 
 const DOLLARS = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" });
 

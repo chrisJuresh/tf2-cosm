@@ -37,17 +37,17 @@ function oneOf<T extends string>(allowed: readonly T[], value: unknown, fallback
   return typeof value === "string" && (allowed as readonly string[]).includes(value) ? (value as T) : fallback;
 }
 
-function boolean(value: unknown, fallback: boolean): boolean {
+function asBoolean(value: unknown, fallback: boolean): boolean {
   return typeof value === "boolean" ? value : fallback;
 }
 
-function rememberedFrom(document: Record<string, unknown>): RememberedControls {
+function rememberedFrom(stored: Record<string, unknown>): RememberedControls {
   return {
-    classView: oneOf<ClassName>(CLASSES, document["classView"], DEFAULT_CONTROLS.classView),
-    hideAllClass: boolean(document["hideAllClass"], DEFAULT_CONTROLS.hideAllClass),
-    slot: oneOf<CosmeticSlot>(COSMETIC_SLOTS, document["slot"], DEFAULT_CONTROLS.slot),
-    hideUnpriced: boolean(document["hideUnpriced"], DEFAULT_CONTROLS.hideUnpriced),
-    sort: oneOf<SortOrder>(SORT_ORDERS, document["sort"], DEFAULT_CONTROLS.sort) ?? DEFAULT_CONTROLS.sort,
+    classView: oneOf<ClassName>(CLASSES, stored["classView"], DEFAULT_CONTROLS.classView),
+    hideAllClass: asBoolean(stored["hideAllClass"], DEFAULT_CONTROLS.hideAllClass),
+    slot: oneOf<CosmeticSlot>(COSMETIC_SLOTS, stored["slot"], DEFAULT_CONTROLS.slot),
+    hideUnpriced: asBoolean(stored["hideUnpriced"], DEFAULT_CONTROLS.hideUnpriced),
+    sort: oneOf<SortOrder>(SORT_ORDERS, stored["sort"], DEFAULT_CONTROLS.sort) ?? DEFAULT_CONTROLS.sort,
   };
 }
 
@@ -61,15 +61,15 @@ export function readControls(storage: Storage | null): BrowsingControls {
   }
   if (raw === null) return DEFAULT_CONTROLS;
 
-  let document: unknown;
+  let stored: unknown;
   try {
-    document = JSON.parse(raw);
+    stored = JSON.parse(raw);
   } catch {
     return DEFAULT_CONTROLS;
   }
-  if (typeof document !== "object" || document === null || Array.isArray(document)) return DEFAULT_CONTROLS;
+  if (typeof stored !== "object" || stored === null || Array.isArray(stored)) return DEFAULT_CONTROLS;
 
-  return { ...DEFAULT_CONTROLS, ...rememberedFrom(document as Record<string, unknown>) };
+  return { ...DEFAULT_CONTROLS, ...rememberedFrom(stored as Record<string, unknown>) };
 }
 
 /** Remembers the controls, or quietly does not when the browser will not have it. */

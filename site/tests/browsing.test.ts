@@ -54,7 +54,7 @@ describe("hiding All-Class Cosmetics", () => {
     expect(slugsOf({ classView: "soldier", hideAllClass: true })).not.toContain("ghastly-gibus");
   });
 
-  it("leaves Multi-Class Cosmetics alone: a hat two Classes wear is still that Class's hat", () => {
+  it("leaves Multi-Class Cosmetics alone: one two Classes wear is still that Class's", () => {
     expect(slugsOf({ classView: "soldier", hideAllClass: true }).toSorted()).toEqual(["team-captain", "tin-pot"]);
   });
 

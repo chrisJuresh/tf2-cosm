@@ -45,7 +45,7 @@ import {
   formatDollars,
   formatMetalValue,
   formatTraderNotation,
-  unpricedReasonLabel,
+  UNPRICED_REASON_LABELS,
 } from "@/prices/format";
 
 /** What a figure reads as when there is nothing to put there. */
@@ -123,7 +123,7 @@ function figuresFor(cosmetic: Cosmetic, keyRate: Metal | null, basis: DollarBasi
   if (price.state === "unpriced") {
     return {
       notation: "Unpriced",
-      reason: unpricedReasonLabel(price.reason),
+      reason: UNPRICED_REASON_LABELS[price.reason],
       metalValue: NOTHING,
       dollars: NOTHING,
     };

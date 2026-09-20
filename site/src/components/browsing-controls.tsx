@@ -12,7 +12,7 @@
  * rules are `@/browsing/controls`, and this file only says which values a viewer
  * can pick.
  */
-import { CLASSES, COSMETIC_SLOTS, type ClassName, type CosmeticSlot } from "@tf2-cosm/data/catalogue";
+import { CLASSES, COSMETIC_SLOTS } from "@tf2-cosm/data/catalogue";
 import type { ChangeEvent } from "react";
 
 import {
@@ -51,24 +51,72 @@ const CONTROL =
   " focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current" +
   " dark:border-white/20 dark:bg-white/5";
 
+/**
+ * A filter that is either one value or no filter at all. Both the Class View and
+ * the slot are that shape, and the empty option standing for "no filter" is a
+ * convention worth having in one place rather than two.
+ */
+function NullablePicker<T extends string>({
+  id,
+  label,
+  everything,
+  options,
+  labels,
+  value,
+  onPick,
+}: {
+  id: string;
+  label: string;
+  /** What the empty option is called — "Every Class", "Head and misc". */
+  everything: string;
+  options: readonly T[];
+  labels: Record<T, string>;
+  value: T | null;
+  onPick: (value: T | null) => void;
+}) {
+  return (
+    <Field label={label} htmlFor={id}>
+      <select
+        id={id}
+        value={value ?? ""}
+        onChange={(event) => onPick(event.target.value === "" ? null : (event.target.value as T))}
+        className={CONTROL}
+      >
+        <option value="">{everything}</option>
+        {options.map((option) => (
+          <option key={option} value={option}>
+            {labels[option]}
+          </option>
+        ))}
+      </select>
+    </Field>
+  );
+}
+
 /** A labelled checkbox, sized for a thumb as much as for a pointer. */
 function Toggle({
   id,
   label,
   checked,
+  disabled = false,
   onChange,
 }: {
   id: string;
   label: string;
   checked: boolean;
+  disabled?: boolean;
   onChange: (checked: boolean) => void;
 }) {
   return (
-    <label htmlFor={id} className="flex cursor-pointer items-center gap-2 py-1 text-sm">
+    <label
+      htmlFor={id}
+      className={`flex items-center gap-2 py-1 text-sm ${disabled ? "cursor-default opacity-50" : "cursor-pointer"}`}
+    >
       <input
         id={id}
         type="checkbox"
         checked={checked}
+        disabled={disabled}
         onChange={(event: ChangeEvent<HTMLInputElement>) => onChange(event.target.checked)}
         className="size-4 accent-current focus-visible:outline-2 focus-visible:outline-offset-2"
       />
@@ -93,54 +141,37 @@ export function BrowsingControlsBar({ controls, onChange, shown, total }: Browsi
       {/* The search is first because it is the control most often wanted, and a
           phone shows it across the full width before the pickers wrap under it. */}
       <div className="grid grid-cols-2 gap-x-3 gap-y-2 sm:grid-cols-[minmax(0,1fr)_8rem_8rem_12rem]">
-        <Field label="Search" htmlFor="search" className="col-span-2 sm:col-span-1">
+        <Field label="Search by name" htmlFor="search" className="col-span-2 sm:col-span-1">
           <input
             id="search"
             type="search"
             value={controls.search}
             placeholder="Name"
-            aria-label="Search by name"
             autoComplete="off"
             onChange={(event) => onChange({ search: event.target.value })}
             className={CONTROL}
           />
         </Field>
 
-        <Field label="Class" htmlFor="class-view">
-          <select
-            id="class-view"
-            value={controls.classView ?? ""}
-            onChange={(event) =>
-              onChange({ classView: event.target.value === "" ? null : (event.target.value as ClassName) })
-            }
-            className={CONTROL}
-          >
-            <option value="">Every Class</option>
-            {CLASSES.map((className) => (
-              <option key={className} value={className}>
-                {CLASS_LABELS[className]}
-              </option>
-            ))}
-          </select>
-        </Field>
+        <NullablePicker
+          id="class-view"
+          label="Class"
+          everything="Every Class"
+          options={CLASSES}
+          labels={CLASS_LABELS}
+          value={controls.classView}
+          onPick={(classView) => onChange({ classView })}
+        />
 
-        <Field label="Slot" htmlFor="slot">
-          <select
-            id="slot"
-            value={controls.slot ?? ""}
-            onChange={(event) =>
-              onChange({ slot: event.target.value === "" ? null : (event.target.value as CosmeticSlot) })
-            }
-            className={CONTROL}
-          >
-            <option value="">Head and misc</option>
-            {COSMETIC_SLOTS.map((slot) => (
-              <option key={slot} value={slot}>
-                {SLOT_LABELS[slot]}
-              </option>
-            ))}
-          </select>
-        </Field>
+        <NullablePicker
+          id="slot"
+          label="Slot"
+          everything="Head and misc"
+          options={COSMETIC_SLOTS}
+          labels={SLOT_LABELS}
+          value={controls.slot}
+          onPick={(slot) => onChange({ slot })}
+        />
 
         <Field label="Sort by" htmlFor="sort">
           <select
@@ -159,10 +190,13 @@ export function BrowsingControlsBar({ controls, onChange, shown, total }: Browsi
       </div>
 
       <div className="flex flex-wrap items-center gap-x-5 gap-y-1">
+        {/* The toggle focuses a Class View, so outside one there is nothing for
+            it to do; it is disabled rather than left to tick and change nothing. */}
         <Toggle
           id="hide-all-class"
           label="Hide All-Class Cosmetics"
           checked={controls.hideAllClass}
+          disabled={controls.classView === null}
           onChange={(checked) => onChange({ hideAllClass: checked })}
         />
         <Toggle

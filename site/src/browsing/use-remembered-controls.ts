@@ -33,10 +33,14 @@ export function useRememberedControls(): readonly [BrowsingControls, (change: Pa
     setState({ controls: readControls(browserStorage()), restored: true });
   }, []);
 
+  // Only the remembered fields are watched. The search is not one of them, and
+  // waking this up on every keystroke to write the same bytes back is work for
+  // nothing.
+  const { classView, hideAllClass, slot, hideUnpriced, sort } = state.controls;
   useEffect(() => {
     if (!state.restored) return;
-    writeControls(browserStorage(), state.controls);
-  }, [state]);
+    writeControls(browserStorage(), { ...DEFAULT_CONTROLS, classView, hideAllClass, slot, hideUnpriced, sort });
+  }, [state.restored, classView, hideAllClass, slot, hideUnpriced, sort]);
 
   const change = useCallback((patch: Partial<BrowsingControls>) => {
     setState((previous) => ({ ...previous, controls: { ...previous.controls, ...patch } }));
