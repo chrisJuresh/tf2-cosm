@@ -40,10 +40,17 @@ on a line of its own, with a reason:
 No issue: syncing the guard from upstream.
 ```
 
-`.claude/hooks/pr-closes-issue.py` enforces this: it reads the body the PR would get, by
-whichever route `gh` would take, and denies `gh pr create` and `land.py` when that body
-would close nothing. It fails open on anything it cannot read. `tests/test_pr_closes_issue.py`
-is its suite. The operator's switches are `CLAUDE_PR_CLOSES_ISSUE=off` and `=warn`.
+Two things enforce this, and they cover different routes:
+
+- `.claude/hooks/pr-closes-issue.py` reads the body the PR would get, by whichever route
+  `gh` would take, and denies `gh pr create` and `land.py` when that body would close
+  nothing. It fails open on anything it cannot read. `tests/test_pr_closes_issue.py` is its
+  suite; the operator's switches are `CLAUDE_PR_CLOSES_ISSUE=off` and `=warn`. It catches a
+  `gh pr create` typed by hand, which is the route `land.py` cannot see.
+- `"requireIssueReference": true` in `.claude/worktree-per-change.json` makes `land.py`
+  refuse the same thing from inside, just before it calls `gh pr create`. That one survives
+  a session whose hooks are off, since it is the script's own check rather than the
+  harness's.
 
 Closing by hand with `gh issue close` stays correct for an issue that no pull request
 delivers — one answered in discussion, or one that turns out to be already done.
