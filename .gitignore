@@ -32,6 +32,12 @@ jobs.json
 /renders/
 # The link `site/scripts/link-renders.mjs` makes so a local run is servable in development.
 /site/public/renders
+# Everything the end-to-end suite builds for itself: the fixture data folder it builds the
+# site from, the placeholder images it serves at /renders, and the built site it serves.
+/site/.e2e/
+# Playwright's own output: the HTML report and a failed run's traces.
+/site/playwright-report/
+/site/test-results/
 assets-cache/
 *.mdl
 *.vvd

@@ -74,7 +74,7 @@ export function CatalogueView({ catalogue, manifest }: CatalogueViewProps) {
               </>
             )}
           </p>
-          <p className="text-xs text-black/50 dark:text-white/50">
+          <p className="text-xs text-black/55 dark:text-white/55">
             Snapshot taken <Moment iso={header.snapshotTakenAt} />
             {/* When the snapshot was taken is not when the rate it quotes was:
                 a price source's estimate can be weeks old by the time a run

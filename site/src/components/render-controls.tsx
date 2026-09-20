@@ -49,7 +49,7 @@ function Choice({ label, chosen, onChoose }: { label: string; chosen: boolean; o
 function Switcher({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div role="group" aria-label={label} className="flex flex-wrap items-center gap-1">
-      <span aria-hidden className="pr-1 text-[0.625rem] uppercase tracking-wide text-black/50 dark:text-white/50">
+      <span aria-hidden className="pr-1 text-[0.625rem] uppercase tracking-wide text-black/55 dark:text-white/55">
         {label}
       </span>
       {children}

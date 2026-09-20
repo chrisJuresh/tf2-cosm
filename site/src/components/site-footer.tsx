@@ -25,7 +25,7 @@ const CREDITS: readonly Credit[] = [
 
 export function SiteFooter() {
   return (
-    <footer className="mx-auto w-full max-w-5xl px-4 py-3 text-xs text-black/50 sm:px-6 dark:text-white/50">
+    <footer className="mx-auto w-full max-w-5xl px-4 py-3 text-xs text-black/55 sm:px-6 dark:text-white/55">
       <ul className="flex flex-wrap gap-x-4 gap-y-1">
         {CREDITS.map((credit) => (
           <li key={credit.name}>

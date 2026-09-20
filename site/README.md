@@ -18,7 +18,18 @@ It reads the two files the other two jobs commit — `catalogue/catalogue.json` 
 a row of it. Either one violating its contract fails the build rather than
 deploying a page of wrong numbers or missing pictures.
 
-The site's only setting is where the images live (below). Every rate it quotes — the Key Rate,
+Which folder those two come out of is configuration, and `catalogue/` is only
+its default:
+
+```bash
+CATALOGUE_DIR=/somewhere/else    # the folder holding catalogue.json and renders.json
+```
+
+That exists for the end-to-end suite, which builds the whole site from the
+fixture pair — a build driven by the committed snapshot could only ever prove
+the page works for today's prices.
+
+The site's other setting is where the images live (below). Every rate it quotes — the Key Rate,
 and each of the three Dollar Bases a dollar figure can be computed from — comes
 out of the catalogue header, so there is nowhere for a number on the page to have
 come from but the snapshot. A rate's own date is shown alongside the snapshot's,
@@ -58,9 +69,12 @@ its icon, which is what production does for an unrendered Cosmetic too.
 - `src/components/catalogue-view.tsx` — the header, the Dollar Basis switch and
   the list. The active basis lives here because it is the one thing the header
   and every row have to agree on.
+- `src/catalogue/source.ts` — the one seam both documents are read through: which
+  folder they come from, and the message a build gets when one of them is
+  missing, is not JSON, or does not match its schema.
 - `src/catalogue/load.ts`, `src/renders/load.ts` — the catalogue and the render
-  manifest, imported as modules so both documents are baked into the static
-  output, and validated before use.
+  manifest themselves, read while the page is being built, so both documents are
+  baked into the static output, and validated before use.
 - `src/renders/manifest.ts` — the manifest's contract in TypeScript. The render
   job is in Python, so this contract exists twice;
   `tests/test_site_render_manifest.py` at the repo root runs the site's fixture
@@ -171,7 +185,52 @@ and the footer apart from each other and neither can see whether the page puts
 them on the same screen.
 
 jsdom applies no stylesheet, so nothing here can assert the responsive layout;
-phone width is checked in a real browser.
+phone width is checked in a real browser, below.
+
+## End to end, in a real browser
+
+```bash
+pnpm test-e2e                    # from the repo root
+pnpm --filter @tf2-cosm/site exec playwright install chromium   # once, per machine
+```
+
+`e2e/` is the suite that builds the site and drives it. It is slow and it is
+small on purpose: every rule the page follows is already covered above, against
+the same fixtures, and what a component test cannot see is whether the exported
+HTML, the hydrated JavaScript, the stylesheet and the images add up to one
+working page.
+
+- `e2e/fixture-site.mjs` builds it. The subject is not the committed snapshot —
+  eighteen hundred Cosmetics whose prices move every run, beside a manifest that
+  is empty until somebody has rendered something locally — but the fixture pair
+  the rest of the suite uses, put in a folder of its own and pointed at with
+  `CATALOGUE_DIR`. The images the manifest names are 1×1 placeholders written
+  there too: the manifest records that an image was produced and how big it is,
+  and what is in the file is the render job's business.
+- `e2e/serve.mjs` serves it: the export as plain files, with the placeholder
+  renders mounted at `/renders`. Fifty lines rather than a dependency, and
+  anything neither folder has is a 404, which the suite treats as a failure.
+- `e2e/catalogue-page.ts` intercepts every request that would leave the machine.
+  Valve's icon CDN is answered with a placeholder, because the fixture
+  catalogue's icon URLs are made-up hashes and a suite that needs the internet
+  fails for reasons that are nobody's fault. Anything else leaving the page is a
+  fault in its own right — the site is meant to have no server, no analytics and
+  no third party but that CDN — and this is the one place that can check it.
+- `e2e/smoke.spec.ts` does what a viewer does: loads the page, filters to a
+  Class, types a search, opens a row and works its Style switcher and Team
+  toggle. Every test also asserts the browser logged nothing and that every
+  picture actually decoded.
+- `e2e/accessibility.spec.ts` runs axe over the list, over an open row, and over
+  both again in dark mode, and then asks the question axe cannot: whether the
+  bar can be *worked* from the keyboard — every control named, reached by Tab,
+  and visibly focused, and a row that opens, closes and hands the focus back.
+- `e2e/build-validation.spec.ts` runs `next build` against a broken catalogue and
+  a broken manifest and reads what it printed. `tests/source.test.ts` says the
+  loader throws; this says the build does.
+
+Everything runs on a desktop and on an emulated phone, one worker at a time —
+the builds are the expensive part, and the build-validation tests run one of
+their own.
 
 ## Two TypeScript versions in one repository
 
@@ -181,9 +240,6 @@ not run against 7, so this package pins `typescript@5`. Both are checked by
 `pnpm typecheck` at the root.
 
 ## Not here yet
-
-The end-to-end smoke test, the accessibility pass and the check that the build
-refuses invalid input are #17.
 
 The whole catalogue and the whole manifest are handed to the client as one
 payload each, which is what makes the exported HTML large; trimming both to the
