@@ -39,7 +39,7 @@ const SPREAD_ENDS = [
 function Field({ term, children }: { term: string; children: ReactNode }) {
   return (
     <div className="flex flex-col gap-0.5">
-      <dt className="text-[0.625rem] uppercase tracking-wide text-black/50 sm:text-[0.6875rem] dark:text-white/50">
+      <dt className="text-[0.625rem] uppercase tracking-wide text-black/55 sm:text-[0.6875rem] dark:text-white/55">
         {term}
       </dt>
       <dd>{children}</dd>
@@ -96,7 +96,7 @@ export function CosmeticDetail({ cosmetic, keyRate, manifest, gameClass, id }: C
                 {SPREAD_ENDS.map((end, index) => (
                   <span key={end.key}>
                     {index === 0 ? null : " · "}
-                    <span className="text-black/50 dark:text-white/50">{end.label}</span>{" "}
+                    <span className="text-black/55 dark:text-white/55">{end.label}</span>{" "}
                     {formatTraderNotation(price.spread[end.key].metal, keyRate)}
                   </span>
                 ))}

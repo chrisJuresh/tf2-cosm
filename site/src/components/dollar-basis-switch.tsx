@@ -76,7 +76,12 @@ export function DollarBasisSwitch({ offered, active, onChoose }: DollarBasisSwit
               className="sr-only"
             />
             <span>{basis.label}</span>
-            <span className="tabular-nums text-black/55 dark:text-white/55">
+            {/* The rate is secondary to the name beside it, but it is secondary
+                on a lifted surface rather than on the page: in dark mode the
+                chosen option is two washes of white above the background, and a
+                grey that reads against #101214 does not read against that. So
+                the dark half is less faint than the light half, deliberately. */}
+            <span className="tabular-nums text-black/55 dark:text-white/70">
               {formatDollars(basis.usdPerKey)} a Key
             </span>
           </label>
