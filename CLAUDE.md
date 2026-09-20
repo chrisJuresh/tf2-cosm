@@ -18,11 +18,16 @@ Single-context: `CONTEXT.md` and `docs/adr/` at the repo root. See `docs/agents/
 
 - `CONTEXT.md` — glossary (the ubiquitous language). `docs/adr/` — decision records. Read both before changing the model.
 - `render/` — Python render job (spike stage). `resolve.py` (schema → jobs), `extract.py` (archive → cache), `mdlinfo.py` (model bodygroups/skins), `spike_import.py` (Blender: import, attach, skin, frame, render).
+- `data/` — TypeScript catalogue data job (pnpm workspace). `src/catalogue/build.ts` is the pure builder every test drives; `src/sources/` holds the thin adapters. See `data/README.md`.
+- `fixtures/cosmetic-rule/` — the shared oracle for which items are Cosmetics; both `data/` and `render/resolve.py` are tested against it. See its README.
+- `catalogue/` — the built catalogue file and its JSON Schema.
 - `assets-cache/`, `renders/` — extracted game files and rendered images; gitignored, never commit.
 - Specs live as GitHub issues labelled `spec`; tickets hang off them.
 
 ## Running things locally
 
+- Node env: pnpm workspace at the repo root, package `data`. Secrets come from `.env` at the root (copy `.env.example`); never commit it.
+- Build the catalogue: `pnpm build-catalogue` (add `--dry-run` to write nothing, `--skip-web-api` to check the Cosmetic count without a Steam Web API key). Tests: `pnpm test`; types: `pnpm typecheck`.
 - Python env: `.venv` (Python 3.14) with `vdf`, `vpk`, `pillow` (`render/requirements.txt`). Use `./.venv/Scripts/python.exe`.
 - Blender 5.2 at `C:/Program Files/Blender Foundation/Blender 5.2/blender.exe` (bundled Python 3.13). SourceIO 5.5.4 is installed as a legacy add-on at `%APPDATA%/Blender Foundation/Blender/5.2/scripts/addons/SourceIO` and enabled per run by the script.
 - TF2 install: `C:/Program Files (x86)/Steam/steamapps/common/Team Fortress 2/tf` (items_game.txt and tf_english.txt loose; models in `tf2_misc_dir.vpk`, textures in `tf2_textures_dir.vpk`).

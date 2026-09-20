@@ -1,0 +1,595 @@
+// Shared Cosmetic-rule fixture: a trimmed excerpt of the game's items_game.txt.
+// Both the catalogue data job (TypeScript) and the render job's resolve step (Python)
+// read this file and must agree on which of these items are Cosmetics.
+// See fixtures/cosmetic-rule/README.md. Regenerate by hand; do not edit the game's file.
+"items_game"
+{
+	"prefabs"
+	{
+		"ash_remains"
+		{
+			"item_class"		"craft_item"
+			"craft_material_type"		"craft_material_burned"
+			"item_type_name"		"#TF_Ash_Type"
+			"show_in_armory"		"0"
+			"image_inventory"		"backpack/crafting/ash"
+			"image_inventory_size_w"		"128"
+			"image_inventory_size_h"		"82"
+			"item_quality"		"unique"
+			"propername"		"0"
+			"min_ilevel"		"1"
+			"max_ilevel"		"1"
+		}
+		"base_hat"
+		{
+			"public_prefab"		"1"
+			"prefab"		"cosmetic_killeater_attribs"
+			"static_attrs"
+			{
+				"cosmetic_allow_inspect"		"1"
+			}
+		}
+		"base_misc"
+		{
+			"public_prefab"		"1"
+			"prefab"		"cosmetic_killeater_attribs"
+			"static_attrs"
+			{
+				"cosmetic_allow_inspect"		"1"
+			}
+		}
+		"cosmetic"
+		{
+			"public_prefab"		"1"
+			"triangle_budget_lod0"		"1400"
+			"triangle_budget_lod1"		"1000"
+			"triangle_budget_lod2"		"700"
+			"qc_template"		"scripts/itemtest_qc_template_misc.txt"
+			"loadondemand"		"1"
+			"capabilities"
+			{
+				"nameable"		"1"
+				"can_craft_if_purchased"		"1"
+			}
+			"show_in_armory"		"1"
+			"item_class"		"tf_wearable"
+			"item_quality"		"unique"
+			"item_slot"		"misc"
+			"image_inventory_size_w"		"128"
+			"image_inventory_size_h"		"82"
+			"drop_type"		"none"
+			"craft_class"		"hat"
+			"craft_material_type"		"hat"
+			"mouse_pressed_sound"		"ui/item_default_pickup.wav"
+			"drop_sound"		"ui/item_default_drop.wav"
+		}
+		"cosmetic_killeater_attribs"
+		{
+			"public_prefab"		"1"
+			"tags"
+			{
+				"is_cosmetic"		"1"
+			}
+			"attributes"
+			{
+				"kill eater score type"
+				{
+					"attribute_class"		"kill_eater_score_type"
+					"value"		"64"
+				}
+				"kill eater kill type"
+				{
+					"attribute_class"		"kill_eater_kill_type"
+					"value"		"64"
+				}
+			}
+		}
+		"hat"
+		{
+			"public_prefab"		"1"
+			"prefab"		"cosmetic base_hat"
+			"qc_template"		"scripts/itemtest_qc_template_hat.txt"
+			"item_type_name"		"#TF_Wearable_Hat"
+			"item_slot"		"head"
+			"equip_region"		"hat"
+			"visuals"
+			{
+				"player_bodygroups"
+				{
+					"hat"		"1"
+				}
+			}
+			"mouse_pressed_sound"		"ui/item_hat_pickup.wav"
+			"drop_sound"		"ui/item_hat_drop.wav"
+		}
+		"tournament_medal"
+		{
+			"prefab"		"base_misc"
+			"loadondemand"		"1"
+			"item_class"		"tf_wearable"
+			"craft_class"		""
+			"craft_material_type"		""
+			"capabilities"
+			{
+			}
+			"show_in_armory"		"0"
+			"armory_remap"		"Tournament Medal (Armory)"
+			"item_type_name"		"#TF_Wearable_TournamentMedal"
+			"item_slot"		"misc"
+			"equip_region"		"medal"
+			"item_quality"		"unique"
+			"min_ilevel"		"25"
+			"max_ilevel"		"25"
+			"image_inventory_size_w"		"128"
+			"image_inventory_size_h"		"82"
+			"drop_type"		"none"
+			"used_by_classes"
+			{
+				"scout"		"1"
+				"sniper"		"1"
+				"soldier"		"1"
+				"demoman"		"1"
+				"medic"		"1"
+				"heavy"		"1"
+				"spy"		"1"
+				"engineer"		"1"
+				"pyro"		"1"
+			}
+			"attributes"
+			{
+				"cannot trade"
+				{
+					"attribute_class"		"cannot_trade"
+					"value"		"1"
+				}
+			}
+			"mouse_pressed_sound"		"ui/item_metal_tiny_pickup.wav"
+			"drop_sound"		"ui/item_metal_tiny_drop.wav"
+		}
+		"triad_trinket"
+		{
+			"first_sale_date"		"2012/08/02"
+			"prefab"		"base_misc"
+			"enabled"		"1"
+			"item_class"		"tf_wearable"
+			"loadondemand"		"1"
+			"craft_class"		"hat"
+			"craft_material_type"		"hat"
+			"capabilities"
+			{
+				"nameable"		"1"
+				"can_craft_count"		"1"
+				"can_craft_if_purchased"		"1"
+			}
+			"item_type_name"		"#TF_Wearable_Apparel"
+			"item_name"		"#TF_SD_Chain"
+			"item_description"		"#TF_SD_Chain_Desc"
+			"item_slot"		"misc"
+			"equip_region"		"shirt"
+			"propername"		"1"
+			"show_in_armory"		"1"
+			"item_quality"		"unique"
+			"drop_type"		"none"
+			"image_inventory"		"backpack/workshop_partner/player/items/all_class/sd_shirt/sd_shirt_sniper"
+			"image_inventory_size_w"		"128"
+			"image_inventory_size_h"		"82"
+			"xifier_class_remap"		"triad_trinket"
+			"model_player_per_class"
+			{
+				"scout"		"models/workshop_partner/player/items/all_class/sd_shirt/sd_shirt_scout.mdl"
+				"sniper"		"models/workshop_partner/player/items/all_class/sd_shirt/sd_shirt_sniper.mdl"
+				"heavy"		"models/workshop_partner/player/items/all_class/sd_shirt/sd_shirt_heavy.mdl"
+				"spy"		"models/workshop_partner/player/items/all_class/sd_shirt/sd_shirt_spy.mdl"
+				"engineer"		"models/workshop_partner/player/items/all_class/sd_shirt/sd_shirt_engineer.mdl"
+			}
+			"used_by_classes"
+			{
+				"scout"		"1"
+				"sniper"		"1"
+				"heavy"		"1"
+				"spy"		"1"
+				"engineer"		"1"
+			}
+			"visuals"
+			{
+				"styles"
+				{
+					"0"
+					{
+						"skin_red"		"0"
+						"skin_blu"		"1"
+						"name"		"#TF_SD_Chain_Style0"
+					}
+					"1"
+					{
+						"skin_red"		"2"
+						"skin_blu"		"3"
+						"name"		"#TF_SD_Chain_Style1"
+					}
+				}
+			}
+			"mouse_pressed_sound"		"ui/item_hat_pickup.wav"
+			"drop_sound"		"ui/item_hat_drop.wav"
+		}
+		"valve"
+		{
+		}
+	}
+	"items"
+	{
+		"94"
+		{
+			"name"		"Texas Ten Gallon"
+			"prefab"		"valve base_hat"
+			"first_sale_date"		"2010/09/29"
+			"item_class"		"tf_wearable"
+			"loadondemand"		"1"
+			"craft_class"		"hat"
+			"craft_material_type"		"hat"
+			"capabilities"
+			{
+				"nameable"		"1"
+				"paintable"		"1"
+				"can_craft_if_purchased"		"1"
+			}
+			"show_in_armory"		"1"
+			"item_type_name"		"#TF_Wearable_Hat"
+			"item_name"		"#TF_Engineer_Cowboy_Hat"
+			"item_description"		"#TF_Engineer_Cowboy_Hat_Desc"
+			"item_slot"		"head"
+			"equip_region"		"hat"
+			"item_quality"		"unique"
+			"image_inventory"		"backpack/player/items/engineer/engineer_cowboy_hat"
+			"image_inventory_size_w"		"128"
+			"image_inventory_size_h"		"82"
+			"model_player"		"models/player/items/engineer/engineer_cowboy_hat.mdl"
+			"drop_type"		"drop"
+			"used_by_classes"
+			{
+				"engineer"		"1"
+			}
+			"visuals"
+			{
+				"player_bodygroups"
+				{
+					"hat"		"1"
+				}
+			}
+			"mouse_pressed_sound"		"ui/item_hat_pickup.wav"
+			"drop_sound"		"ui/item_hat_drop.wav"
+		}
+		"116"
+		{
+			"name"		"Ghastly Gibus"
+			"first_sale_date"		"2010/09/29"
+			"prefab"		"base_hat"
+			"hidden"		"0"
+			"item_class"		"tf_wearable"
+			"capabilities"
+			{
+				"paintable"		"1"
+				"nameable"		"1"
+			}
+			"loadondemand"		"1"
+			"show_in_armory"		"1"
+			"item_type_name"		"#TF_Wearable_Hat"
+			"item_name"		"#TF_Domination_Hat_Ghastlierest"
+			"item_description"		"#TF_Domination_Hat_Ghastlierest_Desc"
+			"item_slot"		"head"
+			"equip_region"		"hat"
+			"item_quality"		"unique"
+			"min_ilevel"		"10"
+			"max_ilevel"		"10"
+			"image_inventory"		"backpack/player/items/all_class/all_domination_b_demo"
+			"image_inventory_size_w"		"128"
+			"image_inventory_size_h"		"82"
+			"model_player_per_class"
+			{
+				"basename"		"models/player/items/all_class/all_domination_b_%s.mdl"
+			}
+			"drop_type"		"drop"
+			"used_by_classes"
+			{
+				"scout"		"1"
+				"sniper"		"1"
+				"soldier"		"1"
+				"demoman"		"1"
+				"medic"		"1"
+				"heavy"		"1"
+				"spy"		"1"
+				"engineer"		"1"
+				"pyro"		"1"
+			}
+			"attributes"
+			{
+				"always tradable"
+				{
+					"attribute_class"		"always_tradable"
+					"value"		"1"
+				}
+				"halloween item"
+				{
+					"attribute_class"		"halloween_item"
+					"value"		"2009"
+				}
+			}
+			"visuals"
+			{
+				"player_bodygroups"
+				{
+					"hat"		"1"
+					"headphones"		"1"
+				}
+				"styles"
+				{
+					"0"
+					{
+						"model_player_per_class"
+						{
+							"basename"		"models/player/items/all_class/all_domination_2009_%s.mdl"
+						}
+						"name"		"#TF_Gibus_Style_Ghastlier"
+					}
+					"1"
+					{
+						"model_player_per_class"
+						{
+							"basename"		"models/player/items/all_class/all_domination_%s.mdl"
+						}
+						"name"		"#TF_Gibus_Style_Ghastly"
+					}
+					"2"
+					{
+						"model_player_per_class"
+						{
+							"basename"		"models/player/items/all_class/all_domination_b_%s.mdl"
+						}
+						"name"		"#TF_Gibus_Style_Ghastlierest"
+					}
+					"3"
+					{
+						"model_player_per_class"
+						{
+							"basename"		"models/player/items/all_class/ghostly_gibus_%s.mdl"
+						}
+						"name"		"#TF_Gibus_Style_Ghostly"
+					}
+				}
+			}
+			"mouse_pressed_sound"		"ui/item_hat_pickup.wav"
+			"drop_sound"		"ui/item_hat_drop.wav"
+		}
+		"125"
+		{
+			"name"		"Honest Halo"
+			"first_sale_date"		"2010/09/29"
+			"prefab"		"base_hat"
+			"hidden"		"0"
+			"item_class"		"tf_wearable"
+			"capabilities"
+			{
+				"nameable"		"1"
+			}
+			"loadondemand"		"1"
+			"show_in_armory"		"1"
+			"item_type_name"		"#TF_Wearable_HonestyHalo"
+			"item_name"		"#TF_HonestyHalo"
+			"item_description"		"#TF_HonestyHalo_Desc"
+			"item_slot"		"head"
+			"item_quality"		"unique"
+			"min_ilevel"		"1"
+			"max_ilevel"		"1"
+			"image_inventory"		"backpack/player/items/all_class/all_halo"
+			"image_inventory_size_w"		"128"
+			"image_inventory_size_h"		"82"
+			"model_player"		"models/player/items/all_class/all_halo.mdl"
+			"drop_type"		"none"
+			"used_by_classes"
+			{
+				"scout"		"1"
+				"sniper"		"1"
+				"soldier"		"1"
+				"demoman"		"1"
+				"medic"		"1"
+				"heavy"		"1"
+				"spy"		"1"
+				"engineer"		"1"
+				"pyro"		"1"
+			}
+			"visuals"
+			{
+				"player_bodygroups"
+				{
+					"hat"		"0"
+				}
+				"styles"
+				{
+					"0"
+					{
+						"name"		"#TF_HonestyHalo_Style0"
+						"additional_hidden_bodygroups"
+						{
+							"hat"		"1"
+						}
+					}
+					"1"
+					{
+						"name"		"#TF_HonestyHalo_Style1"
+					}
+				}
+			}
+			"attributes"
+			{
+				"attach particle effect static"
+				{
+					"attribute_class"		"set_attached_particle_static"
+					"value"		"5"
+				}
+				"cannot trade"
+				{
+					"attribute_class"		"cannot_trade"
+					"value"		"1"
+				}
+			}
+			"static_attrs"
+			{
+				"limited quantity item"		"1"
+			}
+			"mouse_pressed_sound"		"ui/item_metal_tiny_pickup.wav"
+			"drop_sound"		"ui/item_metal_tiny_drop.wav"
+		}
+		"378"
+		{
+			"name"		"The Team Captain"
+			"prefab"		"base_hat"
+			"first_sale_date"		"2011/04/25"
+			"item_class"		"tf_wearable"
+			"craft_class"		"hat"
+			"craft_material_type"		"hat"
+			"capabilities"
+			{
+				"nameable"		"1"
+				"can_craft_count"		"1"
+				"can_craft_mark"		"1"
+				"can_craft_if_purchased"		"1"
+			}
+			"loadondemand"		"1"
+			"show_in_armory"		"1"
+			"item_type_name"		"#TF_Wearable_Hat"
+			"item_name"		"#TF_TeamCaptain"
+			"item_description"		"#TF_TeamCaptain_Desc"
+			"item_slot"		"head"
+			"equip_region"		"hat"
+			"item_quality"		"unique"
+			"propername"		"1"
+			"image_inventory"		"backpack/player/items/soldier/soldier_officer"
+			"image_inventory_size_w"		"128"
+			"image_inventory_size_h"		"82"
+			"model_player"		"models/player/items/soldier/soldier_officer.mdl"
+			"model_player_per_class"
+			{
+				"basename"		"models/player/items/%s/%s_officer.mdl"
+			}
+			"drop_type"		"drop"
+			"used_by_classes"
+			{
+				"heavy"		"1"
+				"soldier"		"1"
+				"medic"		"1"
+			}
+			"visuals"
+			{
+				"player_bodygroups"
+				{
+					"hat"		"1"
+				}
+			}
+			"mouse_pressed_sound"		"ui/item_hat_pickup.wav"
+			"drop_sound"		"ui/item_hat_drop.wav"
+		}
+		"496"
+		{
+			"name"		"TournamentMedal - GWJ Winners"
+			"prefab"		"tournament_medal"
+			"item_name"		"#TF_TournamentMedal_GWJ_1st"
+			"item_description"		"#TF_TournamentMedal_Winners_Desc"
+			"image_inventory"		"backpack/player/items/all_class/weiner_bomb_medal"
+			"model_player"		"models/player/items/all_class/weiner_bomb_medal.mdl"
+			"visuals"
+			{
+				"skin"		"0"
+			}
+		}
+		"814"
+		{
+			"name"		"The Triad Trinket"
+			"prefab"		"triad_trinket"
+		}
+		"835"
+		{
+			"name"		"Promo Triad Trinket"
+			"prefab"		"triad_trinket"
+			"show_in_armory"		"0"
+			"craft_class"		""
+		}
+		"844"
+		{
+			"name"		"The Tin Pot"
+			"prefab"		"hat"
+			"craft_class"		""
+			"item_name"		"#TF_Soldier_Robot_Helmet"
+			"item_description"		"#TF_Soldier_Robot_Helmet_Desc"
+			"image_inventory"		"backpack/player/items/mvm_loot/soldier/robot_helmet"
+			"propername"		"1"
+			"drop_type"		"drop"
+			"visuals"
+			{
+				"styles"
+				{
+					"0"
+					{
+						"model_player"		"models/player/items/mvm_loot/soldier/robot_helmet_bullet.mdl"
+						"skin_red"		"0"
+						"skin_blu"		"1"
+						"name"		"#TF_Soldier_Robot_Helmet_Style0"
+					}
+					"1"
+					{
+						"model_player"		"models/player/items/mvm_loot/soldier/robot_helmet.mdl"
+						"skin_red"		"0"
+						"skin_blu"		"1"
+						"name"		"#TF_Soldier_Robot_Helmet_Style1"
+					}
+				}
+			}
+			"used_by_classes"
+			{
+				"soldier"		"1"
+			}
+			"mouse_pressed_sound"		"ui/item_default_pickup.wav"
+			"drop_sound"		"ui/item_default_drop.wav"
+		}
+		"5606"
+		{
+			"name"		"Damaged Capacitor"
+			"prefab"		"ash_remains base_misc"
+			"item_class"		"tf_wearable"
+			"item_slot"		"misc"
+			"craft_material_type"		""
+			"expiration_date"		""
+			"item_type_name"		"#TF_Item_DamagedCapacitor_Type"
+			"item_name"		"#TF_Item_DamagedCapacitor"
+			"item_description"		"#TF_Item_DamagedCapacitor_Desc"
+			"image_inventory"		"backpack/crafting/capacitor"
+			"used_by_classes"
+			{
+				"scout"		"1"
+				"sniper"		"1"
+				"soldier"		"1"
+				"demoman"		"1"
+				"medic"		"1"
+				"heavy"		"1"
+				"spy"		"1"
+				"engineer"		"1"
+				"pyro"		"1"
+			}
+			"static_attrs"
+			{
+				"limited quantity item"		"1"
+			}
+			"mouse_pressed_sound"		"ui/item_paper_pickup.wav"
+			"drop_sound"		"ui/item_paper_pickup.wav"
+		}
+		"default"
+		{
+			"name"		"default"
+			"hidden"		"1"
+			"item_class"		"tf_wearable"
+			"item_name"		"#TF_Default_ItemDef"
+			"item_slot"		"melee"
+			"item_quality"		"normal"
+			"min_ilevel"		"1"
+			"max_ilevel"		"1"
+		}
+	}
+}

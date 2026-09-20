@@ -1,0 +1,50 @@
+{
+  "comment": "The Cosmetic rule applied to items_game.txt in this directory. Both implementations must produce exactly this. See README.md.",
+  "cosmetics": [
+    {
+      "name": "Ghastlierest Gibus",
+      "defindex": 116,
+      "aliases": [],
+      "slot": "head",
+      "classes": ["scout", "soldier", "pyro", "demoman", "heavy", "engineer", "medic", "sniper", "spy"],
+      "why": "All-Class hat; its model comes from a per-class basename"
+    },
+    {
+      "name": "Team Captain",
+      "defindex": 378,
+      "aliases": [],
+      "slot": "head",
+      "classes": ["soldier", "heavy", "medic"],
+      "why": "Multi-Class hat"
+    },
+    {
+      "name": "Texas Ten Gallon",
+      "defindex": 94,
+      "aliases": [],
+      "slot": "head",
+      "classes": ["engineer"],
+      "why": "Class-Exclusive paintable hat"
+    },
+    {
+      "name": "Tin Pot",
+      "defindex": 844,
+      "aliases": [],
+      "slot": "head",
+      "classes": ["soldier"],
+      "why": "No item-level model; the model exists only inside its Styles"
+    },
+    {
+      "name": "Triad Trinket",
+      "defindex": 814,
+      "aliases": [835],
+      "slot": "misc",
+      "classes": ["scout", "heavy", "engineer", "sniper", "spy"],
+      "why": "Genuine-only promo pair: two defindexes, one Cosmetic (ADR-0003)"
+    }
+  ],
+  "excluded": [
+    { "defindex": 125, "name": "Cheater's Lament", "reason": "never-tradable", "why": "Achievement item with the cannot-trade attribute baked in" },
+    { "defindex": 496, "name": "First Place - Gamers With Jobs Tournament", "reason": "medal", "why": "Tournament medal" },
+    { "defindex": 5606, "name": "Barely-Melted Capacitor", "reason": "no-worn-model", "why": "Craft component sharing the wearable item class" }
+  ]
+}
