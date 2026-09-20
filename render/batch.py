@@ -23,8 +23,10 @@ import json
 import subprocess
 import sys
 import tempfile
+import threading
 import time
 from collections import Counter
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -45,6 +47,10 @@ DEFAULT_BLENDER = Path("C:/Program Files/Blender Foundation/Blender 5.2/blender.
 #: large enough that the mount and add-on start-up (a few seconds) disappear into the run.
 DEFAULT_BATCH_SIZE = 40
 
+#: Blender processes at once. One by default: a full run is the thing worth parallelising and
+#: it is asked for explicitly, and a debugging run of one Cosmetic wants its output readable.
+DEFAULT_WORKERS = 1
+
 INSTALL_HINT = (
     "Install Blender 5.2 and the SourceIO 5.5.4 add-on, or pass --blender with the path to it."
 )
@@ -60,12 +66,14 @@ class Settings:
     styles: list[int] | None
     teams: list[str]
     batch_size: int
+    workers: int
     dry_run: bool
     retry_failed: bool
     trust_manifest: bool
     blender: Path
     tf: Path
     cache: Path
+    texture_cache: Path | None
     root: Path | None
     masters_dir: str | None
     manifest: Path | None
@@ -90,6 +98,12 @@ def parse_args(argv: list[str] | None = None) -> Settings:
         "--batch-size", type=int, default=DEFAULT_BATCH_SIZE, help="images per Blender process"
     )
     parser.add_argument(
+        "--workers",
+        type=int,
+        default=DEFAULT_WORKERS,
+        help="Blender processes at once; the import, not the frame, is what a core buys back",
+    )
+    parser.add_argument(
         "--dry-run", action="store_true", help="say what would be rendered, open nothing"
     )
     parser.add_argument(
@@ -107,7 +121,15 @@ def parse_args(argv: list[str] | None = None) -> Settings:
     return Settings(**vars(parser.parse_args(argv)))
 
 
-def blender_command(settings: Settings, layout: OutputLayout, jobs_file: Path, batch: Batch) -> list[str]:
+def blender_command(
+    settings: Settings,
+    layout: OutputLayout,
+    jobs_file: Path,
+    batch: Batch,
+    *,
+    manifest: Path,
+    texture_cache: Path,
+) -> list[str]:
     """The render step, told to render exactly this batch and nothing else.
 
     The batch is handed over as a job list of its own rather than as filters: the child then
@@ -117,6 +139,8 @@ def blender_command(settings: Settings, layout: OutputLayout, jobs_file: Path, b
     The layout is passed as settled paths, not as the flags that were typed: the runner has
     already let the command line beat the environment, and the child must not resolve it a
     second time and possibly differently.
+
+    The manifest it is given is its own shard, never the run's — see `_render_batches`.
     """
     return [
         str(settings.blender),
@@ -128,9 +152,10 @@ def blender_command(settings: Settings, layout: OutputLayout, jobs_file: Path, b
         "--jobs", str(jobs_file),
         "--tf", str(settings.tf),
         "--cache", str(settings.cache),
+        "--texture-cache", str(texture_cache),
         "--root", str(layout.root),
         "--masters-dir", layout.masters_dir,
-        "--manifest", str(layout.manifest),
+        "--manifest", str(manifest),
         "--size", str(settings.size),
         "--samples", str(settings.samples),
         "--site-packages", str(settings.site_packages),
@@ -245,47 +270,137 @@ def run(settings: Settings, *, launch=launch_blender) -> int:
     return _render_batches(settings, layout, plan, batches(plan.work, settings.batch_size), launch)
 
 
+def texture_cache_for(settings: Settings, worker: int) -> Path:
+    """The decoded-texture cache one worker uses.
+
+    SourceIO writes each decoded texture in place, so two processes sharing a cache can read
+    one that is half written. Each worker therefore gets its own — kept beside the assets
+    cache rather than in the run's scratch, because it is worth having on the next run too.
+    A single-worker run keeps the one shared folder it has always used.
+    """
+    base = settings.texture_cache or settings.cache / "texture-cache"
+    if settings.workers <= 1:
+        return base
+    return base.with_name(f"{base.name}-w{worker}")
+
+
 def _render_batches(
     settings: Settings, layout: OutputLayout, plan: RunPlan, cut: list[Batch], launch
 ) -> int:
+    """Hand every batch to Blender, `settings.workers` of them at a time.
+
+    Each batch writes its results to a manifest shard of its own, and the runner folds that
+    shard into the run's manifest when the batch comes back. Blender processes cannot share a
+    manifest file — each rewrites it whole, so the last writer would drop the others' work —
+    and the shard is cheap besides: the child rewrites it after every job, and a file holding
+    one batch stays small where the run's manifest grows all run long.
+
+    What a crash costs is still one batch, because the shard is written job by job and merged
+    whatever the exit code. What a *runner* crash costs is the batches in flight, which is why
+    the merge happens as each one lands rather than at the end.
+    """
     started = time.monotonic()
-    total = plan.images
-    done = failed = lost = 0
-    stopped = False
+    workers = max(1, min(settings.workers, len(cut)))
+    tally = _Tally(total=plan.images)
+    manifest = load_manifest(layout.manifest)
+    merging = threading.Lock()
+    stopping = threading.Event()
+
+    if workers > 1:
+        log(f"{workers} Blender processes at a time over {len(cut)} batches")
+
     with tempfile.TemporaryDirectory(prefix="tf2-cosm-batch-") as scratch:
-        for number, batch in enumerate(cut, start=1):
-            log(f"batch {number}/{len(cut)}: {len(batch.jobs)} jobs x {' '.join(batch.teams)}")
+
+        def render_one(number: int, batch: Batch, worker: int) -> None:
             jobs_file = Path(scratch) / f"batch-{number}.json"
             jobs_file.write_text(
                 json.dumps(job_list(list(batch.jobs), source=str(settings.jobs))), encoding="utf-8"
             )
-            try:
-                code = launch(blender_command(settings, layout, jobs_file, batch))
-            except KeyboardInterrupt:
-                # ctrl-c reaches Blender too, so the batch in flight is already gone. Say what
-                # the run got to and leave; the next run starts from the manifest.
-                code, stopped = 130, True
+            shard = Path(scratch) / f"manifest-{number}.json"
+            log(f"batch {number}/{len(cut)}: {len(batch.jobs)} jobs x {' '.join(batch.teams)}")
+            code = launch(
+                blender_command(
+                    settings,
+                    layout,
+                    jobs_file,
+                    batch,
+                    manifest=shard,
+                    texture_cache=texture_cache_for(settings, worker),
+                )
+            )
+            with merging:
+                written = load_manifest(shard)
+                manifest.merge(written)
+                manifest.write(layout.manifest)
+                outcome = account_for(written, batch)
+                tally.add(outcome)
+                if outcome.lost:
+                    log(f"  batch {number} exited {code} and lost {outcome.lost} images; carrying on")
+                log("  " + progress_line(
+                    done=tally.done,
+                    failed=tally.failed,
+                    total=tally.total,
+                    elapsed=time.monotonic() - started,
+                ))
 
-            outcome = account_for(load_manifest(layout.manifest), batch)
-            done += outcome.rendered + outcome.failed
-            failed += outcome.failed
-            lost += outcome.lost
-            if outcome.lost:
-                log(f"  batch {number} exited {code} and lost {outcome.lost} images; carrying on")
-            log("  " + progress_line(
-                done=done, failed=failed, total=total, elapsed=time.monotonic() - started
-            ))
-            if stopped:
-                break
+        def take(assigned: list[tuple[int, Batch]], worker: int) -> None:
+            for number, batch in assigned:
+                if stopping.is_set():
+                    return
+                render_one(number, batch, worker)
 
+        # Round robin, so every worker gets batches from across the run rather than one
+        # worker getting all of a Class whose models are slow.
+        rounds = [list(enumerate(cut, start=1))[index::workers] for index in range(workers)]
+        try:
+            if workers == 1:
+                take(rounds[0], 0)
+            else:
+                with ThreadPoolExecutor(max_workers=workers) as pool:
+                    running = [
+                        pool.submit(take, assigned, worker)
+                        for worker, assigned in enumerate(rounds)
+                    ]
+                    try:
+                        for finished in as_completed(running):
+                            finished.result()
+                    except BaseException:
+                        # Set it here, not in the outer handler: leaving this `with` block
+                        # shuts the pool down waiting, and a worker that has not been told
+                        # to stop by then works through every batch it is still holding —
+                        # a ctrl-c that drains the run instead of ending it. The same goes
+                        # for anything else a worker raises, which the serial path would
+                        # have stopped on at once.
+                        stopping.set()
+                        raise
+        except KeyboardInterrupt:
+            # ctrl-c reaches every Blender in the process group, so the batches in flight are
+            # already gone. Stop handing out new ones, let the threads unwind, and leave; the
+            # next run starts from the manifest, which holds everything already merged.
+            stopping.set()
+
+    stopped = stopping.is_set()
     elapsed = time.monotonic() - started
     log(f"{'stopped' if stopped else 'done'} in {format_duration(elapsed)}: "
-        f"{done - failed} rendered, {failed} failed, {lost} lost")
+        f"{tally.done - tally.failed} rendered, {tally.failed} failed, {tally.lost} lost")
     report_failures(layout, plan)
     if stopped:
         log("run it again to pick up where this stopped")
         return 130
-    return 1 if lost else 0
+    return 1 if tally.lost else 0
+
+
+class _Tally:
+    """What the run has got through so far, added to as each batch lands."""
+
+    def __init__(self, *, total: int) -> None:
+        self.total = total
+        self.done = self.failed = self.lost = 0
+
+    def add(self, outcome) -> None:
+        self.done += outcome.rendered + outcome.failed
+        self.failed += outcome.failed
+        self.lost += outcome.lost
 
 
 def main(argv: list[str] | None = None) -> int:

@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -45,9 +46,28 @@ def extract(archive: vpk.VPK, index: dict[str, str], model_path: str, cache: Pat
             continue
         target.parent.mkdir(parents=True, exist_ok=True)
         with archive.get_file(entry) as src:
-            target.write_bytes(src.read())
+            _write_whole(target, src.read())
         written.append(target)
     return written
+
+
+def _write_whole(target: Path, payload: bytes) -> None:
+    """Put `payload` at `target` in one step, so no reader ever opens half a model.
+
+    Several render processes may fill one cache at once, and they overlap: two Classes of the
+    same All-Class Cosmetic share no model file, but re-running a Class does. Writing in
+    place, another process sees `target.exists()` the moment the file is created and imports
+    whatever has been flushed so far — a truncated .mdl, which SourceIO reports as a corrupt
+    model rather than as a race. The temporary name carries the pid so two writers cannot
+    collide on it either, and `os.replace` is atomic within a volume on Windows and POSIX
+    alike.
+    """
+    temporary = target.with_name(f"{target.name}.{os.getpid()}.tmp")
+    try:
+        temporary.write_bytes(payload)
+        os.replace(temporary, target)
+    finally:
+        temporary.unlink(missing_ok=True)
 
 
 class ModelNotInArchive(Exception):

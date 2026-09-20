@@ -103,10 +103,21 @@ def clear_scene() -> None:
             block.remove(item, do_unlink=True)
 
 
-def mount_game(tf: Path, cache: Path) -> None:
+def texture_cache_for(cache: Path, given: Path | None) -> Path:
+    """Where SourceIO decodes textures to: `given`, else the one folder inside the assets cache.
+
+    It is a cache and it is disposable, but it is not safe to share between processes: the
+    add-on writes each decoded texture in place, so a second process can read one that is
+    half written. A parallel run therefore gives every process its own, and everything else
+    keeps the single shared folder it has always used.
+    """
+    return Path(given).resolve() if given is not None else (cache / "texture-cache").resolve()
+
+
+def mount_game(tf: Path, cache: Path, texture_cache: Path | None = None) -> None:
     bpy.ops.preferences.addon_enable(module="SourceIO")
     apply_patches(log=log)
-    texture_cache = (cache / "texture-cache").resolve()
+    texture_cache = texture_cache_for(cache, texture_cache)
     texture_cache.mkdir(parents=True, exist_ok=True)
     bpy.context.scene.TextureCachePath = str(texture_cache)
     bpy.ops.sourceio.new_resource(filepath=str(tf))
@@ -406,7 +417,7 @@ def run(args: argparse.Namespace) -> int:
     manifest = load_manifest(layout.manifest)
     log(f"{len(jobs)} jobs x {len(teams)} teams -> {layout.path_for(layout.masters_dir)}")
 
-    mount_game(args.tf, args.cache)
+    mount_game(args.tf, args.cache, args.texture_cache)
     cache = ModelCache.for_game(args.tf, args.cache)
 
     rendered = failed = 0
