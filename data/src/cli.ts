@@ -6,20 +6,24 @@
  * writes it. Every decision worth testing lives under `src/`; this file is the
  * fetching, the printing and the writing.
  */
-import { readFile } from "node:fs/promises";
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { buildCatalogue } from "./catalogue/build.ts";
-import { CATALOGUE_SCHEMA_VERSION, catalogueJsonSchema } from "./catalogue/schema.ts";
+import {
+  CATALOGUE_SCHEMA_VERSION,
+  catalogueJsonSchema,
+  type DollarBases,
+  type DollarRate,
+} from "./catalogue/schema.ts";
 import {
   type CommittedCatalogue,
   DEFAULT_WRITE_GUARD_LIMITS,
   writeRefusal,
 } from "./catalogue/write-guard.ts";
 import { loadDotEnv, requireEnv } from "./env.ts";
-import type { DollarRate, MarketKeyPrice } from "./prices/dollar-basis.ts";
+import type { MarketKeyPrice } from "./prices/dollar-basis.ts";
 import type { PriceList } from "./prices/price-source.ts";
 import { backpackTfPriceSource } from "./sources/backpack-tf.ts";
 import {
@@ -158,7 +162,12 @@ async function loadMarketKeyPrice(options: Options, warnings: string[]): Promise
   }
 }
 
-/** The committed catalogue the guard holds this run against, if there is one yet. */
+/**
+ * The committed catalogue the guard holds this run against. Null only when there
+ * is no file yet, which is the first run; a file that is there but unreadable
+ * stops the run rather than disabling the guard, since a damaged catalogue is
+ * exactly the state the guard exists for.
+ */
 async function loadCommittedCatalogue(path: string): Promise<CommittedCatalogue | null> {
   let text: string;
   try {
@@ -166,19 +175,25 @@ async function loadCommittedCatalogue(path: string): Promise<CommittedCatalogue 
   } catch {
     return null; // the first run has nothing to compare against
   }
-  try {
-    const previous = JSON.parse(text) as { header?: { counts?: { cosmetics?: unknown } } };
-    const cosmetics = previous.header?.counts?.cosmetics;
-    return typeof cosmetics === "number" ? { path, cosmetics } : null;
-  } catch {
-    // An unreadable file is not a count that dropped; the guard has nothing to say.
-    return null;
+  const previous = JSON.parse(text) as { header?: { counts?: { cosmetics?: unknown } } };
+  const cosmetics = previous.header?.counts?.cosmetics;
+  if (typeof cosmetics !== "number") {
+    throw new Error(`${path} carries no Cosmetic count, so this run cannot be held against it; nothing was written.`);
   }
+  return { path, cosmetics };
 }
 
 /** A Dollar Basis as the summary prints it: what a Key and a Refined cost. */
 function dollarLine(rate: DollarRate): string {
   return `$${rate.usdPerKey.toFixed(2)} a Key, $${rate.usdPerRefined.toFixed(4)} a Refined`;
+}
+
+/** The Market basis prints two rates, either of which the overview may have withheld. */
+function marketLine(market: DollarBases["steamCommunityMarket"]): string {
+  if (market === null) return "missing";
+  const lowest = market.lowest ? `lowest ${dollarLine(market.lowest)}` : "no lowest";
+  const median = market.median ? `median ${dollarLine(market.median)}` : "no median";
+  return `${lowest}; ${median}`;
 }
 
 async function main(): Promise<number> {
@@ -257,16 +272,8 @@ async function main(): Promise<number> {
     console.log("  Dollar Bases       none (no Key Rate to anchor them to)");
   } else {
     console.log("  Dollar Bases");
-    const market = bases.steamCommunityMarket;
-    console.log(
-      `    Steam Market     ${
-        market === null
-          ? "missing"
-          : `${market.lowest ? `lowest ${dollarLine(market.lowest)}` : "no lowest"}; ` +
-            `${market.median ? `median ${dollarLine(market.median)}` : "no median"}`
-      }`,
-    );
-    console.log(`    price source     ${bases.backpackTf ? dollarLine(bases.backpackTf.rate) : "missing"}`);
+    console.log(`    Steam Market     ${marketLine(bases.steamCommunityMarket)}`);
+    console.log(`    price source     ${bases.priceSource ? dollarLine(bases.priceSource.rate) : "missing"}`);
     console.log(`    Mann Co. Store   ${dollarLine(bases.mannCoStore.rate)}`);
   }
 

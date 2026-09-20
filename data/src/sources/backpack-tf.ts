@@ -155,22 +155,25 @@ export async function fetchRates(apiKey: string, fetchImpl: typeof fetch = fetch
   return {
     keyRate: keyRateFromRefined(keysQuote.value, timestamp(keysPrice?.last_update, new Date().toISOString())),
     scrapPerUnit: resolveScrapPerUnit(quotes),
-    usdPerRefined: dollarEstimateOf(body.response?.currencies?.["metal"]?.price),
+    dollarEstimate: dollarEstimateOf(body.response?.currencies?.["metal"]?.price),
   };
 }
 
 /**
  * backpack.tf's refined-to-dollar estimate, the one currency it quotes in dollars
- * rather than in Metal. It comes as a range, and the basis takes its midpoint —
- * the same figure convention a Reference Price follows, where the catalogue shows
- * the spread and its midpoint.
+ * rather than in Metal.
+ *
+ * Its quoted `value` is the estimate, and is recorded as it stands. The Price
+ * Spread's midpoint rule is not applied here: that rule lets a Reference Price
+ * stand for a range of asking prices, whereas a Dollar Basis is one rate the
+ * site multiplies by, and folding in the range's top would publish a figure the
+ * source never gave.
  */
 function dollarEstimateOf(price: RawPrice | undefined): SourceDollarEstimate | undefined {
   if (price?.currency !== "usd" || typeof price.value !== "number" || price.value <= 0) return undefined;
-  const high = typeof price.value_high === "number" && price.value_high > 0 ? price.value_high : price.value;
   return {
     source: BACKPACK_TF_DOLLAR_SOURCE,
-    usdPerRefined: (price.value + high) / 2,
+    usdPerRefined: price.value,
     lastUpdatedAt: timestamp(price.last_update, new Date().toISOString()),
   };
 }

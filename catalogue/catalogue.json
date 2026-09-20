@@ -1,7 +1,7 @@
 {
   "schemaVersion": 3,
   "header": {
-    "snapshotTakenAt": "2026-09-20T21:08:33.956Z",
+    "snapshotTakenAt": "2026-09-20T21:14:24.253Z",
     "sources": {
       "itemDefinitions": "local game install (C:/Program Files (x86)/Steam/steamapps/common/Team Fortress 2/tf)",
       "englishNames": "https://api.steampowered.com/IEconItems_440/GetSchemaItems/v0001/ (IEconItems_440/GetSchemaItems v0001)"
@@ -17,7 +17,7 @@
     },
     "prices": {
       "source": "backpack.tf (IGetPrices v4, IGetCurrencies v1)",
-      "takenAt": "2026-09-20T21:08:32.779Z",
+      "takenAt": "2026-09-20T21:14:21.966Z",
       "keyRate": {
         "scrap": 577,
         "refined": 64.1111,
@@ -40,17 +40,17 @@
     "dollarBases": {
       "steamCommunityMarket": {
         "source": "Steam Community Market price overview (Mann Co. Supply Crate Key, USD)",
-        "takenAt": "2026-09-20T21:08:33.603Z",
+        "takenAt": "2026-09-20T21:14:23.941Z",
         "lowest": {
-          "usdPerKey": 2.25,
-          "usdPerRefined": 0.035095
+          "usdPerKey": 2.27,
+          "usdPerRefined": 0.035407
         },
         "median": {
-          "usdPerKey": 2.28,
-          "usdPerRefined": 0.035563
+          "usdPerKey": 2.25,
+          "usdPerRefined": 0.035095
         }
       },
-      "backpackTf": {
+      "priceSource": {
         "source": "backpack.tf refined-to-dollar estimate (IGetCurrencies v1)",
         "lastUpdatedAt": "2026-08-12T14:03:56.000Z",
         "rate": {

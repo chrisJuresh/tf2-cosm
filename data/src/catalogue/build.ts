@@ -310,7 +310,7 @@ export function buildCatalogue(inputs: CatalogueInputs): BuildResult {
         ? dollarBasesOf({
             keyRate: inputs.prices.rates.keyRate,
             marketKeyPrice: inputs.marketKeyPrice,
-            sourceUsdPerRefined: inputs.prices.rates.usdPerRefined,
+            sourceUsdPerRefined: inputs.prices.rates.dollarEstimate,
           })
         : null,
     },

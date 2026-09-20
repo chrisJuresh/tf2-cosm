@@ -60,12 +60,13 @@ describe("the currency table", () => {
     expect(scrapPerUnit.has("doubloons")).toBe(false);
   });
 
-  it("carries the source's refined-to-dollar estimate, the midpoint of its quoted range", async () => {
+  it("carries the source's own refined-to-dollar estimate as the source quotes it", async () => {
     const rates = await fetchRates("fixture-key", fixtureBackpackTfFetch());
-    // The recorded payload quotes a Refined at $0.03 to $0.05.
-    expect(rates.usdPerRefined).toEqual({
+    // The recorded payload quotes a Refined at $0.03; the $0.05 top of its range
+    // is not averaged in, which would publish a figure the source never gave.
+    expect(rates.dollarEstimate).toEqual({
       source: BACKPACK_TF_DOLLAR_SOURCE,
-      usdPerRefined: 0.04,
+      usdPerRefined: 0.03,
       lastUpdatedAt: "2026-09-08T20:40:00.000Z",
     });
   });
@@ -77,7 +78,7 @@ describe("the currency table", () => {
         currencies: { keys: { price: { currency: "metal", value: 78.66 } } },
       },
     });
-    expect((await fetchRates("fixture-key", fetchImpl)).usdPerRefined).toBeUndefined();
+    expect((await fetchRates("fixture-key", fetchImpl)).dollarEstimate).toBeUndefined();
   });
 
   it("fails loudly when the Key is not priced in Metal", async () => {

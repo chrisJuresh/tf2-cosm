@@ -15,6 +15,7 @@
  */
 import { scrapToRefined } from "./metal.ts";
 import type { KeyRate } from "./price-source.ts";
+import type { DollarBases, DollarRate } from "../catalogue/schema.ts";
 
 /** A dollar price is quoted in cents, so four decimal places is already generous. */
 const USD_PER_KEY_PLACES = 4;
@@ -25,13 +26,9 @@ const USD_PER_REFINED_PLACES = 6;
 /** What the Mann Co. Store charges for a Mann Co. Supply Crate Key, in dollars. */
 export const MANN_CO_STORE_USD_PER_KEY = 2.49;
 
-export const MANN_CO_STORE_SOURCE = "Mann Co. Store constant ($2.49 a Mann Co. Supply Crate Key)";
-
-/** One Dollar Basis's rate, in the two denominations a price in this file uses. */
-export interface DollarRate {
-  readonly usdPerKey: number;
-  readonly usdPerRefined: number;
-}
+export const MANN_CO_STORE_SOURCE = `Mann Co. Store constant ($${MANN_CO_STORE_USD_PER_KEY.toFixed(
+  2,
+)} a Mann Co. Supply Crate Key)`;
 
 /** The Steam Community Market's key price, as its price overview reports it. */
 export interface MarketKeyPrice {
@@ -47,24 +44,6 @@ export interface SourceDollarEstimate {
   readonly source: string;
   readonly usdPerRefined: number;
   readonly lastUpdatedAt: string;
-}
-
-export interface DollarBases {
-  /** Null when the price overview was skipped or did not answer. */
-  readonly steamCommunityMarket: {
-    readonly source: string;
-    readonly takenAt: string;
-    readonly lowest: DollarRate | null;
-    readonly median: DollarRate | null;
-  } | null;
-  /** Null when the price source published no dollar estimate. */
-  readonly backpackTf: {
-    readonly source: string;
-    readonly lastUpdatedAt: string;
-    readonly rate: DollarRate;
-  } | null;
-  /** Always present: it is a constant, not a fetch. */
-  readonly mannCoStore: { readonly source: string; readonly rate: DollarRate };
 }
 
 function round(value: number, places: number): number {
@@ -117,7 +96,7 @@ export function dollarBasesOf(inputs: DollarBasisInputs): DollarBases {
           median: marketKeyPrice.medianUsd === null ? null : dollarRateFromKey(marketKeyPrice.medianUsd, keyRate),
         }
       : null,
-    backpackTf: sourceUsdPerRefined
+    priceSource: sourceUsdPerRefined
       ? {
           source: sourceUsdPerRefined.source,
           lastUpdatedAt: sourceUsdPerRefined.lastUpdatedAt,

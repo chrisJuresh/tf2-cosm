@@ -50,12 +50,12 @@
           "usdPerRefined": 0.029619
         }
       },
-      "backpackTf": {
+      "priceSource": {
         "source": "backpack.tf refined-to-dollar estimate (IGetCurrencies v1)",
         "lastUpdatedAt": "2026-09-08T20:40:00.000Z",
         "rate": {
-          "usdPerKey": 3.1467,
-          "usdPerRefined": 0.04
+          "usdPerKey": 2.36,
+          "usdPerRefined": 0.03
         }
       },
       "mannCoStore": {

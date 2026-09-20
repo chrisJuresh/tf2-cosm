@@ -74,7 +74,9 @@ it directly and every adapter around it stays thin.
   on a guess.
 - `src/prices/dollar-basis.ts` — the Dollar Bases the header carries: the Steam
   Market's key price (lowest and median), the price source's own refined-to-dollar
-  estimate, and the Mann Co. Store constant. Each is recorded both per Key and
+  estimate, and the Mann Co. Store constant. The header names that middle one
+  `priceSource`, not the vendor, so swapping backpack.tf for pricedb.io (ADR-0002)
+  leaves the file's shape alone. Each is recorded both per Key and
   per Refined, converted at the snapshot's own Key Rate like every other figure in
   the file, so a site never needs the Key Rate to show a price in dollars. No
   dollar figure is stored per Cosmetic: the site multiplies a Metal Value by the

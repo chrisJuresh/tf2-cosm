@@ -274,7 +274,7 @@
                     }
                   ]
                 },
-                "backpackTf": {
+                "priceSource": {
                   "anyOf": [
                     {
                       "type": "object",
@@ -354,7 +354,7 @@
               },
               "required": [
                 "steamCommunityMarket",
-                "backpackTf",
+                "priceSource",
                 "mannCoStore"
               ],
               "additionalProperties": false

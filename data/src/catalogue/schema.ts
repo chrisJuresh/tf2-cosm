@@ -111,8 +111,12 @@ const dollarBasesSchema = z
         median: dollarRateSchema.nullable(),
       })
       .nullable(),
-    /** The price source's own refined-to-dollar estimate. Null when it published none. */
-    backpackTf: z
+    /**
+     * The price source's own refined-to-dollar estimate. Null when it published
+     * none. The vendor is named in `source`, never in the key: ADR-0002 keeps
+     * the source swappable without a change to this file's shape.
+     */
+    priceSource: z
       .object({
         source: z.string().min(1),
         lastUpdatedAt: z.iso.datetime(),
@@ -179,7 +183,8 @@ export type Metal = z.infer<typeof metalSchema>;
 export type PricePoint = z.infer<typeof pricePointSchema>;
 export type Price = z.infer<typeof priceSchema>;
 export type PriceHeader = NonNullable<z.infer<typeof headerSchema>["prices"]>;
-export type DollarBasesHeader = z.infer<typeof dollarBasesSchema>;
+export type DollarRate = z.infer<typeof dollarRateSchema>;
+export type DollarBases = NonNullable<z.infer<typeof dollarBasesSchema>>;
 export type Cosmetic = z.infer<typeof cosmeticSchema>;
 export type Catalogue = z.infer<typeof catalogueSchema>;
 

@@ -30,11 +30,11 @@ describe("the snapshot header", () => {
       lowest: { usdPerKey: 2.29, usdPerRefined: 0.02911 },
       median: { usdPerKey: 2.33, usdPerRefined: 0.029619 },
     });
-    // backpack.tf quotes a Refined at $0.03 to $0.05; the basis is the midpoint.
-    expect(bases?.backpackTf).toEqual({
+    // backpack.tf quotes a Refined at $0.03, which the basis records as it stands.
+    expect(bases?.priceSource).toEqual({
       source: BACKPACK_TF_DOLLAR_SOURCE,
       lastUpdatedAt: "2026-09-08T20:40:00.000Z",
-      rate: { usdPerKey: 3.1467, usdPerRefined: 0.04 },
+      rate: { usdPerKey: 2.36, usdPerRefined: 0.03 },
     });
     expect(bases?.mannCoStore.rate).toEqual({ usdPerKey: MANN_CO_STORE_USD_PER_KEY, usdPerRefined: 0.031653 });
   });
@@ -43,7 +43,7 @@ describe("the snapshot header", () => {
     const { catalogue } = buildCatalogue(await fixturePricedInputs());
 
     expect(catalogue.header.dollarBases?.steamCommunityMarket).toBeNull();
-    expect(catalogue.header.dollarBases?.backpackTf).not.toBeNull();
+    expect(catalogue.header.dollarBases?.priceSource).not.toBeNull();
   });
 
   it("has no Dollar Bases at all when the run had no price source, so no Key Rate", async () => {

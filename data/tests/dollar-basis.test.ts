@@ -52,7 +52,7 @@ describe("the header's Dollar Bases", () => {
       lowest: { usdPerKey: 2.29, usdPerRefined: 0.02911 },
       median: { usdPerKey: 2.33, usdPerRefined: 0.029619 },
     });
-    expect(bases.backpackTf).toEqual({
+    expect(bases.priceSource).toEqual({
       source: "backpack.tf (IGetCurrencies v1)",
       lastUpdatedAt: "2026-09-19T00:00:00.000Z",
       rate: { usdPerKey: 2.36, usdPerRefined: 0.03 },
@@ -67,7 +67,7 @@ describe("the header's Dollar Bases", () => {
     const bases = dollarBasesOf({ keyRate: KEY_RATE });
 
     expect(bases.steamCommunityMarket).toBeNull();
-    expect(bases.backpackTf).toBeNull();
+    expect(bases.priceSource).toBeNull();
     expect(bases.mannCoStore.rate.usdPerKey).toBe(MANN_CO_STORE_USD_PER_KEY);
   });
 

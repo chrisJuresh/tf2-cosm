@@ -73,7 +73,7 @@ export interface Rates {
    * is a Dollar Basis for the header, and it arrives in the same call the Key
    * Rate does. Undefined when the source quotes Metal in something else.
    */
-  readonly usdPerRefined?: SourceDollarEstimate | undefined;
+  readonly dollarEstimate?: SourceDollarEstimate | undefined;
 }
 
 /** The rate for a currency, or undefined when the snapshot cannot convert it. */
