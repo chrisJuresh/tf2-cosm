@@ -38,3 +38,11 @@ globalThis.ResizeObserver ??= class ResizeObserver {
   unobserve(): void {}
   disconnect(): void {}
 } as unknown as typeof ResizeObserver;
+
+/**
+ * jsdom implements no scrolling at all, so an element has no `scrollTo` for the
+ * list to call when a link asks it to bring a row into view. A browser has one;
+ * without this stub the call is silently skipped and a test could not tell a
+ * list that scrolls from one that does not.
+ */
+Object.defineProperty(Element.prototype, "scrollTo", { configurable: true, writable: true, value: () => {} });
