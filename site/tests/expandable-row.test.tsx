@@ -82,6 +82,18 @@ describe("opening and closing a row", () => {
     expect(toggleFor("Team Captain")).toHaveAttribute("aria-expanded", "false");
   });
 
+  it("hands the focus to the row's control even when the click landed somewhere else in the row", async () => {
+    // Otherwise the viewer who just opened a row has the focus on the body and
+    // nothing to press Escape on.
+    const user = userEvent.setup();
+    renderList();
+    await user.click(within(rowFor("tin-pot")).getByRole("img"));
+    expect(toggleFor("Tin Pot")).toHaveFocus();
+
+    await user.keyboard("{Escape}");
+    expect(toggleFor("Tin Pot")).toHaveAttribute("aria-expanded", "false");
+  });
+
   it("closes on Escape and leaves the focus on the control that opened it", async () => {
     const user = userEvent.setup();
     renderList();
@@ -216,5 +228,47 @@ describe("linking to a Cosmetic", () => {
     window.history.replaceState(null, "", "/#bolt-boy");
     window.dispatchEvent(new HashChangeEvent("hashchange"));
     expect(await screen.findByRole("button", { name: "Bolt Boy", expanded: true })).toBeInTheDocument();
+  });
+
+  it("closes the open row when the address loses its Cosmetic, rather than saying two things at once", async () => {
+    const user = userEvent.setup();
+    renderList();
+    await user.click(toggleFor("Bolt Boy"));
+
+    window.history.replaceState(null, "", "/");
+    window.dispatchEvent(new HashChangeEvent("hashchange"));
+    expect(await screen.findByRole("button", { name: "Bolt Boy", expanded: false })).toBeInTheDocument();
+    expect(expandedSlugs()).toEqual([]);
+  });
+});
+
+describe("the table an open row leaves behind", () => {
+  it("counts the open row's panel as the row it is, and shifts every row below it down", async () => {
+    // A panel spanning the columns is a row of its own; folding it into the
+    // summary row would leave that row with six cells under five headings.
+    const user = userEvent.setup();
+    renderList();
+    await user.click(toggleFor("Ghastly Gibus"));
+
+    expect(screen.getByRole("table")).toHaveAttribute("aria-rowcount", "7");
+    const [, body] = screen.getAllByRole("rowgroup");
+    expect(within(body!).getAllByRole("row").map((row) => row.getAttribute("aria-rowindex"))).toEqual([
+      "2", // Bolt Boy
+      "3", // Dead of Night
+      "4", // Ghastly Gibus
+      "5", // its panel
+      "6", // Team Captain
+      "7", // Tin Pot
+    ]);
+  });
+
+  it("gives the summary row its five cells and the panel one across all of them", async () => {
+    const user = userEvent.setup();
+    renderList();
+    await user.click(toggleFor("Ghastly Gibus"));
+
+    expect(within(rowFor("ghastly-gibus")).getAllByRole("cell")).toHaveLength(5);
+    const panelCell = document.getElementById("cosmetic-detail-ghastly-gibus")?.closest('[role="cell"]');
+    expect(panelCell).toHaveAttribute("aria-colspan", "5");
   });
 });

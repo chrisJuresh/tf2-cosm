@@ -159,6 +159,7 @@ interface CosmeticRowProps {
   cosmetic: Cosmetic;
   figures: Figures;
   keyRate: Metal | null;
+  /** The summary row's own index; an open row's panel is the row after it. */
   rowIndex: number;
   expanded: boolean;
   onToggle: (slug: string) => void;
@@ -184,39 +185,46 @@ function CosmeticRow({
   style,
 }: CosmeticRowProps) {
   const { slug } = cosmetic;
+  const toggle = useRef<HTMLButtonElement | null>(null);
   const toggleRef = useCallback(
-    (toggle: HTMLButtonElement | null) => registerToggle(slug, toggle),
+    (node: HTMLButtonElement | null) => {
+      toggle.current = node;
+      registerToggle(slug, node);
+    },
     [registerToggle, slug],
   );
 
   // Escape closes the row from anywhere inside it, which is where the focus is
-  // once a link has opened one.
+  // whenever a row is open: opening one always puts the focus on its toggle.
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key !== "Escape" || !expanded) return;
     event.stopPropagation();
     onCollapse(slug);
   };
 
+  /**
+   * A click on the row is a click on its toggle. Taking the focus is the point:
+   * a click landing on a plain cell would otherwise leave the focus on the body,
+   * and the viewer who just opened a row would have nothing to press Escape on.
+   */
+  const onRowClick = () => {
+    toggle.current?.focus();
+    onToggle(slug);
+  };
+
   return (
-    <div
-      role="row"
-      aria-rowindex={rowIndex}
-      data-slug={slug}
-      data-index={index}
-      ref={measure}
-      style={style}
-      className={`border-b border-black/5 text-xs sm:text-sm dark:border-white/10 ${
-        expanded ? "bg-black/[0.03] dark:bg-white/[0.04]" : ""
-      }`}
-      onKeyDown={onKeyDown}
-    >
-      {/* Presentational, so the cells below are still the row's own cells to a
-          screen reader rather than a nested group of their own. */}
+    // Presentational, so the two rows below are the rowgroup's own rows rather
+    // than something nested inside a row.
+    <div role="none" data-index={index} ref={measure} style={style} onKeyDown={onKeyDown}>
       <div
-        role="none"
+        role="row"
+        aria-rowindex={rowIndex}
+        data-slug={slug}
         style={{ height: ROW_HEIGHT }}
-        className={`${GRID} cursor-pointer`}
-        onClick={() => onToggle(slug)}
+        className={`${GRID} cursor-pointer border-b border-black/5 text-xs sm:text-sm dark:border-white/10 ${
+          expanded ? "border-transparent bg-black/[0.03] dark:border-transparent dark:bg-white/[0.04]" : ""
+        }`}
+        onClick={onRowClick}
       >
         <Cell column={0}>
           {cosmetic.backpackIcon === null ? null : (
@@ -253,8 +261,17 @@ function CosmeticRow({
         <Cell column={4}>{figures.dollars}</Cell>
       </div>
       {expanded ? (
-        <div role="cell" aria-colspan={COLUMNS.length}>
-          <CosmeticDetail cosmetic={cosmetic} keyRate={keyRate} id={detailId(slug)} />
+        // A row of its own, one cell wide across every column, which is what a
+        // table does with a detail panel. Folding it into the summary row
+        // instead would leave that row with six cells under five headings.
+        <div
+          role="row"
+          aria-rowindex={rowIndex + 1}
+          className="border-b border-black/5 text-xs sm:text-sm dark:border-white/10"
+        >
+          <div role="cell" aria-colindex={1} aria-colspan={COLUMNS.length} className="bg-black/[0.03] dark:bg-white/[0.04]">
+            <CosmeticDetail cosmetic={cosmetic} keyRate={keyRate} id={detailId(slug)} />
+          </div>
         </div>
       ) : null}
     </div>
@@ -273,6 +290,9 @@ export function CosmeticList({ cosmetics, keyRate, basis }: CosmeticListProps) {
     cosmetics.forEach((cosmetic, position) => index.set(cosmetic.slug, position));
     return index;
   }, [cosmetics]);
+
+  /** Where the open row sits in the list, which every row below it counts from. */
+  const expandedIndex = expandedSlug === null ? null : (indexBySlug.get(expandedSlug) ?? null);
 
   const virtualiser = useVirtualizer({
     count: cosmetics.length,
@@ -308,16 +328,22 @@ export function CosmeticList({ cosmetics, keyRate, basis }: CosmeticListProps) {
 
   // A link to a Cosmetic opens it: on arrival, and again whenever the hash
   // changes underneath us, which is what an in-page link to another row does.
+  // An address with no Cosmetic on it closes whatever was open, so the page and
+  // the address cannot say two different things.
   useEffect(() => {
-    const open = () => {
+    const follow = () => {
       const slug = slugInHash();
+      if (slug === "") {
+        setExpandedSlug(null);
+        return;
+      }
       if (!indexBySlug.has(slug)) return;
       setExpandedSlug(slug);
       setPendingFocus(slug);
     };
-    open();
-    window.addEventListener("hashchange", open);
-    return () => window.removeEventListener("hashchange", open);
+    follow();
+    window.addEventListener("hashchange", follow);
+    return () => window.removeEventListener("hashchange", follow);
   }, [indexBySlug]);
 
   // Bring the linked row into view. Only the scroll: the row it scrolls to may
@@ -343,9 +369,9 @@ export function CosmeticList({ cosmetics, keyRate, basis }: CosmeticListProps) {
     <div
       role="table"
       aria-label="Cosmetics"
-      // The header is a row too, so the count a screen reader announces each row
-      // out of has to include it.
-      aria-rowcount={cosmetics.length + 1}
+      // The header is a row too, and so is an open row's panel, so the count a
+      // screen reader announces each row out of has to include both.
+      aria-rowcount={cosmetics.length + 1 + (expandedIndex === null ? 0 : 1)}
       className="flex min-h-0 flex-1 flex-col"
     >
       <div role="rowgroup" className="border-b border-black/10 dark:border-white/15">
@@ -374,8 +400,10 @@ export function CosmeticList({ cosmetics, keyRate, basis }: CosmeticListProps) {
                 cosmetic={cosmetic}
                 figures={figuresFor(cosmetic, keyRate, basis)}
                 keyRate={keyRate}
-                // The header is row one, so the first Cosmetic is row two.
-                rowIndex={item.index + 2}
+                // The header is row one, so the first Cosmetic is row two — and
+                // every Cosmetic below an open one is a further row down,
+                // because that row's panel is a row in its own right.
+                rowIndex={item.index + 2 + (expandedIndex !== null && item.index > expandedIndex ? 1 : 0)}
                 expanded={cosmetic.slug === expandedSlug}
                 onToggle={toggle}
                 onCollapse={collapse}
