@@ -47,15 +47,27 @@ the time a run picks it up.
   catalogue. Its rows are virtualised, so eighteen hundred of them with a picture
   each scroll without the browser holding eighteen hundred rows. A phone has room
   for four columns across rather than five, so it carries the Metal Value on a
-  second line under the Cosmetic's name instead of dropping it.
+  second line under the Cosmetic's name instead of dropping it. A row opens in
+  place, one at a time; because an open row is taller by an amount that depends
+  on how its panel wraps, rows are measured rather than assumed and the fixed
+  height is only the estimate the list starts from.
+- `src/components/cosmetic-detail.tsx` — what an open row shows: the Price
+  Spread, the Reference Variant the figure is for, when the source last repriced
+  it, who can wear it, and the defindexes ADR-0003 folded into it.
 - `src/components/dollar-basis-switch.tsx` — the switch, as native radios so a
   keyboard walks it and a screen reader announces it without being told to. Each
   option carries its own rate, because that is the whole point of the choice.
 - `src/components/site-footer.tsx` — the credits. Nothing on the page is the
   site's own.
+- `src/catalogue/describe.ts` — the pure module that writes the catalogue's own
+  tokens out in English: a Class, a Quality, an Unpriced reason, a date.
 - `src/browser/remembered.ts` — a choice remembered in this browser and nowhere
   else. Every access is guarded, the page is right without it, and it is read
   after mount so the static markup React hydrates carries nobody's preference.
+
+The open Cosmetic's slug is the URL hash, so a row can be linked to, and every
+row carries its slug in `data-slug` — the hook the later wishlist and per-item
+pages hang off (ADR-0003).
 
 Styling is Tailwind utilities. Light and dark both follow the system colour
 scheme; there is no switch and nothing is stored.
@@ -75,7 +87,8 @@ cheapest price there is, Styles and an Unpriced item. The tests assert what a
 viewer sees: the rows, their order, and the figures as they are written on
 screen. `tests/setup.ts` gives jsdom a fixed 1024×800 viewport, because a
 virtualised list in a DOM that lays nothing out would decide nothing is visible
-and render no rows.
+and render no rows, and an element a `scrollTo` to call, because jsdom implements
+no scrolling at all.
 
 `tests/page.test.tsx` is the exception: it renders the page against the committed
 catalogue rather than the fixture, because the component suites drive the view
@@ -94,8 +107,9 @@ not run against 7, so this package pins `typescript@5`. Both are checked by
 
 ## Not here yet
 
-The Class View, filters, sort and search are #13; the expandable row with the
-Price Spread is #15; Worn Renders in place of Backpack Icons are #16.
+The Class View, filters, sort, search and their remembered state are #13; Worn
+Renders in place of Backpack Icons, and the Style switcher and Team toggle inside
+the open row, are #16.
 The whole catalogue is handed to the client as one payload, which is what makes
 the exported HTML large; trimming it to the fields a row needs is worth doing
 once those tickets have settled what a row needs.

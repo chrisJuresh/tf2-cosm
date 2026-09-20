@@ -14,6 +14,15 @@ const ORACLE = {
     { defindex: 103, name: "Ghastly Gibus", slug: "ghastly-gibus", aliases: [104], kind: "all-class" },
     { defindex: 105, name: "Tin Pot", slug: "tin-pot", aliases: [], kind: "class-exclusive" },
     { defindex: 109, name: "Dead of Night", slug: "dead-of-night", aliases: [], kind: "class-exclusive" },
+    {
+      defindex: 111,
+      name: "Scotsman's Stove Pipe",
+      slug: "scotsman-s-stove-pipe",
+      aliases: [],
+      kind: "class-exclusive",
+    },
+    { defindex: 112, name: "Crocodile Smile", slug: "crocodile-smile", aliases: [], kind: "class-exclusive" },
+    { defindex: 113, name: "Baronial Badge", slug: "baronial-badge", aliases: [], kind: "class-exclusive" },
   ],
   excluded: [
     { defindex: 106, reason: "medal" },
@@ -129,7 +138,7 @@ describe("the catalogue document", () => {
     const { catalogue } = buildCatalogue(fixtureInputs());
     expect(catalogue.header.counts).toMatchObject({
       cosmetics: catalogue.cosmetics.length,
-      classExclusive: 3,
+      classExclusive: 6,
       multiClass: 1,
       allClass: 1,
       aliasesMerged: 1,

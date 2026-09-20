@@ -9,8 +9,12 @@
  * printed next to it.
  */
 import { formatRefined, refinedToScrap, scrapToRefined, traderNotation, unitsToScrap } from "./metal.ts";
-import type { KeyRate, PricedVariant, Quality, Rates } from "./price-source.ts";
-import { chooseReferenceVariant, type ReferenceVariant } from "./reference-variant.ts";
+import type { KeyRate, PricedVariant, Rates } from "./price-source.ts";
+import {
+  chooseReferenceVariant,
+  type ReferenceVariant,
+  type ReferenceVariantContext,
+} from "./reference-variant.ts";
 import type { Metal, Price, PricePoint } from "../catalogue/schema.ts";
 
 /** A scrap count in the three forms the catalogue records it. */
@@ -86,6 +90,7 @@ function spreadOf(chosen: ReferenceVariant, keyRate: KeyRate): Price {
     state: "priced",
     referenceVariant: { quality: variant.quality, craftable: variant.craftable },
     currency: chosen.currency,
+    blanket: chosen.blanket,
     spread: {
       low: pointOf(low, chosen, keyRate),
       mid: pointOf(midpointOf(low, high), chosen, keyRate),
@@ -101,9 +106,9 @@ function spreadOf(chosen: ReferenceVariant, keyRate: KeyRate): Price {
  */
 export function priceOf(
   variants: readonly PricedVariant[] | undefined,
-  nativeQuality: Quality,
+  cosmetic: ReferenceVariantContext,
   rates: Rates,
 ): Price {
-  const chosen = chooseReferenceVariant(variants, nativeQuality, rates);
+  const chosen = chooseReferenceVariant(variants, cosmetic, rates);
   return "unpriced" in chosen ? { state: "unpriced", reason: chosen.unpriced } : spreadOf(chosen, rates.keyRate);
 }

@@ -15,13 +15,23 @@ function renderView(catalogue: Catalogue = fixtureCatalogue()) {
   return render(<CatalogueView catalogue={catalogue} />);
 }
 
-/** Every dollar figure on screen, in the order the rows run. */
-function dollarFigures(): string[] {
+/**
+ * Every dollar figure on screen, against the Cosmetic it belongs to. Keyed by
+ * name rather than by row, because the fixture is the shared Cosmetic oracle and
+ * grows whenever a new case has to be covered; a test that counted rows would
+ * break on a change that has nothing to do with it.
+ */
+function dollarFigures(): Record<string, string> {
   const [, body] = screen.getAllByRole("rowgroup");
   if (body === undefined) throw new Error("the list should have a header and a body");
-  return within(body)
-    .getAllByRole("row")
-    .map((row) => within(row).getAllByRole("cell")[4]?.textContent?.trim() ?? "");
+  return Object.fromEntries(
+    within(body)
+      .getAllByRole("row")
+      .map((row) => {
+        const cells = within(row).getAllByRole("cell");
+        return [cells[1]?.textContent?.trim() ?? "", cells[4]?.textContent?.trim() ?? ""];
+      }),
+  );
 }
 
 function chooseBasisNamed(name: RegExp): void {
@@ -59,12 +69,29 @@ describe("the Dollar Basis switch", () => {
 });
 
 describe("switching the Dollar Basis", () => {
-  // The fixture's five Cosmetics, priced at each basis's refined rate. Dead of
-  // Night is Unpriced, and the Ghastly Gibus is worth a ninth of a Refined,
-  // which is under a cent at every basis there is.
-  const AT_STEAM_MARKET = ["$0.04", "—", "$0.00", "$5.15", "$0.56"];
-  const AT_PRICE_SOURCE = ["$0.04", "—", "$0.00", "$5.31", "$0.58"];
-  const AT_MANN_CO_STORE = ["$0.05", "—", "$0.00", "$5.60", "$0.61"];
+  // The fixture's Cosmetics, priced at each basis's refined rate. Dead of Night
+  // is Unpriced; the Ghastly Gibus is worth a ninth of a Refined, which is under
+  // a cent at every basis there is; and the two Blanket Prices read as about,
+  // because the source quotes them for every cheap hat rather than for these
+  // (ADR-0004).
+  const AT_STEAM_MARKET = {
+    "Baronial Badge": "$0.18",
+    "Bolt Boy": "$0.04",
+    "Crocodile Smile": "≈$0.04",
+    "Dead of Night": "—",
+    "Ghastly Gibus": "$0.00",
+    "Scotsman's Stove Pipe": "≈$0.04",
+    "Team Captain": "$5.15",
+    "Tin Pot": "$0.56",
+  };
+  const AT_PRICE_SOURCE = { ...AT_STEAM_MARKET, "Team Captain": "$5.31", "Tin Pot": "$0.58" };
+  const AT_MANN_CO_STORE = {
+    ...AT_STEAM_MARKET,
+    "Baronial Badge": "$0.19",
+    "Bolt Boy": "$0.05",
+    "Team Captain": "$5.60",
+    "Tin Pot": "$0.61",
+  };
 
   it("recomputes every dollar figure on screen", () => {
     renderView();
@@ -81,8 +108,10 @@ describe("switching the Dollar Basis", () => {
     renderView();
     chooseBasisNamed(/Mann Co\. Store/);
     const [, body] = screen.getAllByRole("rowgroup");
-    const teamCaptain = within(body!).getAllByRole("row")[3]!;
-    expect(within(teamCaptain).getAllByRole("cell").map((cell) => cell.textContent?.trim())).toEqual([
+    const teamCaptain = within(body!)
+      .getAllByRole("row")
+      .find((row) => row.getAttribute("data-slug") === "team-captain");
+    expect(within(teamCaptain!).getAllByRole("cell").map((cell) => cell.textContent?.trim())).toEqual([
       "",
       "Team Captain",
       "2 keys, 19.66 ref",
@@ -109,7 +138,7 @@ describe("the basis a viewer chose", () => {
 
     renderView();
     expect(screen.getByRole("radio", { name: /Mann Co\. Store/ })).toBeChecked();
-    expect(dollarFigures()[3]).toBe("$5.60");
+    expect(dollarFigures()["Team Captain"]).toBe("$5.60");
   });
 
   it("gives way to the default when the snapshot no longer offers it", () => {
@@ -133,7 +162,7 @@ describe("the basis a viewer chose", () => {
     try {
       renderView();
       chooseBasisNamed(/Mann Co\. Store/);
-      expect(dollarFigures()[3]).toBe("$5.60");
+      expect(dollarFigures()["Team Captain"]).toBe("$5.60");
     } finally {
       Object.defineProperty(globalThis, "localStorage", { configurable: true, value: real });
     }
@@ -144,7 +173,7 @@ describe("the header", () => {
   it("says how many Cosmetics there are and what a Key is worth in Metal", () => {
     renderView();
     const header = screen.getByRole("banner");
-    expect(header).toHaveTextContent(/5 Cosmetics/);
+    expect(header).toHaveTextContent(/8 Cosmetics/);
     expect(header).toHaveTextContent(/a Key is 78\.66 ref/);
   });
 
@@ -179,7 +208,7 @@ describe("a snapshot with no Dollar Bases in it", () => {
     renderView({ ...catalogue, header: { ...catalogue.header, dollarBases: null } });
 
     expect(screen.queryByRole("radiogroup")).toBeNull();
-    expect(dollarFigures()).toEqual(["—", "—", "—", "—", "—"]);
+    expect(Object.values(dollarFigures()).every((figure) => figure === "—")).toBe(true);
     expect(screen.getByRole("banner")).not.toHaveTextContent(/a Key at the/);
   });
 });

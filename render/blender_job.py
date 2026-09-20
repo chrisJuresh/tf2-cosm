@@ -47,7 +47,7 @@ def _import_path(argv: list[str]) -> None:
 _import_path(sys.argv[sys.argv.index("--") + 1 :] if "--" in sys.argv else [])
 
 from render import scene as scene_plan  # noqa: E402
-from render.extract import CLASS_MODELS, DEFAULT_TF, ModelCache, ModelNotInArchive  # noqa: E402
+from render.extract import CLASS_MODELS, ModelCache, ModelNotInArchive  # noqa: E402
 from render.geometry import Vec3  # noqa: E402
 from render.jobs import validate_job_list  # noqa: E402
 from render.manifest import (  # noqa: E402
@@ -57,14 +57,11 @@ from render.manifest import (  # noqa: E402
     REASON_RENDER_ERROR,
     load_manifest,
 )
+from render.cli import add_job_filters, add_render_paths  # noqa: E402
 from render.mdlinfo import read_mdl  # noqa: E402
 from render.output import OutputLayout  # noqa: E402
 from render.selection import select_jobs, selected_teams  # noqa: E402
 from render.sourceio_patch import apply_patches  # noqa: E402
-
-DEFAULT_CACHE = REPO_ROOT / "assets-cache"
-SIZE = 1024
-SAMPLES = 32
 
 
 def log(*parts: object) -> None:
@@ -87,26 +84,9 @@ class RenderFailure(Exception):
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     argv = argv if argv is not None else (sys.argv[sys.argv.index("--") + 1 :] if "--" in sys.argv else [])
     parser = argparse.ArgumentParser(prog="blender_job", description=__doc__)
-    parser.add_argument("--jobs", type=Path, required=True, help="the job list from render.resolve")
-    parser.add_argument("--slug", nargs="*", default=None, help="Cosmetic slugs to render")
-    parser.add_argument("--class", dest="classes", nargs="*", default=None, help="Classes to render")
-    parser.add_argument("--style", dest="styles", nargs="*", type=int, default=None, help="Style indices")
-    parser.add_argument("--teams", nargs="*", default=list(scene_plan.TEAMS))
-    parser.add_argument("--tf", type=Path, default=DEFAULT_TF, help="the game's tf folder")
-    parser.add_argument("--cache", type=Path, default=DEFAULT_CACHE)
-    parser.add_argument(
-        "--out", type=Path, default=None, help="the output root images are written under"
-    )
-    parser.add_argument("--masters-dir", default=None, help="the image folder holding masters")
-    parser.add_argument("--manifest", type=Path, default=None)
-    parser.add_argument("--size", type=int, default=SIZE)
-    parser.add_argument("--samples", type=int, default=SAMPLES)
-    parser.add_argument(
-        "--site-packages",
-        type=Path,
-        default=DEFAULT_SITE_PACKAGES,
-        help="where vdf and vpk live; Blender's Python has its own site-packages",
-    )
+    add_job_filters(parser, teams_flag="--teams")
+    parser.set_defaults(teams=list(scene_plan.TEAMS))
+    add_render_paths(parser)
     return parser.parse_args(argv)
 
 
@@ -417,7 +397,7 @@ def render_team(
 
 def run(args: argparse.Namespace) -> int:
     layout = OutputLayout.from_env().overridden(
-        root=args.out, masters_dir=args.masters_dir, manifest=args.manifest
+        root=args.root, masters_dir=args.masters_dir, manifest=args.manifest
     )
     document = json.loads(args.jobs.read_text(encoding="utf-8"))
     validate_job_list(document)

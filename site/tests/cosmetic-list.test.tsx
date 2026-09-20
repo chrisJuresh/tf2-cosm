@@ -31,13 +31,23 @@ function cellsOf(row: HTMLElement): string[] {
     .map((cell) => cell.textContent?.trim() ?? "");
 }
 
+/** A row by the Cosmetic it is for, so adding one to the fixture moves nothing. */
+function rowFor(rows: readonly HTMLElement[], slug: string): HTMLElement {
+  const row = rows.find((one) => one.getAttribute("data-slug") === slug);
+  if (row === undefined) throw new Error(`no row for ${slug}`);
+  return row;
+}
+
 describe("the Cosmetic list", () => {
   it("shows every Cosmetic in the catalogue, in the catalogue's order", () => {
     const rows = renderList();
     expect(rows.map((row) => cellsOf(row)[1])).toEqual([
+      "Baronial Badge",
       "Bolt Boy",
+      "Crocodile Smile",
       "Dead of Night",
       "Ghastly Gibus",
+      "Scotsman's Stove Pipe",
       "Team Captain",
       "Tin Pot",
     ]);
@@ -45,24 +55,38 @@ describe("the Cosmetic list", () => {
 
   it("writes a price in Keys in Trader Notation, and the same price in Refined beside it", () => {
     const rows = renderList();
-    const teamCaptain = rows[3];
-    expect(teamCaptain).toBeDefined();
-    expect(cellsOf(teamCaptain!)).toEqual(["", "Team Captain", "2 keys, 19.66 ref", "177 ref", "$5.15"]);
+    const teamCaptain = rowFor(rows, "team-captain");
+    expect(cellsOf(teamCaptain)).toEqual(["", "Team Captain", "2 keys, 19.66 ref", "177 ref", "$5.15"]);
   });
 
   it("writes a price in Metal the same way in both columns", () => {
     const rows = renderList();
-    expect(cellsOf(rows[0]!)).toEqual(["", "Bolt Boy", "1.44 ref", "1.44 ref", "$0.04"]);
+    expect(cellsOf(rowFor(rows, "bolt-boy"))).toEqual(["", "Bolt Boy", "1.44 ref", "1.44 ref", "$0.04"]);
   });
 
   it("writes the cheapest price there is rather than rounding it away", () => {
     const rows = renderList();
-    expect(cellsOf(rows[2]!).slice(2)).toEqual(["0.11 ref", "0.11 ref", "$0.00"]);
+    expect(cellsOf(rowFor(rows, "ghastly-gibus")).slice(2)).toEqual(["0.11 ref", "0.11 ref", "$0.00"]);
+  });
+
+  it("writes a Blanket Price as about, since the source quotes it for every cheap hat", () => {
+    // The Scotsman's Stove Pipe is priced at one Random Craft Hat, which is a
+    // figure backpack.tf lays over the whole class rather than one it observed
+    // for this Cosmetic (ADR-0004).
+    const rows = renderList();
+    expect(cellsOf(rowFor(rows, "scotsman-s-stove-pipe")).slice(2)).toEqual([
+      "≈1.33 ref",
+      "≈1.33 ref",
+      "≈$0.04",
+    ]);
+    // The Baronial Badge's blanket figure was passed over, so its Genuine price
+    // is written plainly.
+    expect(cellsOf(rowFor(rows, "baronial-badge")).slice(2)).toEqual(["6.11 ref", "6.11 ref", "$0.18"]);
   });
 
   it("says an Unpriced Cosmetic is Unpriced and shows no figures for it", () => {
     const rows = renderList();
-    const deadOfNight = rows[1]!;
+    const deadOfNight = rowFor(rows, "dead-of-night");
     expect(within(deadOfNight).getByText("Unpriced")).toBeInTheDocument();
     expect(deadOfNight.textContent).not.toContain("$");
   });
@@ -84,16 +108,28 @@ describe("the Cosmetic list", () => {
     // Cosmetic must not come out as "row 1,834 of 1,833".
     const rows = renderList();
     const table = screen.getByRole("table");
-    expect(table).toHaveAttribute("aria-rowcount", "6");
-    expect(rows.map((row) => row.getAttribute("aria-rowindex"))).toEqual(["2", "3", "4", "5", "6"]);
+    expect(table).toHaveAttribute("aria-rowcount", "9");
+    expect(rows.map((row) => row.getAttribute("aria-rowindex"))).toEqual([
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7",
+      "8",
+      "9",
+    ]);
   });
 
   it("addresses each row by the Cosmetic's slug, so a later per-item page can link to it", () => {
     const rows = renderList();
     expect(rows.map((row) => row.getAttribute("data-slug"))).toEqual([
+      "baronial-badge",
       "bolt-boy",
+      "crocodile-smile",
       "dead-of-night",
       "ghastly-gibus",
+      "scotsman-s-stove-pipe",
       "team-captain",
       "tin-pot",
     ]);
@@ -103,7 +139,7 @@ describe("the Cosmetic list", () => {
 describe("the Backpack Icon", () => {
   it("is loaded lazily and named for the Cosmetic it pictures", () => {
     const rows = renderList();
-    const icon = within(rows[0]!).getByRole("img");
+    const icon = within(rowFor(rows, "bolt-boy")).getByRole("img");
     expect(icon).toHaveAttribute("loading", "lazy");
     expect(icon).toHaveAccessibleName("Bolt Boy");
     expect(icon.getAttribute("src")).toContain("boltboy");
@@ -119,11 +155,12 @@ describe("the Backpack Icon", () => {
   });
 
   it("leaves a blank rather than a broken image when the Cosmetic has no icon", () => {
-    const cosmetics = fixtureCosmetics();
-    const first = cosmetics[0]!;
-    const rows = renderList({ cosmetics: [{ ...first, backpackIcon: null }, ...cosmetics.slice(1)] });
-    expect(within(rows[0]!).queryByRole("img")).toBeNull();
-    expect(cellsOf(rows[0]!)[1]).toBe("Bolt Boy");
+    const cosmetics = fixtureCosmetics().map((cosmetic) =>
+      cosmetic.slug === "bolt-boy" ? { ...cosmetic, backpackIcon: null } : cosmetic,
+    );
+    const boltBoy = rowFor(renderList({ cosmetics }), "bolt-boy");
+    expect(within(boltBoy).queryByRole("img")).toBeNull();
+    expect(cellsOf(boltBoy)[1]).toBe("Bolt Boy");
   });
 });
 
@@ -133,12 +170,12 @@ describe("a snapshot with no prices in it", () => {
     // which is not the same thing as the source having no price for it.
     const cosmetics = fixtureCosmetics().map((cosmetic) => ({ ...cosmetic, price: null }));
     const rows = renderList({ cosmetics, keyRate: null, basis: null });
-    expect(rows).toHaveLength(5);
-    expect(cellsOf(rows[3]!)).toEqual(["", "Team Captain", "—", "—", "—"]);
+    expect(rows).toHaveLength(8);
+    expect(cellsOf(rowFor(rows, "team-captain"))).toEqual(["", "Team Captain", "—", "—", "—"]);
   });
 
   it("writes prices in Refined alone when the snapshot carries no Key Rate", () => {
     const rows = renderList({ keyRate: null, basis: null });
-    expect(cellsOf(rows[3]!)).toEqual(["", "Team Captain", "177 ref", "177 ref", "—"]);
+    expect(cellsOf(rowFor(rows, "team-captain"))).toEqual(["", "Team Captain", "177 ref", "177 ref", "—"]);
   });
 });

@@ -92,7 +92,7 @@ def rendered(tmp_path_factory) -> tuple[dict, Path]:
             "--teams", "red", "blu",
             "--tf", str(TF),
             "--cache", str(CACHE),
-            "--out", str(out),
+            "--root", str(out),
             "--manifest", str(manifest_file),
             "--site-packages", str(SITE_PACKAGES),
         ],

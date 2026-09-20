@@ -241,5 +241,63 @@
 			"item_slot"		"primary"
 			"item_name"		"#TF_Scattergun"
 		}
+
+		// Issued in Play by dropping: a craft hat whose blanket price is its real one,
+		// although a Genuine copy of it is priced too (ADR-0004).
+		"111"
+		{
+			"name"		"Scotsman's Stove Pipe"
+			"prefab"		"hat"
+			"item_name"		"#TF_StovePipe"
+			"drop_type"		"drop"
+			"used_by_classes"
+			{
+				"Demoman"	"1"
+			}
+			"model_player"	"models/player/items/demo/stove_pipe.mdl"
+		}
+
+		// Issued in Play by a loot list rather than by dropping: no drop of its own,
+		// but "Crocodile Smile" is what the case at the foot of this file hands out.
+		"112"
+		{
+			"name"		"Crocodile Smile"
+			"prefab"		"hat"
+			"item_name"		"#TF_CrocodileSmile"
+			"drop_type"		"none"
+			"used_by_classes"
+			{
+				"Sniper"	"1"
+			}
+			"model_player"	"models/player/items/sniper/crocodile_smile.mdl"
+		}
+
+		// A promo the game never issues: no drop, in no loot list. Its blanket Unique
+		// price is an artefact, so its Genuine price is the Reference Price.
+		"113"
+		{
+			"name"		"Baronial Badge"
+			"prefab"		"misc"
+			"item_name"		"#TF_BaronialBadge"
+			"used_by_classes"
+			{
+				"Engineer"	"1"
+			}
+			"model_player"	"models/player/items/engineer/baronial_badge.mdl"
+		}
+	}
+
+	// What a case can hand out. The Cosmetic rule never reads this; the price rule
+	// does, to tell a Cosmetic the game issues from one it only ever gave away.
+	"client_loot_lists"
+	{
+		"summer2015_cosmetics"
+		{
+			"Crocodile Smile"	"1"
+			"lootlist_job_templates"
+			{
+				"add_kill_eater_and_strange"	"1"
+			}
+		}
 	}
 }

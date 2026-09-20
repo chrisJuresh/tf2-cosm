@@ -14,6 +14,22 @@ export interface ItemDefinition {
 export interface ItemsGameDocument {
   readonly prefabs: Readonly<Record<string, ItemDefinition>>;
   readonly items: Readonly<Record<string, ItemDefinition>>;
+  /**
+   * Every item the game's loot lists and collections can hand out, keyed by
+   * `lootListKey`. One half of whether a Cosmetic is Issued in Play (ADR-0004);
+   * `drop_type` is the other.
+   */
+  readonly lootListItems: ReadonlySet<string>;
+}
+
+/**
+ * The key `lootListItems` is built and read under. A loot list writes an item's
+ * internal `name` with whatever casing the file happens to use, so both sides of
+ * the join reduce it the same way — the same trick `priceKey` plays on the other
+ * join this job makes.
+ */
+export function lootListKey(name: string): string {
+  return name.trim().toLowerCase();
 }
 
 type Mutable = Record<string, ItemDefinitionValue>;
