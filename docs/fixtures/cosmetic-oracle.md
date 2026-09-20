@@ -11,7 +11,12 @@ The agreement is pinned by one fixture, used by both:
 - `tests/fixtures/tf_english_excerpt.txt` — the English names for those items.
 
 Both implementations resolve this fixture and must produce the verdicts in the table below.
-A change to the Cosmetic rule changes this file and both test suites together.
+A change to the Cosmetic rule changes this file and both test suites together:
+
+```bash
+./.venv/Scripts/python.exe -m pytest      # tests/test_resolve.py
+pnpm test                                 # data/tests/build-catalogue.test.ts
+```
 
 ## Verdicts
 
@@ -31,6 +36,16 @@ A change to the Cosmetic rule changes this file and both test suites together.
 Display names drop a leading "The" (ADR-0003), so the catalogue names are `Bolt Boy`,
 `Team Captain`, `Ghastly Gibus`, `Tin Pot` and `Dead of Night`, with slugs `bolt-boy`,
 `team-captain`, `ghastly-gibus`, `tin-pot`, `dead-of-night`.
+
+## What the catalogue additionally asserts
+
+Identity and the fields the site reads are the catalogue's business:
+
+- 103 is one Cosmetic with alias `[104]`; the catalogue's row carries defindex 103.
+- 105 carries its Styles by English name, "Closed" and "Open"; 102, which has no Styles
+  of its own, carries none.
+- 109 is `paintable`, 101 is not.
+- Two items sharing an English name but not their models fail the run loudly (ADR-0003).
 
 ## What the render job additionally asserts
 

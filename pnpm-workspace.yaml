@@ -1,0 +1,7 @@
+packages:
+  - data
+
+# esbuild ships a prebuilt binary that its install script puts in place; tsx and
+# vitest do not run without it.
+allowBuilds:
+  esbuild: true

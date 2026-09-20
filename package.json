@@ -1,0 +1,10 @@
+{
+  "name": "tf2-cosm",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build-catalogue": "pnpm --filter @tf2-cosm/data build-catalogue",
+    "test": "pnpm --filter @tf2-cosm/data test",
+    "typecheck": "pnpm --filter @tf2-cosm/data typecheck"
+  }
+}
