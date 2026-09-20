@@ -48,12 +48,19 @@ for (user story 22). Everything the manifest records is *relative to the output 
 <root>/<derivatives_dir>/<slug>/<class>-<team>-<style>@<size>.webp  a web size
 ```
 
-The root, both image folders and the manifest's own path are configuration —
+An image folder may be nested (`images/masters`); what it may not be is absolute or a path
+that climbs out of the root. The root, both image folders and the manifest's own path are
+configuration —
 `RENDER_OUTPUT_ROOT`, `RENDER_MASTERS_DIR`, `RENDER_DERIVATIVES_DIR`, `RENDER_MANIFEST` in
 the environment, each beaten by the matching command-line argument. The day the folder
 becomes a bucket, an uploader walks the manifest and pushes each relative path; nothing else
 in the job changes. The manifest and its JSON Schema are committed under `catalogue/`; the
-images never are.
+images never are — `renders/` is ignored, and a root pointed anywhere else inside the
+repository has to be ignored too.
+
+A manifest from an older version of the job is not migrated. It is a record of images on
+this disk, every one of which can be rendered again, so the job says so and stops rather
+than carrying a converter for every past shape.
 
 ## Why deriving is a step of its own
 

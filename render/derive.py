@@ -71,16 +71,19 @@ def derive_all(
     outcome = Outcome()
     for slug, cls, team, style, entry in list(manifest.entries()):
         where = f"{slug}/{cls}/{team}/{style}"
-        wanted = layout.derivative_relpaths(entry["master"]["path"], sizes)
-        if not force and _is_finished(entry, wanted, layout):
-            outcome.skipped += 1
-            continue
         master = layout.path_for(entry["master"]["path"])
-        if dry_run:
-            on_log(f"would derive {where} from {entry['master']['path']}")
-            outcome.derived += 1
-            continue
         try:
+            # Inside the try with the rest: working out where a derivative goes is itself a
+            # step that can refuse an entry — one recorded under a masters folder this run is
+            # not configured for — and that must be a recorded failure like any other.
+            wanted = layout.derivative_relpaths(entry["master"]["path"], sizes)
+            if not force and _is_finished(entry, wanted, layout):
+                outcome.skipped += 1
+                continue
+            if dry_run:
+                on_log(f"would derive {where} from {entry['master']['path']}")
+                outcome.derived += 1
+                continue
             written = write_derivatives(master, wanted, layout.root)
         except (OSError, EmptyMaster, ValueError) as error:
             on_log(f"FAILED {where}: {error!r}")

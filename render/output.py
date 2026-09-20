@@ -90,12 +90,15 @@ class OutputLayout:
 
     def derivative_relpath(self, master_relpath: str, size: int) -> str:
         """Where one derivative of `master_relpath` lives, relative to the output root."""
+        # Compared a segment at a time, not as a string: an image folder may be nested
+        # (`images/masters`), and `masters-old/...` must not read as being under `masters`.
         master = PurePosixPath(master_relpath)
-        if master.parts[:1] != (self.masters_dir,):
+        folder = PurePosixPath(self.masters_dir).parts
+        if master.parts[: len(folder)] != folder:
             raise ValueError(
                 f"{master_relpath!r} is not under the masters folder {self.masters_dir!r}"
             )
-        inside = PurePosixPath(*master.parts[1:])
+        inside = PurePosixPath(*master.parts[len(folder) :])
         return str(
             PurePosixPath(self.derivatives_dir)
             / inside.with_name(f"{inside.stem}@{size}.{DERIVATIVE_FORMAT}")

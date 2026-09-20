@@ -161,6 +161,25 @@ def test_one_bad_master_never_stops_the_rest(tmp_path):
     assert manifest.entry("team-captain", "soldier", "red", 1)["derivatives"]
 
 
+def test_a_master_left_by_an_older_layout_is_a_recorded_failure_not_a_stopped_run(tmp_path):
+    """An entry from a run with a different RENDER_MASTERS_DIR has no derivative path here."""
+    layout = a_layout(tmp_path)
+    manifest = Manifest()
+    stale = a_job(style=0)
+    manifest.record(stale, "red", path="elsewhere/team-captain/soldier-red-0.png",
+                    width=64, height=64, at=AT)
+    good = a_job(style=1)
+    relpath = layout.master_relpath(good, "red")
+    manifest.record(good, "red", path=relpath, width=64, height=64, at=AT)
+    write_master(layout, relpath)
+
+    outcome = derive_all(manifest, layout, SIZES, at=AT)
+
+    assert outcome.derived == 1 and outcome.failed == 1
+    assert manifest.to_document()["failures"][0]["reason"] == REASON_DERIVE_ERROR
+    assert manifest.entry("team-captain", "soldier", "red", 1)["derivatives"]
+
+
 def test_the_command_writes_the_manifest_it_finished(tmp_path):
     layout = a_layout(tmp_path)
     manifest, relpath = a_manifest(layout)
