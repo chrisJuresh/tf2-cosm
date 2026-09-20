@@ -104,6 +104,14 @@ class Manifest:
             .get(str(style))
         )
 
+    def failure(self, slug: str, cls: str, team: str, style: int) -> dict | None:
+        """Why one job produced no image last time, or None if it has never been tried."""
+        identity = (slug, cls, team, style)
+        for failure in self._document["failures"]:
+            if (failure["slug"], failure["class"], failure["team"], failure["style"]) == identity:
+                return failure
+        return None
+
     def record(
         self,
         job: dict,

@@ -5,27 +5,70 @@ The spike that established these facts is gone; this is what replaced it.
 
 ## Running it
 
-Resolve first, then render the jobs you want:
+Resolve first, then run the batch runner. These two commands are the whole job:
 
 ```bash
 ./.venv/Scripts/python.exe -m render.resolve --out jobs.json
 ```
 
 ```bash
-"C:/Program Files/Blender Foundation/Blender 5.2/blender.exe" -b --factory-startup --python render/blender_job.py -- --jobs jobs.json --slug team-captain --teams red blu
+./.venv/Scripts/python.exe -m render.batch --jobs jobs.json
 ```
 
-Useful arguments (all optional): `--class`, `--style` to narrow further; `--out` for the
-master images (default `renders/masters`); `--manifest` (default `catalogue/renders.json`);
-`--tf`, `--cache`, `--size`, `--samples`; `--site-packages` when the venv is not at
-`.venv/` beside the script — a worktree, for instance, where it is the main checkout's.
+The second one renders everything the manifest does not already have, a batch of jobs per
+Blender process, and prints progress and an estimate of time remaining as it goes. Run it
+again and it renders only what is still missing, so stopping it with ctrl-c, a crash or a
+power cut costs the batch that was in flight and nothing more. A run over work that is
+already done opens Blender not at all.
+
+Useful arguments (all optional):
+
+- `--dry-run` — list what would be rendered and open nothing. Check the counts after a game
+  update.
+- `--slug`, `--class`, `--team`, `--style` — render a subset while fixing one item.
+- `--batch-size` — images per Blender process (default 40). Smaller loses less to a crash;
+  larger amortises the mount and the class import over more frames.
+- `--retry-failed` — render the jobs that failed on an earlier run. Without it they are left
+  alone, because a second run that repeats yesterday's failures has done nothing.
+- `--trust-manifest` — skip the check that every recorded image is still on disk. The check
+  costs one `stat` an image and is what makes a deleted or moved image come back.
+- `--out` (masters, default `renders/masters`), `--manifest` (default
+  `catalogue/renders.json`), `--blender`, `--tf`, `--cache`, `--size`, `--samples`.
+- `--site-packages` when the venv is not at `.venv/` beside the script — a worktree, for
+  instance, where it is the main checkout's.
+
+Exit codes: 0 when every image planned was either rendered or recorded as a failure, 1 when
+a Blender process died and took some with it (run it again; it picks up where it stopped),
+2 when the command itself is wrong — no Blender, or a selection that matches no job.
+
+To drive one Blender process yourself — debugging an import, mostly — the render step is
+still a command of its own, and takes the same filters:
+
+```bash
+"C:/Program Files/Blender Foundation/Blender 5.2/blender.exe" -b --factory-startup --python render/blender_job.py -- --jobs jobs.json --slug team-captain --teams red blu
+```
 
 The render step extracts each job's models into the assets cache itself; `render.extract`
 stays a command for filling the cache ahead of time.
 
 Failures never stop a run. Each one lands in the manifest as `{reason, detail}` —
 `model-missing`, `import-error`, `no-skeleton` or `render-error` — and the site falls back
-to the Backpack Icon for it (ADR-0001).
+to the Backpack Icon for it (ADR-0001). The runner prints the whole failure list, grouped by
+reason, when it finishes.
+
+## What resuming is decided from
+
+`render.plan` decides, from the job list and the manifest alone, what a run still owes:
+
+- An image is **done** when the manifest has an entry for it whose `job_version` is the
+  current `JOB_LIST_VERSION` and — unless `--trust-manifest` — the file it names is on disk.
+  Bumping `JOB_LIST_VERSION` therefore re-renders everything, which is the point of it.
+- An image that **failed** before is left alone until `--retry-failed`.
+- Everything else is work, and the unit of work is one image: a job whose RED is rendered and
+  whose BLU is not goes back to Blender for BLU only.
+
+Jobs wanting different Teams are never batched together, because a Blender process renders
+every job in its batch on every Team it is given.
 
 ## What one render is
 
