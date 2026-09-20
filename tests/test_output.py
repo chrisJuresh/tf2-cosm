@@ -105,3 +105,24 @@ def test_an_image_folder_that_escapes_the_output_root_is_refused(tmp_path):
 def test_a_derivative_path_is_refused_for_a_master_outside_the_masters_folder(tmp_path):
     with pytest.raises(ValueError, match="masters"):
         a_layout(tmp_path).derivative_relpath("elsewhere/soldier-red-0.png", 256)
+
+
+def test_a_nested_image_folder_works_the_whole_way_through(tmp_path):
+    layout = OutputLayout.from_env(
+        {"RENDER_MASTERS_DIR": "images/masters", "RENDER_DERIVATIVES_DIR": "images/web"},
+        repo_root=tmp_path,
+    )
+
+    master = layout.master_relpath(a_job(), "red")
+
+    assert master == "images/masters/team-captain/soldier-red-0.png"
+    assert layout.derivative_relpath(master, 256) == (
+        "images/web/team-captain/soldier-red-0@256.webp"
+    )
+
+
+def test_a_master_under_a_folder_that_merely_starts_the_same_is_not_mistaken_for_one(tmp_path):
+    layout = a_layout(tmp_path)
+
+    with pytest.raises(ValueError, match="masters"):
+        layout.derivative_relpath("masters-old/team-captain/soldier-red-0.png", 256)

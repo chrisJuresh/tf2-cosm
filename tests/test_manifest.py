@@ -269,6 +269,14 @@ def test_loading_a_manifest_that_is_not_there_starts_an_empty_one(tmp_path):
     assert load_manifest(tmp_path / "absent.json").to_document()["renders"] == {}
 
 
+def test_a_manifest_from_an_older_version_says_what_to_do_about_itself(tmp_path):
+    out = tmp_path / "renders.json"
+    out.write_text(json.dumps({"version": 1, "renders": {}, "failures": []}), encoding="utf-8")
+
+    with pytest.raises(InvalidManifest, match="delete it and render again"):
+        load_manifest(out)
+
+
 def test_a_written_manifest_is_valid(tmp_path):
     manifest = Manifest()
     manifest.record(a_job(), "red", path="p.png", width=1024, height=1024, at=AT)
