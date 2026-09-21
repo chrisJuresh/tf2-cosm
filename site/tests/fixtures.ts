@@ -1,7 +1,7 @@
 /**
- * The fixture catalogue every component test is driven from: five Cosmetics that
+ * The fixture catalogue every component test is driven from: eight Cosmetics that
  * between them cover a price in Metal, a price in Keys, the cheapest price there
- * is, Styles, an Unpriced item and all three kinds.
+ * is, Styles, an Unpriced item, an Event-Only Cosmetic and all three kinds.
  *
  * It is not a copy. This is the data job's own golden document, built from the
  * shared Cosmetic oracle — the one fixture the render job and the data job must

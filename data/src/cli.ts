@@ -237,6 +237,7 @@ async function main(): Promise<number> {
   console.log(`    Multi-Class      ${counts.multiClass}`);
   console.log(`    All-Class        ${counts.allClass}`);
   console.log(`  aliases merged     ${counts.aliasesMerged}`);
+  console.log(`  Event-Only         ${counts.eventOnly}`);
   console.log(`  without an icon    ${counts.withoutBackpackIcon}`);
   for (const [reason, count] of [...excludedByReason].sort()) console.log(`  excluded ${reason.padEnd(14)} ${count}`);
 

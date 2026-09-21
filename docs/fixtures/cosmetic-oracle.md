@@ -33,7 +33,7 @@ pnpm test                                 # data/tests/build-catalogue.test.ts
 | 109 | The Dead of Night | Cosmetic | Misc slot, worn below the head, paintable |
 | 110 | Scattergun | Not a Cosmetic | Not a wearable at all |
 | 111 | The Scotsman's Stove Pipe | Cosmetic (Class-Exclusive) | Demoman; `drop_type` of `drop`, so Issued in Play |
-| 112 | Crocodile Smile | Cosmetic (Class-Exclusive) | Sniper; no drop of its own, but a loot list hands it out |
+| 112 | Crocodile Smile | Cosmetic (Class-Exclusive) | Sniper; no drop of its own, but a loot list hands it out; Event-Only |
 | 113 | The Baronial Badge | Cosmetic (Class-Exclusive) | Engineer, misc slot; issued by neither route |
 
 Display names drop a leading "The" (ADR-0003), so the catalogue names are `Bolt Boy`,
@@ -54,6 +54,9 @@ Identity and the fields the site reads are the catalogue's business:
 - 105 carries its Styles by English name, "Closed" and "Open"; 102, which has no Styles
   of its own, carries none.
 - 109 is `paintable`, 101 is not.
+- 112 is an Event-Only Cosmetic, bound to `halloween_or_fullmoon`; every other one in the
+  fixture is bound to no event. The restriction is a field, not an exclusion: 112 is a
+  Cosmetic, and both jobs still render and price it.
 - Two items sharing an English name but not their models fail the run loudly (ADR-0003).
 
 Prices are the catalogue's alone — the render job never sees them — and hang off the same

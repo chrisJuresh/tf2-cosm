@@ -1,9 +1,10 @@
 # Catalogue data job
 
 Builds the catalogue file the site reads: every Cosmetic, with identity, Classes,
-slot, paintable flag, Styles, Backpack Icons and its Reference Price, under a
-header that records the snapshot time, the Key Rate, the three Dollar Bases and
-the counts. The catalogue's schema is versioned; this is version 3.
+slot, paintable flag, event restriction, Styles, Backpack Icons and its Reference
+Price, under a header that records the snapshot time, the Key Rate, the three
+Dollar Bases and the counts. The catalogue's schema is versioned; this is
+version 5.
 
 ## Running it
 

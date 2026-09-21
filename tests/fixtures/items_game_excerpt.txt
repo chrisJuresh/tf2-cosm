@@ -270,6 +270,9 @@
 				"Sniper"	"1"
 			}
 			"model_player"	"models/player/items/sniper/crocodile_smile.mdl"
+			// Event-Only: the game only draws it while Halloween or a full moon
+			// is running. Still a Cosmetic, still priced and catalogued like one.
+			"holiday_restriction"	"halloween_or_fullmoon"
 		}
 
 		// A promo the game never issues: no drop, in no loot list. Its blanket Unique

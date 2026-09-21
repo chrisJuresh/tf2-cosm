@@ -150,7 +150,7 @@ its icon, which is what production does for an unrendered Cosmetic too.
   provenance like the rest of it. Which rate's date is shown depends on the
   Dollar Basis in force, so the view hands it in.
 - `src/catalogue/describe.ts` — the pure module that writes the catalogue's own
-  tokens out in English: a Class, a Quality, an Unpriced reason, a date.
+  tokens out in English: a Class, a Quality, an Unpriced reason, an event, a date.
 - `src/browser/remembered.ts` — a choice remembered in this browser and nowhere
   else. Every access is guarded, the page is right without it, and it is read
   after mount so the static markup React hydrates carries nobody's preference.
@@ -187,8 +187,8 @@ Component tests are driven from `data/tests/golden/catalogue.json` — the docum
 the data job builds from the shared Cosmetic oracle, read where it lives rather
 than copied here, so a change to the catalogue's shape reaches these tests the
 moment it lands. Its Cosmetics cover a price in Metal, a price in Keys, the
-cheapest price there is, Styles, an Unpriced item and all three of
-Class-Exclusive, Multi-Class and All-Class — which is what makes them an oracle
+cheapest price there is, Styles, an Unpriced item, an Event-Only Cosmetic and all
+three of Class-Exclusive, Multi-Class and All-Class — which is what makes them an oracle
 for the Class View rules as well as for the figures. The tests assert what a
 viewer sees: the cards, their order, and the figures as they are written on
 screen.

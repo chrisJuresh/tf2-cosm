@@ -5,7 +5,13 @@ import { describe, expect, it } from "vitest";
 
 import { fixtureCosmetics } from "./fixtures.ts";
 
-import { classesRead, priceDateRead, referenceVariantRead, unpricedReasonRead } from "@/catalogue/describe";
+import {
+  classesRead,
+  eventRestrictionRead,
+  priceDateRead,
+  referenceVariantRead,
+  unpricedReasonRead,
+} from "@/catalogue/describe";
 
 function fixture(slug: string) {
   const cosmetic = fixtureCosmetics().find((candidate) => candidate.slug === slug);
@@ -43,6 +49,19 @@ describe("the Reference Variant", () => {
 
   it("writes a Quality whose name is not just its token capitalised", () => {
     expect(referenceVariantRead({ quality: "collectors", craftable: true })).toBe("Collector's, craftable");
+  });
+});
+
+describe("the event an Event-Only Cosmetic is worn during", () => {
+  it("names the events the game gates Cosmetics behind", () => {
+    expect(eventRestrictionRead("halloween_or_fullmoon")).toBe("Halloween or a full moon");
+    expect(eventRestrictionRead("christmas")).toBe("Smissmas");
+  });
+
+  it("shows a token it does not know rather than swallowing it", () => {
+    // The catalogue deliberately does not close the list of events, so this is
+    // what a Valve event nobody has named here yet looks like on the page.
+    expect(eventRestrictionRead("summer_scorch")).toBe("summer scorch");
   });
 });
 

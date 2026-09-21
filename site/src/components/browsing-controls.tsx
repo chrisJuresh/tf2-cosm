@@ -2,7 +2,7 @@
 
 /**
  * The bar the catalogue is browsed with: a name search, the Class View picker,
- * the slot filter, the sort, and the two toggles.
+ * the slot filter, the sort, and the three toggles.
  *
  * Every control is a plain form control with a real label. That is what makes
  * them keyboard operable and announced properly without a line of code for
@@ -218,6 +218,14 @@ export function BrowsingControlsBar({ controls, onChange, shown, total }: Browsi
           label="Hide Unpriced"
           checked={controls.hideUnpriced}
           onChange={(checked) => onChange({ hideUnpriced: checked })}
+        />
+        {/* Ticked when the page opens, so the toggle is also how a viewer finds
+            out the Event-Only Cosmetics are in the catalogue at all. */}
+        <Toggle
+          id="hide-event-only"
+          label="Hide Event-Only"
+          checked={controls.hideEventOnly}
+          onChange={(checked) => onChange({ hideEventOnly: checked })}
         />
         {/* Announced when it changes, so a viewer working the controls from the
             keyboard hears what a sighted viewer sees the list do. */}

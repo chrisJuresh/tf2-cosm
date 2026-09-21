@@ -29,6 +29,7 @@ describe("reading the remembered controls", () => {
       hideAllClass: true,
       slot: "misc",
       hideUnpriced: true,
+      hideEventOnly: false,
       sort: "name",
     } as const;
     writeControls(localStorage, controls);
@@ -39,6 +40,19 @@ describe("reading the remembered controls", () => {
     writeControls(localStorage, { ...DEFAULT_CONTROLS, classView: "medic", hideUnpriced: true });
     localStorage.clear();
     expect(readControls(localStorage)).toEqual(DEFAULT_CONTROLS);
+  });
+
+  it("keeps the Event-Only toggle on for a browser that was here before it existed", () => {
+    // The document from an older build carries no such field. Read field by
+    // field, an absent one costs its own default and not the rest — and the
+    // default is the one a viewer who has never seen the toggle should get.
+    localStorage.setItem(CONTROLS_STORAGE_KEY, JSON.stringify({ classView: "medic", sort: "name" }));
+    expect(readControls(localStorage)).toEqual({
+      ...DEFAULT_CONTROLS,
+      classView: "medic",
+      sort: "name",
+      hideEventOnly: true,
+    });
   });
 
   it("does not remember the search: a visit starts on the whole list, not mid-word", () => {

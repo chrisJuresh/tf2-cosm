@@ -6,7 +6,8 @@
  * each Cosmetic's Reference Variant and Price Spread, and the Key Rate they were
  * converted at. Version 3 completes the header with the Dollar Bases — the rate
  * each dollar figure the site shows is computed from. Version 4 marks a price
- * the source quoted in a blanket currency (ADR-0004).
+ * the source quoted in a blanket currency (ADR-0004). Version 5 records which
+ * event an Event-Only Cosmetic is bound to.
  */
 import { z } from "zod";
 
@@ -14,7 +15,7 @@ import { CLASSES, COSMETIC_SLOTS } from "./cosmetic-rule.ts";
 import { PRICE_CURRENCIES, QUALITIES } from "../prices/price-source.ts";
 import { UNPRICED_REASONS } from "../prices/reference-variant.ts";
 
-export const CATALOGUE_SCHEMA_VERSION = 4;
+export const CATALOGUE_SCHEMA_VERSION = 5;
 
 /**
  * The vocabularies the fields below are drawn from, re-exported so that a reader
@@ -91,6 +92,14 @@ const cosmeticSchema = z.object({
   /** Whether a copy can be painted; the catalogue records it so the site can filter on it. */
   paintable: z.boolean(),
   /**
+   * The event an Event-Only Cosmetic may be worn during, as the game's own
+   * `holiday_restriction` token — `halloween_or_fullmoon`, `christmas`,
+   * `birthday`. Null for a Cosmetic that can be worn any day, which is most of
+   * them. Left an open string rather than an enum: a new event Valve invents
+   * should widen the catalogue rather than fail the run.
+   */
+  eventRestriction: z.string().min(1).nullable(),
+  /**
    * The Cosmetic's named Styles, in game order. Every Cosmetic has a default
    * Style; this list is empty when that default is the only one, so a site shows
    * a Style switcher exactly when the list is non-empty.
@@ -160,6 +169,8 @@ const headerSchema = z.object({
     /** Cosmetics the Web API schema had no entry for: name fell back to items_game. */
     withoutWebApiEntry: z.int().nonnegative(),
     withoutBackpackIcon: z.int().nonnegative(),
+    /** How many of them are Event-Only Cosmetics, over every event together. */
+    eventOnly: z.int().nonnegative(),
   }),
   /**
    * The price snapshot's own header, or null when the run had no price source —

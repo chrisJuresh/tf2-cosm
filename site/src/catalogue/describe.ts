@@ -56,6 +56,25 @@ export function referenceVariantRead(variant: PricedVariant): string {
   return `${quality}, ${variant.craftable ? "craftable" : "non-craftable"}`;
 }
 
+/**
+ * The events the game gates a Cosmetic behind, in English. The catalogue stores
+ * the game's own token and deliberately does not close the list (a new event
+ * should widen the catalogue, not fail the run), so an unknown one is shown
+ * rather than swallowed: the token is at least a name, and a Cosmetic that is
+ * visibly gated by something unnamed beats one that looks gated by nothing.
+ */
+const EVENT_NAMES: Record<string, string> = {
+  halloween: "Halloween",
+  halloween_or_fullmoon: "Halloween or a full moon",
+  christmas: "Smissmas",
+  birthday: "the game's birthday",
+};
+
+/** When an Event-Only Cosmetic can be worn: "Halloween or a full moon". */
+export function eventRestrictionRead(token: string): string {
+  return EVENT_NAMES[token] ?? token.replaceAll("_", " ");
+}
+
 /** Why a Cosmetic has no price, in the viewer's terms rather than the job's. */
 export function unpricedReasonRead(reason: UnpricedReason): string {
   switch (reason) {

@@ -1,12 +1,12 @@
 {
-  "$id": "https://github.com/chrisJuresh/tf2-cosm/catalogue/v4",
-  "title": "TF2 Cosmetics catalogue v4",
+  "$id": "https://github.com/chrisJuresh/tf2-cosm/catalogue/v5",
+  "title": "TF2 Cosmetics catalogue v5",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
   "properties": {
     "schemaVersion": {
       "type": "number",
-      "const": 4
+      "const": 5
     },
     "header": {
       "type": "object",
@@ -71,6 +71,11 @@
               "type": "integer",
               "minimum": 0,
               "maximum": 9007199254740991
+            },
+            "eventOnly": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
             }
           },
           "required": [
@@ -80,7 +85,8 @@
             "allClass",
             "aliasesMerged",
             "withoutWebApiEntry",
-            "withoutBackpackIcon"
+            "withoutBackpackIcon",
+            "eventOnly"
           ],
           "additionalProperties": false
         },
@@ -442,6 +448,17 @@
           "paintable": {
             "type": "boolean"
           },
+          "eventRestriction": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "styles": {
             "type": "array",
             "items": {
@@ -726,6 +743,7 @@
           "classes",
           "kind",
           "paintable",
+          "eventRestriction",
           "styles",
           "backpackIcon",
           "price"

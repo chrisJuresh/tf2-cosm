@@ -84,7 +84,6 @@ describe("switching the Dollar Basis", () => {
   const AT_STEAM_MARKET = {
     "Baronial Badge": "$0.18",
     "Bolt Boy": "$0.04",
-    "Crocodile Smile": "≈$0.04",
     "Dead of Night": "—",
     "Ghastly Gibus": "$0.00",
     "Scotsman's Stove Pipe": "≈$0.04",
