@@ -128,6 +128,21 @@ What is remembered is the profile and nothing else. The Owned Copies are a
 person's possessions and go stale the moment they trade, so they are fetched
 afresh — which costs Steam nothing, because the proxy caches.
 
+**A backpack is a link.** The profile a viewer looks up goes into the query
+string — `/?profile=robinwalker` — so the address bar is the share button, and
+opening that link reads that backpack. What rides in the parameter is the
+viewer's own text rather than something parsed out of it: the proxy is the side
+that knows what names a Steam profile (`worker/src/profile.ts`), so a pasted
+profile URL arrives percent-encoded and a typed vanity name arrives as itself.
+The URL is replaced rather than pushed, because a lookup is what this page does
+and not somewhere else the viewer went, and the open Cosmetic's hash is left
+alone, so a link can name a Cosmetic and a backpack at once.
+
+The two places a profile can come from are not the same thing. What this browser
+remembers is *this viewer's* profile, so it fills the box and waits to be asked.
+What a link carries is somebody's profile the viewer was sent, so it is looked up
+on arrival — that is what the link was for — and is never remembered as theirs.
+
 Nothing decides what is a Cosmetic twice. An Owned Copy carries a defindex, the
 catalogue is the Cosmetic rule, and a defindex it does not carry is not one — so
 weapons, taunts, tools, crates and Medals are left out by the rule that was
@@ -251,6 +266,9 @@ would read as their backpack's worth.
 - `src/inventory/use-inventory.ts` — the Inventory the page is looking at. What
   is remembered and what is not is the whole design of it: the profile, yes; the
   Owned Copies, never.
+- `src/inventory/profile-url.ts` — the profile in the query string: what a link
+  names, and what a link becomes. Pure, and takes a query string rather than
+  reading the browser's.
 - `src/prices/variant-prices.ts` — the second price document, and the check that
   it came out of the same run as the catalogue.
 - `src/components/inventory-controls.tsx` — the profile box and what the page

@@ -12,12 +12,21 @@
  * stale the moment they trade, and a backpack read three weeks ago shown as
  * today's is worse than no backpack at all. They are fetched afresh, which is
  * cheap: the proxy caches, so a returning viewer costs Steam nothing.
+ *
+ * The profile is also written into the address bar (`@/inventory/profile-url`),
+ * which is what makes a backpack something a viewer can send to somebody. The
+ * two places a profile can come from are not the same thing and are not treated
+ * as one: what the browser remembers is *this viewer's* profile, so it fills the
+ * box and waits to be asked; what a link carries is somebody's profile the
+ * viewer was sent, so it is looked up on arrival — that is what the link was for
+ * — and is never remembered as theirs.
  */
 import type { Cosmetic } from "@tf2-cosm/data/catalogue";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { Inventory } from "@/inventory/copies";
 import { fetchInventory, InventoryError, loadVariantPrices } from "@/inventory/load";
+import { profileFromSearch, searchWithProfile } from "@/inventory/profile-url";
 import { inventoryTotal, type InventoryTotal, ownedCosmetics, type OwnedCosmetic, ownedSlugs } from "@/inventory/owned";
 import type { VariantPrices } from "@/prices/variant-prices";
 
@@ -35,6 +44,32 @@ function remember(value: string | null): void {
 function recall(): string | null {
   try {
     return globalThis.localStorage?.getItem(PROFILE_STORAGE_KEY) ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Puts the profile in the address bar, replacing rather than pushing: looking up
+ * a backpack is what this page does, not somewhere else the viewer went, and a
+ * back button that walked through every profile they tried would not take them
+ * off the page they wanted to leave.
+ */
+function showInUrl(profile: string | null): void {
+  try {
+    const { location, history } = globalThis as unknown as { location?: Location; history?: History };
+    if (location === undefined || history === undefined) return;
+    history.replaceState(null, "", `${location.pathname}${searchWithProfile(location.search, profile)}${location.hash}`);
+  } catch {
+    // A browser that will not let the URL be rewritten costs the viewer a
+    // shareable link and nothing else the page needs.
+  }
+}
+
+/** The profile the link the viewer followed names, if it names one. */
+function shared(): string | null {
+  try {
+    return profileFromSearch(globalThis.location?.search ?? "");
   } catch {
     return null;
   }
@@ -83,12 +118,14 @@ export function useInventory(
   const [prices, setPrices] = useState<VariantPrices | null>(null);
   const request = useRef<AbortController | null>(null);
 
-  // After mount, for the reason every stored preference is read after mount: the
-  // static markup React hydrates was built with nobody's profile in it.
-  useEffect(() => setProfile(recall()), []);
-
   const look = useCallback(
-    (asked: string) => {
+    /**
+     * `mine` is whether this profile is the viewer's own — which is what the
+     * box submits — or one they were sent in a link. Only their own is
+     * remembered in this browser; a link is about somebody else, and coming
+     * back to the page tomorrow should show the viewer their own backpack.
+     */
+    (asked: string, mine = true) => {
       const trimmed = asked.trim();
       if (trimmed === "") return;
       request.current?.abort();
@@ -96,7 +133,8 @@ export function useInventory(
       request.current = controller;
 
       setProfile(trimmed);
-      remember(trimmed);
+      if (mine) remember(trimmed);
+      showInUrl(trimmed);
       setLoading(true);
       setError(null);
 
@@ -122,10 +160,25 @@ export function useInventory(
     [snapshotTakenAt],
   );
 
+  // After mount, for the reason every stored preference is read after mount: the
+  // static markup React hydrates was built with nobody's profile in it. A link
+  // that names a profile is read in the same breath and wins, because following
+  // one is a viewer asking for that backpack now, and it is looked up rather
+  // than only filled in — otherwise the link is a box somebody else typed in.
+  const arrived = useRef(false);
+  useEffect(() => {
+    if (arrived.current) return;
+    arrived.current = true;
+    const sent = shared();
+    if (sent === null) setProfile(recall());
+    else look(sent, false);
+  }, [look]);
+
   const clear = useCallback(() => {
     request.current?.abort();
     setProfile(null);
     remember(null);
+    showInUrl(null);
     setInventory(null);
     setError(null);
     setLoading(false);
