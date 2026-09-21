@@ -4,22 +4,22 @@
  * Two different questions are asked here, and an automated checker only answers
  * the first. axe finds the faults that are mechanical — an unlabelled control,
  * an image with no alt text, a contrast ratio below the threshold, a role used
- * where its required children are missing — and it is run over the list and
- * over an open row, because the open row is markup that does not exist until a
+ * where its required children are missing — and it is run over the grid and
+ * over an open row, because the open card is markup that does not exist until a
  * viewer asks for it and so is exactly the markup nobody looks at.
  *
  * The second question is the one axe cannot answer: whether the page can be
  * *worked* without a mouse. That is asked directly — every control in the bar
- * named, reachable by Tab, and visibly focused when it gets there, and a row
+ * named, reachable by Tab, and visibly focused when it gets there, and a card
  * that opens, closes and hands the focus back from the keyboard alone.
  *
  * Like the smoke suite, this runs on a desktop and on a phone.
  */
 import AxeBuilder from "@axe-core/playwright";
 
-import { expect, expectClean, openRow, row, test } from "./catalogue-page";
+import { expect, expectClean, openCard, card, test } from "./catalogue-page";
 
-/** Two Styles, both Teams: the open row with the most in it to get wrong. */
+/** Two Styles, both Teams: the open card with the most in it to get wrong. */
 const STYLED = "tin-pot";
 
 /**
@@ -35,13 +35,13 @@ const CONTROLS = [
   "Hide Unpriced",
 ] as const;
 
-test("the list has no automatically detectable accessibility faults", async ({ catalogue: { page, faults } }) => {
+test("the grid has no automatically detectable accessibility faults", async ({ catalogue: { page, faults } }) => {
   expect(await axeFaults(page)).toEqual([]);
   expectClean(faults);
 });
 
-test("an open row has none either", async ({ catalogue: { page, faults } }) => {
-  await openRow(page, STYLED);
+test("an open card has none either", async ({ catalogue: { page, faults } }) => {
+  await openCard(page, STYLED);
   expect(await axeFaults(page)).toEqual([]);
   expectClean(faults);
 });
@@ -53,7 +53,7 @@ test("nor does either of them in dark mode", async ({ catalogue: { page, faults 
   await page.emulateMedia({ colorScheme: "dark" });
   expect(await axeFaults(page)).toEqual([]);
 
-  await openRow(page, STYLED);
+  await openCard(page, STYLED);
   expect(await axeFaults(page)).toEqual([]);
   expectClean(faults);
 });
@@ -86,17 +86,17 @@ test("the controls are reachable from the keyboard, and visible once focused", a
   expect(reached).toEqual([...CONTROLS]);
 
   // And focus is something you can see, on every control the page has and not
-  // only on the bar: the Dollar Basis switch, and the two an open row gains.
+  // only on the bar: the Dollar Basis switch, and the two an open card gains.
   // Tailwind draws it as an outline; what matters is that the browser computes
   // one rather than `none`. The Dollar Basis radios are `sr-only` and their
   // label carries the outline, which is why the check walks up from whatever
   // has the focus rather than reading only that element.
-  await openRow(page, STYLED);
+  await openCard(page, STYLED);
   const focusable = [
     page.getByLabel("Search by name", { exact: true }),
     page.getByLabel("Sort by", { exact: true }),
     page.getByRole("radiogroup", { name: "Dollar Basis" }).getByRole("radio").first(),
-    row(page, STYLED).getByRole("button"),
+    card(page, STYLED).getByRole("button"),
     page.getByRole("group", { name: "Style" }).getByRole("button", { name: "Open" }),
     page.getByRole("group", { name: "Team" }).getByRole("button", { name: "BLU" }),
   ];
@@ -132,15 +132,15 @@ async function visibleFocus(page: import("@playwright/test").Page): Promise<bool
   });
 }
 
-test("a row opens, closes and gives the focus back, without a mouse", async ({ catalogue: { page } }) => {
-  const toggle = row(page, STYLED).getByRole("button");
+test("a card opens, closes and gives the focus back, without a mouse", async ({ catalogue: { page } }) => {
+  const toggle = card(page, STYLED).getByRole("button");
   await toggle.focus();
   await page.keyboard.press("Enter");
   await expect(toggle).toHaveAttribute("aria-expanded", "true");
   await expect(page.locator(`#cosmetic-detail-${STYLED}`)).toBeVisible();
 
   // Escape closes it from wherever inside it the focus has got to, and the
-  // focus comes back to the row that was opened rather than to the body.
+  // focus comes back to the card that was opened rather than to the body.
   await page.keyboard.press("Escape");
   await expect(toggle).toHaveAttribute("aria-expanded", "false");
   await expect(toggle).toBeFocused();

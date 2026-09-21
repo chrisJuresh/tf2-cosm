@@ -1,0 +1,517 @@
+"use client";
+
+/**
+ * The catalogue as a grid: every Cosmetic a card, as many cards across as the
+ * screen is wide, each with its picture, its name, its price in Trader Notation
+ * and as a Metal Value, and what that comes to in dollars. A card opens in place
+ * to show where its one figure came from.
+ *
+ * A grid rather than a list because of what the picture costs. A Worn Render
+ * only says which hat this is at something like the size a hand holds it, and at
+ * that size a row is a picture with two hundred pixels of figures beside it and
+ * the rest of a desktop screen empty — five Cosmetics on a screenful out of
+ * eighteen hundred. The same card in a grid is thirty. Nothing shrank and
+ * nothing was dropped to get there; the width was simply being thrown away.
+ *
+ * How many across is a measurement, not a breakpoint: the grid takes the width
+ * it is given and fits as many cards of at least `MIN_CARD_WIDTH` into it as
+ * will go, which is two on a phone and ten or more on a wide monitor without a
+ * single media query. Everything else is the same problem the row list had:
+ * eighteen hundred cards with a picture each only scroll smoothly if the browser
+ * is holding a screenful rather than all of them, so the grid is virtualised a
+ * row of cards at a time, and an open card's panel makes its row taller by an
+ * amount that depends on how the panel wraps, so rows are measured rather than
+ * assumed.
+ *
+ * The markup carries its list roles explicitly — absolutely positioned rows of
+ * cards are not a `<ul>`, but they are still a list of eighteen hundred things
+ * to anyone reading the page with a screen reader, and each card says which of
+ * the eighteen hundred it is because only a screenful of them exists to count.
+ *
+ * The Dollar Basis the dollar figure is computed at is chosen above the grid and
+ * handed down, and which Cosmetics these are, and in what order, is settled
+ * before they get here — see `@/components/catalogue-browser`.
+ */
+import type { ClassName, Cosmetic, Metal } from "@tf2-cosm/data/catalogue";
+import { useVirtualizer } from "@tanstack/react-virtual";
+import {
+  type CSSProperties,
+  type KeyboardEvent,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+
+import { CosmeticDetail } from "@/components/cosmetic-detail";
+import { WornRender } from "@/components/worn-render";
+import type { RenderManifest } from "@/renders/manifest";
+import { DEFAULT_STYLE, DEFAULT_TEAM, displayedClass } from "@/renders/select";
+
+import {
+  approximately,
+  type DollarBasis,
+  dollarsFor,
+  formatDollars,
+  formatMetalValue,
+  formatTraderNotation,
+  UNPRICED_REASON_LABELS,
+} from "@/prices/format";
+
+/** What a figure reads as when there is nothing to put there. */
+const NOTHING = "—";
+
+/**
+ * The narrowest a card may get before the grid drops a column, in pixels.
+ *
+ * A shade under the picture's own box, which is deliberate and is the one place
+ * the picture gives anything up: at this width a phone of 375 pixels gets two
+ * columns rather than one, and the picture on it comes out about a hundred and
+ * fifty-five pixels across instead of a hundred and sixty. A column is worth
+ * five pixels. Anything narrower is not — the picture is what says which hat
+ * this is, and a card that shrank it to fit a third column would be a card you
+ * cannot read.
+ */
+const MIN_CARD_WIDTH = 168;
+
+/** The gap between cards, across and down, in pixels. */
+const GAP = 8;
+
+/**
+ * A card is always exactly this tall, in pixels: the picture, two lines for the
+ * name, and the three figures under it. Fixed, so a row of cards is one height
+ * rather than the tallest name in it, and so the figures line up across the row.
+ */
+const CARD_HEIGHT = 256;
+
+/**
+ * How many across before the grid has been measured — the server's render, and
+ * anywhere a width cannot be had. The measurement lands in a layout effect, so a
+ * real browser never paints this; it is here so that what it paints instead of
+ * nothing is a plausible grid rather than a single column.
+ */
+const UNMEASURED_COLUMNS = 4;
+
+/**
+ * How big the grid draws a Cosmetic, and which derivative it asks for. A closed
+ * card shows the catalogue's own default look on RED: the Style and the Team are
+ * what an open card lets a viewer change, and eighteen hundred cards each
+ * remembering their own would be eighteen hundred pictures nobody asked to see.
+ *
+ * The derivative is the next size up from the box it is drawn in, so a
+ * high-density screen has pixels to spend.
+ */
+const CARD_RENDER_SIZE = 256;
+
+/**
+ * How many cards fit across the element, and a way to keep that current. Nothing
+ * about it is a breakpoint: it is the width, divided.
+ *
+ * A width of zero is not a measurement — it is an element that has not been laid
+ * out, a `display: none` ancestor, or jsdom, which lays nothing out at all — so
+ * it leaves the last real answer standing rather than collapsing the grid to one
+ * column and back.
+ */
+function useColumns(element: React.RefObject<HTMLElement | null>): number {
+  const [columns, setColumns] = useState(UNMEASURED_COLUMNS);
+
+  useLayoutEffect(() => {
+    const node = element.current;
+    if (node === null) return;
+
+    const measure = () => {
+      const width = node.clientWidth;
+      if (width === 0) return;
+      const fits = Math.floor((width + GAP) / (MIN_CARD_WIDTH + GAP));
+      setColumns(Math.max(1, fits));
+    };
+
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [element]);
+
+  return columns;
+}
+
+export interface CosmeticGridProps {
+  readonly cosmetics: readonly Cosmetic[];
+  /** Which Worn Renders exist; empty when no run has produced any. */
+  readonly manifest: RenderManifest;
+  /**
+   * The Class whose Class View is showing, or null for the whole catalogue. It
+   * decides which Class every picture shows, which is what the view is for where
+   * an All-Class Cosmetic is concerned; the Class filter itself is #13.
+   */
+  readonly classView: ClassName | null;
+  /** The snapshot's Key Rate, or null when it carried no prices. */
+  readonly keyRate: Metal | null;
+  /** The active Dollar Basis, or null when no dollar figure can be computed. */
+  readonly basis: DollarBasis | null;
+}
+
+/** The three price figures a card shows, already written out. */
+interface Figures {
+  readonly notation: string;
+  /** Why an Unpriced Cosmetic has no figures, under the word "Unpriced". */
+  readonly reason: string | null;
+  readonly metalValue: string;
+  readonly dollars: string;
+}
+
+function figuresFor(cosmetic: Cosmetic, keyRate: Metal | null, basis: DollarBasis | null): Figures {
+  const { price } = cosmetic;
+  if (price === null) return { notation: NOTHING, reason: null, metalValue: NOTHING, dollars: NOTHING };
+  if (price.state === "unpriced") {
+    return {
+      notation: "Unpriced",
+      reason: UNPRICED_REASON_LABELS[price.reason],
+      metalValue: NOTHING,
+      dollars: NOTHING,
+    };
+  }
+  const metal = price.spread.mid.metal;
+  const dollars = dollarsFor(metal, basis);
+  // A Blanket Price is the source's figure for every cheap hat rather than for
+  // this one, so all three figures say about (ADR-0004).
+  const written = (figure: string) => (price.blanket ? approximately(figure) : figure);
+  return {
+    notation: written(formatTraderNotation(metal, keyRate)),
+    reason: null,
+    metalValue: written(formatMetalValue(metal)),
+    dollars: dollars === null ? NOTHING : written(formatDollars(dollars)),
+  };
+}
+
+/** The id the card's toggle points `aria-controls` at. */
+function detailId(slug: string): string {
+  return `cosmetic-detail-${slug}`;
+}
+
+/** The slug in the address bar, if there is one. Empty means no Cosmetic named. */
+function slugInHash(): string {
+  return decodeURIComponent(window.location.hash.replace(/^#/, ""));
+}
+
+/**
+ * Put the expanded Cosmetic in the address bar, so the page can be linked to. It
+ * replaces rather than pushes: expanding a card is reading, not navigating, and a
+ * viewer who opened six cards wants Back to leave the site rather than to close
+ * them one at a time.
+ */
+function writeHash(slug: string | null): void {
+  const { pathname, search } = window.location;
+  const url = slug === null ? `${pathname}${search}` : `${pathname}${search}#${encodeURIComponent(slug)}`;
+  window.history.replaceState(null, "", url);
+}
+
+/**
+ * One figure, with the name of the figure alongside it for a screen reader.
+ *
+ * A row list could label its figures once, in a column heading over all
+ * eighteen hundred of them. A grid has nowhere to put that heading, and three
+ * bare numbers on a card read aloud as three bare numbers — so each card carries
+ * its own labels, and only the figure is drawn.
+ */
+function Figure({ term, value, className }: { term: string; value: string; className?: string }) {
+  return (
+    <>
+      <dt className="sr-only">{term}</dt>
+      <dd className={`tabular-nums ${className ?? ""}`}>{value}</dd>
+    </>
+  );
+}
+
+interface CosmeticCardProps {
+  cosmetic: Cosmetic;
+  figures: Figures;
+  manifest: RenderManifest;
+  /** The Class this card's picture shows, settled once by the grid. */
+  gameClass: ClassName;
+  /** Which of the whole catalogue this card is, since only a screenful exists. */
+  position: number;
+  total: number;
+  expanded: boolean;
+  onToggle: (slug: string) => void;
+  /** Hands the card's toggle to the grid, which focuses it when a link opens the card. */
+  registerToggle: (slug: string, toggle: HTMLButtonElement | null) => void;
+}
+
+function CosmeticCard({
+  cosmetic,
+  figures,
+  manifest,
+  gameClass,
+  position,
+  total,
+  expanded,
+  onToggle,
+  registerToggle,
+}: CosmeticCardProps) {
+  const { slug } = cosmetic;
+  const toggleRef = useCallback(
+    (node: HTMLButtonElement | null) => registerToggle(slug, node),
+    [registerToggle, slug],
+  );
+
+  return (
+    <div
+      role="listitem"
+      data-slug={slug}
+      aria-posinset={position}
+      aria-setsize={total}
+      style={{ height: CARD_HEIGHT }}
+      // `relative`, because the toggle below stretches over the whole card: the
+      // name is what a screen reader should hear the control called, and the
+      // picture is what a viewer aims at.
+      className={`relative flex flex-col overflow-hidden rounded-lg border p-2 text-sm ${
+        expanded
+          ? "border-black/25 bg-black/[0.04] dark:border-white/30 dark:bg-white/[0.06]"
+          : "border-black/10 hover:bg-black/[0.03] dark:border-white/15 dark:hover:bg-white/[0.05]"
+      }`}
+    >
+      <div className="flex h-40 items-center justify-center">
+        <WornRender
+          cosmetic={cosmetic}
+          manifest={manifest}
+          gameClass={gameClass}
+          team={DEFAULT_TEAM}
+          style={DEFAULT_STYLE}
+          size={CARD_RENDER_SIZE}
+          // Drawn at 160 pixels, so the fallback is the 512 icon: the 64 one
+          // would be upscaled in the only place it shows.
+          icon="large"
+          className="max-h-40 max-w-full object-contain"
+        />
+      </div>
+      {/* Two lines whether the name needs them or not, so the figures line up
+          across a row of cards rather than floating up under the short names.
+          Not a heading: eighteen hundred of them would be a heading outline
+          nobody could navigate, and the card is a list item already. */}
+      <div className="mt-1.5 h-9 leading-tight font-medium">
+        <button
+          type="button"
+          ref={toggleRef}
+          aria-expanded={expanded}
+          aria-controls={expanded ? detailId(slug) : undefined}
+          onClick={() => onToggle(slug)}
+          // The pseudo-element is the click target: the whole card takes a click
+          // that way, without the picture and the figures having to live inside
+          // the control and be read out as part of its name.
+          className={
+            "line-clamp-2 text-left after:absolute after:inset-0 after:content-['']" +
+            " focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current"
+          }
+        >
+          {cosmetic.name}
+        </button>
+      </div>
+      <dl className="mt-0.5 grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-2">
+        <Figure term="Trader Notation" value={figures.notation} className="col-span-2 truncate" />
+        {figures.reason === null ? null : (
+          <>
+            <dt className="sr-only">Why</dt>
+            <dd className="col-span-2 truncate text-[0.6875rem] leading-tight text-black/55 dark:text-white/55">
+              {figures.reason}
+            </dd>
+          </>
+        )}
+        <Figure term="Metal Value" value={figures.metalValue} className="text-xs text-black/60 dark:text-white/60" />
+        <Figure term="Dollars" value={figures.dollars} className="justify-self-end text-xs" />
+      </dl>
+    </div>
+  );
+}
+
+export function CosmeticGrid({ cosmetics, manifest, classView, keyRate, basis }: CosmeticGridProps) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const toggles = useRef(new Map<string, HTMLButtonElement>());
+  const [expandedSlug, setExpandedSlug] = useState<string | null>(null);
+  /** A card a link asked for, waiting for its toggle to exist so it can take focus. */
+  const [pendingFocus, setPendingFocus] = useState<string | null>(null);
+
+  const columns = useColumns(scrollRef);
+  const rowCount = Math.ceil(cosmetics.length / columns);
+
+  const indexBySlug = useMemo(() => {
+    const index = new Map<string, number>();
+    cosmetics.forEach((cosmetic, position) => index.set(cosmetic.slug, position));
+    return index;
+  }, [cosmetics]);
+
+  /** Which row of cards the open one sits in; its panel hangs under that row. */
+  const expandedRow = useMemo(() => {
+    if (expandedSlug === null) return null;
+    const index = indexBySlug.get(expandedSlug);
+    return index === undefined ? null : Math.floor(index / columns);
+  }, [expandedSlug, indexBySlug, columns]);
+
+  const virtualiser = useVirtualizer({
+    count: rowCount,
+    getScrollElement: () => scrollRef.current,
+    estimateSize: () => CARD_HEIGHT + GAP,
+    overscan: 3,
+  });
+
+  // A row of four cards and a row of ten are different rows, and the heights
+  // measured for the old ones say nothing about the new.
+  const { measure } = virtualiser;
+  useEffect(() => measure(), [columns, measure]);
+
+  const registerToggle = useCallback((slug: string, toggle: HTMLButtonElement | null) => {
+    if (toggle === null) toggles.current.delete(slug);
+    else toggles.current.set(slug, toggle);
+  }, []);
+
+  const collapse = useCallback(
+    (slug: string) => {
+      if (expandedSlug !== slug) return;
+      setExpandedSlug(null);
+      writeHash(null);
+      toggles.current.get(slug)?.focus();
+    },
+    [expandedSlug],
+  );
+
+  // Only ever one slug, so opening a card closes whichever one was open.
+  const toggle = useCallback(
+    (slug: string) => {
+      const next = expandedSlug === slug ? null : slug;
+      setExpandedSlug(next);
+      writeHash(next);
+    },
+    [expandedSlug],
+  );
+
+  // Escape closes the open card from anywhere inside the grid, which is where
+  // the focus is whenever a card is open: opening one always leaves the focus on
+  // its toggle.
+  const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key !== "Escape" || expandedSlug === null) return;
+    event.stopPropagation();
+    collapse(expandedSlug);
+  };
+
+  // A link to a Cosmetic opens it: on arrival, and again whenever the hash
+  // changes underneath us, which is what an in-page link to another card does.
+  // An address with no Cosmetic on it closes whatever was open, so the page and
+  // the address cannot say two different things.
+  useEffect(() => {
+    const follow = () => {
+      const slug = slugInHash();
+      if (slug === "") {
+        setExpandedSlug(null);
+        return;
+      }
+      if (!indexBySlug.has(slug)) return;
+      setExpandedSlug(slug);
+      setPendingFocus(slug);
+    };
+    follow();
+    window.addEventListener("hashchange", follow);
+    return () => window.removeEventListener("hashchange", follow);
+  }, [indexBySlug]);
+
+  // Bring the linked card into view. Only the scroll: the card it scrolls to may
+  // not be mounted yet, so taking focus is the effect below's job.
+  useEffect(() => {
+    if (pendingFocus === null) return;
+    const index = indexBySlug.get(pendingFocus);
+    if (index === undefined) setPendingFocus(null);
+    else virtualiser.scrollToIndex(Math.floor(index / columns), { align: "start" });
+  }, [pendingFocus, indexBySlug, columns, virtualiser]);
+
+  // Deliberately every render: scrolling to a card renders it, and this is the
+  // first pass after that render where its toggle exists to be focused.
+  useEffect(() => {
+    if (pendingFocus === null) return;
+    const toggleForCard = toggles.current.get(pendingFocus);
+    if (toggleForCard === undefined) return;
+    toggleForCard.focus();
+    setPendingFocus(null);
+  });
+
+  const row: CSSProperties = {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: "100%",
+    display: "grid",
+    gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
+    gap: GAP,
+    // The gap below the last row of a card, which a grid's own `gap` does not
+    // draw. The row is measured, so what it is tall is what the virtualiser puts
+    // between this row and the next.
+    paddingBottom: GAP,
+  };
+
+  return (
+    <div ref={scrollRef} onKeyDown={onKeyDown} className="min-h-0 flex-1 overflow-y-auto pb-3">
+      {/* A grid narrowed to nothing has to say so: an empty scroller reads as a
+          page that has broken rather than as a filter that matched nothing. */}
+      {cosmetics.length === 0 ? (
+        <p className="px-3 py-8 text-center text-sm text-black/60 dark:text-white/60">
+          No Cosmetic matches these controls.
+        </p>
+      ) : null}
+      <div
+        role="list"
+        aria-label="Cosmetics"
+        style={{ height: virtualiser.getTotalSize(), position: "relative" }}
+      >
+        {virtualiser.getVirtualItems().map((item) => {
+          const first = item.index * columns;
+          const shown = cosmetics.slice(first, first + columns);
+          const open = expandedRow === item.index ? shown.find((one) => one.slug === expandedSlug) : undefined;
+          return (
+            // Presentational, so the cards below are the list's own items rather
+            // than something nested inside one.
+            <div
+              key={item.key}
+              role="none"
+              data-index={item.index}
+              ref={virtualiser.measureElement}
+              style={{ ...row, transform: `translateY(${item.start}px)` }}
+            >
+              {shown.map((cosmetic, offset) => (
+                <CosmeticCard
+                  key={cosmetic.slug}
+                  cosmetic={cosmetic}
+                  figures={figuresFor(cosmetic, keyRate, basis)}
+                  manifest={manifest}
+                  gameClass={displayedClass(cosmetic, classView)}
+                  position={first + offset + 1}
+                  total={cosmetics.length}
+                  expanded={cosmetic.slug === expandedSlug}
+                  onToggle={toggle}
+                  registerToggle={registerToggle}
+                />
+              ))}
+              {open === undefined ? null : (
+                // An item of its own, across every column, which is what the
+                // panel is: it belongs to the card above it but it is not inside
+                // it, and a card is one of a row of equal boxes.
+                <div
+                  role="listitem"
+                  style={{ gridColumn: "1 / -1" }}
+                  className="rounded-lg border border-black/10 bg-black/[0.03] text-sm dark:border-white/15 dark:bg-white/[0.05]"
+                >
+                  <CosmeticDetail
+                    cosmetic={open}
+                    keyRate={keyRate}
+                    manifest={manifest}
+                    gameClass={displayedClass(open, classView)}
+                    id={detailId(open.slug)}
+                  />
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}

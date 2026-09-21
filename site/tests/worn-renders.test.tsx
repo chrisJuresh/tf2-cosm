@@ -1,7 +1,7 @@
 /**
- * The pictures, as a viewer meets them: the Worn Render in a row, the icon where
- * there is no render, the Class the picture shows following the Class View, and
- * the Style switcher and Team toggle in an open row.
+ * The pictures, as a viewer meets them: the Worn Render on a card, the icon
+ * where there is no render, the Class the picture shows following the Class
+ * View, and the Style switcher and Team toggle on an open card.
  *
  * Driven by the fixture manifest, which the render job itself wrote — see
  * `tests/fixtures.ts`. Nothing here asserts how the fallback chain is walked;
@@ -14,11 +14,11 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { fixtureBasis, fixtureCosmetics, fixtureKeyRate, fixtureManifest } from "./fixtures.ts";
 
 import { CatalogueBrowser } from "@/components/catalogue-browser";
-import { CosmeticList } from "@/components/cosmetic-list";
+import { CosmeticGrid } from "@/components/cosmetic-grid";
 
-function renderList(overrides: Partial<Parameters<typeof CosmeticList>[0]> = {}) {
+function renderList(overrides: Partial<Parameters<typeof CosmeticGrid>[0]> = {}) {
   return render(
-    <CosmeticList
+    <CosmeticGrid
       cosmetics={fixtureCosmetics()}
       manifest={fixtureManifest()}
       classView={null}
@@ -45,15 +45,15 @@ function renderBrowser() {
   return userEvent.setup();
 }
 
-function rowFor(slug: string): HTMLElement {
-  const row = document.querySelector<HTMLElement>(`[role="row"][data-slug="${slug}"]`);
-  if (row === null) throw new Error(`no row for ${slug}`);
-  return row;
+function cardFor(slug: string): HTMLElement {
+  const card = document.querySelector<HTMLElement>(`[data-slug="${slug}"]`);
+  if (card === null) throw new Error(`no card for ${slug}`);
+  return card;
 }
 
-/** The picture in a collapsed row. */
+/** The picture on a closed card. */
 function pictureIn(slug: string): HTMLImageElement {
-  return within(rowFor(slug)).getByRole("img");
+  return within(cardFor(slug)).getByRole("img");
 }
 
 function panelFor(slug: string): HTMLElement {
@@ -62,7 +62,7 @@ function panelFor(slug: string): HTMLElement {
   return panel;
 }
 
-/** The picture in an open row, which is the larger one. */
+/** The picture in an open card's panel, which is the larger one. */
 function pictureInPanel(slug: string): HTMLImageElement {
   return within(panelFor(slug)).getByRole("img");
 }
@@ -77,8 +77,8 @@ afterEach(() => {
   localStorage.clear();
 });
 
-describe("the picture a row shows", () => {
-  it("shows the Worn Render where the manifest has one, at the list's size", () => {
+describe("the picture a card shows", () => {
+  it("shows the Worn Render where the manifest has one, at the grid's size", () => {
     renderList();
     expect(pictureIn("team-captain")).toHaveAttribute("src", "/renders/web/team-captain/soldier-red-0@256.webp");
   });
@@ -88,7 +88,7 @@ describe("the picture a row shows", () => {
     expect(pictureIn("team-captain")).toHaveAccessibleName("Team Captain worn by the Soldier");
   });
 
-  it("loads every picture lazily, because the list is eighteen hundred rows of them", () => {
+  it("loads every picture lazily, because the grid is eighteen hundred of them", () => {
     renderList();
     expect(pictureIn("team-captain")).toHaveAttribute("loading", "lazy");
     expect(pictureIn("dead-of-night")).toHaveAttribute("loading", "lazy");
@@ -130,7 +130,7 @@ describe("the picture a row shows", () => {
     renderList();
     fireEvent.error(pictureIn("team-captain"));
     fireEvent.error(pictureIn("team-captain"));
-    expect(within(rowFor("team-captain")).queryByRole("img")).toBeNull();
+    expect(within(cardFor("team-captain")).queryByRole("img")).toBeNull();
   });
 
   it("leaves a blank rather than a broken image when there is neither a render nor an icon", () => {
@@ -138,13 +138,13 @@ describe("the picture a row shows", () => {
       cosmetic.slug === "dead-of-night" ? { ...cosmetic, backpackIcon: null } : cosmetic,
     );
     renderList({ cosmetics });
-    expect(within(rowFor("dead-of-night")).queryByRole("img")).toBeNull();
+    expect(within(cardFor("dead-of-night")).queryByRole("img")).toBeNull();
   });
 
   it("points every picture on screen at the manifest or at Valve, and at nothing else", () => {
-    // Every row the virtualiser has mounted: no row may end up asking for a path
-    // the manifest does not carry. jsdom mounts a screenful, so this is the rows
-    // a viewer can see rather than all eighteen hundred — the sweep over a real
+    // Every card the virtualiser has mounted: none may end up asking for a path
+    // the manifest does not carry. jsdom mounts a screenful, so this is the
+    // cards a viewer can see rather than all eighteen hundred — the sweep over a real
     // built page, with no failed request, is #17.
     renderList();
     const paths = new Set<string>();
@@ -202,7 +202,7 @@ describe("the Class the picture shows", () => {
   });
 });
 
-describe("the open row", () => {
+describe("the open card", () => {
   it("shows the larger derivative", async () => {
     const user = userEvent.setup();
     renderList();

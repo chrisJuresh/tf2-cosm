@@ -9,10 +9,11 @@
  * nothing and that nothing the page asked for failed to arrive.
  *
  * They run twice: on a desktop, and on an emulated phone. The phone is not a
- * formality — the list lays itself out differently below `sm`, and jsdom applies
- * no stylesheet at all, so this is the only place that layout is ever exercised.
+ * formality — how many cards the grid puts across is the width divided, and
+ * jsdom lays nothing out at all, so this is the only place that layout, or the
+ * click target stretched over a whole card, is ever exercised.
  */
-import { expect, expectClean, openRow, row, rows, slugs, test } from "./catalogue-page";
+import { expect, expectClean, openCard, card, cards, slugs, test } from "./catalogue-page";
 
 /** From the golden catalogue: one Cosmetic of each of the three kinds. */
 const DEMOMAN_ONLY = "scotsman-s-stove-pipe";
@@ -22,23 +23,24 @@ const ALL_CLASS = "ghastly-gibus";
 const STYLED = "tin-pot";
 
 test("the page loads and lists every Cosmetic in the catalogue", async ({ catalogue: { page, faults } }) => {
-  await expect(page.getByRole("table", { name: "Cosmetics" })).toBeVisible();
+  await expect(page.getByRole("list", { name: "Cosmetics" })).toBeVisible();
 
   // Eight, because that is what the fixture catalogue's own header says it has.
-  await expect(rows(page)).toHaveCount(8);
+  await expect(cards(page)).toHaveCount(8);
   await expect(page.getByRole("status")).toHaveText("8 Cosmetics");
 
   // Sorted by Metal Value, high to low, which is the default.
-  const figures = await rows(page).evaluateAll((elements) =>
+  const figures = await cards(page).evaluateAll((elements) =>
     elements.map((element) => element.textContent ?? ""),
   );
   expect(figures[0]).toContain("Team Captain");
 
-  // The header states what the figures below it mean and how fresh they are.
+  // The header states what the figures below it mean; the footer, how fresh
+  // they are.
   await expect(page.getByRole("banner")).toContainText("a Key is 78.66 ref");
-  await expect(page.getByRole("banner")).toContainText("Snapshot taken");
+  await expect(page.getByRole("contentinfo")).toContainText("Snapshot taken");
 
-  // And it fits the screen it is on. Only the list scrolls, and only downwards:
+  // And it fits the screen it is on. Only the grid scrolls, and only downwards:
   // a page a phone has to be dragged sideways to read is the failure this whole
   // project's phone layout exists to avoid, and jsdom could never see it.
   const overflow = await page.evaluate(() => ({
@@ -50,29 +52,62 @@ test("the page loads and lists every Cosmetic in the catalogue", async ({ catalo
   expectClean(faults);
 });
 
-test("the Class filter narrows the list to what that Class can wear", async ({ catalogue: { page, faults } }) => {
+test("the Class filter narrows the grid to what that Class can wear", async ({ catalogue: { page, faults } }) => {
   await page.getByLabel("Class", { exact: true }).selectOption("demoman");
 
   // The Class View's three rules at once: the Demoman's own Cosmetic, the
   // Multi-Class one he shares with the Soldier, and the All-Class one.
-  await expect(row(page, DEMOMAN_ONLY)).toBeVisible();
-  await expect(row(page, MULTI_CLASS)).toBeVisible();
-  await expect(row(page, ALL_CLASS)).toBeVisible();
+  await expect(card(page, DEMOMAN_ONLY)).toBeVisible();
+  await expect(card(page, MULTI_CLASS)).toBeVisible();
+  await expect(card(page, ALL_CLASS)).toBeVisible();
   // The Scout's Bolt Boy is not one of them.
-  await expect(row(page, "bolt-boy")).toHaveCount(0);
+  await expect(card(page, "bolt-boy")).toHaveCount(0);
 
   // Hiding All-Class Cosmetics leaves the one he shares, which is the whole
   // point of the toggle.
   await page.getByLabel("Hide All-Class Cosmetics").check();
-  await expect(row(page, ALL_CLASS)).toHaveCount(0);
-  await expect(row(page, MULTI_CLASS)).toBeVisible();
+  await expect(card(page, ALL_CLASS)).toHaveCount(0);
+  await expect(card(page, MULTI_CLASS)).toBeVisible();
 
   expectClean(faults);
 });
 
-test("the search narrows the list as it is typed", async ({ catalogue: { page, faults } }) => {
+test("a click anywhere on a card opens it, and puts the focus on its control", async ({
+  catalogue: { page, faults },
+}) => {
+  // The whole card is the control: a viewer aims at the picture, not at the
+  // name under it. It is a pseudo-element stretched over the card, so this is
+  // the only suite that can see it at all — and the focus landing on the
+  // control is what leaves the viewer something to press Escape on.
+  // The middle of the card, which is the middle of the picture. Playwright
+  // clicks what is actually painted there, so a card whose overlay had not
+  // taken would open nothing, and one with the header spilling over it would
+  // refuse the click outright.
+  await card(page, STYLED).click();
+  await expect(page.locator(`#cosmetic-detail-${STYLED}`)).toBeVisible();
+  await expect(card(page, STYLED).getByRole("button")).toBeFocused();
+
+  await page.keyboard.press("Escape");
+  await expect(page.locator(`#cosmetic-detail-${STYLED}`)).toHaveCount(0);
+
+  expectClean(faults);
+});
+
+test("the grid puts as many Cosmetics across as the width allows", async ({ catalogue: { page, faults } }) => {
+  // The point of the grid: the cards sit side by side rather than one to a
+  // line. How many is the width divided, so a desktop has more of them across
+  // than a phone — what is asserted is only that the width is being used.
+  const lefts = await cards(page).evaluateAll((elements) =>
+    elements.map((element) => Math.round(element.getBoundingClientRect().left)),
+  );
+  expect(new Set(lefts).size).toBeGreaterThan(1);
+
+  expectClean(faults);
+});
+
+test("the search narrows the grid as it is typed", async ({ catalogue: { page, faults } }) => {
   await page.getByLabel("Search by name").fill("gib");
-  await expect(rows(page)).toHaveCount(1);
+  await expect(cards(page)).toHaveCount(1);
   expect(await slugs(page)).toEqual([ALL_CLASS]);
 
   await page.getByLabel("Search by name").fill("nothing is called this");
@@ -81,13 +116,13 @@ test("the search narrows the list as it is typed", async ({ catalogue: { page, f
   expectClean(faults);
 });
 
-test("an expanded row shows the Worn Render, its Styles and both Teams", async ({
+test("an expanded card shows the Worn Render, its Styles and both Teams", async ({
   catalogue: { page, faults },
 }) => {
-  const detail = await openRow(page, STYLED);
+  const detail = await openCard(page, STYLED);
 
   // The picture is a render served by the site, not the Backpack Icon: the
-  // larger derivative, which is what an open row asks for.
+  // larger derivative, which is what an open card asks for.
   const picture = detail.locator("img");
   await expect(picture).toHaveAttribute("src", /\/renders\/web\/tin-pot\/soldier-red-0@512\.webp$/);
 
@@ -98,11 +133,11 @@ test("an expanded row shows the Worn Render, its Styles and both Teams", async (
   await detail.getByRole("group", { name: "Team" }).getByRole("button", { name: "BLU" }).click();
   await expect(picture).toHaveAttribute("src", /soldier-blu-0@512\.webp$/);
 
-  // The context the figure needed, which is why the row opens at all.
+  // The context the figure needed, which is why the card opens at all.
   await expect(detail).toContainText("Price Spread");
   await expect(detail).toContainText("Reference Variant");
 
-  // Opened rows are linkable: the slug is the hash (ADR-0003).
+  // Opened cards are linkable: the slug is the hash (ADR-0003).
   expect(new URL(page.url()).hash).toBe(`#${STYLED}`);
 
   expectClean(faults);
@@ -112,15 +147,15 @@ test("every picture on the page actually loads", async ({ catalogue: { page, fau
   // A render that fails to load falls back to the Backpack Icon and leaves no
   // trace in the DOM, so the DOM cannot be asked. The browser can: an image
   // that decoded has a natural size, and one that did not has none.
-  const undecoded = await page.locator('[role="table"] img').evaluateAll((images) =>
+  const undecoded = await page.locator('[role="list"] img').evaluateAll((images) =>
     images
       .filter((image) => !(image as HTMLImageElement).complete || (image as HTMLImageElement).naturalWidth === 0)
       .map((image) => (image as HTMLImageElement).currentSrc || (image as HTMLImageElement).src),
   );
   expect(undecoded).toEqual([]);
 
-  // And the list is showing renders rather than eight icons.
-  const sources = await page.locator('[role="table"] img').evaluateAll((images) =>
+  // And the grid is showing renders rather than eight icons.
+  const sources = await page.locator('[role="list"] img').evaluateAll((images) =>
     images.map((image) => (image as HTMLImageElement).src),
   );
   expect(sources.filter((src) => src.includes("/renders/")).length).toBeGreaterThan(0);

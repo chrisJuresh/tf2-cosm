@@ -1,9 +1,18 @@
 # Catalogue site
 
-The static site: one page, one list, every Cosmetic with its picture — worn on a
-class wherever a render exists, its Backpack Icon where one does not — its
-Reference Price in Trader Notation and as a Metal Value, and what that comes to
-in dollars.
+The static site: one page, one grid, every Cosmetic a card with its picture —
+worn on a class wherever a render exists, its Backpack Icon where one does not —
+its Reference Price in Trader Notation and as a Metal Value, and what that comes
+to in dollars.
+
+The page is a grid rather than a list because of what the picture costs. A Worn
+Render only says which hat this is at something like the size a hand holds it,
+and at that size a row is a picture with two hundred pixels of figures beside it
+and the rest of a desktop screen empty. The same card in a grid is thirty
+Cosmetics on a screenful instead of five, with nothing smaller and nothing
+dropped. Everything around the grid is laid out to leave it the space: the
+header on one line, the browsing controls on one line, and the snapshot's dates
+down in the credits with the rest of the provenance.
 
 ## Running it
 
@@ -15,7 +24,7 @@ pnpm build-site   # from the repo root: static output in site/out
 `pnpm build-site` writes a fully static export and runs no server at any point.
 It reads the two files the other two jobs commit — `catalogue/catalogue.json` and
 `catalogue/renders.json` — and validates each against its schema before rendering
-a row of it. Either one violating its contract fails the build rather than
+a card of it. Either one violating its contract fails the build rather than
 deploying a page of wrong numbers or missing pictures.
 
 Which folder those two come out of is configuration, and `catalogue/` is only
@@ -73,9 +82,11 @@ its icon, which is what production does for an unrendered Cosmetic too.
 
 - `src/app/page.tsx` — the page. A server component: it reads the catalogue and
   the render manifest at build time and hands both to the view.
-- `src/components/catalogue-view.tsx` — the header, the Dollar Basis switch and
-  the list. The active basis lives here because it is the one thing the header
-  and every row have to agree on.
+- `src/components/catalogue-view.tsx` — the header, the Dollar Basis switch, the
+  grid and the footer. The active basis lives here because it is the one thing
+  the header, the footer and every card have to agree on: the header says which
+  basis is in force, the footer when its rate was quoted, and every card's
+  dollar figure is that rate applied.
 - `src/catalogue/source.ts` — the one seam both documents are read through: which
   folder they come from, and the message a build gets when one of them is
   missing, is not JSON, or does not match its schema.
@@ -87,7 +98,7 @@ its icon, which is what production does for an unrendered Cosmetic too.
   `tests/test_site_render_manifest.py` at the repo root runs the site's fixture
   manifest back through that job's own validator, which is what holds the two
   together.
-- `src/renders/select.ts` — the fallback chain, and which Class a row's picture
+- `src/renders/select.ts` — the fallback chain, and which Class a card's picture
   shows. Pure, and driven directly by `tests/renders.test.ts`.
 - `src/renders/base-url.ts` — the image base, and joining a manifest path onto
   it.
@@ -108,28 +119,36 @@ its icon, which is what production does for an unrendered Cosmetic too.
   arrived is not offered at all, rather than guessed at. The price source names
   itself in the header and nowhere in this code, so ADR-0002's swappable source
   stays swappable without an edit here.
-- `src/components/cosmetic-list.tsx` — the list, a client component fed the
-  Cosmetics it is to draw and nothing about why those are the ones. Its rows are
-  virtualised, so eighteen hundred of them with a picture each scroll without the
-  browser holding eighteen hundred rows. A row draws its picture at the size an
-  open row draws it — the picture is the only thing in the row that says which
-  hat this is — which leaves a phone about two hundred pixels for the rest, so a
-  phone stacks the name and the three figures beside the picture rather than
-  across from it. Nothing is dropped at either width. A row opens in place, one
-  at a time; because an open row is taller by an amount that depends on how its
-  panel wraps, rows are measured rather than assumed and the fixed height is only
-  the estimate the list starts from.
-- `src/components/cosmetic-detail.tsx` — what an open row shows: the larger Worn
+- `src/components/cosmetic-grid.tsx` — the grid, a client component fed the
+  Cosmetics it is to draw and nothing about why those are the ones. How many
+  cards it puts across is a measurement rather than a breakpoint: it fits as
+  many cards of at least its minimum width into the width it is given as will
+  go, which is two on a phone and eight or more on a wide monitor, without a
+  media query. The rows of cards are virtualised, so eighteen hundred cards with
+  a picture each scroll without the browser holding eighteen hundred of them.
+  Each card carries the name of every figure on it for a screen reader, because
+  a grid has nowhere to put the column heading a list could label all eighteen
+  hundred with at once. A card opens in place, one at a time, and its panel
+  hangs under the row of cards it is in rather than inside it — a card is one of
+  a row of equal boxes and the panel is wider than any of them. Because that
+  makes the row taller by an amount that depends on how the panel wraps, rows
+  are measured rather than assumed and the fixed height is only the estimate the
+  grid starts from. The whole card is the control that opens it, by way of a
+  pseudo-element stretched over it: a viewer aims at the picture, and a screen
+  reader still hears the control called by the Cosmetic's name alone.
+- `src/components/cosmetic-detail.tsx` — what an open card shows: the larger Worn
   Render with its two controls, the Price Spread, the Reference Variant the
   figure is for, when the source last repriced it, who can wear it, and the
   defindexes ADR-0003 folded into it. The chosen Style and Team live here, not in
-  the list: closing a row is done looking, and the next one opens on its own
+  the grid: closing a card is done looking, and the next one opens on its own
   default.
 - `src/components/dollar-basis-switch.tsx` — the switch, as native radios so a
   keyboard walks it and a screen reader announces it without being told to. Each
   option carries its own rate, because that is the whole point of the choice.
-- `src/components/site-footer.tsx` — the credits. Nothing on the page is the
-  site's own.
+- `src/components/site-footer.tsx` — the credits, and the snapshot's own dates
+  beside them. Nothing on the page is the site's own, and how old the page is is
+  provenance like the rest of it. Which rate's date is shown depends on the
+  Dollar Basis in force, so the view hands it in.
 - `src/catalogue/describe.ts` — the pure module that writes the catalogue's own
   tokens out in English: a Class, a Quality, an Unpriced reason, a date.
 - `src/browser/remembered.ts` — a choice remembered in this browser and nowhere
@@ -137,7 +156,7 @@ its icon, which is what production does for an unrendered Cosmetic too.
   after mount so the static markup React hydrates carries nobody's preference.
 - `src/browsing/controls.ts` — the browsing rules, pure: the Class View's three
   inclusion rules, the toggles, the slot filter, the sorts and the name search,
-  and the one function that turns the whole catalogue into the rows to draw. The
+  and the one function that turns the whole catalogue into the cards to draw. The
   controls are a surface over this file, not the place the rules live.
 - `src/browser/remembered-controls.ts` — those controls as this browser remembers
   them, on the same terms as `remembered.ts` but for a whole document rather than
@@ -148,10 +167,10 @@ its icon, which is what production does for an unrendered Cosmetic too.
   with real labels, which is what makes them keyboard operable and properly
   announced without a line of code for either.
 - `src/components/catalogue-browser.tsx` — where the rules and the bar meet: it
-  holds what the viewer picked and hands the list what is left.
+  holds what the viewer picked and hands the grid what is left.
 
-The open Cosmetic's slug is the URL hash, so a row can be linked to, and every
-row carries its slug in `data-slug` — the hook the later wishlist and per-item
+The open Cosmetic's slug is the URL hash, so a card can be linked to, and every
+card carries its slug in `data-slug` — the hook the later wishlist and per-item
 pages hang off (ADR-0003).
 
 Styling is Tailwind utilities. Light and dark both follow the system colour
@@ -171,7 +190,7 @@ moment it lands. Its Cosmetics cover a price in Metal, a price in Keys, the
 cheapest price there is, Styles, an Unpriced item and all three of
 Class-Exclusive, Multi-Class and All-Class — which is what makes them an oracle
 for the Class View rules as well as for the figures. The tests assert what a
-viewer sees: the rows, their order, and the figures as they are written on
+viewer sees: the cards, their order, and the figures as they are written on
 screen.
 
 The pictures are driven from `tests/fixtures/renders.json`, a manifest the render
@@ -184,17 +203,20 @@ through the render job's own validator, so the fixture cannot drift into a
 manifest that job would never write.
 
 `tests/setup.ts` gives jsdom a fixed 1024×800 viewport, because a
-virtualised list in a DOM that lays nothing out would decide nothing is visible
-and render no rows, and an element a `scrollTo` to call, because jsdom implements
-no scrolling at all.
+virtualised grid in a DOM that lays nothing out would decide nothing is visible
+and render no cards, and an element a `scrollTo` to call, because jsdom
+implements no scrolling at all. jsdom measures every element as zero wide, so
+the grid falls back to the column count it starts from rather than collapsing to
+one; how many columns a real width buys is the end-to-end suite's to check.
 
 `tests/page.test.tsx` is the exception: it renders the page against the committed
 catalogue rather than the fixture, because the component suites drive the view
 and the footer apart from each other and neither can see whether the page puts
 them on the same screen.
 
-jsdom applies no stylesheet, so nothing here can assert the responsive layout;
-phone width is checked in a real browser, below.
+jsdom applies no stylesheet and lays nothing out, so nothing here can assert the
+responsive layout, how many cards go across, or the click target stretched over
+a whole card — all three are checked in a real browser, below.
 
 ## End to end, in a real browser
 
@@ -226,13 +248,16 @@ working page.
   fault in its own right — the site is meant to have no server, no analytics and
   no third party but that CDN — and this is the one place that can check it.
 - `e2e/smoke.spec.ts` does what a viewer does: loads the page, filters to a
-  Class, types a search, opens a row and works its Style switcher and Team
-  toggle. Every test also asserts the browser logged nothing and that every
-  picture actually decoded.
-- `e2e/accessibility.spec.ts` runs axe over the list, over an open row, and over
+  Class, types a search, opens a card and works its Style switcher and Team
+  toggle. It also checks the two things only a laid-out page has: that the
+  cards sit side by side rather than one to a line, and that a click on the
+  middle of a card — the picture, not the name — opens it and leaves the focus
+  on its control. Every test also asserts the browser logged nothing and that
+  every picture actually decoded.
+- `e2e/accessibility.spec.ts` runs axe over the grid, over an open card, and over
   both again in dark mode, and then asks the question axe cannot: whether the
   bar can be *worked* from the keyboard — every control named, reached by Tab,
-  and visibly focused, and a row that opens, closes and hands the focus back.
+  and visibly focused, and a card that opens, closes and hands the focus back.
 - `e2e/build-validation.spec.ts` runs `next build` against a broken catalogue and
   a broken manifest and reads what it printed. `tests/source.test.ts` says the
   loader throws; this says the build does.
@@ -252,5 +277,5 @@ not run against 7, so this package pins `typescript@5`. Both are checked by
 
 The whole catalogue and the whole manifest are handed to the client as one
 payload each, which is what makes the exported HTML large; trimming both to the
-fields a row and its picture need is worth doing now that the tickets have
+fields a card and its picture need is worth doing now that the tickets have
 settled what those are.

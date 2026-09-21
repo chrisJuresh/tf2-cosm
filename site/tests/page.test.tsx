@@ -13,10 +13,10 @@ import { describe, expect, it } from "vitest";
 import CataloguePage from "@/app/page";
 
 describe("the catalogue page", () => {
-  it("puts the list, the Dollar Basis switch and the credits on one page", () => {
+  it("puts the grid, the Dollar Basis switch and the credits on one page", () => {
     render(<CataloguePage />);
 
-    expect(screen.getByRole("table", { name: "Cosmetics" })).toBeInTheDocument();
+    expect(screen.getByRole("list", { name: "Cosmetics" })).toBeInTheDocument();
     expect(screen.getByRole("radiogroup", { name: "Dollar Basis" })).toBeInTheDocument();
     expect(within(screen.getByRole("contentinfo")).getAllByRole("link")).not.toHaveLength(0);
   });
