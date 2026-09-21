@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import pytest
 
-from render.sourceio_patch import collapse_slashes, suffix_of
+from render.sourceio_patch import UV_OUT_TYPO, collapse_slashes, repaired_source, suffix_of
 
 
 @pytest.mark.parametrize(
@@ -43,3 +43,23 @@ def test_a_leading_double_slash_is_left_alone():
 )
 def test_the_suffix_comes_from_the_last_component(path, expected):
     assert suffix_of(path) == expected
+
+
+def test_both_uv_out_typos_are_corrected():
+    """SourceIO writes `uv.output` in two places; both are the socket list, and `uv` can be None."""
+    source = (
+        "def create_nodes(self):\n"
+        "    uv = None\n"
+        "    a = f(uv_out=uv.output[0])\n"
+        "    b = g(x, uv_out=uv.output[0])\n"
+    )
+    repaired, found = repaired_source(source)
+    assert found == 2
+    assert UV_OUT_TYPO not in repaired
+    assert repaired.count("uv_out=(uv.outputs[0] if uv is not None else None)") == 2
+
+
+def test_a_source_without_the_typo_is_left_exactly_as_it_is():
+    """An add-on that has fixed this upstream must not be rewritten behind its back."""
+    source = "def create_nodes(self):\n    return f(uv_out=uv.outputs[0])\n"
+    assert repaired_source(source) == (source, 0)

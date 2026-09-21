@@ -197,7 +197,8 @@ describe("the Class the picture shows", () => {
     // The fixture has the Gibus on Scout, Soldier and Heavy only. A Medic
     // looking at it gets the icon, not a Heavy wearing it.
     renderList({ classView: "medic" });
-    expect(pictureIn("ghastly-gibus").getAttribute("src")).toContain("/gibus.");
+    // The large one: a row draws its picture at the size the open row does.
+    expect(pictureIn("ghastly-gibus").getAttribute("src")).toContain("/gibus_large.");
   });
 });
 

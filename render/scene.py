@@ -119,13 +119,20 @@ class Light(NamedTuple):
 
 
 #: The fixed rig: identical for every render, so pictures are comparable (spec R1).
+#:
+#: Exposed for the texture rather than for the silhouette. The first full run stood the rig at
+#: two and a half times these energies, and TF2's albedos are bright to begin with: half the
+#: Medic's coat came out at pure white, a Soldier's red read as pink, and a black overcoat read
+#: as grey — the frame was legible but the Cosmetic was not. What matters in a catalogue picture
+#: is telling one hat from another, so the rig is set where the brightest common material still
+#: has somewhere to go, and the whole catalogue is re-rendered when it moves.
 LIGHT_RIG: tuple[Light, ...] = (
-    Light("key", "AREA", (-1.6, 1.4, 1.8), 350.0, 1.5),
-    Light("fill", "AREA", (1.8, 0.6, 1.4), 120.0, 2.0),
-    Light("rim", "AREA", (0.6, 1.2, -2.0), 150.0, 1.0),
+    Light("key", "AREA", (-1.6, 1.4, 1.8), 140.0, 1.5),
+    Light("fill", "AREA", (1.8, 0.6, 1.4), 48.0, 2.0),
+    Light("rim", "AREA", (0.6, 1.2, -2.0), 60.0, 1.0),
 )
 
-WORLD_STRENGTH = 0.6
+WORLD_STRENGTH = 0.28
 WORLD_COLOR = (0.35, 0.35, 0.38, 1.0)
 
 
