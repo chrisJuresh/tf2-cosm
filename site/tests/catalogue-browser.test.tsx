@@ -11,7 +11,7 @@ import { cleanup, render, screen, waitFor, within } from "@testing-library/react
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { fixtureBasis, fixtureCosmetics, fixtureKeyRate } from "./fixtures.ts";
+import { fixtureBasis, fixtureCosmetics, fixtureKeyRate, fixtureSnapshotTakenAt } from "./fixtures.ts";
 
 import { CatalogueBrowser } from "@/components/catalogue-browser";
 import { EMPTY_MANIFEST } from "@/renders/manifest";
@@ -31,6 +31,7 @@ function renderBrowser() {
       manifest={EMPTY_MANIFEST}
       keyRate={fixtureKeyRate()}
       basis={fixtureBasis()}
+      snapshotTakenAt={fixtureSnapshotTakenAt()}
     />,
   );
   return userEvent.setup();

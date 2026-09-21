@@ -93,7 +93,13 @@ export function CatalogueView({ catalogue, manifest }: CatalogueViewProps) {
         )}
       </header>
       <main className="flex w-full min-h-0 flex-1 flex-col px-3 sm:px-4">
-        <CatalogueBrowser cosmetics={catalogue.cosmetics} manifest={manifest} keyRate={keyRate} basis={basis} />
+        <CatalogueBrowser
+          cosmetics={catalogue.cosmetics}
+          manifest={manifest}
+          keyRate={keyRate}
+          basis={basis}
+          snapshotTakenAt={header.snapshotTakenAt}
+        />
       </main>
       <SiteFooter
         provenance={

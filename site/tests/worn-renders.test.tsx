@@ -12,7 +12,13 @@ import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { fixtureBasis, fixtureCosmetics, fixtureKeyRate, fixtureManifest } from "./fixtures.ts";
+import {
+  fixtureBasis,
+  fixtureCosmetics,
+  fixtureKeyRate,
+  fixtureManifest,
+  fixtureSnapshotTakenAt,
+} from "./fixtures.ts";
 
 import { CatalogueBrowser } from "@/components/catalogue-browser";
 import { CosmeticGrid } from "@/components/cosmetic-grid";
@@ -41,6 +47,7 @@ function renderBrowser() {
       manifest={fixtureManifest()}
       keyRate={fixtureKeyRate()}
       basis={fixtureBasis()}
+      snapshotTakenAt={fixtureSnapshotTakenAt()}
     />,
   );
   return userEvent.setup();

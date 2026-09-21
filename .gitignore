@@ -40,6 +40,10 @@ jobs.json
 /renders/
 # The link `site/scripts/link-renders.mjs` makes so a local run is servable in development.
 /site/public/renders
+# The copy `site/scripts/copy-variant-prices.mjs` makes so the Inventory view can fetch the
+# Variant Prices beside the page rather than have them baked into it (ADR-0005). The
+# document itself is committed under `catalogue/`; this is a build artefact of it.
+/site/public/variant-prices.json
 # Everything the end-to-end suite builds for itself: the fixture data folder it builds the
 # site from, the placeholder images it serves at /renders, and the built site it serves.
 /site/.e2e/

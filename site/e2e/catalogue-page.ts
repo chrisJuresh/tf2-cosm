@@ -14,14 +14,40 @@
  * the internet to pass is a suite that fails for reasons that are nobody's
  * fault. Anything else leaving the page is recorded as a fault in its own right
  * — the site is meant to have no server, no analytics and no third party but
- * that CDN (ADR-0002), and this is the one place that can actually check it.
+ * that CDN and the inventory proxy (ADR-0002, ADR-0006), and this is the one
+ * place that can actually check it.
+ *
+ * The proxy is the second allowed destination and it is *not* blanket-allowed:
+ * a test asks for a backpack with `serveInventory`, and until it does, a request
+ * to the proxy is a fault like any other. The page is meant to talk to it when
+ * the viewer asks and at no other moment, and a rule that let it through
+ * whenever could not tell the difference.
  */
 import { expect, test as base, type Page, type Request } from "@playwright/test";
 
-import { PLACEHOLDER_PNG } from "./fixture-site.mjs";
+import { INVENTORY_API_URL, PLACEHOLDER_PNG } from "./fixture-site.mjs";
 
 /** Valve's icon CDN, the page's only legitimate outside request. */
 const ICON_HOST = "steamcdn-a.akamaihd.net";
+
+/** The inventory proxy, as the fixture site was built to reach it. */
+const INVENTORY_HOST = new URL(INVENTORY_API_URL).hostname;
+
+/** What the proxy is to answer with, once a test has said so. */
+export interface InventoryAnswer {
+  readonly status: number;
+  readonly body: unknown;
+}
+
+export interface CataloguePage {
+  readonly page: Page;
+  readonly faults: PageFaults;
+  /**
+   * Answer the inventory proxy with this, from now on. Until a test calls it,
+   * the proxy is not an allowed destination and a request to it is a fault.
+   */
+  serveInventory(answer: InventoryAnswer): void;
+}
 
 export interface PageFaults {
   readonly consoleErrors: string[];
@@ -37,9 +63,10 @@ function describeRequest(request: Request, why: string): string {
   return `${request.method()} ${request.url()} — ${why}`;
 }
 
-export const test = base.extend<{ catalogue: { page: Page; faults: PageFaults } }>({
+export const test = base.extend<{ catalogue: CataloguePage }>({
   catalogue: async ({ page }, use) => {
     const faults: PageFaults = { consoleErrors: [], failedRequests: [], offSiteRequests: [] };
+    let inventoryAnswer: InventoryAnswer | null = null;
 
     await page.route("**/*", async (route) => {
       const url = route.request().url();
@@ -47,8 +74,18 @@ export const test = base.extend<{ catalogue: { page: Page; faults: PageFaults } 
         await route.continue();
         return;
       }
-      if (new URL(url).hostname === ICON_HOST) {
+      const { hostname } = new URL(url);
+      if (hostname === ICON_HOST) {
         await route.fulfill({ status: 200, contentType: "image/png", body: PLACEHOLDER_PNG });
+        return;
+      }
+      if (hostname === INVENTORY_HOST && inventoryAnswer !== null) {
+        await route.fulfill({
+          status: inventoryAnswer.status,
+          contentType: "application/json",
+          headers: { "access-control-allow-origin": "*" },
+          body: JSON.stringify(inventoryAnswer.body),
+        });
         return;
       }
       faults.offSiteRequests.push(describeRequest(route.request(), "the page should talk to nobody but the icon CDN"));
@@ -72,7 +109,13 @@ export const test = base.extend<{ catalogue: { page: Page; faults: PageFaults } 
     await page.goto("/");
     await expect(page.getByRole("heading", { name: "TF2 Cosmetics Catalogue" })).toBeVisible();
 
-    await use({ page, faults });
+    await use({
+      page,
+      faults,
+      serveInventory(answer: InventoryAnswer) {
+        inventoryAnswer = answer;
+      },
+    });
   },
 });
 
@@ -83,6 +126,20 @@ export function expectClean(faults: PageFaults): void {
   expect(faults.consoleErrors).toEqual([]);
   expect(faults.failedRequests).toEqual([]);
   expect(faults.offSiteRequests).toEqual([]);
+}
+
+/**
+ * The count the control bar announces: "8 Cosmetics", "7 of 8 Cosmetics".
+ *
+ * Scoped to the bar rather than found by its role, because the Inventory has a
+ * live region of its own. That one is mounted empty and stays mounted: a
+ * screen reader announces content added to a region that was already there, and
+ * a region that appears along with its text is announced unreliably or not at
+ * all — so "there is only one status on the page" was never something to hold
+ * the page to.
+ */
+export function shownCount(page: Page) {
+  return page.getByRole("region", { name: "Browsing controls" }).getByRole("status");
 }
 
 /** Every Cosmetic card currently drawn, by its slug — the hook ADR-0003 put there. */

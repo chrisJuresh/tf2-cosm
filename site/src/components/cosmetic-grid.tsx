@@ -37,8 +37,10 @@ import type { ClassName, Cosmetic, Metal } from "@tf2-cosm/data/catalogue";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { type CSSProperties, type MouseEvent, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
+import { qualityRead } from "@/catalogue/describe";
 import { CosmeticModal } from "@/components/cosmetic-modal";
 import { WornRender } from "@/components/worn-render";
+import type { OwnedCosmetic } from "@/inventory/owned";
 import type { RenderManifest } from "@/renders/manifest";
 import { DEFAULT_STYLE, DEFAULT_TEAM, displayedClass } from "@/renders/select";
 
@@ -143,6 +145,15 @@ export interface CosmeticGridProps {
   readonly keyRate: Metal | null;
   /** The active Dollar Basis, or null when no dollar figure can be computed. */
   readonly basis: DollarBasis | null;
+  /**
+   * What the viewer owns, by slug. A card of a Cosmetic in here shows what their
+   * copy is worth rather than what the Cosmetic costs, which is the whole point
+   * of reading a backpack.
+   *
+   * Left out means no backpack has been read, which is how every viewer arrives
+   * and is the state most of the suite drives the grid in.
+   */
+  readonly owned?: ReadonlyMap<string, OwnedCosmetic> | undefined;
 }
 
 /** The three price figures a card shows, already written out. */
@@ -152,6 +163,63 @@ interface Figures {
   readonly reason: string | null;
   readonly metalValue: string;
   readonly dollars: string;
+}
+
+/**
+ * What a card shows for a Cosmetic the viewer owns: their own copy's figure,
+ * not the Cosmetic's.
+ *
+ * This is the whole point of reading a backpack. A Genuine copy is worth the
+ * Genuine price and the catalogue's Reference Price is a different number about
+ * a different copy, so where the two disagree the card follows the viewer's.
+ *
+ * `owned.copies` is most valuable first, so the figure is the best copy they
+ * hold. An Unusual has no figure by design — a price source prices those by
+ * effect (ADR-0005) — and says so under the Quality rather than falling through
+ * to a number that would be wrong by two orders of magnitude.
+ */
+function ownedFigures(
+  owned: OwnedCosmetic,
+  keyRate: Metal | null,
+  basis: DollarBasis | null,
+): Figures {
+  const best = owned.copies[0];
+  const held = owned.count === 1 ? "" : ` ×${owned.count}`;
+  if (best === undefined) return { notation: NOTHING, reason: null, metalValue: NOTHING, dollars: NOTHING };
+
+  const said = `${qualityRead(best.quality)}${best.craftable ? "" : ", non-craftable"}${held}`;
+  if (best.price === null) {
+    return {
+      notation: best.noPrice === "priced-per-effect" ? "Priced by its effect" : "No price for that Quality",
+      reason: best.effect === undefined ? said : `${said} · ${best.effect}`,
+      metalValue: NOTHING,
+      dollars: NOTHING,
+    };
+  }
+
+  const metal: Metal = {
+    scrap: best.price.scrap.mid,
+    refined: best.price.scrap.mid / 9,
+    notation: "",
+  };
+  const dollars = dollarsFor(metal, basis);
+  const written = (figure: string) => (best.price?.blanket === true ? approximately(figure) : figure);
+  return {
+    notation: written(formatTraderNotation(metal, keyRate)),
+    reason: said,
+    metalValue: written(formatMetalValue(metal)),
+    dollars: dollars === null ? NOTHING : written(formatDollars(dollars)),
+  };
+}
+
+/** A card's figures: the viewer's own copy where they have one, the Cosmetic's otherwise. */
+function figuresForCard(
+  cosmetic: Cosmetic,
+  owned: OwnedCosmetic | undefined,
+  keyRate: Metal | null,
+  basis: DollarBasis | null,
+): Figures {
+  return owned === undefined ? figuresFor(cosmetic, keyRate, basis) : ownedFigures(owned, keyRate, basis);
 }
 
 function figuresFor(cosmetic: Cosmetic, keyRate: Metal | null, basis: DollarBasis | null): Figures {
@@ -229,6 +297,8 @@ function Figure({ term, value, className }: { term: string; value: string; class
 interface CosmeticCardProps {
   cosmetic: Cosmetic;
   figures: Figures;
+  /** What the viewer owns of this Cosmetic, where they own any. */
+  owned: OwnedCosmetic | undefined;
   manifest: RenderManifest;
   /** The Class this card's picture shows, settled once by the grid. */
   gameClass: ClassName;
@@ -243,6 +313,7 @@ interface CosmeticCardProps {
 function CosmeticCard({
   cosmetic,
   figures,
+  owned,
   manifest,
   gameClass,
   position,
@@ -280,7 +351,24 @@ function CosmeticCard({
         " hover:bg-black/[0.03] dark:border-white/15 dark:hover:bg-white/[0.05]"
       }
     >
-      <div className="flex h-40 items-center justify-center">
+      {/* A corner mark rather than a line of its own: a card is a fixed height
+          and every pixel the mark took would come off the picture. It carries
+          its own words for a screen reader, because "×2" over a picture is not
+          a sentence. */}
+      <div className="relative flex h-40 items-center justify-center">
+        {owned === undefined ? null : (
+          <span
+            className={
+              "absolute top-0 right-0 rounded-full bg-black/75 px-1.5 py-0.5 text-[0.625rem]" +
+              " font-medium text-white dark:bg-white/85 dark:text-black"
+            }
+          >
+            <span aria-hidden="true">{owned.count === 1 ? "Owned" : `Owned ×${owned.count}`}</span>
+            <span className="sr-only">
+              You own {owned.count === 1 ? "one copy" : `${owned.count} copies`} of this
+            </span>
+          </span>
+        )}
         <WornRender
           cosmetic={cosmetic}
           manifest={manifest}
@@ -340,7 +428,17 @@ function CosmeticCard({
   );
 }
 
-export function CosmeticGrid({ cosmetics, manifest, classView, keyRate, basis }: CosmeticGridProps) {
+/** No backpack read: what every viewer arrives with, and a stable identity for it. */
+const NOTHING_OWNED: ReadonlyMap<string, OwnedCosmetic> = new Map();
+
+export function CosmeticGrid({
+  cosmetics,
+  manifest,
+  classView,
+  keyRate,
+  basis,
+  owned = NOTHING_OWNED,
+}: CosmeticGridProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const toggles = useRef(new Map<string, HTMLButtonElement>());
   const [openSlug, setOpenSlug] = useState<string | null>(null);
@@ -468,7 +566,11 @@ export function CosmeticGrid({ cosmetics, manifest, classView, keyRate, basis }:
                 <CosmeticCard
                   key={cosmetic.slug}
                   cosmetic={cosmetic}
-                  figures={figuresFor(cosmetic, keyRate, basis)}
+                  // A Cosmetic the viewer owns is shown at their own copy's
+                  // figure. Where the two disagree the card follows theirs,
+                  // because that is the copy in their hands.
+                  figures={figuresForCard(cosmetic, owned.get(cosmetic.slug), keyRate, basis)}
+                  owned={owned.get(cosmetic.slug)}
                   manifest={manifest}
                   gameClass={displayedClass(cosmetic, classView)}
                   position={first + offset + 1}

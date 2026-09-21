@@ -50,10 +50,22 @@ export function classesRead(cosmetic: Cosmetic): string {
   return `${names.slice(0, -1).join(", ")} and ${names.at(-1) ?? ""}`;
 }
 
+/**
+ * A Quality's English name: "Unique", "Collector's", "Self-Made".
+ *
+ * This takes an open string rather than the Quality union, because the Qualities
+ * that reach it from a viewer's own backpack are whatever Steam found in it, and
+ * the Worker's vocabulary is checked against the catalogue's by its own test
+ * rather than by this function's type. A token nobody has an entry for comes out
+ * capitalised, which is at least a name.
+ */
+export function qualityRead(quality: string): string {
+  return QUALITY_NAMES[quality as PricedVariant["quality"]] ?? titleCase(quality);
+}
+
 /** The Reference Variant the price is for: "Unique, craftable". */
 export function referenceVariantRead(variant: PricedVariant): string {
-  const quality = QUALITY_NAMES[variant.quality] ?? titleCase(variant.quality);
-  return `${quality}, ${variant.craftable ? "craftable" : "non-craftable"}`;
+  return `${qualityRead(variant.quality)}, ${variant.craftable ? "craftable" : "non-craftable"}`;
 }
 
 /**
