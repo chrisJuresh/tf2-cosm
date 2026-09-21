@@ -146,6 +146,19 @@ describe("hiding Event-Only Cosmetics", () => {
   });
 });
 
+describe("narrowing to what a viewer owns", () => {
+  it("is where a viewer starts, and costs them nothing before an Inventory is read", () => {
+    expect(DEFAULT_CONTROLS.onlyOwned).toBe(true);
+    expect(slugsOf()).toContain("team-captain");
+  });
+
+  it("narrows to the Inventory the moment there is one", () => {
+    const owned = new Set(["team-captain"]);
+    const visible = visibleCosmetics(fixtureCosmetics(), DEFAULT_CONTROLS, owned);
+    expect(visible.map((c) => c.slug)).toEqual(["team-captain"]);
+  });
+});
+
 describe("the sort orders", () => {
   it("puts the highest Metal Value first by default", () => {
     expect(slugsOf().slice(0, 3)).toEqual(["team-captain", "tin-pot", "baronial-badge"]);

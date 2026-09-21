@@ -123,9 +123,14 @@ describe("asking for a backpack", () => {
     await look(user, "robinwalker");
 
     await waitFor(() => expect(within(cardFor("team-captain") as HTMLElement).getByText("Owned ×2")).toBeInTheDocument());
-    // A Cosmetic they do not own carries no mark.
+
+    // A Cosmetic they do not own carries no mark — which needs the rest of the
+    // catalogue back, since a backpack narrows to itself on arrival.
+    await user.click(screen.getByLabelText("Only what I own"));
     const other = cosmetics.find((one) => one.slug !== "team-captain");
-    expect(within(cardFor(other?.slug ?? "") as HTMLElement).queryByText(/Owned/)).toBeNull();
+    await waitFor(() =>
+      expect(within(cardFor(other?.slug ?? "") as HTMLElement).queryByText(/Owned/)).toBeNull(),
+    );
   });
 
   it("prices the copy they hold, not the copy the catalogue prices", async () => {
@@ -187,17 +192,26 @@ describe("narrowing the catalogue to what a viewer owns", () => {
     await waitFor(() => expect(toggle).toBeEnabled());
   });
 
-  it("shows only what they own once it is ticked", async () => {
+  it("shows only what they own as soon as the backpack lands, without being asked", async () => {
     serve(() => answer(inventory([{ defindex: defindexOf("team-captain") }])));
     const user = renderBrowser();
     await look(user, "robinwalker");
-    await waitFor(() => expect(screen.getByLabelText("Only what I own")).toBeEnabled());
+    await waitFor(() => expect(screen.getByLabelText("Only what I own")).toBeChecked());
 
-    await user.click(screen.getByLabelText("Only what I own"));
     await waitFor(() => {
       expect(cardFor("team-captain")).not.toBeNull();
       expect(cardFor("crocodile-smile")).toBeNull();
     });
+  });
+
+  it("puts the rest of the catalogue back when the toggle is cleared", async () => {
+    serve(() => answer(inventory([{ defindex: defindexOf("team-captain") }])));
+    const user = renderBrowser();
+    await look(user, "robinwalker");
+    await waitFor(() => expect(cardFor("scotsmans-stove-pipe")).toBeNull());
+
+    await user.click(screen.getByLabelText("Only what I own"));
+    await waitFor(() => expect(cardFor("scotsmans-stove-pipe")).not.toBeNull());
   });
 
   it("leaves out everything that is not a Cosmetic, with no rule of its own to do it", async () => {
@@ -206,7 +220,6 @@ describe("narrowing the catalogue to what a viewer owns", () => {
     const user = renderBrowser();
     await look(user, "robinwalker");
     await waitFor(() => expect(screen.getByLabelText("Only what I own")).toBeEnabled());
-    await user.click(screen.getByLabelText("Only what I own"));
 
     await waitFor(() => expect(screen.getByText(/1 Cosmetics · 1 copies priced at/)).toBeInTheDocument());
   });
