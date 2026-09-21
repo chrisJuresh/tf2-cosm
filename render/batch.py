@@ -229,8 +229,13 @@ def report_failures(layout: OutputLayout, plan: RunPlan) -> None:
         )
 
 
-def run(settings: Settings, *, launch=launch_blender) -> int:
-    """Render what is missing. 0 when everything planned was accounted for, 1 when work was lost."""
+def run(settings: Settings, *, launch=launch_blender, stopping: threading.Event | None = None) -> int:
+    """Render what is missing. 0 when everything planned was accounted for, 1 when work was lost.
+
+    `stopping` is the run's own stop signal, passed in when the caller wants to watch it — a
+    test that has to know the run has given up before it lets its fake Blender return. A run
+    that does not care gets a fresh one.
+    """
     layout = OutputLayout.from_env().overridden(
         root=settings.root, masters_dir=settings.masters_dir, manifest=settings.manifest
     )
@@ -271,7 +276,14 @@ def run(settings: Settings, *, launch=launch_blender) -> int:
         print(f"[batch] {complaint}", file=sys.stderr, flush=True)
         return 2
 
-    return _render_batches(settings, layout, plan, batches(plan.work, settings.batch_size, plan.variants), launch)
+    return _render_batches(
+        settings,
+        layout,
+        plan,
+        batches(plan.work, settings.batch_size, plan.variants),
+        launch,
+        stopping if stopping is not None else threading.Event(),
+    )
 
 
 def texture_cache_for(settings: Settings, worker: int) -> Path:
@@ -289,7 +301,12 @@ def texture_cache_for(settings: Settings, worker: int) -> Path:
 
 
 def _render_batches(
-    settings: Settings, layout: OutputLayout, plan: RunPlan, cut: list[Batch], launch
+    settings: Settings,
+    layout: OutputLayout,
+    plan: RunPlan,
+    cut: list[Batch],
+    launch,
+    stopping: threading.Event,
 ) -> int:
     """Hand every batch to Blender, `settings.workers` of them at a time.
 
@@ -308,7 +325,6 @@ def _render_batches(
     tally = _Tally(total=plan.images)
     manifest = load_manifest(layout.manifest)
     merging = threading.Lock()
-    stopping = threading.Event()
 
     if workers > 1:
         log(f"{workers} Blender processes at a time over {len(cut)} batches")
@@ -348,10 +364,19 @@ def _render_batches(
                 ))
 
         def take(assigned: list[tuple[int, Batch]], worker: int) -> None:
-            for number, batch in assigned:
-                if stopping.is_set():
-                    return
-                render_one(number, batch, worker)
+            try:
+                for number, batch in assigned:
+                    if stopping.is_set():
+                        return
+                    render_one(number, batch, worker)
+            except BaseException:
+                # Stop the run here, in the thread that failed, rather than leaving it to the
+                # main thread to notice: between a worker raising and `as_completed` waking
+                # with the bad future, every other worker is still free to open another
+                # Blender, and how many it got through would be thread scheduling. The main
+                # thread still sets it too, for a ctrl-c that lands there instead.
+                stopping.set()
+                raise
 
         # Round robin, so every worker gets batches from across the run rather than one
         # worker getting all of a Class whose models are slow.
@@ -372,9 +397,9 @@ def _render_batches(
                         # Set it here, not in the outer handler: leaving this `with` block
                         # shuts the pool down waiting, and a worker that has not been told
                         # to stop by then works through every batch it is still holding —
-                        # a ctrl-c that drains the run instead of ending it. The same goes
-                        # for anything else a worker raises, which the serial path would
-                        # have stopped on at once.
+                        # a ctrl-c that drains the run instead of ending it. `take` has
+                        # already set it for anything a worker itself raised; this is for a
+                        # ctrl-c that lands on the main thread while it waits here.
                         stopping.set()
                         raise
         except KeyboardInterrupt:
