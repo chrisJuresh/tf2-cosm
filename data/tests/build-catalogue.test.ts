@@ -17,7 +17,7 @@ const ORACLE = {
     {
       defindex: 111,
       name: "Scotsman's Stove Pipe",
-      slug: "scotsman-s-stove-pipe",
+      slug: "scotsmans-stove-pipe",
       aliases: [],
       kind: "class-exclusive",
     },

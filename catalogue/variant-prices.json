@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "header": {
-    "snapshotTakenAt": "2026-09-21T02:36:02.383Z",
+    "snapshotTakenAt": "2026-09-21T02:51:01.934Z",
     "source": "backpack.tf (IGetPrices v4, IGetCurrencies v1)",
-    "takenAt": "2026-09-21T02:36:00.274Z",
+    "takenAt": "2026-09-21T02:50:59.322Z",
     "keyRate": {
       "scrap": 577,
       "refined": 64.1111,
@@ -566,7 +566,7 @@
         "lastUpdatedAt": "2026-04-25T12:35:48.000Z"
       }
     ],
-    "aladdin-s-private-reserve": [
+    "aladdins-private-reserve": [
       {
         "quality": "strange",
         "craftable": true,
@@ -1099,7 +1099,7 @@
         "lastUpdatedAt": "2024-08-18T21:33:46.000Z"
       }
     ],
-    "apparatchik-s-apparel": [
+    "apparatchiks-apparel": [
       {
         "quality": "strange",
         "craftable": true,
@@ -1134,7 +1134,7 @@
         "lastUpdatedAt": "2023-12-27T20:16:55.000Z"
       }
     ],
-    "apparition-s-aspect": [
+    "apparitions-aspect": [
       {
         "quality": "strange",
         "craftable": true,
@@ -1217,7 +1217,7 @@
         "lastUpdatedAt": "2026-05-08T12:34:40.000Z"
       }
     ],
-    "archer-s-groundings": [
+    "archers-groundings": [
       {
         "quality": "strange",
         "craftable": true,
@@ -1241,7 +1241,7 @@
         "lastUpdatedAt": "2026-04-12T05:56:31.000Z"
       }
     ],
-    "archer-s-sterling": [
+    "archers-sterling": [
       {
         "quality": "strange",
         "craftable": true,
@@ -1549,7 +1549,7 @@
         "lastUpdatedAt": "2022-03-24T14:54:18.000Z"
       }
     ],
-    "arthropod-s-aspect": [
+    "arthropods-aspect": [
       {
         "quality": "strange",
         "craftable": true,
@@ -1573,7 +1573,7 @@
         "lastUpdatedAt": "2026-04-12T14:53:39.000Z"
       }
     ],
-    "assassin-s-attire": [
+    "assassins-attire": [
       {
         "quality": "strange",
         "craftable": true,
@@ -1874,54 +1874,6 @@
         "lastUpdatedAt": "2026-04-24T13:27:06.000Z"
       }
     ],
-    "b-aaarrgh-n-bicorne": [
-      {
-        "quality": "strange",
-        "craftable": true,
-        "blanket": false,
-        "scrap": {
-          "low": 2452,
-          "mid": 2683,
-          "high": 2914
-        },
-        "lastUpdatedAt": "2026-05-06T16:10:17.000Z"
-      },
-      {
-        "quality": "unique",
-        "craftable": true,
-        "blanket": false,
-        "scrap": {
-          "low": 411,
-          "mid": 430,
-          "high": 449
-        },
-        "lastUpdatedAt": "2026-05-06T16:10:09.000Z"
-      }
-    ],
-    "b-aaarrgh-n-britches": [
-      {
-        "quality": "strange",
-        "craftable": true,
-        "blanket": false,
-        "scrap": {
-          "low": 366,
-          "mid": 411,
-          "high": 456
-        },
-        "lastUpdatedAt": "2026-05-06T16:11:46.000Z"
-      },
-      {
-        "quality": "unique",
-        "craftable": true,
-        "blanket": false,
-        "scrap": {
-          "low": 175,
-          "mid": 189,
-          "high": 204
-        },
-        "lastUpdatedAt": "2026-04-25T04:11:27.000Z"
-      }
-    ],
     "b-ankh": [
       {
         "quality": "haunted",
@@ -1970,7 +1922,55 @@
         "lastUpdatedAt": "2026-04-28T16:38:07.000Z"
       }
     ],
-    "backbiter-s-billycock": [
+    "baaarrgh-n-bicorne": [
+      {
+        "quality": "strange",
+        "craftable": true,
+        "blanket": false,
+        "scrap": {
+          "low": 2452,
+          "mid": 2683,
+          "high": 2914
+        },
+        "lastUpdatedAt": "2026-05-06T16:10:17.000Z"
+      },
+      {
+        "quality": "unique",
+        "craftable": true,
+        "blanket": false,
+        "scrap": {
+          "low": 411,
+          "mid": 430,
+          "high": 449
+        },
+        "lastUpdatedAt": "2026-05-06T16:10:09.000Z"
+      }
+    ],
+    "baaarrgh-n-britches": [
+      {
+        "quality": "strange",
+        "craftable": true,
+        "blanket": false,
+        "scrap": {
+          "low": 366,
+          "mid": 411,
+          "high": 456
+        },
+        "lastUpdatedAt": "2026-05-06T16:11:46.000Z"
+      },
+      {
+        "quality": "unique",
+        "craftable": true,
+        "blanket": false,
+        "scrap": {
+          "low": 175,
+          "mid": 189,
+          "high": 204
+        },
+        "lastUpdatedAt": "2026-04-25T04:11:27.000Z"
+      }
+    ],
+    "backbiters-billycock": [
       {
         "quality": "collectors",
         "craftable": true,
@@ -2038,7 +2038,7 @@
         "lastUpdatedAt": "2026-04-11T07:15:31.000Z"
       }
     ],
-    "backbreaker-s-guards": [
+    "backbreakers-guards": [
       {
         "quality": "strange",
         "craftable": true,
@@ -2062,7 +2062,7 @@
         "lastUpdatedAt": "2026-04-21T18:25:41.000Z"
       }
     ],
-    "backbreaker-s-skullcracker": [
+    "backbreakers-skullcracker": [
       {
         "quality": "strange",
         "craftable": true,
@@ -2121,7 +2121,7 @@
         "lastUpdatedAt": "2026-04-22T12:16:28.000Z"
       }
     ],
-    "backstabber-s-boomslang": [
+    "backstabbers-boomslang": [
       {
         "quality": "strange",
         "craftable": true,
@@ -2477,7 +2477,7 @@
         "lastUpdatedAt": "2026-04-24T13:27:14.000Z"
       }
     ],
-    "bandit-s-boots": [
+    "bandits-boots": [
       {
         "quality": "strange",
         "craftable": true,
@@ -2706,7 +2706,7 @@
         "lastUpdatedAt": "2026-06-28T05:44:28.000Z"
       }
     ],
-    "baseball-bill-s-sports-shine": [
+    "baseball-bills-sports-shine": [
       {
         "quality": "strange",
         "craftable": true,
@@ -2802,7 +2802,7 @@
         "lastUpdatedAt": "2026-01-31T16:28:36.000Z"
       }
     ],
-    "batter-s-beak": [
+    "batters-beak": [
       {
         "quality": "unique",
         "craftable": true,
@@ -2815,7 +2815,7 @@
         "lastUpdatedAt": "2026-07-09T11:23:15.000Z"
       }
     ],
-    "batter-s-bracers": [
+    "batters-bracers": [
       {
         "quality": "unique",
         "craftable": true,
@@ -2828,7 +2828,7 @@
         "lastUpdatedAt": "2026-02-03T14:25:30.000Z"
       }
     ],
-    "batter-s-helmet": [
+    "batters-helmet": [
       {
         "quality": "unique",
         "craftable": true,
@@ -3391,7 +3391,7 @@
         "lastUpdatedAt": "2026-09-10T15:18:53.000Z"
       }
     ],
-    "berliner-s-bucket-helm": [
+    "berliners-bucket-helm": [
       {
         "quality": "unique",
         "craftable": true,
@@ -3708,7 +3708,7 @@
         "lastUpdatedAt": "2026-07-15T19:52:28.000Z"
       }
     ],
-    "bill-s-hat": [
+    "bills-hat": [
       {
         "quality": "unique",
         "craftable": true,
@@ -3837,30 +3837,6 @@
         "lastUpdatedAt": "2022-01-19T19:06:42.000Z"
       }
     ],
-    "bird-s-eye-viewer": [
-      {
-        "quality": "strange",
-        "craftable": true,
-        "blanket": false,
-        "scrap": {
-          "low": 323,
-          "mid": 334,
-          "high": 346
-        },
-        "lastUpdatedAt": "2026-04-11T11:48:37.000Z"
-      },
-      {
-        "quality": "unique",
-        "craftable": true,
-        "blanket": false,
-        "scrap": {
-          "low": 107,
-          "mid": 124,
-          "high": 141
-        },
-        "lastUpdatedAt": "2026-04-21T14:32:53.000Z"
-      }
-    ],
     "birdcage": [
       {
         "quality": "collectors",
@@ -3966,7 +3942,31 @@
         "lastUpdatedAt": "2026-04-13T21:49:47.000Z"
       }
     ],
-    "black-knight-s-bascinet": [
+    "birds-eye-viewer": [
+      {
+        "quality": "strange",
+        "craftable": true,
+        "blanket": false,
+        "scrap": {
+          "low": 323,
+          "mid": 334,
+          "high": 346
+        },
+        "lastUpdatedAt": "2026-04-11T11:48:37.000Z"
+      },
+      {
+        "quality": "unique",
+        "craftable": true,
+        "blanket": false,
+        "scrap": {
+          "low": 107,
+          "mid": 124,
+          "high": 141
+        },
+        "lastUpdatedAt": "2026-04-21T14:32:53.000Z"
+      }
+    ],
+    "black-knights-bascinet": [
       {
         "quality": "strange",
         "craftable": true,
@@ -4337,7 +4337,7 @@
         "lastUpdatedAt": "2026-04-26T14:33:16.000Z"
       }
     ],
-    "bloke-s-bucket-hat": [
+    "blokes-bucket-hat": [
       {
         "quality": "unique",
         "craftable": true,
@@ -4396,7 +4396,7 @@
         "lastUpdatedAt": "2026-04-12T05:54:50.000Z"
       }
     ],
-    "boarder-s-beanie": [
+    "boarders-beanie": [
       {
         "quality": "strange",
         "craftable": true,
@@ -4697,7 +4697,7 @@
         "lastUpdatedAt": "2026-08-21T01:53:28.000Z"
       }
     ],
-    "bomber-s-bucket-hat": [
+    "bombers-bucket-hat": [
       {
         "quality": "strange",
         "craftable": true,
@@ -4887,7 +4887,7 @@
         "lastUpdatedAt": "2026-08-09T17:20:52.000Z"
       }
     ],
-    "bonk-batter-s-backup": [
+    "bonk-batters-backup": [
       {
         "quality": "strange",
         "craftable": true,
@@ -5420,7 +5420,7 @@
         "lastUpdatedAt": "2026-01-24T07:45:10.000Z"
       }
     ],
-    "bozo-s-bouffant": [
+    "bozos-bouffant": [
       {
         "quality": "haunted",
         "craftable": true,
@@ -5444,7 +5444,7 @@
         "lastUpdatedAt": "2024-01-29T20:55:38.000Z"
       }
     ],
-    "bozo-s-brogues": [
+    "bozos-brogues": [
       {
         "quality": "haunted",
         "craftable": true,
@@ -6038,7 +6038,7 @@
         "lastUpdatedAt": "2026-03-14T10:34:04.000Z"
       }
     ],
-    "brock-s-locks": [
+    "brocks-locks": [
       {
         "quality": "unique",
         "craftable": true,
@@ -6193,7 +6193,7 @@
         "lastUpdatedAt": "2025-11-05T16:01:36.000Z"
       }
     ],
-    "bruce-s-bonnet": [
+    "bruces-bonnet": [
       {
         "quality": "strange",
         "craftable": true,
@@ -6217,7 +6217,7 @@
         "lastUpdatedAt": "2026-04-11T11:51:28.000Z"
       }
     ],
-    "bruiser-s-bandanna": [
+    "bruisers-bandanna": [
       {
         "quality": "strange",
         "craftable": true,
@@ -6265,7 +6265,7 @@
         "lastUpdatedAt": "2026-09-12T05:02:37.000Z"
       }
     ],
-    "brute-s-braces": [
+    "brutes-braces": [
       {
         "quality": "strange",
         "craftable": true,
@@ -6324,7 +6324,7 @@
         "lastUpdatedAt": "2024-01-24T22:37:21.000Z"
       }
     ],
-    "buccaneer-s-bicorne": [
+    "buccaneers-bicorne": [
       {
         "quality": "collectors",
         "craftable": true,
@@ -6370,30 +6370,6 @@
         "lastUpdatedAt": "2026-05-17T17:51:42.000Z"
       }
     ],
-    "buck-s-brim": [
-      {
-        "quality": "strange",
-        "craftable": true,
-        "blanket": false,
-        "scrap": {
-          "low": 290,
-          "mid": 360,
-          "high": 431
-        },
-        "lastUpdatedAt": "2026-05-01T13:50:22.000Z"
-      },
-      {
-        "quality": "unique",
-        "craftable": true,
-        "blanket": false,
-        "scrap": {
-          "low": 119,
-          "mid": 149,
-          "high": 179
-        },
-        "lastUpdatedAt": "2026-04-25T22:05:48.000Z"
-      }
-    ],
     "buck-turner-all-stars": [
       {
         "quality": "genuine",
@@ -6418,7 +6394,7 @@
         "lastUpdatedAt": "2026-04-20T19:02:29.000Z"
       }
     ],
-    "buckaroo-s-hat": [
+    "buckaroos-hat": [
       {
         "quality": "unique",
         "craftable": true,
@@ -6442,7 +6418,31 @@
         "lastUpdatedAt": "2026-04-16T00:16:49.000Z"
       }
     ],
-    "builder-s-blueprints": [
+    "bucks-brim": [
+      {
+        "quality": "strange",
+        "craftable": true,
+        "blanket": false,
+        "scrap": {
+          "low": 290,
+          "mid": 360,
+          "high": 431
+        },
+        "lastUpdatedAt": "2026-05-01T13:50:22.000Z"
+      },
+      {
+        "quality": "unique",
+        "craftable": true,
+        "blanket": false,
+        "scrap": {
+          "low": 119,
+          "mid": 149,
+          "high": 179
+        },
+        "lastUpdatedAt": "2026-04-25T22:05:48.000Z"
+      }
+    ],
+    "builders-blueprints": [
       {
         "quality": "strange",
         "craftable": true,
@@ -6562,7 +6562,7 @@
         "lastUpdatedAt": "2026-07-10T08:05:49.000Z"
       }
     ],
-    "bunnyhopper-s-ballistics-vest": [
+    "bunnyhoppers-ballistics-vest": [
       {
         "quality": "strange",
         "craftable": true,
@@ -6752,7 +6752,7 @@
         "lastUpdatedAt": "2026-08-19T20:53:04.000Z"
       }
     ],
-    "burny-s-boney-bonnet": [
+    "burnys-boney-bonnet": [
       {
         "quality": "haunted",
         "craftable": true,
@@ -6824,7 +6824,7 @@
         "lastUpdatedAt": "2026-04-21T03:38:42.000Z"
       }
     ],
-    "bushman-s-boonie": [
+    "bushmans-boonie": [
       {
         "quality": "genuine",
         "craftable": true,
@@ -6848,7 +6848,7 @@
         "lastUpdatedAt": "2026-01-30T09:36:44.000Z"
       }
     ],
-    "bushman-s-bristles": [
+    "bushmans-bristles": [
       {
         "quality": "strange",
         "craftable": true,
@@ -6979,7 +6979,7 @@
         "lastUpdatedAt": "2025-05-15T14:53:55.000Z"
       }
     ],
-    "byte-d-beak": [
+    "byted-beak": [
       {
         "quality": "strange",
         "craftable": true,
@@ -7016,7 +7016,7 @@
         "lastUpdatedAt": "2026-04-22T05:41:31.000Z"
       }
     ],
-    "cadaver-s-capper": [
+    "cadavers-capper": [
       {
         "quality": "haunted",
         "craftable": true,
@@ -7040,7 +7040,7 @@
         "lastUpdatedAt": "2025-10-05T03:10:17.000Z"
       }
     ],
-    "cadaver-s-cranium": [
+    "cadavers-cranium": [
       {
         "quality": "unique",
         "craftable": true,
@@ -7383,7 +7383,7 @@
         "lastUpdatedAt": "2026-08-19T19:19:07.000Z"
       }
     ],
-    "candyman-s-cap": [
+    "candymans-cap": [
       {
         "quality": "haunted",
         "craftable": true,
@@ -7407,7 +7407,20 @@
         "lastUpdatedAt": "2022-12-29T22:37:22.000Z"
       }
     ],
-    "cap-n-calamari": [
+    "caped-crusader": [
+      {
+        "quality": "unique",
+        "craftable": true,
+        "blanket": false,
+        "scrap": {
+          "low": 1212,
+          "mid": 1298,
+          "high": 1385
+        },
+        "lastUpdatedAt": "2026-09-04T12:31:31.000Z"
+      }
+    ],
+    "capn-calamari": [
       {
         "quality": "haunted",
         "craftable": true,
@@ -7431,20 +7444,7 @@
         "lastUpdatedAt": "2024-12-02T13:48:24.000Z"
       }
     ],
-    "caped-crusader": [
-      {
-        "quality": "unique",
-        "craftable": true,
-        "blanket": false,
-        "scrap": {
-          "low": 1212,
-          "mid": 1298,
-          "high": 1385
-        },
-        "lastUpdatedAt": "2026-09-04T12:31:31.000Z"
-      }
-    ],
-    "capo-s-capper": [
+    "capos-capper": [
       {
         "quality": "unique",
         "craftable": true,
@@ -7492,7 +7492,31 @@
         "lastUpdatedAt": "2026-04-23T14:47:31.000Z"
       }
     ],
-    "captain-s-cocktails": [
+    "captain-space-mann": [
+      {
+        "quality": "strange",
+        "craftable": true,
+        "blanket": false,
+        "scrap": {
+          "low": 2308,
+          "mid": 2568,
+          "high": 2827
+        },
+        "lastUpdatedAt": "2025-09-23T15:57:41.000Z"
+      },
+      {
+        "quality": "unique",
+        "craftable": true,
+        "blanket": false,
+        "scrap": {
+          "low": 606,
+          "mid": 678,
+          "high": 750
+        },
+        "lastUpdatedAt": "2026-06-12T08:29:22.000Z"
+      }
+    ],
+    "captains-cocktails": [
       {
         "quality": "collectors",
         "craftable": true,
@@ -7538,31 +7562,7 @@
         "lastUpdatedAt": "2021-09-24T14:59:04.000Z"
       }
     ],
-    "captain-space-mann": [
-      {
-        "quality": "strange",
-        "craftable": true,
-        "blanket": false,
-        "scrap": {
-          "low": 2308,
-          "mid": 2568,
-          "high": 2827
-        },
-        "lastUpdatedAt": "2025-09-23T15:57:41.000Z"
-      },
-      {
-        "quality": "unique",
-        "craftable": true,
-        "blanket": false,
-        "scrap": {
-          "low": 606,
-          "mid": 678,
-          "high": 750
-        },
-        "lastUpdatedAt": "2026-06-12T08:29:22.000Z"
-      }
-    ],
-    "cardiologist-s-cardigan": [
+    "cardiologists-cardigan": [
       {
         "quality": "strange",
         "craftable": true,
@@ -7706,7 +7706,7 @@
         "lastUpdatedAt": "2026-05-21T14:41:23.000Z"
       }
     ],
-    "carouser-s-capotain": [
+    "carousers-capotain": [
       {
         "quality": "collectors",
         "craftable": true,
@@ -7802,30 +7802,6 @@
         "lastUpdatedAt": "2026-07-10T08:00:11.000Z"
       }
     ],
-    "cat-s-pajamas": [
-      {
-        "quality": "strange",
-        "craftable": true,
-        "blanket": false,
-        "scrap": {
-          "low": 4760,
-          "mid": 5005,
-          "high": 5251
-        },
-        "lastUpdatedAt": "2026-02-05T22:59:45.000Z"
-      },
-      {
-        "quality": "unique",
-        "craftable": true,
-        "blanket": false,
-        "scrap": {
-          "low": 2770,
-          "mid": 2972,
-          "high": 3174
-        },
-        "lastUpdatedAt": "2026-05-19T14:29:14.000Z"
-      }
-    ],
     "catastrophic-companions": [
       {
         "quality": "strange",
@@ -7850,7 +7826,7 @@
         "lastUpdatedAt": "2026-08-13T02:11:01.000Z"
       }
     ],
-    "catcher-s-companion": [
+    "catchers-companion": [
       {
         "quality": "strange",
         "craftable": true,
@@ -7874,7 +7850,31 @@
         "lastUpdatedAt": "2026-04-24T14:22:28.000Z"
       }
     ],
-    "cattleman-s-kettle": [
+    "cats-pajamas": [
+      {
+        "quality": "strange",
+        "craftable": true,
+        "blanket": false,
+        "scrap": {
+          "low": 4760,
+          "mid": 5005,
+          "high": 5251
+        },
+        "lastUpdatedAt": "2026-02-05T22:59:45.000Z"
+      },
+      {
+        "quality": "unique",
+        "craftable": true,
+        "blanket": false,
+        "scrap": {
+          "low": 2770,
+          "mid": 2972,
+          "high": 3174
+        },
+        "lastUpdatedAt": "2026-05-19T14:29:14.000Z"
+      }
+    ],
+    "cattlemans-kettle": [
       {
         "quality": "strange",
         "craftable": true,
@@ -7898,7 +7898,7 @@
         "lastUpdatedAt": "2026-01-10T14:19:36.000Z"
       }
     ],
-    "cauterizer-s-caudal-appendage": [
+    "cauterizers-caudal-appendage": [
       {
         "quality": "haunted",
         "craftable": true,
@@ -7992,7 +7992,7 @@
         "lastUpdatedAt": "2021-12-15T11:33:15.000Z"
       }
     ],
-    "charmer-s-chapeau": [
+    "charmers-chapeau": [
       {
         "quality": "collectors",
         "craftable": true,
@@ -8206,7 +8206,7 @@
         "lastUpdatedAt": "2023-08-24T10:38:32.000Z"
       }
     ],
-    "chieftain-s-challenge": [
+    "chieftains-challenge": [
       {
         "quality": "unique",
         "craftable": true,
@@ -8278,7 +8278,7 @@
         "lastUpdatedAt": "2026-03-30T21:50:20.000Z"
       }
     ],
-    "chiromancer-s-kit": [
+    "chiromancers-kit": [
       {
         "quality": "strange",
         "craftable": true,
@@ -8577,7 +8577,7 @@
         "lastUpdatedAt": "2026-05-04T13:33:47.000Z"
       }
     ],
-    "cleaner-s-cap": [
+    "cleaners-cap": [
       {
         "quality": "strange",
         "craftable": true,
@@ -8697,7 +8697,7 @@
         "lastUpdatedAt": "2026-04-25T08:57:42.000Z"
       }
     ],
-    "clown-s-cover-up": [
+    "clowns-cover-up": [
       {
         "quality": "strange",
         "craftable": true,
@@ -9127,7 +9127,7 @@
         "lastUpdatedAt": "2026-04-19T13:51:48.000Z"
       }
     ],
-    "colonel-s-coat": [
+    "colonels-coat": [
       {
         "quality": "strange",
         "craftable": true,
@@ -9223,7 +9223,7 @@
         "lastUpdatedAt": "2026-04-20T18:17:53.000Z"
       }
     ],
-    "combat-medic-s-crusher-cap": [
+    "combat-medics-crusher-cap": [
       {
         "quality": "genuine",
         "craftable": true,
@@ -9367,7 +9367,7 @@
         "lastUpdatedAt": "2026-08-22T18:50:57.000Z"
       }
     ],
-    "commissar-s-coat": [
+    "commissars-coat": [
       {
         "quality": "strange",
         "craftable": true,
@@ -9546,7 +9546,7 @@
         "lastUpdatedAt": "2026-05-11T16:00:33.000Z"
       }
     ],
-    "conagher-s-combover": [
+    "conaghers-combover": [
       {
         "quality": "strange",
         "craftable": true,
@@ -9570,7 +9570,7 @@
         "lastUpdatedAt": "2026-01-31T21:55:50.000Z"
       }
     ],
-    "conagher-s-utility-idol": [
+    "conaghers-utility-idol": [
       {
         "quality": "strange",
         "craftable": true,
@@ -9642,7 +9642,7 @@
         "lastUpdatedAt": "2025-08-21T22:41:24.000Z"
       }
     ],
-    "conjurer-s-cowl": [
+    "conjurers-cowl": [
       {
         "quality": "collectors",
         "craftable": true,
@@ -9688,7 +9688,7 @@
         "lastUpdatedAt": "2025-07-22T01:47:00.000Z"
       }
     ],
-    "connoisseur-s-cap": [
+    "connoisseurs-cap": [
       {
         "quality": "unique",
         "craftable": true,
@@ -9758,7 +9758,7 @@
         "lastUpdatedAt": "2021-10-15T16:34:38.000Z"
       }
     ],
-    "consigliere-s-coverup": [
+    "consiglieres-coverup": [
       {
         "quality": "strange",
         "craftable": true,
@@ -9806,7 +9806,7 @@
         "lastUpdatedAt": "2026-09-11T10:18:02.000Z"
       }
     ],
-    "constructor-s-cover": [
+    "constructors-cover": [
       {
         "quality": "strange",
         "craftable": true,
@@ -10033,7 +10033,7 @@
         "lastUpdatedAt": "2026-05-05T18:57:58.000Z"
       }
     ],
-    "copper-s-hard-top": [
+    "coppers-hard-top": [
       {
         "quality": "unique",
         "craftable": true,
@@ -10260,7 +10260,7 @@
         "lastUpdatedAt": "2026-04-06T21:27:59.000Z"
       }
     ],
-    "coupe-d-isaster": [
+    "coupe-disaster": [
       {
         "quality": "unique",
         "craftable": true,
@@ -10284,7 +10284,7 @@
         "lastUpdatedAt": "2024-04-27T16:21:25.000Z"
       }
     ],
-    "courtier-s-collar": [
+    "courtiers-collar": [
       {
         "quality": "strange",
         "craftable": true,
@@ -10657,7 +10657,7 @@
         "lastUpdatedAt": "2024-05-10T16:48:47.000Z"
       }
     ],
-    "creature-s-grin": [
+    "creatures-grin": [
       {
         "quality": "unique",
         "craftable": true,
@@ -10694,7 +10694,7 @@
         "lastUpdatedAt": "2026-05-11T15:58:32.000Z"
       }
     ],
-    "cremator-s-conscience": [
+    "cremators-conscience": [
       {
         "quality": "collectors",
         "craftable": true,
@@ -10967,7 +10967,7 @@
         "lastUpdatedAt": "2025-08-13T16:09:27.000Z"
       }
     ],
-    "croft-s-crest": [
+    "crofts-crest": [
       {
         "quality": "genuine",
         "craftable": true,
@@ -10991,7 +10991,7 @@
         "lastUpdatedAt": "2026-03-14T07:15:53.000Z"
       }
     ],
-    "crone-s-dome": [
+    "crones-dome": [
       {
         "quality": "haunted",
         "craftable": true,
@@ -11050,7 +11050,7 @@
         "lastUpdatedAt": "2025-10-02T08:37:51.000Z"
       }
     ],
-    "crook-s-cap": [
+    "crooks-cap": [
       {
         "quality": "strange",
         "craftable": true,
@@ -11146,7 +11146,7 @@
         "lastUpdatedAt": "2026-05-06T16:07:21.000Z"
       }
     ],
-    "crosslinker-s-coil": [
+    "crosslinkers-coil": [
       {
         "quality": "genuine",
         "craftable": true,
@@ -11194,7 +11194,7 @@
         "lastUpdatedAt": "2026-09-12T04:46:07.000Z"
       }
     ],
-    "crusader-s-getup": [
+    "crusaders-getup": [
       {
         "quality": "strange",
         "craftable": true,
@@ -12006,30 +12006,6 @@
         "lastUpdatedAt": "2019-07-21T17:53:59.000Z"
       }
     ],
-    "dead-er-alive": [
-      {
-        "quality": "strange",
-        "craftable": true,
-        "blanket": false,
-        "scrap": {
-          "low": 28273,
-          "mid": 28273,
-          "high": 28273
-        },
-        "lastUpdatedAt": "2025-09-16T09:55:57.000Z"
-      },
-      {
-        "quality": "unique",
-        "craftable": true,
-        "blanket": false,
-        "scrap": {
-          "low": 4299,
-          "mid": 4414,
-          "high": 4529
-        },
-        "lastUpdatedAt": "2026-01-30T13:40:43.000Z"
-      }
-    ],
     "dead-head": [
       {
         "quality": "strange",
@@ -12172,6 +12148,30 @@
         "lastUpdatedAt": "2026-04-25T22:01:24.000Z"
       }
     ],
+    "deader-alive": [
+      {
+        "quality": "strange",
+        "craftable": true,
+        "blanket": false,
+        "scrap": {
+          "low": 28273,
+          "mid": 28273,
+          "high": 28273
+        },
+        "lastUpdatedAt": "2025-09-16T09:55:57.000Z"
+      },
+      {
+        "quality": "unique",
+        "craftable": true,
+        "blanket": false,
+        "scrap": {
+          "low": 4299,
+          "mid": 4414,
+          "high": 4529
+        },
+        "lastUpdatedAt": "2026-01-30T13:40:43.000Z"
+      }
+    ],
     "deadliest-duckling": [
       {
         "quality": "genuine",
@@ -12220,7 +12220,7 @@
         "lastUpdatedAt": "2026-08-02T13:07:15.000Z"
       }
     ],
-    "dealer-s-visor": [
+    "dealers-visor": [
       {
         "quality": "unique",
         "craftable": true,
@@ -12233,7 +12233,7 @@
         "lastUpdatedAt": "2026-09-15T22:54:15.000Z"
       }
     ],
-    "death-racer-s-helmet": [
+    "death-racers-helmet": [
       {
         "quality": "strange",
         "craftable": true,
@@ -12436,7 +12436,7 @@
         "lastUpdatedAt": "2026-07-31T19:19:36.000Z"
       }
     ],
-    "deity-s-dress": [
+    "deitys-dress": [
       {
         "quality": "strange",
         "craftable": true,
@@ -12460,7 +12460,7 @@
         "lastUpdatedAt": "2026-09-10T15:51:55.000Z"
       }
     ],
-    "delinquent-s-down-vest": [
+    "delinquents-down-vest": [
       {
         "quality": "collectors",
         "craftable": true,
@@ -12569,30 +12569,6 @@
         "lastUpdatedAt": "2026-09-15T22:44:07.000Z"
       }
     ],
-    "demo-s-dustcatcher": [
-      {
-        "quality": "strange",
-        "craftable": true,
-        "blanket": false,
-        "scrap": {
-          "low": 34,
-          "mid": 43,
-          "high": 52
-        },
-        "lastUpdatedAt": "2026-02-01T13:03:10.000Z"
-      },
-      {
-        "quality": "unique",
-        "craftable": true,
-        "blanket": false,
-        "scrap": {
-          "low": 26,
-          "mid": 27,
-          "high": 28
-        },
-        "lastUpdatedAt": "2026-02-01T13:03:45.000Z"
-      }
-    ],
     "demoman-mask": [
       {
         "quality": "unique",
@@ -12606,7 +12582,7 @@
         "lastUpdatedAt": "2026-08-14T10:48:20.000Z"
       }
     ],
-    "demoman-s-fro": [
+    "demomans-fro": [
       {
         "quality": "unique",
         "craftable": true,
@@ -12663,6 +12639,30 @@
           "high": 1183
         },
         "lastUpdatedAt": "2026-05-02T16:01:52.000Z"
+      }
+    ],
+    "demos-dustcatcher": [
+      {
+        "quality": "strange",
+        "craftable": true,
+        "blanket": false,
+        "scrap": {
+          "low": 34,
+          "mid": 43,
+          "high": 52
+        },
+        "lastUpdatedAt": "2026-02-01T13:03:10.000Z"
+      },
+      {
+        "quality": "unique",
+        "craftable": true,
+        "blanket": false,
+        "scrap": {
+          "low": 26,
+          "mid": 27,
+          "high": 28
+        },
+        "lastUpdatedAt": "2026-02-01T13:03:45.000Z"
       }
     ],
     "der-maschinensoldaten-helm": [
@@ -12761,7 +12761,7 @@
         "lastUpdatedAt": "2021-09-28T20:04:50.000Z"
       }
     ],
-    "deserter-s-duster": [
+    "deserters-duster": [
       {
         "quality": "strange",
         "craftable": true,
@@ -12999,7 +12999,7 @@
         "lastUpdatedAt": "2026-05-19T20:44:04.000Z"
       }
     ],
-    "dillinger-s-duffel": [
+    "dillingers-duffel": [
       {
         "quality": "strange",
         "craftable": true,
@@ -13117,7 +13117,7 @@
         "lastUpdatedAt": "2024-05-10T15:34:03.000Z"
       }
     ],
-    "doc-s-holiday": [
+    "docs-holiday": [
       {
         "quality": "strange",
         "craftable": true,
@@ -13141,7 +13141,7 @@
         "lastUpdatedAt": "2026-05-20T00:56:54.000Z"
       }
     ],
-    "doctor-s-sack": [
+    "doctors-sack": [
       {
         "quality": "collectors",
         "craftable": true,
@@ -13403,7 +13403,7 @@
         "lastUpdatedAt": "2025-03-02T20:16:57.000Z"
       }
     ],
-    "dr-grordbort-s-copper-crest": [
+    "dr-grordborts-copper-crest": [
       {
         "quality": "unique",
         "craftable": true,
@@ -13427,7 +13427,7 @@
         "lastUpdatedAt": "2026-06-22T16:33:07.000Z"
       }
     ],
-    "dr-grordbort-s-crest": [
+    "dr-grordborts-crest": [
       {
         "quality": "unique",
         "craftable": true,
@@ -13451,7 +13451,7 @@
         "lastUpdatedAt": "2026-06-22T16:32:54.000Z"
       }
     ],
-    "dr-grordbort-s-silver-crest": [
+    "dr-grordborts-silver-crest": [
       {
         "quality": "unique",
         "craftable": true,
@@ -13473,41 +13473,6 @@
           "high": 1212
         },
         "lastUpdatedAt": "2026-06-21T13:19:23.000Z"
-      }
-    ],
-    "dr-s-dapper-topper": [
-      {
-        "quality": "collectors",
-        "craftable": true,
-        "blanket": false,
-        "scrap": {
-          "low": 112515,
-          "mid": 112515,
-          "high": 112515
-        },
-        "lastUpdatedAt": "2017-03-25T14:50:48.000Z"
-      },
-      {
-        "quality": "unique",
-        "craftable": true,
-        "blanket": false,
-        "scrap": {
-          "low": 12,
-          "mid": 13,
-          "high": 14
-        },
-        "lastUpdatedAt": "2026-09-12T05:02:04.000Z"
-      },
-      {
-        "quality": "unique",
-        "craftable": false,
-        "blanket": false,
-        "scrap": {
-          "low": 261,
-          "mid": 261,
-          "high": 261
-        },
-        "lastUpdatedAt": "2024-05-10T15:32:49.000Z"
       }
     ],
     "dr-whoa": [
@@ -13672,6 +13637,41 @@
           "high": 80
         },
         "lastUpdatedAt": "2026-05-08T12:36:00.000Z"
+      }
+    ],
+    "drs-dapper-topper": [
+      {
+        "quality": "collectors",
+        "craftable": true,
+        "blanket": false,
+        "scrap": {
+          "low": 112515,
+          "mid": 112515,
+          "high": 112515
+        },
+        "lastUpdatedAt": "2017-03-25T14:50:48.000Z"
+      },
+      {
+        "quality": "unique",
+        "craftable": true,
+        "blanket": false,
+        "scrap": {
+          "low": 12,
+          "mid": 13,
+          "high": 14
+        },
+        "lastUpdatedAt": "2026-09-12T05:02:04.000Z"
+      },
+      {
+        "quality": "unique",
+        "craftable": false,
+        "blanket": false,
+        "scrap": {
+          "low": 261,
+          "mid": 261,
+          "high": 261
+        },
+        "lastUpdatedAt": "2024-05-10T15:32:49.000Z"
       }
     ],
     "dry-gulch-gulp": [
@@ -13914,7 +13914,7 @@
         "lastUpdatedAt": "2025-11-06T21:11:43.000Z"
       }
     ],
-    "egghead-s-overalls": [
+    "eggheads-overalls": [
       {
         "quality": "collectors",
         "craftable": true,
@@ -14093,7 +14093,7 @@
         "lastUpdatedAt": "2026-04-25T08:59:29.000Z"
       }
     ],
-    "el-gigante-s-gunbelt": [
+    "el-gigantes-gunbelt": [
       {
         "quality": "strange",
         "craftable": true,
@@ -14429,7 +14429,7 @@
         "lastUpdatedAt": "2026-04-19T18:06:33.000Z"
       }
     ],
-    "eliminator-s-safeguard": [
+    "eliminators-safeguard": [
       {
         "quality": "strange",
         "craftable": true,
@@ -14597,7 +14597,7 @@
         "lastUpdatedAt": "2025-11-06T14:09:43.000Z"
       }
     ],
-    "engineer-s-cap": [
+    "engineers-cap": [
       {
         "quality": "genuine",
         "craftable": true,
@@ -15449,7 +15449,7 @@
         "lastUpdatedAt": "2026-04-20T18:12:32.000Z"
       }
     ],
-    "fat-man-s-field-cap": [
+    "fat-mans-field-cap": [
       {
         "quality": "strange",
         "craftable": true,
@@ -16121,7 +16121,7 @@
         "lastUpdatedAt": "2025-09-20T08:38:01.000Z"
       }
     ],
-    "fireman-s-essentials": [
+    "firemans-essentials": [
       {
         "quality": "strange",
         "craftable": true,
@@ -16848,7 +16848,7 @@
         "lastUpdatedAt": "2026-08-14T10:40:35.000Z"
       }
     ],
-    "forgotten-king-s-pauldrons": [
+    "forgotten-kings-pauldrons": [
       {
         "quality": "unique",
         "craftable": true,
@@ -16861,7 +16861,7 @@
         "lastUpdatedAt": "2022-12-29T22:52:24.000Z"
       }
     ],
-    "forgotten-king-s-restless-head": [
+    "forgotten-kings-restless-head": [
       {
         "quality": "unique",
         "craftable": true,
@@ -16922,7 +16922,7 @@
         "lastUpdatedAt": "2026-09-12T05:01:41.000Z"
       }
     ],
-    "foster-s-facade": [
+    "fosters-facade": [
       {
         "quality": "unique",
         "craftable": true,
@@ -17055,7 +17055,7 @@
         "lastUpdatedAt": "2026-04-26T14:36:47.000Z"
       }
     ],
-    "free-mann-s-fashion": [
+    "free-manns-fashion": [
       {
         "quality": "strange",
         "craftable": true,
@@ -17103,7 +17103,7 @@
         "lastUpdatedAt": "2026-05-03T22:03:26.000Z"
       }
     ],
-    "frenchman-s-beret": [
+    "frenchmans-beret": [
       {
         "quality": "strange",
         "craftable": true,
@@ -17149,7 +17149,7 @@
         "lastUpdatedAt": "2026-04-11T07:14:01.000Z"
       }
     ],
-    "frenchman-s-formals": [
+    "frenchmans-formals": [
       {
         "quality": "collectors",
         "craftable": true,
@@ -17269,7 +17269,7 @@
         "lastUpdatedAt": "2026-04-24T22:08:56.000Z"
       }
     ],
-    "frogmann-s-fittings": [
+    "frogmanns-fittings": [
       {
         "quality": "strange",
         "craftable": true,
@@ -17983,7 +17983,7 @@
         "lastUpdatedAt": "2022-05-27T02:00:23.000Z"
       }
     ],
-    "gentleman-s-gatsby": [
+    "gentlemans-gatsby": [
       {
         "quality": "unique",
         "craftable": true,
@@ -18018,7 +18018,7 @@
         "lastUpdatedAt": "2026-04-12T18:58:27.000Z"
       }
     ],
-    "gentleman-s-ushanka": [
+    "gentlemans-ushanka": [
       {
         "quality": "strange",
         "craftable": true,
@@ -18992,7 +18992,7 @@
         "lastUpdatedAt": "2025-08-11T19:08:16.000Z"
       }
     ],
-    "grenadier-s-softcap": [
+    "grenadiers-softcap": [
       {
         "quality": "collectors",
         "craftable": true,
@@ -19051,7 +19051,7 @@
         "lastUpdatedAt": "2025-09-27T17:37:47.000Z"
       }
     ],
-    "griffin-s-gog": [
+    "griffins-gog": [
       {
         "quality": "haunted",
         "craftable": true,
@@ -19601,7 +19601,7 @@
         "lastUpdatedAt": "2026-04-28T09:07:09.000Z"
       }
     ],
-    "handyman-s-handle": [
+    "handymans-handle": [
       {
         "quality": "unique",
         "craftable": true,
@@ -19769,7 +19769,7 @@
         "lastUpdatedAt": "2026-03-22T03:49:37.000Z"
       }
     ],
-    "harlequin-s-hooves": [
+    "harlequins-hooves": [
       {
         "quality": "strange",
         "craftable": true,
@@ -20415,7 +20415,7 @@
         "lastUpdatedAt": "2023-12-27T20:14:56.000Z"
       }
     ],
-    "headhunter-s-brim": [
+    "headhunters-brim": [
       {
         "quality": "strange",
         "craftable": true,
@@ -20463,7 +20463,7 @@
         "lastUpdatedAt": "2026-03-21T09:42:43.000Z"
       }
     ],
-    "headtaker-s-hood": [
+    "headtakers-hood": [
       {
         "quality": "haunted",
         "craftable": true,
@@ -20535,7 +20535,7 @@
         "lastUpdatedAt": "2026-06-16T15:13:47.000Z"
       }
     ],
-    "heavy-artillery-officer-s-cap": [
+    "heavy-artillery-officers-cap": [
       {
         "quality": "genuine",
         "craftable": true,
@@ -20714,30 +20714,6 @@
         "lastUpdatedAt": "2026-04-21T03:32:41.000Z"
       }
     ],
-    "heavy-s-hockey-hair": [
-      {
-        "quality": "strange",
-        "craftable": true,
-        "blanket": false,
-        "scrap": {
-          "low": 1731,
-          "mid": 1731,
-          "high": 1731
-        },
-        "lastUpdatedAt": "2026-01-24T07:46:35.000Z"
-      },
-      {
-        "quality": "unique",
-        "craftable": true,
-        "blanket": true,
-        "scrap": {
-          "low": 12,
-          "mid": 12,
-          "high": 12
-        },
-        "lastUpdatedAt": "2026-05-19T23:02:09.000Z"
-      }
-    ],
     "heavy-tourism": [
       {
         "quality": "strange",
@@ -20797,7 +20773,31 @@
         "lastUpdatedAt": "2026-04-22T00:32:50.000Z"
       }
     ],
-    "heer-s-helmet": [
+    "heavys-hockey-hair": [
+      {
+        "quality": "strange",
+        "craftable": true,
+        "blanket": false,
+        "scrap": {
+          "low": 1731,
+          "mid": 1731,
+          "high": 1731
+        },
+        "lastUpdatedAt": "2026-01-24T07:46:35.000Z"
+      },
+      {
+        "quality": "unique",
+        "craftable": true,
+        "blanket": true,
+        "scrap": {
+          "low": 12,
+          "mid": 12,
+          "high": 12
+        },
+        "lastUpdatedAt": "2026-05-19T23:02:09.000Z"
+      }
+    ],
+    "heers-helmet": [
       {
         "quality": "strange",
         "craftable": true,
@@ -20821,7 +20821,7 @@
         "lastUpdatedAt": "2026-01-28T02:47:11.000Z"
       }
     ],
-    "hellhunter-s-headpiece": [
+    "hellhunters-headpiece": [
       {
         "quality": "unique",
         "craftable": true,
@@ -21000,7 +21000,7 @@
         "lastUpdatedAt": "2026-08-22T03:58:36.000Z"
       }
     ],
-    "herald-s-helm": [
+    "heralds-helm": [
       {
         "quality": "strange",
         "craftable": true,
@@ -21059,54 +21059,6 @@
         "lastUpdatedAt": "2023-02-27T16:27:10.000Z"
       }
     ],
-    "hero-s-hachimaki": [
-      {
-        "quality": "genuine",
-        "craftable": true,
-        "blanket": false,
-        "scrap": {
-          "low": 490,
-          "mid": 534,
-          "high": 577
-        },
-        "lastUpdatedAt": "2025-09-01T23:31:47.000Z"
-      },
-      {
-        "quality": "unique",
-        "craftable": true,
-        "blanket": false,
-        "scrap": {
-          "low": 12,
-          "mid": 15,
-          "high": 18
-        },
-        "lastUpdatedAt": "2025-09-23T07:59:34.000Z"
-      }
-    ],
-    "hero-s-tail": [
-      {
-        "quality": "genuine",
-        "craftable": true,
-        "blanket": false,
-        "scrap": {
-          "low": 1327,
-          "mid": 1356,
-          "high": 1385
-        },
-        "lastUpdatedAt": "2026-07-05T16:06:20.000Z"
-      },
-      {
-        "quality": "unique",
-        "craftable": true,
-        "blanket": false,
-        "scrap": {
-          "low": 65,
-          "mid": 70,
-          "high": 75
-        },
-        "lastUpdatedAt": "2026-04-20T22:46:38.000Z"
-      }
-    ],
     "heroic-companion-badge": [
       {
         "quality": "genuine",
@@ -21131,6 +21083,54 @@
         "lastUpdatedAt": "2026-09-12T05:06:41.000Z"
       }
     ],
+    "heros-hachimaki": [
+      {
+        "quality": "genuine",
+        "craftable": true,
+        "blanket": false,
+        "scrap": {
+          "low": 490,
+          "mid": 534,
+          "high": 577
+        },
+        "lastUpdatedAt": "2025-09-01T23:31:47.000Z"
+      },
+      {
+        "quality": "unique",
+        "craftable": true,
+        "blanket": false,
+        "scrap": {
+          "low": 12,
+          "mid": 15,
+          "high": 18
+        },
+        "lastUpdatedAt": "2025-09-23T07:59:34.000Z"
+      }
+    ],
+    "heros-tail": [
+      {
+        "quality": "genuine",
+        "craftable": true,
+        "blanket": false,
+        "scrap": {
+          "low": 1327,
+          "mid": 1356,
+          "high": 1385
+        },
+        "lastUpdatedAt": "2026-07-05T16:06:20.000Z"
+      },
+      {
+        "quality": "unique",
+        "craftable": true,
+        "blanket": false,
+        "scrap": {
+          "low": 65,
+          "mid": 70,
+          "high": 75
+        },
+        "lastUpdatedAt": "2026-04-20T22:46:38.000Z"
+      }
+    ],
     "herzensbrecher": [
       {
         "quality": "unique",
@@ -21144,7 +21144,7 @@
         "lastUpdatedAt": "2026-05-04T13:34:18.000Z"
       }
     ],
-    "hetman-s-headpiece": [
+    "hetmans-headpiece": [
       {
         "quality": "genuine",
         "craftable": true,
@@ -21491,7 +21491,7 @@
         "lastUpdatedAt": "2024-08-18T21:32:38.000Z"
       }
     ],
-    "honcho-s-headgear": [
+    "honchos-headgear": [
       {
         "quality": "collectors",
         "craftable": true,
@@ -21803,7 +21803,7 @@
         "lastUpdatedAt": "2026-04-12T04:26:02.000Z"
       }
     ],
-    "horseless-headless-horsemann-s-head": [
+    "horseless-headless-horsemanns-head": [
       {
         "quality": "strange",
         "craftable": true,
@@ -21827,7 +21827,7 @@
         "lastUpdatedAt": "2025-10-05T06:42:50.000Z"
       }
     ],
-    "horsemann-s-hand-me-down": [
+    "horsemanns-hand-me-down": [
       {
         "quality": "haunted",
         "craftable": true,
@@ -22017,7 +22017,7 @@
         "lastUpdatedAt": "2026-04-12T18:57:54.000Z"
       }
     ],
-    "hottie-s-hoodie": [
+    "hotties-hoodie": [
       {
         "quality": "strange",
         "craftable": true,
@@ -22087,7 +22087,7 @@
         "lastUpdatedAt": "2026-04-12T18:58:16.000Z"
       }
     ],
-    "hound-s-hood": [
+    "hounds-hood": [
       {
         "quality": "haunted",
         "craftable": true,
@@ -22327,7 +22327,7 @@
         "lastUpdatedAt": "2026-08-14T10:46:22.000Z"
       }
     ],
-    "huntsman-s-essentials": [
+    "huntsmans-essentials": [
       {
         "quality": "strange",
         "craftable": true,
@@ -22375,7 +22375,7 @@
         "lastUpdatedAt": "2026-04-12T05:56:21.000Z"
       }
     ],
-    "hustler-s-hallmark": [
+    "hustlers-hallmark": [
       {
         "quality": "unique",
         "craftable": true,
@@ -22541,30 +22541,6 @@
         "lastUpdatedAt": "2023-12-29T19:42:58.000Z"
       }
     ],
-    "imp-s-imprint": [
-      {
-        "quality": "strange",
-        "craftable": true,
-        "blanket": false,
-        "scrap": {
-          "low": 60,
-          "mid": 65,
-          "high": 71
-        },
-        "lastUpdatedAt": "2026-05-04T13:22:09.000Z"
-      },
-      {
-        "quality": "unique",
-        "craftable": true,
-        "blanket": false,
-        "scrap": {
-          "low": 30,
-          "mid": 32,
-          "high": 35
-        },
-        "lastUpdatedAt": "2026-08-26T21:16:34.000Z"
-      }
-    ],
     "impact-impaler": [
       {
         "quality": "strange",
@@ -22611,6 +22587,30 @@
           "high": 65
         },
         "lastUpdatedAt": "2026-08-22T03:51:07.000Z"
+      }
+    ],
+    "imps-imprint": [
+      {
+        "quality": "strange",
+        "craftable": true,
+        "blanket": false,
+        "scrap": {
+          "low": 60,
+          "mid": 65,
+          "high": 71
+        },
+        "lastUpdatedAt": "2026-05-04T13:22:09.000Z"
+      },
+      {
+        "quality": "unique",
+        "craftable": true,
+        "blanket": false,
+        "scrap": {
+          "low": 30,
+          "mid": 32,
+          "high": 35
+        },
+        "lastUpdatedAt": "2026-08-26T21:16:34.000Z"
       }
     ],
     "industrial-festivizer": [
@@ -22742,7 +22742,7 @@
         "lastUpdatedAt": "2025-10-09T07:47:48.000Z"
       }
     ],
-    "infiltrator-s-insulation": [
+    "infiltrators-insulation": [
       {
         "quality": "strange",
         "craftable": true,
@@ -23205,7 +23205,7 @@
         "lastUpdatedAt": "2026-04-24T14:00:00.000Z"
       }
     ],
-    "jumper-s-jeepcap": [
+    "jumpers-jeepcap": [
       {
         "quality": "unique",
         "craftable": true,
@@ -23397,7 +23397,7 @@
         "lastUpdatedAt": "2026-04-21T13:59:54.000Z"
       }
     ],
-    "juvenile-s-jumper": [
+    "juveniles-jumper": [
       {
         "quality": "strange",
         "craftable": true,
@@ -23469,7 +23469,7 @@
         "lastUpdatedAt": "2025-08-19T10:06:31.000Z"
       }
     ],
-    "kapitan-s-kaftan": [
+    "kapitans-kaftan": [
       {
         "quality": "strange",
         "craftable": true,
@@ -23611,7 +23611,7 @@
         "lastUpdatedAt": "2025-01-18T22:52:11.000Z"
       }
     ],
-    "killer-s-kabuto": [
+    "killers-kabuto": [
       {
         "quality": "unique",
         "craftable": true,
@@ -23646,7 +23646,7 @@
         "lastUpdatedAt": "2025-10-24T22:43:00.000Z"
       }
     ],
-    "killer-s-kit": [
+    "killers-kit": [
       {
         "quality": "strange",
         "craftable": true,
@@ -23860,89 +23860,6 @@
         "lastUpdatedAt": "2026-05-12T15:05:21.000Z"
       }
     ],
-    "l-aire-filteure": [
-      {
-        "quality": "strange",
-        "craftable": true,
-        "blanket": false,
-        "scrap": {
-          "low": 808,
-          "mid": 938,
-          "high": 1067
-        },
-        "lastUpdatedAt": "2025-09-09T09:12:43.000Z"
-      },
-      {
-        "quality": "unique",
-        "craftable": true,
-        "blanket": false,
-        "scrap": {
-          "low": 216,
-          "mid": 262,
-          "high": 308
-        },
-        "lastUpdatedAt": "2026-04-20T18:19:08.000Z"
-      }
-    ],
-    "l-homme-burglerre": [
-      {
-        "quality": "strange",
-        "craftable": true,
-        "blanket": false,
-        "scrap": {
-          "low": 450,
-          "mid": 468,
-          "high": 487
-        },
-        "lastUpdatedAt": "2026-07-13T12:05:18.000Z"
-      },
-      {
-        "quality": "unique",
-        "craftable": true,
-        "blanket": false,
-        "scrap": {
-          "low": 12,
-          "mid": 13,
-          "high": 15
-        },
-        "lastUpdatedAt": "2025-07-01T10:10:03.000Z"
-      }
-    ],
-    "l-inspecteur": [
-      {
-        "quality": "strange",
-        "craftable": true,
-        "blanket": false,
-        "scrap": {
-          "low": 1298,
-          "mid": 1414,
-          "high": 1529
-        },
-        "lastUpdatedAt": "2026-07-19T12:53:15.000Z"
-      },
-      {
-        "quality": "unique",
-        "craftable": true,
-        "blanket": false,
-        "scrap": {
-          "low": 12,
-          "mid": 13,
-          "high": 14
-        },
-        "lastUpdatedAt": "2026-04-25T09:14:50.000Z"
-      },
-      {
-        "quality": "unique",
-        "craftable": false,
-        "blanket": false,
-        "scrap": {
-          "low": 360,
-          "mid": 360,
-          "high": 360
-        },
-        "lastUpdatedAt": "2023-04-11T01:23:47.000Z"
-      }
-    ],
     "lacking-moral-fiber-mask": [
       {
         "quality": "genuine",
@@ -23989,6 +23906,30 @@
           "high": 1067
         },
         "lastUpdatedAt": "2026-07-13T12:03:12.000Z"
+      }
+    ],
+    "laire-filteure": [
+      {
+        "quality": "strange",
+        "craftable": true,
+        "blanket": false,
+        "scrap": {
+          "low": 808,
+          "mid": 938,
+          "high": 1067
+        },
+        "lastUpdatedAt": "2025-09-09T09:12:43.000Z"
+      },
+      {
+        "quality": "unique",
+        "craftable": true,
+        "blanket": false,
+        "scrap": {
+          "low": 216,
+          "mid": 262,
+          "high": 308
+        },
+        "lastUpdatedAt": "2026-04-20T18:19:08.000Z"
       }
     ],
     "large-luchador": [
@@ -24493,7 +24434,7 @@
         "lastUpdatedAt": "2026-04-25T14:05:38.000Z"
       }
     ],
-    "letch-s-led": [
+    "letchs-led": [
       {
         "quality": "strange",
         "craftable": true,
@@ -24541,30 +24482,17 @@
         "lastUpdatedAt": "2026-08-19T02:49:19.000Z"
       }
     ],
-    "li-l-dutchman": [
-      {
-        "quality": "unique",
-        "craftable": true,
-        "blanket": false,
-        "scrap": {
-          "low": 866,
-          "mid": 1024,
-          "high": 1183
-        },
-        "lastUpdatedAt": "2025-09-18T12:52:02.000Z"
-      }
-    ],
-    "li-l-snaggletooth": [
+    "lhomme-burglerre": [
       {
         "quality": "strange",
         "craftable": true,
         "blanket": false,
         "scrap": {
-          "low": 635,
-          "mid": 664,
-          "high": 692
+          "low": 450,
+          "mid": 468,
+          "high": 487
         },
-        "lastUpdatedAt": "2026-06-30T22:44:12.000Z"
+        "lastUpdatedAt": "2026-07-13T12:05:18.000Z"
       },
       {
         "quality": "unique",
@@ -24573,9 +24501,9 @@
         "scrap": {
           "low": 12,
           "mid": 13,
-          "high": 14
+          "high": 15
         },
-        "lastUpdatedAt": "2026-01-05T05:28:42.000Z"
+        "lastUpdatedAt": "2025-07-01T10:10:03.000Z"
       }
     ],
     "license-to-maim": [
@@ -24711,7 +24639,79 @@
         "lastUpdatedAt": "2026-05-08T05:34:36.000Z"
       }
     ],
-    "liquidator-s-lid": [
+    "lil-dutchman": [
+      {
+        "quality": "unique",
+        "craftable": true,
+        "blanket": false,
+        "scrap": {
+          "low": 866,
+          "mid": 1024,
+          "high": 1183
+        },
+        "lastUpdatedAt": "2025-09-18T12:52:02.000Z"
+      }
+    ],
+    "lil-snaggletooth": [
+      {
+        "quality": "strange",
+        "craftable": true,
+        "blanket": false,
+        "scrap": {
+          "low": 635,
+          "mid": 664,
+          "high": 692
+        },
+        "lastUpdatedAt": "2026-06-30T22:44:12.000Z"
+      },
+      {
+        "quality": "unique",
+        "craftable": true,
+        "blanket": false,
+        "scrap": {
+          "low": 12,
+          "mid": 13,
+          "high": 14
+        },
+        "lastUpdatedAt": "2026-01-05T05:28:42.000Z"
+      }
+    ],
+    "linspecteur": [
+      {
+        "quality": "strange",
+        "craftable": true,
+        "blanket": false,
+        "scrap": {
+          "low": 1298,
+          "mid": 1414,
+          "high": 1529
+        },
+        "lastUpdatedAt": "2026-07-19T12:53:15.000Z"
+      },
+      {
+        "quality": "unique",
+        "craftable": true,
+        "blanket": false,
+        "scrap": {
+          "low": 12,
+          "mid": 13,
+          "high": 14
+        },
+        "lastUpdatedAt": "2026-04-25T09:14:50.000Z"
+      },
+      {
+        "quality": "unique",
+        "craftable": false,
+        "blanket": false,
+        "scrap": {
+          "low": 360,
+          "mid": 360,
+          "high": 360
+        },
+        "lastUpdatedAt": "2023-04-11T01:23:47.000Z"
+      }
+    ],
+    "liquidators-lid": [
       {
         "quality": "strange",
         "craftable": true,
@@ -25034,7 +25034,7 @@
         "lastUpdatedAt": "2026-08-17T13:01:46.000Z"
       }
     ],
-    "lord-cockswain-s-novelty-mutton-chops-and-pipe": [
+    "lord-cockswains-novelty-mutton-chops-and-pipe": [
       {
         "quality": "strange",
         "craftable": true,
@@ -25080,7 +25080,7 @@
         "lastUpdatedAt": "2025-11-05T15:55:44.000Z"
       }
     ],
-    "lord-cockswain-s-pith-helmet": [
+    "lord-cockswains-pith-helmet": [
       {
         "quality": "collectors",
         "craftable": true,
@@ -25305,7 +25305,7 @@
         "lastUpdatedAt": "2024-08-21T19:43:15.000Z"
       }
     ],
-    "lunatic-s-leathers": [
+    "lunatics-leathers": [
       {
         "quality": "strange",
         "craftable": true,
@@ -25329,7 +25329,7 @@
         "lastUpdatedAt": "2026-04-25T13:08:17.000Z"
       }
     ],
-    "lurker-s-leathers": [
+    "lurkers-leathers": [
       {
         "quality": "strange",
         "craftable": true,
@@ -25545,7 +25545,7 @@
         "lastUpdatedAt": "2022-10-02T14:47:35.000Z"
       }
     ],
-    "madmann-s-muzzle": [
+    "madmanns-muzzle": [
       {
         "quality": "strange",
         "craftable": true,
@@ -25606,7 +25606,7 @@
         "lastUpdatedAt": "2026-05-04T13:25:23.000Z"
       }
     ],
-    "magistrate-s-mullet": [
+    "magistrates-mullet": [
       {
         "quality": "unique",
         "craftable": true,
@@ -25783,7 +25783,7 @@
         "lastUpdatedAt": "2026-04-25T13:05:55.000Z"
       }
     ],
-    "maniac-s-manacles": [
+    "maniacs-manacles": [
       {
         "quality": "haunted",
         "craftable": true,
@@ -26097,7 +26097,7 @@
         "lastUpdatedAt": "2026-04-24T14:21:49.000Z"
       }
     ],
-    "marksman-s-mohair": [
+    "marksmans-mohair": [
       {
         "quality": "strange",
         "craftable": true,
@@ -26121,7 +26121,7 @@
         "lastUpdatedAt": "2026-05-05T18:59:12.000Z"
       }
     ],
-    "marshall-s-mutton-chops": [
+    "marshalls-mutton-chops": [
       {
         "quality": "strange",
         "craftable": true,
@@ -26346,7 +26346,7 @@
         "lastUpdatedAt": "2023-12-27T20:16:29.000Z"
       }
     ],
-    "master-s-yellow-belt": [
+    "masters-yellow-belt": [
       {
         "quality": "collectors",
         "craftable": true,
@@ -26425,7 +26425,7 @@
         "lastUpdatedAt": "2026-04-12T18:58:39.000Z"
       }
     ],
-    "max-s-severed-head": [
+    "maxs-severed-head": [
       {
         "quality": "unique",
         "craftable": true,
@@ -26582,30 +26582,6 @@
         "lastUpdatedAt": "2026-02-07T15:48:01.000Z"
       }
     ],
-    "medic-s-mountain-cap": [
-      {
-        "quality": "unique",
-        "craftable": true,
-        "blanket": false,
-        "scrap": {
-          "low": 12,
-          "mid": 13,
-          "high": 14
-        },
-        "lastUpdatedAt": "2025-04-16T02:06:33.000Z"
-      },
-      {
-        "quality": "unique",
-        "craftable": false,
-        "blanket": false,
-        "scrap": {
-          "low": 135,
-          "mid": 135,
-          "high": 135
-        },
-        "lastUpdatedAt": "2021-12-27T20:37:33.000Z"
-      }
-    ],
     "medical-emergency": [
       {
         "quality": "strange",
@@ -26724,6 +26700,30 @@
           "high": 15
         },
         "lastUpdatedAt": "2026-04-24T13:13:43.000Z"
+      }
+    ],
+    "medics-mountain-cap": [
+      {
+        "quality": "unique",
+        "craftable": true,
+        "blanket": false,
+        "scrap": {
+          "low": 12,
+          "mid": 13,
+          "high": 14
+        },
+        "lastUpdatedAt": "2025-04-16T02:06:33.000Z"
+      },
+      {
+        "quality": "unique",
+        "craftable": false,
+        "blanket": false,
+        "scrap": {
+          "low": 135,
+          "mid": 135,
+          "high": 135
+        },
+        "lastUpdatedAt": "2021-12-27T20:37:33.000Z"
       }
     ],
     "medimedes": [
@@ -26905,7 +26905,7 @@
         "lastUpdatedAt": "2025-07-24T17:12:38.000Z"
       }
     ],
-    "merc-s-mohawk": [
+    "mercs-mohawk": [
       {
         "quality": "strange",
         "craftable": true,
@@ -26929,7 +26929,7 @@
         "lastUpdatedAt": "2026-09-12T04:47:31.000Z"
       }
     ],
-    "merc-s-muffler": [
+    "mercs-muffler": [
       {
         "quality": "strange",
         "craftable": true,
@@ -26953,7 +26953,7 @@
         "lastUpdatedAt": "2026-04-26T14:29:19.000Z"
       }
     ],
-    "merc-s-pride-scarf": [
+    "mercs-pride-scarf": [
       {
         "quality": "genuine",
         "craftable": true,
@@ -27034,7 +27034,7 @@
         "lastUpdatedAt": "2026-08-23T16:48:42.000Z"
       }
     ],
-    "messenger-s-mail-bag": [
+    "messengers-mail-bag": [
       {
         "quality": "strange",
         "craftable": true,
@@ -27322,7 +27322,7 @@
         "lastUpdatedAt": "2026-08-20T09:55:14.000Z"
       }
     ],
-    "miser-s-muttonchops": [
+    "misers-muttonchops": [
       {
         "quality": "strange",
         "craftable": true,
@@ -27370,19 +27370,6 @@
         "lastUpdatedAt": "2026-04-25T21:59:12.000Z"
       }
     ],
-    "misha-s-maw": [
-      {
-        "quality": "unique",
-        "craftable": true,
-        "blanket": false,
-        "scrap": {
-          "low": 26,
-          "mid": 28,
-          "high": 31
-        },
-        "lastUpdatedAt": "2026-04-15T12:55:11.000Z"
-      }
-    ],
     "mishap-mercenary": [
       {
         "quality": "strange",
@@ -27405,6 +27392,19 @@
           "high": 837
         },
         "lastUpdatedAt": "2026-04-22T16:54:01.000Z"
+      }
+    ],
+    "mishas-maw": [
+      {
+        "quality": "unique",
+        "craftable": true,
+        "blanket": false,
+        "scrap": {
+          "low": 26,
+          "mid": 28,
+          "high": 31
+        },
+        "lastUpdatedAt": "2026-04-15T12:55:11.000Z"
       }
     ],
     "mislaid-sweater": [
@@ -27551,30 +27551,6 @@
         "lastUpdatedAt": "2026-04-25T09:09:47.000Z"
       }
     ],
-    "mo-horn": [
-      {
-        "quality": "strange",
-        "craftable": true,
-        "blanket": false,
-        "scrap": {
-          "low": 3174,
-          "mid": 3188,
-          "high": 3202
-        },
-        "lastUpdatedAt": "2025-10-14T21:27:17.000Z"
-      },
-      {
-        "quality": "unique",
-        "craftable": true,
-        "blanket": false,
-        "scrap": {
-          "low": 1414,
-          "mid": 1543,
-          "high": 1673
-        },
-        "lastUpdatedAt": "2026-05-08T05:39:20.000Z"
-      }
-    ],
     "moccasin-machinery": [
       {
         "quality": "unique",
@@ -27658,6 +27634,30 @@
         "lastUpdatedAt": "2026-02-08T07:41:53.000Z"
       }
     ],
+    "mohorn": [
+      {
+        "quality": "strange",
+        "craftable": true,
+        "blanket": false,
+        "scrap": {
+          "low": 3174,
+          "mid": 3188,
+          "high": 3202
+        },
+        "lastUpdatedAt": "2025-10-14T21:27:17.000Z"
+      },
+      {
+        "quality": "unique",
+        "craftable": true,
+        "blanket": false,
+        "scrap": {
+          "low": 1414,
+          "mid": 1543,
+          "high": 1673
+        },
+        "lastUpdatedAt": "2026-05-08T05:39:20.000Z"
+      }
+    ],
     "momma-kiev": [
       {
         "quality": "strange",
@@ -27706,7 +27706,7 @@
         "lastUpdatedAt": "2026-04-21T02:45:29.000Z"
       }
     ],
-    "monster-s-stompers": [
+    "monsters-stompers": [
       {
         "quality": "haunted",
         "craftable": true,
@@ -27887,7 +27887,7 @@
         "lastUpdatedAt": "2026-05-06T16:01:31.000Z"
       }
     ],
-    "mountebank-s-masque": [
+    "mountebanks-masque": [
       {
         "quality": "strange",
         "craftable": true,
@@ -27924,7 +27924,7 @@
         "lastUpdatedAt": "2025-10-13T08:22:01.000Z"
       }
     ],
-    "mr-mundee-s-wild-ride": [
+    "mr-mundees-wild-ride": [
       {
         "quality": "unique",
         "craftable": true,
@@ -28009,7 +28009,7 @@
         "lastUpdatedAt": "2021-10-12T20:52:09.000Z"
       }
     ],
-    "murderer-s-motif": [
+    "murderers-motif": [
       {
         "quality": "strange",
         "craftable": true,
@@ -28175,7 +28175,7 @@
         "lastUpdatedAt": "2026-04-25T09:24:54.000Z"
       }
     ],
-    "napper-s-respite": [
+    "nappers-respite": [
       {
         "quality": "unique",
         "craftable": true,
@@ -28271,7 +28271,7 @@
         "lastUpdatedAt": "2025-10-14T21:24:05.000Z"
       }
     ],
-    "neptune-s-nightmare": [
+    "neptunes-nightmare": [
       {
         "quality": "strange",
         "craftable": true,
@@ -28760,7 +28760,7 @@
         "lastUpdatedAt": "2026-05-07T14:39:47.000Z"
       }
     ],
-    "officer-s-ushanka": [
+    "officers-ushanka": [
       {
         "quality": "collectors",
         "craftable": true,
@@ -29199,7 +29199,7 @@
         "lastUpdatedAt": "2026-05-11T16:01:02.000Z"
       }
     ],
-    "orion-s-belt": [
+    "orions-belt": [
       {
         "quality": "unique",
         "craftable": true,
@@ -29258,7 +29258,7 @@
         "lastUpdatedAt": "2021-09-25T20:36:55.000Z"
       }
     ],
-    "otolaryngologist-s-mirror": [
+    "otolaryngologists-mirror": [
       {
         "quality": "genuine",
         "craftable": true,
@@ -29623,7 +29623,7 @@
         "lastUpdatedAt": "2022-10-28T03:19:12.000Z"
       }
     ],
-    "pardner-s-pompadour": [
+    "pardners-pompadour": [
       {
         "quality": "strange",
         "craftable": true,
@@ -29767,7 +29767,7 @@
         "lastUpdatedAt": "2026-09-11T15:12:39.000Z"
       }
     ],
-    "patriot-s-pouches": [
+    "patriots-pouches": [
       {
         "quality": "strange",
         "craftable": true,
@@ -29815,7 +29815,7 @@
         "lastUpdatedAt": "2026-03-21T09:43:02.000Z"
       }
     ],
-    "peacenik-s-ponytail": [
+    "peaceniks-ponytail": [
       {
         "quality": "strange",
         "craftable": true,
@@ -29933,30 +29933,6 @@
         "lastUpdatedAt": "2026-05-02T18:59:16.000Z"
       }
     ],
-    "pest-s-pads": [
-      {
-        "quality": "strange",
-        "craftable": true,
-        "blanket": false,
-        "scrap": {
-          "low": 39,
-          "mid": 48,
-          "high": 57
-        },
-        "lastUpdatedAt": "2026-04-21T02:49:05.000Z"
-      },
-      {
-        "quality": "unique",
-        "craftable": true,
-        "blanket": false,
-        "scrap": {
-          "low": 26,
-          "mid": 27,
-          "high": 28
-        },
-        "lastUpdatedAt": "2026-04-21T14:13:39.000Z"
-      }
-    ],
     "pestering-jester": [
       {
         "quality": "strange",
@@ -29979,6 +29955,30 @@
           "high": 3462
         },
         "lastUpdatedAt": "2026-05-08T05:33:54.000Z"
+      }
+    ],
+    "pests-pads": [
+      {
+        "quality": "strange",
+        "craftable": true,
+        "blanket": false,
+        "scrap": {
+          "low": 39,
+          "mid": 48,
+          "high": 57
+        },
+        "lastUpdatedAt": "2026-04-21T02:49:05.000Z"
+      },
+      {
+        "quality": "unique",
+        "craftable": true,
+        "blanket": false,
+        "scrap": {
+          "low": 26,
+          "mid": 27,
+          "high": 28
+        },
+        "lastUpdatedAt": "2026-04-21T14:13:39.000Z"
       }
     ],
     "phobos-filter": [
@@ -30075,7 +30075,7 @@
         "lastUpdatedAt": "2025-08-13T16:10:23.000Z"
       }
     ],
-    "physician-s-procedure-mask": [
+    "physicians-procedure-mask": [
       {
         "quality": "collectors",
         "craftable": true,
@@ -30121,7 +30121,7 @@
         "lastUpdatedAt": "2026-04-12T18:56:58.000Z"
       }
     ],
-    "physician-s-protector": [
+    "physicians-protector": [
       {
         "quality": "strange",
         "craftable": true,
@@ -30442,7 +30442,7 @@
         "lastUpdatedAt": "2025-08-20T09:22:56.000Z"
       }
     ],
-    "plumber-s-cap": [
+    "plumbers-cap": [
       {
         "quality": "strange",
         "craftable": true,
@@ -30466,7 +30466,7 @@
         "lastUpdatedAt": "2026-09-17T02:05:48.000Z"
       }
     ],
-    "plumber-s-pipe": [
+    "plumbers-pipe": [
       {
         "quality": "strange",
         "craftable": true,
@@ -30525,7 +30525,7 @@
         "lastUpdatedAt": "2025-04-13T13:12:33.000Z"
       }
     ],
-    "poacher-s-safari-jacket": [
+    "poachers-safari-jacket": [
       {
         "quality": "strange",
         "craftable": true,
@@ -31402,7 +31402,7 @@
         "lastUpdatedAt": "2026-09-04T12:37:47.000Z"
       }
     ],
-    "practitioner-s-processing-mask": [
+    "practitioners-processing-mask": [
       {
         "quality": "strange",
         "craftable": true,
@@ -31461,7 +31461,7 @@
         "lastUpdatedAt": "2024-05-10T19:00:00.000Z"
       }
     ],
-    "prancer-s-pride": [
+    "prancers-pride": [
       {
         "quality": "collectors",
         "craftable": true,
@@ -31544,7 +31544,7 @@
         "lastUpdatedAt": "2026-04-21T03:39:51.000Z"
       }
     ],
-    "prince-tavish-s-crown": [
+    "prince-tavishs-crown": [
       {
         "quality": "strange",
         "craftable": true,
@@ -31721,7 +31721,7 @@
         "lastUpdatedAt": "2026-07-03T15:45:19.000Z"
       }
     ],
-    "professional-s-panama": [
+    "professionals-panama": [
       {
         "quality": "strange",
         "craftable": true,
@@ -31767,7 +31767,7 @@
         "lastUpdatedAt": "2026-06-28T16:15:47.000Z"
       }
     ],
-    "professional-s-pom-pom": [
+    "professionals-pom-pom": [
       {
         "quality": "strange",
         "craftable": true,
@@ -31791,7 +31791,7 @@
         "lastUpdatedAt": "2026-05-23T14:52:40.000Z"
       }
     ],
-    "professional-s-ushanka": [
+    "professionals-ushanka": [
       {
         "quality": "strange",
         "craftable": true,
@@ -31839,7 +31839,7 @@
         "lastUpdatedAt": "2026-04-30T16:39:06.000Z"
       }
     ],
-    "professor-s-peculiarity": [
+    "professors-peculiarity": [
       {
         "quality": "strange",
         "craftable": true,
@@ -31874,7 +31874,7 @@
         "lastUpdatedAt": "2025-10-19T10:57:53.000Z"
       }
     ],
-    "professor-s-pineapple": [
+    "professors-pineapple": [
       {
         "quality": "genuine",
         "craftable": true,
@@ -32138,7 +32138,7 @@
         "lastUpdatedAt": "2026-05-23T14:32:17.000Z"
       }
     ],
-    "pugilist-s-protector": [
+    "pugilists-protector": [
       {
         "quality": "unique",
         "craftable": true,
@@ -32162,7 +32162,7 @@
         "lastUpdatedAt": "2024-05-10T15:33:07.000Z"
       }
     ],
-    "puncher-s-polar-puffer": [
+    "punchers-polar-puffer": [
       {
         "quality": "strange",
         "craftable": true,
@@ -32186,7 +32186,7 @@
         "lastUpdatedAt": "2026-07-07T12:43:36.000Z"
       }
     ],
-    "punk-s-pomp": [
+    "punks-pomp": [
       {
         "quality": "strange",
         "craftable": true,
@@ -32304,30 +32304,6 @@
         "lastUpdatedAt": "2022-03-24T15:01:42.000Z"
       }
     ],
-    "pyr-o-lantern": [
-      {
-        "quality": "strange",
-        "craftable": true,
-        "blanket": false,
-        "scrap": {
-          "low": 2683,
-          "mid": 2683,
-          "high": 2683
-        },
-        "lastUpdatedAt": "2026-05-09T15:27:09.000Z"
-      },
-      {
-        "quality": "unique",
-        "craftable": true,
-        "blanket": false,
-        "scrap": {
-          "low": 692,
-          "mid": 721,
-          "high": 750
-        },
-        "lastUpdatedAt": "2026-02-09T23:19:43.000Z"
-      }
-    ],
     "pyro-in-chinatown": [
       {
         "quality": "strange",
@@ -32352,6 +32328,30 @@
         "lastUpdatedAt": "2026-05-08T12:33:47.000Z"
       }
     ],
+    "pyro-lantern": [
+      {
+        "quality": "strange",
+        "craftable": true,
+        "blanket": false,
+        "scrap": {
+          "low": 2683,
+          "mid": 2683,
+          "high": 2683
+        },
+        "lastUpdatedAt": "2026-05-09T15:27:09.000Z"
+      },
+      {
+        "quality": "unique",
+        "craftable": true,
+        "blanket": false,
+        "scrap": {
+          "low": 692,
+          "mid": 721,
+          "high": 750
+        },
+        "lastUpdatedAt": "2026-02-09T23:19:43.000Z"
+      }
+    ],
     "pyro-mask": [
       {
         "quality": "unique",
@@ -32363,65 +32363,6 @@
           "high": 185
         },
         "lastUpdatedAt": "2026-04-22T11:00:32.000Z"
-      }
-    ],
-    "pyro-s-beanie": [
-      {
-        "quality": "unique",
-        "craftable": true,
-        "blanket": false,
-        "scrap": {
-          "low": 577,
-          "mid": 606,
-          "high": 635
-        },
-        "lastUpdatedAt": "2026-04-21T19:11:18.000Z"
-      },
-      {
-        "quality": "unique",
-        "craftable": false,
-        "blanket": false,
-        "scrap": {
-          "low": 421,
-          "mid": 421,
-          "high": 421
-        },
-        "lastUpdatedAt": "2025-07-17T03:40:18.000Z"
-      },
-      {
-        "quality": "vintage",
-        "craftable": true,
-        "blanket": false,
-        "scrap": {
-          "low": 462,
-          "mid": 606,
-          "high": 750
-        },
-        "lastUpdatedAt": "2026-04-21T19:11:28.000Z"
-      }
-    ],
-    "pyro-s-boron-beanie": [
-      {
-        "quality": "strange",
-        "craftable": true,
-        "blanket": false,
-        "scrap": {
-          "low": 302,
-          "mid": 302,
-          "high": 302
-        },
-        "lastUpdatedAt": "2026-04-16T23:46:48.000Z"
-      },
-      {
-        "quality": "unique",
-        "craftable": true,
-        "blanket": false,
-        "scrap": {
-          "low": 17,
-          "mid": 17,
-          "high": 18
-        },
-        "lastUpdatedAt": "2026-04-05T10:22:52.000Z"
       }
     ],
     "pyro-shark": [
@@ -32474,7 +32415,7 @@
         "lastUpdatedAt": "2026-02-01T14:46:03.000Z"
       }
     ],
-    "pyromancer-s-hood": [
+    "pyromancers-hood": [
       {
         "quality": "strange",
         "craftable": true,
@@ -32498,7 +32439,7 @@
         "lastUpdatedAt": "2026-05-05T18:55:08.000Z"
       }
     ],
-    "pyromancer-s-mask": [
+    "pyromancers-mask": [
       {
         "quality": "unique",
         "craftable": true,
@@ -32522,7 +32463,7 @@
         "lastUpdatedAt": "2025-11-05T15:59:19.000Z"
       }
     ],
-    "pyromancer-s-raiments": [
+    "pyromancers-raiments": [
       {
         "quality": "strange",
         "craftable": true,
@@ -32557,6 +32498,65 @@
           "high": 27
         },
         "lastUpdatedAt": "2026-04-25T04:10:01.000Z"
+      }
+    ],
+    "pyros-beanie": [
+      {
+        "quality": "unique",
+        "craftable": true,
+        "blanket": false,
+        "scrap": {
+          "low": 577,
+          "mid": 606,
+          "high": 635
+        },
+        "lastUpdatedAt": "2026-04-21T19:11:18.000Z"
+      },
+      {
+        "quality": "unique",
+        "craftable": false,
+        "blanket": false,
+        "scrap": {
+          "low": 421,
+          "mid": 421,
+          "high": 421
+        },
+        "lastUpdatedAt": "2025-07-17T03:40:18.000Z"
+      },
+      {
+        "quality": "vintage",
+        "craftable": true,
+        "blanket": false,
+        "scrap": {
+          "low": 462,
+          "mid": 606,
+          "high": 750
+        },
+        "lastUpdatedAt": "2026-04-21T19:11:28.000Z"
+      }
+    ],
+    "pyros-boron-beanie": [
+      {
+        "quality": "strange",
+        "craftable": true,
+        "blanket": false,
+        "scrap": {
+          "low": 302,
+          "mid": 302,
+          "high": 302
+        },
+        "lastUpdatedAt": "2026-04-16T23:46:48.000Z"
+      },
+      {
+        "quality": "unique",
+        "craftable": true,
+        "blanket": false,
+        "scrap": {
+          "low": 17,
+          "mid": 17,
+          "high": 18
+        },
+        "lastUpdatedAt": "2026-04-05T10:22:52.000Z"
       }
     ],
     "pyrotechnic-tote": [
@@ -32764,7 +32764,7 @@
         "lastUpdatedAt": "2026-04-25T06:50:56.000Z"
       }
     ],
-    "raven-s-visage": [
+    "ravens-visage": [
       {
         "quality": "haunted",
         "craftable": true,
@@ -32812,7 +32812,7 @@
         "lastUpdatedAt": "2026-02-16T04:28:44.000Z"
       }
     ],
-    "reader-s-choice": [
+    "readers-choice": [
       {
         "quality": "strange",
         "craftable": true,
@@ -33039,7 +33039,7 @@
         "lastUpdatedAt": "2026-05-13T14:31:52.000Z"
       }
     ],
-    "reissued-dealer-s-visor": [
+    "reissued-dealers-visor": [
       {
         "quality": "unique",
         "craftable": true,
@@ -33159,7 +33159,7 @@
         "lastUpdatedAt": "2026-02-02T18:57:52.000Z"
       }
     ],
-    "rifleman-s-regalia": [
+    "riflemans-regalia": [
       {
         "quality": "strange",
         "craftable": true,
@@ -33255,7 +33255,7 @@
         "lastUpdatedAt": "2026-06-16T15:14:31.000Z"
       }
     ],
-    "ritzy-rick-s-hair-fixative": [
+    "ritzy-ricks-hair-fixative": [
       {
         "quality": "collectors",
         "craftable": true,
@@ -33563,7 +33563,7 @@
         "lastUpdatedAt": "2026-04-20T18:18:18.000Z"
       }
     ],
-    "rogue-s-brogues": [
+    "rogues-brogues": [
       {
         "quality": "strange",
         "craftable": true,
@@ -33587,7 +33587,7 @@
         "lastUpdatedAt": "2025-10-08T06:07:26.000Z"
       }
     ],
-    "rogue-s-col-roule": [
+    "rogues-col-roule": [
       {
         "quality": "collectors",
         "craftable": true,
@@ -33622,7 +33622,7 @@
         "lastUpdatedAt": "2026-04-07T09:37:29.000Z"
       }
     ],
-    "rogue-s-rabbit": [
+    "rogues-rabbit": [
       {
         "quality": "unique",
         "craftable": true,
@@ -33635,7 +33635,7 @@
         "lastUpdatedAt": "2024-02-22T20:16:58.000Z"
       }
     ],
-    "rogue-s-robe": [
+    "rogues-robe": [
       {
         "quality": "strange",
         "craftable": true,
@@ -33862,7 +33862,7 @@
         "lastUpdatedAt": "2025-11-05T16:03:17.000Z"
       }
     ],
-    "runner-s-warm-up": [
+    "runners-warm-up": [
       {
         "quality": "strange",
         "craftable": true,
@@ -33995,7 +33995,7 @@
         "lastUpdatedAt": "2026-04-24T12:39:40.000Z"
       }
     ],
-    "safe-n-sound": [
+    "safensound": [
       {
         "quality": "strange",
         "craftable": true,
@@ -34172,7 +34172,7 @@
         "lastUpdatedAt": "2021-10-20T21:27:31.000Z"
       }
     ],
-    "sandmann-s-brush": [
+    "sandmanns-brush": [
       {
         "quality": "strange",
         "craftable": true,
@@ -34447,7 +34447,7 @@
         "lastUpdatedAt": "2026-04-10T17:10:00.000Z"
       }
     ],
-    "scoper-s-scales": [
+    "scopers-scales": [
       {
         "quality": "unique",
         "craftable": true,
@@ -34460,7 +34460,7 @@
         "lastUpdatedAt": "2026-04-14T15:41:14.000Z"
       }
     ],
-    "scoper-s-smoke": [
+    "scopers-smoke": [
       {
         "quality": "strange",
         "craftable": true,
@@ -34604,7 +34604,7 @@
         "lastUpdatedAt": "2026-04-21T14:19:02.000Z"
       }
     ],
-    "scotsman-s-stove-pipe": [
+    "scotsmans-stove-pipe": [
       {
         "quality": "genuine",
         "craftable": true,
@@ -34960,7 +34960,7 @@
         "lastUpdatedAt": "2026-03-24T09:56:02.000Z"
       }
     ],
-    "seamann-s-stubble": [
+    "seamanns-stubble": [
       {
         "quality": "strange",
         "craftable": true,
@@ -35200,7 +35200,7 @@
         "lastUpdatedAt": "2026-04-21T14:30:53.000Z"
       }
     ],
-    "semi-tame-trapper-s-hat": [
+    "semi-tame-trappers-hat": [
       {
         "quality": "strange",
         "craftable": true,
@@ -35248,7 +35248,7 @@
         "lastUpdatedAt": "2026-04-25T13:07:10.000Z"
       }
     ],
-    "sergeant-s-drill-hat": [
+    "sergeants-drill-hat": [
       {
         "quality": "unique",
         "craftable": true,
@@ -35355,7 +35355,7 @@
         "lastUpdatedAt": "2026-08-22T03:47:49.000Z"
       }
     ],
-    "shadowman-s-shade": [
+    "shadowmans-shade": [
       {
         "quality": "unique",
         "craftable": true,
@@ -35392,7 +35392,7 @@
         "lastUpdatedAt": "2026-04-20T18:14:28.000Z"
       }
     ],
-    "shaman-s-skull": [
+    "shamans-skull": [
       {
         "quality": "haunted",
         "craftable": true,
@@ -35464,7 +35464,7 @@
         "lastUpdatedAt": "2026-08-28T18:59:23.000Z"
       }
     ],
-    "sharpshooter-s-shroud": [
+    "sharpshooters-shroud": [
       {
         "quality": "strange",
         "craftable": true,
@@ -35512,7 +35512,7 @@
         "lastUpdatedAt": "2026-09-10T15:25:46.000Z"
       }
     ],
-    "sheriff-s-stetson": [
+    "sheriffs-stetson": [
       {
         "quality": "strange",
         "craftable": true,
@@ -35619,7 +35619,7 @@
         "lastUpdatedAt": "2026-05-23T14:53:07.000Z"
       }
     ],
-    "shogun-s-shoulder-guard": [
+    "shoguns-shoulder-guard": [
       {
         "quality": "strange",
         "craftable": true,
@@ -35643,7 +35643,7 @@
         "lastUpdatedAt": "2026-04-21T21:53:58.000Z"
       }
     ],
-    "shooter-s-sola-topi": [
+    "shooters-sola-topi": [
       {
         "quality": "strange",
         "craftable": true,
@@ -35689,7 +35689,7 @@
         "lastUpdatedAt": "2026-04-28T09:04:02.000Z"
       }
     ],
-    "shooter-s-tin-topi": [
+    "shooters-tin-topi": [
       {
         "quality": "strange",
         "craftable": true,
@@ -35940,7 +35940,7 @@
         "lastUpdatedAt": "2026-09-10T15:32:52.000Z"
       }
     ],
-    "sidekick-s-side-slick": [
+    "sidekicks-side-slick": [
       {
         "quality": "unique",
         "craftable": true,
@@ -36047,7 +36047,7 @@
         "lastUpdatedAt": "2026-05-02T16:00:37.000Z"
       }
     ],
-    "sign-of-the-wolf-s-school": [
+    "sign-of-the-wolfs-school": [
       {
         "quality": "genuine",
         "craftable": true,
@@ -36106,7 +36106,7 @@
         "lastUpdatedAt": "2025-03-13T14:49:17.000Z"
       }
     ],
-    "sinner-s-shade": [
+    "sinners-shade": [
       {
         "quality": "strange",
         "craftable": true,
@@ -36392,7 +36392,7 @@
         "lastUpdatedAt": "2026-04-26T14:35:54.000Z"
       }
     ],
-    "sledder-s-sidekick": [
+    "sledders-sidekick": [
       {
         "quality": "strange",
         "craftable": true,
@@ -37317,7 +37317,7 @@
         "lastUpdatedAt": "2026-02-01T16:10:13.000Z"
       }
     ],
-    "soldier-s-slope-scopers": [
+    "soldiers-slope-scopers": [
       {
         "quality": "collectors",
         "craftable": true,
@@ -37352,7 +37352,7 @@
         "lastUpdatedAt": "2026-09-12T05:26:18.000Z"
       }
     ],
-    "soldier-s-sparkplug": [
+    "soldiers-sparkplug": [
       {
         "quality": "strange",
         "craftable": true,
@@ -37376,7 +37376,7 @@
         "lastUpdatedAt": "2026-04-25T16:38:37.000Z"
       }
     ],
-    "soldier-s-stash": [
+    "soldiers-stash": [
       {
         "quality": "unique",
         "craftable": true,
@@ -37411,7 +37411,7 @@
         "lastUpdatedAt": "2026-06-23T11:03:18.000Z"
       }
     ],
-    "soldier-s-stogie": [
+    "soldiers-stogie": [
       {
         "quality": "strange",
         "craftable": true,
@@ -37865,7 +37865,7 @@
         "lastUpdatedAt": "2022-03-02T22:37:05.000Z"
       }
     ],
-    "spectre-s-spectacles": [
+    "spectres-spectacles": [
       {
         "quality": "collectors",
         "craftable": true,
@@ -37911,7 +37911,7 @@
         "lastUpdatedAt": "2023-12-27T20:12:33.000Z"
       }
     ],
-    "speedster-s-spandex": [
+    "speedsters-spandex": [
       {
         "quality": "strange",
         "craftable": true,
@@ -37959,7 +37959,7 @@
         "lastUpdatedAt": "2026-04-21T18:03:44.000Z"
       }
     ],
-    "spellbinder-s-bonnet": [
+    "spellbinders-bonnet": [
       {
         "quality": "haunted",
         "craftable": true,
@@ -38481,7 +38481,7 @@
         "lastUpdatedAt": "2026-04-09T15:32:23.000Z"
       }
     ],
-    "squatter-s-right": [
+    "squatters-right": [
       {
         "quality": "strange",
         "craftable": true,
@@ -38505,7 +38505,7 @@
         "lastUpdatedAt": "2026-02-04T10:48:50.000Z"
       }
     ],
-    "squid-s-lid": [
+    "squids-lid": [
       {
         "quality": "haunted",
         "craftable": true,
@@ -38529,7 +38529,7 @@
         "lastUpdatedAt": "2022-04-29T17:27:53.000Z"
       }
     ],
-    "squire-s-sabatons": [
+    "squires-sabatons": [
       {
         "quality": "strange",
         "craftable": true,
@@ -38658,7 +38658,7 @@
         "lastUpdatedAt": "2026-09-10T15:54:33.000Z"
       }
     ],
-    "stapler-s-specs": [
+    "staplers-specs": [
       {
         "quality": "strange",
         "craftable": true,
@@ -39062,7 +39062,7 @@
         "lastUpdatedAt": "2024-04-27T16:09:39.000Z"
       }
     ],
-    "stockbroker-s-scarf": [
+    "stockbrokers-scarf": [
       {
         "quality": "strange",
         "craftable": true,
@@ -39442,7 +39442,7 @@
         "lastUpdatedAt": "2026-06-28T16:16:58.000Z"
       }
     ],
-    "sultan-s-ceremonial": [
+    "sultans-ceremonial": [
       {
         "quality": "unique",
         "craftable": true,
@@ -39588,7 +39588,7 @@
         "lastUpdatedAt": "2026-04-25T22:05:04.000Z"
       }
     ],
-    "surgeon-s-shako": [
+    "surgeons-shako": [
       {
         "quality": "strange",
         "craftable": true,
@@ -39612,7 +39612,7 @@
         "lastUpdatedAt": "2026-09-19T12:36:33.000Z"
       }
     ],
-    "surgeon-s-side-satchel": [
+    "surgeons-side-satchel": [
       {
         "quality": "collectors",
         "craftable": true,
@@ -39658,7 +39658,7 @@
         "lastUpdatedAt": "2021-09-24T12:49:18.000Z"
       }
     ],
-    "surgeon-s-sidearms": [
+    "surgeons-sidearms": [
       {
         "quality": "strange",
         "craftable": true,
@@ -39682,7 +39682,7 @@
         "lastUpdatedAt": "2026-04-25T09:16:35.000Z"
       }
     ],
-    "surgeon-s-space-suit": [
+    "surgeons-space-suit": [
       {
         "quality": "haunted",
         "craftable": true,
@@ -39706,7 +39706,7 @@
         "lastUpdatedAt": "2026-04-11T17:24:09.000Z"
       }
     ],
-    "surgeon-s-stahlhelm": [
+    "surgeons-stahlhelm": [
       {
         "quality": "strange",
         "craftable": true,
@@ -39741,7 +39741,7 @@
         "lastUpdatedAt": "2023-12-04T13:38:24.000Z"
       }
     ],
-    "surgeon-s-stethoscope": [
+    "surgeons-stethoscope": [
       {
         "quality": "strange",
         "craftable": true,
@@ -39800,7 +39800,7 @@
         "lastUpdatedAt": "2026-04-24T03:08:55.000Z"
       }
     ],
-    "swagman-s-swatter": [
+    "swagmans-swatter": [
       {
         "quality": "collectors",
         "craftable": true,
@@ -40038,7 +40038,7 @@
         "lastUpdatedAt": "2026-04-25T22:02:58.000Z"
       }
     ],
-    "tanker-s-top": [
+    "tankers-top": [
       {
         "quality": "strange",
         "craftable": true,
@@ -40276,7 +40276,7 @@
         "lastUpdatedAt": "2026-04-20T18:16:55.000Z"
       }
     ],
-    "technician-s-tunic": [
+    "technicians-tunic": [
       {
         "quality": "strange",
         "craftable": true,
@@ -40405,7 +40405,7 @@
         "lastUpdatedAt": "2026-04-24T10:14:22.000Z"
       }
     ],
-    "templar-s-spirit": [
+    "templars-spirit": [
       {
         "quality": "unique",
         "craftable": true,
@@ -40608,7 +40608,7 @@
         "lastUpdatedAt": "2025-11-05T16:03:06.000Z"
       }
     ],
-    "texas-slim-s-dome-shine": [
+    "texas-slims-dome-shine": [
       {
         "quality": "collectors",
         "craftable": true,
@@ -41119,7 +41119,7 @@
         "lastUpdatedAt": "2026-09-12T04:46:22.000Z"
       }
     ],
-    "tippler-s-tricorne": [
+    "tipplers-tricorne": [
       {
         "quality": "collectors",
         "craftable": true,
@@ -41381,7 +41381,7 @@
         "lastUpdatedAt": "2026-05-01T13:49:50.000Z"
       }
     ],
-    "torcher-s-tabard": [
+    "torchers-tabard": [
       {
         "quality": "strange",
         "craftable": true,
@@ -41405,7 +41405,7 @@
         "lastUpdatedAt": "2026-05-05T18:56:23.000Z"
       }
     ],
-    "torcher-s-trench-coat": [
+    "torchers-trench-coat": [
       {
         "quality": "strange",
         "craftable": true,
@@ -41510,7 +41510,7 @@
         "lastUpdatedAt": "2026-03-30T21:51:32.000Z"
       }
     ],
-    "tough-guy-s-toque": [
+    "tough-guys-toque": [
       {
         "quality": "genuine",
         "craftable": true,
@@ -41914,7 +41914,7 @@
         "lastUpdatedAt": "2021-09-07T01:39:37.000Z"
       }
     ],
-    "trapper-s-flap": [
+    "trappers-flap": [
       {
         "quality": "strange",
         "craftable": true,
@@ -42036,7 +42036,7 @@
         "lastUpdatedAt": "2026-04-25T22:04:57.000Z"
       }
     ],
-    "trencher-s-topper": [
+    "trenchers-topper": [
       {
         "quality": "strange",
         "craftable": true,
@@ -42060,7 +42060,7 @@
         "lastUpdatedAt": "2026-04-25T09:00:56.000Z"
       }
     ],
-    "trencher-s-tunic": [
+    "trenchers-tunic": [
       {
         "quality": "strange",
         "craftable": true,
@@ -42272,7 +42272,7 @@
         "lastUpdatedAt": "2026-04-12T04:31:47.000Z"
       }
     ],
-    "trickster-s-treats": [
+    "tricksters-treats": [
       {
         "quality": "strange",
         "craftable": true,
@@ -42296,7 +42296,7 @@
         "lastUpdatedAt": "2026-05-11T16:00:23.000Z"
       }
     ],
-    "trickster-s-turnout-gear": [
+    "tricksters-turnout-gear": [
       {
         "quality": "collectors",
         "craftable": true,
@@ -42331,7 +42331,7 @@
         "lastUpdatedAt": "2026-02-11T07:29:35.000Z"
       }
     ],
-    "triggerman-s-tacticals": [
+    "triggermans-tacticals": [
       {
         "quality": "strange",
         "craftable": true,
@@ -42523,7 +42523,7 @@
         "lastUpdatedAt": "2026-08-17T13:00:59.000Z"
       }
     ],
-    "troublemaker-s-tossle-cap": [
+    "troublemakers-tossle-cap": [
       {
         "quality": "collectors",
         "craftable": true,
@@ -42580,7 +42580,7 @@
         "lastUpdatedAt": "2026-07-01T17:41:50.000Z"
       }
     ],
-    "trucker-s-topper": [
+    "truckers-topper": [
       {
         "quality": "strange",
         "craftable": true,
@@ -42855,7 +42855,31 @@
         "lastUpdatedAt": "2026-07-07T12:45:00.000Z"
       }
     ],
-    "tyrant-s-helm": [
+    "tyrantium-helmet": [
+      {
+        "quality": "strange",
+        "craftable": true,
+        "blanket": false,
+        "scrap": {
+          "low": 247,
+          "mid": 247,
+          "high": 248
+        },
+        "lastUpdatedAt": "2026-01-15T07:28:24.000Z"
+      },
+      {
+        "quality": "unique",
+        "craftable": true,
+        "blanket": false,
+        "scrap": {
+          "low": 13,
+          "mid": 15,
+          "high": 17
+        },
+        "lastUpdatedAt": "2026-04-26T14:27:18.000Z"
+      }
+    ],
+    "tyrants-helm": [
       {
         "quality": "genuine",
         "craftable": true,
@@ -42910,30 +42934,6 @@
           "high": 482
         },
         "lastUpdatedAt": "2026-02-08T08:13:03.000Z"
-      }
-    ],
-    "tyrantium-helmet": [
-      {
-        "quality": "strange",
-        "craftable": true,
-        "blanket": false,
-        "scrap": {
-          "low": 247,
-          "mid": 247,
-          "high": 248
-        },
-        "lastUpdatedAt": "2026-01-15T07:28:24.000Z"
-      },
-      {
-        "quality": "unique",
-        "craftable": true,
-        "blanket": false,
-        "scrap": {
-          "low": 13,
-          "mid": 15,
-          "high": 17
-        },
-        "lastUpdatedAt": "2026-04-26T14:27:18.000Z"
       }
     ],
     "tyurtlenek": [
@@ -43056,7 +43056,7 @@
         "lastUpdatedAt": "2026-04-21T02:46:16.000Z"
       }
     ],
-    "underminer-s-overcoat": [
+    "underminers-overcoat": [
       {
         "quality": "strange",
         "craftable": true,
@@ -43527,7 +43527,7 @@
         "lastUpdatedAt": "2026-06-16T15:12:02.000Z"
       }
     ],
-    "vested-investor-s-vest": [
+    "vested-investors-vest": [
       {
         "quality": "unique",
         "craftable": true,
@@ -43540,7 +43540,7 @@
         "lastUpdatedAt": "2026-08-17T13:01:35.000Z"
       }
     ],
-    "veteran-s-attire": [
+    "veterans-attire": [
       {
         "quality": "strange",
         "craftable": true,
@@ -43564,7 +43564,7 @@
         "lastUpdatedAt": "2026-04-26T14:36:05.000Z"
       }
     ],
-    "veteran-s-visor": [
+    "veterans-visor": [
       {
         "quality": "strange",
         "craftable": true,
@@ -43588,7 +43588,7 @@
         "lastUpdatedAt": "2026-06-28T16:15:28.000Z"
       }
     ],
-    "vicar-s-vestments": [
+    "vicars-vestments": [
       {
         "quality": "haunted",
         "craftable": true,
@@ -43708,7 +43708,7 @@
         "lastUpdatedAt": "2026-07-04T16:38:59.000Z"
       }
     ],
-    "villain-s-veil": [
+    "villains-veil": [
       {
         "quality": "strange",
         "craftable": true,
@@ -44462,7 +44462,7 @@
         "lastUpdatedAt": "2026-02-05T14:48:57.000Z"
       }
     ],
-    "wanderer-s-wear": [
+    "wanderers-wear": [
       {
         "quality": "strange",
         "craftable": true,
@@ -44486,7 +44486,7 @@
         "lastUpdatedAt": "2026-09-10T15:20:32.000Z"
       }
     ],
-    "wanderer-s-wool": [
+    "wanderers-wool": [
       {
         "quality": "strange",
         "craftable": true,
@@ -44752,7 +44752,7 @@
         "lastUpdatedAt": "2026-04-25T06:51:38.000Z"
       }
     ],
-    "warlock-s-warcloak": [
+    "warlocks-warcloak": [
       {
         "quality": "strange",
         "craftable": true,
@@ -44848,7 +44848,7 @@
         "lastUpdatedAt": "2025-09-19T08:38:18.000Z"
       }
     ],
-    "watchmann-s-wetsuit": [
+    "watchmanns-wetsuit": [
       {
         "quality": "strange",
         "craftable": true,
@@ -46069,7 +46069,7 @@
         "lastUpdatedAt": "2026-05-23T14:46:30.000Z"
       }
     ],
-    "yuri-s-revenge": [
+    "yuris-revenge": [
       {
         "quality": "strange",
         "craftable": true,
@@ -46152,7 +46152,7 @@
         "lastUpdatedAt": "2026-04-07T09:46:04.000Z"
       }
     ],
-    "zepheniah-s-shroud": [
+    "zepheniahs-shroud": [
       {
         "quality": "unique",
         "craftable": true,

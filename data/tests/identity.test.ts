@@ -1,6 +1,19 @@
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+
 import { describe, expect, it } from "vitest";
 
 import { displayName, slugify } from "../src/catalogue/identity.ts";
+
+/**
+ * The shared slug oracle. The render job derives the same slug from the same name, and
+ * the site looks its render manifest up by it, so the two rules are one rule. Its half of
+ * this table is `tests/test_cosmetic_identity.py`; the reasoning is
+ * `docs/fixtures/cosmetic-oracle.md`.
+ */
+const ORACLE = JSON.parse(
+  readFileSync(fileURLToPath(new URL("../../tests/fixtures/slugs.json", import.meta.url)), "utf8"),
+) as { slugs: Record<string, string>; unsluggable: string[] };
 
 describe("displayName", () => {
   it("strips a leading The, whatever its case", () => {
@@ -18,18 +31,15 @@ describe("displayName", () => {
 });
 
 describe("slugify", () => {
-  it("is lowercase, ASCII and hyphen-separated", () => {
-    expect(slugify("Team Captain")).toBe("team-captain");
-    expect(slugify("Dr. Whoa")).toBe("dr-whoa");
-    expect(slugify("Cheater's Lament")).toBe("cheater-s-lament");
+  it.each(Object.entries(ORACLE.slugs))("slugs %j to %j, as the render job does", (name, expected) => {
+    expect(slugify(name)).toBe(expected);
   });
 
-  it("folds accents and spells out an ampersand", () => {
-    expect(slugify("Sécurité Blanket")).toBe("securite-blanket");
-    expect(slugify("Cap & Gown")).toBe("cap-and-gown");
+  it.each(ORACLE.unsluggable)("refuses %j, which has nothing to slug", (name) => {
+    expect(() => slugify(name)).toThrow();
   });
 
-  it("refuses a name with nothing to slug", () => {
-    expect(() => slugify("!!!")).toThrow();
+  it("is idempotent, so re-slugging a stored identifier cannot drift", () => {
+    for (const expected of Object.values(ORACLE.slugs)) expect(slugify(expected)).toBe(expected);
   });
 });

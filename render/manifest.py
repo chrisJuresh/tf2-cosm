@@ -249,12 +249,25 @@ class Manifest:
         ]
 
     def forget_render(self, slug: str, cls: str, team: str, style: int) -> None:
-        """Drop any render recorded for one job, because it has just been found to fail."""
-        by_style = (
-            self._document["renders"].get(slug, {}).get(cls, {}).get(team)
-        )
-        if by_style is not None:
-            by_style.pop(str(style), None)
+        """Drop any render recorded for one job, because it has just been found to fail.
+
+        A branch left with nothing under it goes too. An empty Class or slug would otherwise
+        read as "this Cosmetic has renders" to the site, which joins the catalogue to this
+        document by the slug alone.
+        """
+        renders = self._document["renders"]
+        by_class = renders.get(slug)
+        by_team = (by_class or {}).get(cls)
+        by_style = (by_team or {}).get(team)
+        if by_style is None:
+            return
+        by_style.pop(str(style), None)
+        if not by_style:
+            by_team.pop(team, None)
+        if not by_team:
+            by_class.pop(cls, None)
+        if not by_class:
+            renders.pop(slug, None)
 
     def merge(self, other: "Manifest") -> None:
         """Fold another manifest into this one, letting `other` win job by job.

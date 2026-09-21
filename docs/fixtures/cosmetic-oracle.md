@@ -9,13 +9,15 @@ The agreement is pinned by one fixture, used by both:
 - `tests/fixtures/items_game_excerpt.txt` — a hand-written excerpt of the game's item
   definitions, with prefab inheritance, Styles and the awkward cases.
 - `tests/fixtures/tf_english_excerpt.txt` — the English names for those items.
+- `tests/fixtures/slugs.json` — the slug each English name resolves to. See
+  [The slug is the second agreement](#the-slug-is-the-second-agreement).
 
 Both implementations resolve this fixture and must produce the verdicts in the table below.
 A change to the Cosmetic rule changes this file and both test suites together:
 
 ```bash
-./.venv/Scripts/python.exe -m pytest      # tests/test_resolve.py
-pnpm test                                 # data/tests/build-catalogue.test.ts
+./.venv/Scripts/python.exe -m pytest      # tests/test_resolve.py, tests/test_cosmetic_identity.py
+pnpm test                                 # data/tests/build-catalogue.test.ts, data/tests/identity.test.ts
 ```
 
 ## Verdicts
@@ -39,8 +41,37 @@ pnpm test                                 # data/tests/build-catalogue.test.ts
 Display names drop a leading "The" (ADR-0003), so the catalogue names are `Bolt Boy`,
 `Team Captain`, `Ghastly Gibus`, `Tin Pot`, `Dead of Night`, `Scotsman's Stove Pipe`,
 `Crocodile Smile` and `Baronial Badge`, with slugs `bolt-boy`, `team-captain`,
-`ghastly-gibus`, `tin-pot`, `dead-of-night`, `scotsman-s-stove-pipe`, `crocodile-smile`
+`ghastly-gibus`, `tin-pot`, `dead-of-night`, `scotsmans-stove-pipe`, `crocodile-smile`
 and `baronial-badge`.
+
+## The slug is the second agreement
+
+Agreeing on *which* items are Cosmetics is only half of it. The site reads the catalogue and
+the render manifest as two separate documents and joins them on the slug
+(`site/src/renders/select.ts`), so the two jobs also have to derive the same slug from the
+same name — and until #66 they did not.
+
+`data/src/catalogue/identity.ts` folded diacritics and spelt out `&` but treated the
+apostrophe as a separator; `render/cosmetics.py` dropped the apostrophe but had no rule for
+either of the others. Buckaroo's Hat was `buckaroo-s-hat` in the catalogue and
+`buckaroos-hat` in the manifest; Brütal Bouffant was `brutal-bouffant` and
+`br-tal-bouffant`. The join missed, and 282 of 1833 Cosmetics — every name with an
+apostrophe or an accent — quietly fell back to their Backpack Icon on every Class (#66).
+
+Nothing caught it, because each suite asserted its own spelling and the site's fixtures were
+written to match the catalogue's. So the rule now lives in a fixture both suites read,
+`tests/fixtures/slugs.json`, and both assert it: `tests/test_cosmetic_identity.py` and
+`data/tests/identity.test.ts`. The two implementations still stand apart — one is Python and
+one is TypeScript — but they can no longer drift silently.
+
+The rule, in order: fold diacritics to ASCII, spell `&` as "and", **drop** apostrophes
+(`'`, `‘`, `’`) rather than separate on them, replace every other run of non-alphanumerics
+with a single hyphen, trim the hyphens off the ends. A name left with nothing is an error on
+both sides, not an empty slug.
+
+Dropping the apostrophe is the arbitrary half of that, and it went the way it did because
+the render manifest and the bucket already held every image under `buckaroos-hat`. Going the
+other way meant re-rendering and re-publishing 277 Cosmetics to change nothing anyone sees.
 
 The last three are in the fixture for the price rules alone; the Cosmetic rule has nothing
 to say about them beyond that they are Cosmetics. The file's `client_loot_lists` block is

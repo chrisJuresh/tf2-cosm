@@ -1,7 +1,7 @@
 {
   "schemaVersion": 5,
   "header": {
-    "snapshotTakenAt": "2026-09-21T02:36:02.383Z",
+    "snapshotTakenAt": "2026-09-21T02:51:01.934Z",
     "sources": {
       "itemDefinitions": "daily mirror (https://raw.githubusercontent.com/SteamDatabase/GameTracking-TF2/master/tf/scripts/items/items_game.txt)",
       "englishNames": "https://api.steampowered.com/IEconItems_440/GetSchemaItems/v0001/ (IEconItems_440/GetSchemaItems v0001)"
@@ -18,7 +18,7 @@
     },
     "prices": {
       "source": "backpack.tf (IGetPrices v4, IGetCurrencies v1)",
-      "takenAt": "2026-09-21T02:36:00.274Z",
+      "takenAt": "2026-09-21T02:50:59.322Z",
       "keyRate": {
         "scrap": 577,
         "refined": 64.1111,
@@ -43,7 +43,7 @@
     "dollarBases": {
       "steamCommunityMarket": {
         "source": "Steam Community Market price overview (Mann Co. Supply Crate Key, USD)",
-        "takenAt": "2026-09-21T02:36:02.151Z",
+        "takenAt": "2026-09-21T02:51:01.664Z",
         "lowest": {
           "usdPerKey": 2.27,
           "usdPerRefined": 0.035407
@@ -1330,7 +1330,7 @@
       }
     },
     {
-      "slug": "aladdin-s-private-reserve",
+      "slug": "aladdins-private-reserve",
       "name": "Aladdin's Private Reserve",
       "defindex": 708,
       "aliases": [],
@@ -2442,7 +2442,7 @@
       }
     },
     {
-      "slug": "apparatchik-s-apparel",
+      "slug": "apparatchiks-apparel",
       "name": "Apparatchik's Apparel",
       "defindex": 777,
       "aliases": [],
@@ -2513,7 +2513,7 @@
       }
     },
     {
-      "slug": "apparition-s-aspect",
+      "slug": "apparitions-aspect",
       "name": "Apparition's Aspect",
       "defindex": 571,
       "aliases": [],
@@ -2675,7 +2675,7 @@
       }
     },
     {
-      "slug": "archer-s-groundings",
+      "slug": "archers-groundings",
       "name": "Archer's Groundings",
       "defindex": 30371,
       "aliases": [],
@@ -2729,7 +2729,7 @@
       }
     },
     {
-      "slug": "archer-s-sterling",
+      "slug": "archers-sterling",
       "name": "Archer's Sterling",
       "defindex": 30874,
       "aliases": [],
@@ -3355,7 +3355,7 @@
       }
     },
     {
-      "slug": "arthropod-s-aspect",
+      "slug": "arthropods-aspect",
       "name": "Arthropod's Aspect",
       "defindex": 30717,
       "aliases": [],
@@ -3409,7 +3409,7 @@
       }
     },
     {
-      "slug": "assassin-s-attire",
+      "slug": "assassins-attire",
       "name": "Assassin's Attire",
       "defindex": 30989,
       "aliases": [],
@@ -4173,114 +4173,6 @@
       }
     },
     {
-      "slug": "b-aaarrgh-n-bicorne",
-      "name": "B'aaarrgh-n-Bicorne",
-      "defindex": 30718,
-      "aliases": [],
-      "slot": "head",
-      "classes": [
-        "scout"
-      ],
-      "kind": "class-exclusive",
-      "paintable": true,
-      "eventRestriction": null,
-      "styles": [],
-      "backpackIcon": {
-        "small": "http://media.steampowered.com/apps/440/icons/hwn2015_bargain_bicorne.7d991e392b74f22b6a2f6d78aa3988e0f1643e85.png",
-        "large": "http://media.steampowered.com/apps/440/icons/hwn2015_bargain_bicorne_large.79ad60b98fc021997b91a57c2159589ea18d45a0.png"
-      },
-      "price": {
-        "state": "priced",
-        "referenceVariant": {
-          "quality": "unique",
-          "craftable": true
-        },
-        "currency": "metal",
-        "blanket": false,
-        "spread": {
-          "low": {
-            "value": 45.66,
-            "metal": {
-              "scrap": 411,
-              "refined": 45.6667,
-              "notation": "45.66 ref"
-            }
-          },
-          "mid": {
-            "value": 47.769999999999996,
-            "metal": {
-              "scrap": 430,
-              "refined": 47.7778,
-              "notation": "47.77 ref"
-            }
-          },
-          "high": {
-            "value": 49.88,
-            "metal": {
-              "scrap": 449,
-              "refined": 49.8889,
-              "notation": "49.88 ref"
-            }
-          }
-        },
-        "lastUpdatedAt": "2026-05-06T16:10:09.000Z"
-      }
-    },
-    {
-      "slug": "b-aaarrgh-n-britches",
-      "name": "B'aaarrgh-n-Britches",
-      "defindex": 30719,
-      "aliases": [],
-      "slot": "misc",
-      "classes": [
-        "scout"
-      ],
-      "kind": "class-exclusive",
-      "paintable": false,
-      "eventRestriction": null,
-      "styles": [],
-      "backpackIcon": {
-        "small": "http://media.steampowered.com/apps/440/icons/hwn2015_bargain_britches.3dcb12ff3cab9d3f562ef38a52bf4a6130b2466d.png",
-        "large": "http://media.steampowered.com/apps/440/icons/hwn2015_bargain_britches_large.ec6022e0c02bafbd3c76ac4fa4af7228a1608f8b.png"
-      },
-      "price": {
-        "state": "priced",
-        "referenceVariant": {
-          "quality": "unique",
-          "craftable": true
-        },
-        "currency": "metal",
-        "blanket": false,
-        "spread": {
-          "low": {
-            "value": 19.44,
-            "metal": {
-              "scrap": 175,
-              "refined": 19.4444,
-              "notation": "19.44 ref"
-            }
-          },
-          "mid": {
-            "value": 21.05,
-            "metal": {
-              "scrap": 189,
-              "refined": 21,
-              "notation": "21 ref"
-            }
-          },
-          "high": {
-            "value": 22.66,
-            "metal": {
-              "scrap": 204,
-              "refined": 22.6667,
-              "notation": "22.66 ref"
-            }
-          }
-        },
-        "lastUpdatedAt": "2026-04-25T04:11:27.000Z"
-      }
-    },
-    {
       "slug": "b-ankh",
       "name": "B-Ankh!",
       "defindex": 547,
@@ -4397,7 +4289,115 @@
       }
     },
     {
-      "slug": "backbiter-s-billycock",
+      "slug": "baaarrgh-n-bicorne",
+      "name": "B'aaarrgh-n-Bicorne",
+      "defindex": 30718,
+      "aliases": [],
+      "slot": "head",
+      "classes": [
+        "scout"
+      ],
+      "kind": "class-exclusive",
+      "paintable": true,
+      "eventRestriction": null,
+      "styles": [],
+      "backpackIcon": {
+        "small": "http://media.steampowered.com/apps/440/icons/hwn2015_bargain_bicorne.7d991e392b74f22b6a2f6d78aa3988e0f1643e85.png",
+        "large": "http://media.steampowered.com/apps/440/icons/hwn2015_bargain_bicorne_large.79ad60b98fc021997b91a57c2159589ea18d45a0.png"
+      },
+      "price": {
+        "state": "priced",
+        "referenceVariant": {
+          "quality": "unique",
+          "craftable": true
+        },
+        "currency": "metal",
+        "blanket": false,
+        "spread": {
+          "low": {
+            "value": 45.66,
+            "metal": {
+              "scrap": 411,
+              "refined": 45.6667,
+              "notation": "45.66 ref"
+            }
+          },
+          "mid": {
+            "value": 47.769999999999996,
+            "metal": {
+              "scrap": 430,
+              "refined": 47.7778,
+              "notation": "47.77 ref"
+            }
+          },
+          "high": {
+            "value": 49.88,
+            "metal": {
+              "scrap": 449,
+              "refined": 49.8889,
+              "notation": "49.88 ref"
+            }
+          }
+        },
+        "lastUpdatedAt": "2026-05-06T16:10:09.000Z"
+      }
+    },
+    {
+      "slug": "baaarrgh-n-britches",
+      "name": "B'aaarrgh-n-Britches",
+      "defindex": 30719,
+      "aliases": [],
+      "slot": "misc",
+      "classes": [
+        "scout"
+      ],
+      "kind": "class-exclusive",
+      "paintable": false,
+      "eventRestriction": null,
+      "styles": [],
+      "backpackIcon": {
+        "small": "http://media.steampowered.com/apps/440/icons/hwn2015_bargain_britches.3dcb12ff3cab9d3f562ef38a52bf4a6130b2466d.png",
+        "large": "http://media.steampowered.com/apps/440/icons/hwn2015_bargain_britches_large.ec6022e0c02bafbd3c76ac4fa4af7228a1608f8b.png"
+      },
+      "price": {
+        "state": "priced",
+        "referenceVariant": {
+          "quality": "unique",
+          "craftable": true
+        },
+        "currency": "metal",
+        "blanket": false,
+        "spread": {
+          "low": {
+            "value": 19.44,
+            "metal": {
+              "scrap": 175,
+              "refined": 19.4444,
+              "notation": "19.44 ref"
+            }
+          },
+          "mid": {
+            "value": 21.05,
+            "metal": {
+              "scrap": 189,
+              "refined": 21,
+              "notation": "21 ref"
+            }
+          },
+          "high": {
+            "value": 22.66,
+            "metal": {
+              "scrap": 204,
+              "refined": 22.6667,
+              "notation": "22.66 ref"
+            }
+          }
+        },
+        "lastUpdatedAt": "2026-04-25T04:11:27.000Z"
+      }
+    },
+    {
+      "slug": "backbiters-billycock",
       "name": "Backbiter's Billycock",
       "defindex": 108,
       "aliases": [],
@@ -4451,7 +4451,7 @@
       }
     },
     {
-      "slug": "backbreaker-s-guards",
+      "slug": "backbreakers-guards",
       "name": "Backbreaker's Guards",
       "defindex": 31039,
       "aliases": [],
@@ -4505,7 +4505,7 @@
       }
     },
     {
-      "slug": "backbreaker-s-skullcracker",
+      "slug": "backbreakers-skullcracker",
       "name": "Backbreaker's Skullcracker",
       "defindex": 31038,
       "aliases": [],
@@ -4613,7 +4613,7 @@
       }
     },
     {
-      "slug": "backstabber-s-boomslang",
+      "slug": "backstabbers-boomslang",
       "name": "Backstabber's Boomslang",
       "defindex": 30353,
       "aliases": [],
@@ -5385,7 +5385,7 @@
       }
     },
     {
-      "slug": "bandit-s-boots",
+      "slug": "bandits-boots",
       "name": "Bandit's Boots",
       "defindex": 31015,
       "aliases": [],
@@ -5952,7 +5952,7 @@
       }
     },
     {
-      "slug": "baseball-bill-s-sports-shine",
+      "slug": "baseball-bills-sports-shine",
       "name": "Baseball Bill's Sports Shine",
       "defindex": 111,
       "aliases": [],
@@ -6184,7 +6184,7 @@
       }
     },
     {
-      "slug": "batter-s-beak",
+      "slug": "batters-beak",
       "name": "Batter's Beak",
       "defindex": 31229,
       "aliases": [],
@@ -6238,7 +6238,7 @@
       }
     },
     {
-      "slug": "batter-s-bracers",
+      "slug": "batters-bracers",
       "name": "Batter's Bracers",
       "defindex": 30722,
       "aliases": [],
@@ -6300,7 +6300,7 @@
       }
     },
     {
-      "slug": "batter-s-helmet",
+      "slug": "batters-helmet",
       "name": "Batter's Helmet",
       "defindex": 52,
       "aliases": [],
@@ -6851,7 +6851,7 @@
       }
     },
     {
-      "slug": "beachcomber-s-brim",
+      "slug": "beachcombers-brim",
       "name": "Beachcomber's Brim",
       "defindex": 31608,
       "aliases": [],
@@ -7710,7 +7710,7 @@
       }
     },
     {
-      "slug": "berliner-s-bucket-helm",
+      "slug": "berliners-bucket-helm",
       "name": "Berliner's Bucket Helm",
       "defindex": 303,
       "aliases": [],
@@ -8277,7 +8277,7 @@
       }
     },
     {
-      "slug": "bill-s-hat",
+      "slug": "bills-hat",
       "name": "Bill's Hat",
       "defindex": 126,
       "aliases": [],
@@ -8531,69 +8531,6 @@
       }
     },
     {
-      "slug": "bird-s-eye-viewer",
-      "name": "Bird's Eye Viewer",
-      "defindex": 31110,
-      "aliases": [],
-      "slot": "misc",
-      "classes": [
-        "spy"
-      ],
-      "kind": "class-exclusive",
-      "paintable": true,
-      "eventRestriction": null,
-      "styles": [
-        {
-          "index": 0,
-          "name": "Informant"
-        },
-        {
-          "index": 1,
-          "name": "Civilian"
-        }
-      ],
-      "backpackIcon": {
-        "small": "http://media.steampowered.com/apps/440/icons/sum20_birds_eye_viewer_style2.e8bfa452723173450a30155b4db6dbc281691ceb.png",
-        "large": "http://media.steampowered.com/apps/440/icons/sum20_birds_eye_viewer_style2_large.f4c1ce2520e0f79086da7fbb686ce81606a71ca4.png"
-      },
-      "price": {
-        "state": "priced",
-        "referenceVariant": {
-          "quality": "unique",
-          "craftable": true
-        },
-        "currency": "metal",
-        "blanket": false,
-        "spread": {
-          "low": {
-            "value": 11.88,
-            "metal": {
-              "scrap": 107,
-              "refined": 11.8889,
-              "notation": "11.88 ref"
-            }
-          },
-          "mid": {
-            "value": 13.77,
-            "metal": {
-              "scrap": 124,
-              "refined": 13.7778,
-              "notation": "13.77 ref"
-            }
-          },
-          "high": {
-            "value": 15.66,
-            "metal": {
-              "scrap": 141,
-              "refined": 15.6667,
-              "notation": "15.66 ref"
-            }
-          }
-        },
-        "lastUpdatedAt": "2026-04-21T14:32:53.000Z"
-      }
-    },
-    {
       "slug": "birdcage",
       "name": "Birdcage",
       "defindex": 615,
@@ -8764,7 +8701,70 @@
       }
     },
     {
-      "slug": "black-knight-s-bascinet",
+      "slug": "birds-eye-viewer",
+      "name": "Bird's Eye Viewer",
+      "defindex": 31110,
+      "aliases": [],
+      "slot": "misc",
+      "classes": [
+        "spy"
+      ],
+      "kind": "class-exclusive",
+      "paintable": true,
+      "eventRestriction": null,
+      "styles": [
+        {
+          "index": 0,
+          "name": "Informant"
+        },
+        {
+          "index": 1,
+          "name": "Civilian"
+        }
+      ],
+      "backpackIcon": {
+        "small": "http://media.steampowered.com/apps/440/icons/sum20_birds_eye_viewer_style2.e8bfa452723173450a30155b4db6dbc281691ceb.png",
+        "large": "http://media.steampowered.com/apps/440/icons/sum20_birds_eye_viewer_style2_large.f4c1ce2520e0f79086da7fbb686ce81606a71ca4.png"
+      },
+      "price": {
+        "state": "priced",
+        "referenceVariant": {
+          "quality": "unique",
+          "craftable": true
+        },
+        "currency": "metal",
+        "blanket": false,
+        "spread": {
+          "low": {
+            "value": 11.88,
+            "metal": {
+              "scrap": 107,
+              "refined": 11.8889,
+              "notation": "11.88 ref"
+            }
+          },
+          "mid": {
+            "value": 13.77,
+            "metal": {
+              "scrap": 124,
+              "refined": 13.7778,
+              "notation": "13.77 ref"
+            }
+          },
+          "high": {
+            "value": 15.66,
+            "metal": {
+              "scrap": 141,
+              "refined": 15.6667,
+              "notation": "15.66 ref"
+            }
+          }
+        },
+        "lastUpdatedAt": "2026-04-21T14:32:53.000Z"
+      }
+    },
+    {
+      "slug": "black-knights-bascinet",
       "name": "Black Knight's Bascinet",
       "defindex": 30582,
       "aliases": [],
@@ -9623,7 +9623,7 @@
       }
     },
     {
-      "slug": "bloke-s-bucket-hat",
+      "slug": "blokes-bucket-hat",
       "name": "Bloke's Bucket Hat",
       "defindex": 181,
       "aliases": [],
@@ -9754,7 +9754,7 @@
       }
     },
     {
-      "slug": "boarder-s-beanie",
+      "slug": "boarders-beanie",
       "name": "Boarder's Beanie",
       "defindex": 31415,
       "aliases": [],
@@ -10556,7 +10556,7 @@
       }
     },
     {
-      "slug": "bomber-s-bucket-hat",
+      "slug": "bombers-bucket-hat",
       "name": "Bomber's Bucket Hat",
       "defindex": 30547,
       "aliases": [],
@@ -11001,7 +11001,7 @@
       }
     },
     {
-      "slug": "bonk-batter-s-backup",
+      "slug": "bonk-batters-backup",
       "name": "Bonk Batter's Backup",
       "defindex": 30751,
       "aliases": [],
@@ -12154,7 +12154,7 @@
       }
     },
     {
-      "slug": "bozo-s-bouffant",
+      "slug": "bozos-bouffant",
       "name": "Bozo's Bouffant",
       "defindex": 30245,
       "aliases": [],
@@ -12208,7 +12208,7 @@
       }
     },
     {
-      "slug": "bozo-s-brogues",
+      "slug": "bozos-brogues",
       "name": "Bozo's Brogues",
       "defindex": 30301,
       "aliases": [],
@@ -13483,7 +13483,7 @@
       }
     },
     {
-      "slug": "brock-s-locks",
+      "slug": "brocks-locks",
       "name": "Brock's Locks",
       "defindex": 952,
       "aliases": [],
@@ -13853,7 +13853,7 @@
       }
     },
     {
-      "slug": "bruce-s-bonnet",
+      "slug": "bruces-bonnet",
       "name": "Bruce's Bonnet",
       "defindex": 30627,
       "aliases": [],
@@ -13907,7 +13907,7 @@
       }
     },
     {
-      "slug": "bruiser-s-bandanna",
+      "slug": "bruisers-bandanna",
       "name": "Bruiser's Bandanna",
       "defindex": 30397,
       "aliases": [],
@@ -14053,7 +14053,7 @@
       }
     },
     {
-      "slug": "brute-s-braces",
+      "slug": "brutes-braces",
       "name": "Brute's Braces",
       "defindex": 31453,
       "aliases": [],
@@ -14170,7 +14170,7 @@
       }
     },
     {
-      "slug": "buccaneer-s-bicorne",
+      "slug": "buccaneers-bicorne",
       "name": "Buccaneer's Bicorne",
       "defindex": 607,
       "aliases": [],
@@ -14224,7 +14224,116 @@
       }
     },
     {
-      "slug": "buck-s-brim",
+      "slug": "buck-turner-all-stars",
+      "name": "Buck Turner All-Stars",
+      "defindex": 1016,
+      "aliases": [],
+      "slot": "misc",
+      "classes": [
+        "scout",
+        "demoman"
+      ],
+      "kind": "multi-class",
+      "paintable": true,
+      "eventRestriction": null,
+      "styles": [],
+      "backpackIcon": {
+        "small": "http://media.steampowered.com/apps/440/icons/bit_trippers_demo.aff344a16077cdbe904df6c6aad7ae59523f7902.png",
+        "large": "http://media.steampowered.com/apps/440/icons/bit_trippers_demo_large.6db661776fd30bcdef77cdae1ab82b1df80036f8.png"
+      },
+      "price": {
+        "state": "priced",
+        "referenceVariant": {
+          "quality": "unique",
+          "craftable": true
+        },
+        "currency": "metal",
+        "blanket": false,
+        "spread": {
+          "low": {
+            "value": 21.33,
+            "metal": {
+              "scrap": 192,
+              "refined": 21.3333,
+              "notation": "21.33 ref"
+            }
+          },
+          "mid": {
+            "value": 22.775,
+            "metal": {
+              "scrap": 205,
+              "refined": 22.7778,
+              "notation": "22.77 ref"
+            }
+          },
+          "high": {
+            "value": 24.22,
+            "metal": {
+              "scrap": 218,
+              "refined": 24.2222,
+              "notation": "24.22 ref"
+            }
+          }
+        },
+        "lastUpdatedAt": "2026-04-20T19:02:29.000Z"
+      }
+    },
+    {
+      "slug": "buckaroos-hat",
+      "name": "Buckaroo's Hat",
+      "defindex": 322,
+      "aliases": [],
+      "slot": "head",
+      "classes": [
+        "engineer"
+      ],
+      "kind": "class-exclusive",
+      "paintable": true,
+      "eventRestriction": null,
+      "styles": [],
+      "backpackIcon": {
+        "small": "http://media.steampowered.com/apps/440/icons/engineer_buckaroos_hat.831cc29cde100265ad11e28b51dd0d57ad46fabd.png",
+        "large": "http://media.steampowered.com/apps/440/icons/engineer_buckaroos_hat_large.d75e5531d188f1bc46f491de80362688bf97a498.png"
+      },
+      "price": {
+        "state": "priced",
+        "referenceVariant": {
+          "quality": "unique",
+          "craftable": true
+        },
+        "currency": "hat",
+        "blanket": true,
+        "spread": {
+          "low": {
+            "value": 1,
+            "metal": {
+              "scrap": 12,
+              "refined": 1.3333,
+              "notation": "1.33 ref"
+            }
+          },
+          "mid": {
+            "value": 1,
+            "metal": {
+              "scrap": 12,
+              "refined": 1.3333,
+              "notation": "1.33 ref"
+            }
+          },
+          "high": {
+            "value": 1,
+            "metal": {
+              "scrap": 12,
+              "refined": 1.3333,
+              "notation": "1.33 ref"
+            }
+          }
+        },
+        "lastUpdatedAt": "2026-05-11T15:39:32.000Z"
+      }
+    },
+    {
+      "slug": "bucks-brim",
       "name": "Buck's Brim",
       "defindex": 31514,
       "aliases": [],
@@ -14295,116 +14404,7 @@
       }
     },
     {
-      "slug": "buck-turner-all-stars",
-      "name": "Buck Turner All-Stars",
-      "defindex": 1016,
-      "aliases": [],
-      "slot": "misc",
-      "classes": [
-        "scout",
-        "demoman"
-      ],
-      "kind": "multi-class",
-      "paintable": true,
-      "eventRestriction": null,
-      "styles": [],
-      "backpackIcon": {
-        "small": "http://media.steampowered.com/apps/440/icons/bit_trippers_demo.aff344a16077cdbe904df6c6aad7ae59523f7902.png",
-        "large": "http://media.steampowered.com/apps/440/icons/bit_trippers_demo_large.6db661776fd30bcdef77cdae1ab82b1df80036f8.png"
-      },
-      "price": {
-        "state": "priced",
-        "referenceVariant": {
-          "quality": "unique",
-          "craftable": true
-        },
-        "currency": "metal",
-        "blanket": false,
-        "spread": {
-          "low": {
-            "value": 21.33,
-            "metal": {
-              "scrap": 192,
-              "refined": 21.3333,
-              "notation": "21.33 ref"
-            }
-          },
-          "mid": {
-            "value": 22.775,
-            "metal": {
-              "scrap": 205,
-              "refined": 22.7778,
-              "notation": "22.77 ref"
-            }
-          },
-          "high": {
-            "value": 24.22,
-            "metal": {
-              "scrap": 218,
-              "refined": 24.2222,
-              "notation": "24.22 ref"
-            }
-          }
-        },
-        "lastUpdatedAt": "2026-04-20T19:02:29.000Z"
-      }
-    },
-    {
-      "slug": "buckaroo-s-hat",
-      "name": "Buckaroo's Hat",
-      "defindex": 322,
-      "aliases": [],
-      "slot": "head",
-      "classes": [
-        "engineer"
-      ],
-      "kind": "class-exclusive",
-      "paintable": true,
-      "eventRestriction": null,
-      "styles": [],
-      "backpackIcon": {
-        "small": "http://media.steampowered.com/apps/440/icons/engineer_buckaroos_hat.831cc29cde100265ad11e28b51dd0d57ad46fabd.png",
-        "large": "http://media.steampowered.com/apps/440/icons/engineer_buckaroos_hat_large.d75e5531d188f1bc46f491de80362688bf97a498.png"
-      },
-      "price": {
-        "state": "priced",
-        "referenceVariant": {
-          "quality": "unique",
-          "craftable": true
-        },
-        "currency": "hat",
-        "blanket": true,
-        "spread": {
-          "low": {
-            "value": 1,
-            "metal": {
-              "scrap": 12,
-              "refined": 1.3333,
-              "notation": "1.33 ref"
-            }
-          },
-          "mid": {
-            "value": 1,
-            "metal": {
-              "scrap": 12,
-              "refined": 1.3333,
-              "notation": "1.33 ref"
-            }
-          },
-          "high": {
-            "value": 1,
-            "metal": {
-              "scrap": 12,
-              "refined": 1.3333,
-              "notation": "1.33 ref"
-            }
-          }
-        },
-        "lastUpdatedAt": "2026-05-11T15:39:32.000Z"
-      }
-    },
-    {
-      "slug": "builder-s-blueprints",
+      "slug": "builders-blueprints",
       "name": "Builder's Blueprints",
       "defindex": 606,
       "aliases": [],
@@ -14691,7 +14691,7 @@
       }
     },
     {
-      "slug": "bunnyhopper-s-ballistics-vest",
+      "slug": "bunnyhoppers-ballistics-vest",
       "name": "Bunnyhopper's Ballistics Vest",
       "defindex": 30756,
       "aliases": [],
@@ -15069,7 +15069,7 @@
       }
     },
     {
-      "slug": "burny-s-boney-bonnet",
+      "slug": "burnys-boney-bonnet",
       "name": "Burny's Boney Bonnet",
       "defindex": 30203,
       "aliases": [],
@@ -15231,7 +15231,7 @@
       }
     },
     {
-      "slug": "bushman-s-boonie",
+      "slug": "bushmans-boonie",
       "name": "Bushman's Boonie",
       "defindex": 720,
       "aliases": [],
@@ -15285,7 +15285,7 @@
       }
     },
     {
-      "slug": "bushman-s-bristles",
+      "slug": "bushmans-bristles",
       "name": "Bushman's Bristles",
       "defindex": 30597,
       "aliases": [],
@@ -15570,7 +15570,7 @@
       }
     },
     {
-      "slug": "byte-d-beak",
+      "slug": "byted-beak",
       "name": "Byte'd Beak",
       "defindex": 30052,
       "aliases": [],
@@ -15678,7 +15678,7 @@
       }
     },
     {
-      "slug": "cadaver-s-capper",
+      "slug": "cadavers-capper",
       "name": "Cadaver's Capper",
       "defindex": 30251,
       "aliases": [],
@@ -15732,7 +15732,7 @@
       }
     },
     {
-      "slug": "cadaver-s-cranium",
+      "slug": "cadavers-cranium",
       "name": "Cadaver's Cranium",
       "defindex": 290,
       "aliases": [],
@@ -16429,7 +16429,7 @@
       }
     },
     {
-      "slug": "candyman-s-cap",
+      "slug": "candymans-cap",
       "name": "Candyman's Cap",
       "defindex": 30261,
       "aliases": [],
@@ -16480,60 +16480,6 @@
           }
         },
         "lastUpdatedAt": "2022-12-29T22:37:22.000Z"
-      }
-    },
-    {
-      "slug": "cap-n-calamari",
-      "name": "Cap'n Calamari",
-      "defindex": 30193,
-      "aliases": [],
-      "slot": "misc",
-      "classes": [
-        "demoman"
-      ],
-      "kind": "class-exclusive",
-      "paintable": true,
-      "eventRestriction": "halloween_or_fullmoon",
-      "styles": [],
-      "backpackIcon": {
-        "small": "http://media.steampowered.com/apps/440/icons/hw2013_octo_face.5d14dbf382386ee465d52af7e369b06cac8348ef.png",
-        "large": "http://media.steampowered.com/apps/440/icons/hw2013_octo_face_large.7e10626fc6284c71cd4c4761875779cd211e9cd9.png"
-      },
-      "price": {
-        "state": "priced",
-        "referenceVariant": {
-          "quality": "unique",
-          "craftable": true
-        },
-        "currency": "keys",
-        "blanket": false,
-        "spread": {
-          "low": {
-            "value": 9.4,
-            "metal": {
-              "scrap": 5424,
-              "refined": 602.6667,
-              "notation": "9 keys, 25.66 ref"
-            }
-          },
-          "mid": {
-            "value": 9.9,
-            "metal": {
-              "scrap": 5712,
-              "refined": 634.6667,
-              "notation": "9 keys, 57.66 ref"
-            }
-          },
-          "high": {
-            "value": 10.4,
-            "metal": {
-              "scrap": 6001,
-              "refined": 666.7778,
-              "notation": "10 keys, 25.66 ref"
-            }
-          }
-        },
-        "lastUpdatedAt": "2024-12-02T13:48:24.000Z"
       }
     },
     {
@@ -16600,7 +16546,61 @@
       }
     },
     {
-      "slug": "capo-s-capper",
+      "slug": "capn-calamari",
+      "name": "Cap'n Calamari",
+      "defindex": 30193,
+      "aliases": [],
+      "slot": "misc",
+      "classes": [
+        "demoman"
+      ],
+      "kind": "class-exclusive",
+      "paintable": true,
+      "eventRestriction": "halloween_or_fullmoon",
+      "styles": [],
+      "backpackIcon": {
+        "small": "http://media.steampowered.com/apps/440/icons/hw2013_octo_face.5d14dbf382386ee465d52af7e369b06cac8348ef.png",
+        "large": "http://media.steampowered.com/apps/440/icons/hw2013_octo_face_large.7e10626fc6284c71cd4c4761875779cd211e9cd9.png"
+      },
+      "price": {
+        "state": "priced",
+        "referenceVariant": {
+          "quality": "unique",
+          "craftable": true
+        },
+        "currency": "keys",
+        "blanket": false,
+        "spread": {
+          "low": {
+            "value": 9.4,
+            "metal": {
+              "scrap": 5424,
+              "refined": 602.6667,
+              "notation": "9 keys, 25.66 ref"
+            }
+          },
+          "mid": {
+            "value": 9.9,
+            "metal": {
+              "scrap": 5712,
+              "refined": 634.6667,
+              "notation": "9 keys, 57.66 ref"
+            }
+          },
+          "high": {
+            "value": 10.4,
+            "metal": {
+              "scrap": 6001,
+              "refined": 666.7778,
+              "notation": "10 keys, 25.66 ref"
+            }
+          }
+        },
+        "lastUpdatedAt": "2024-12-02T13:48:24.000Z"
+      }
+    },
+    {
+      "slug": "capos-capper",
       "name": "Capo's Capper",
       "defindex": 427,
       "aliases": [],
@@ -16716,60 +16716,6 @@
       }
     },
     {
-      "slug": "captain-s-cocktails",
-      "name": "Captain's Cocktails",
-      "defindex": 731,
-      "aliases": [],
-      "slot": "misc",
-      "classes": [
-        "soldier"
-      ],
-      "kind": "class-exclusive",
-      "paintable": false,
-      "eventRestriction": null,
-      "styles": [],
-      "backpackIcon": {
-        "small": "http://media.steampowered.com/apps/440/icons/ds_can_grenades.9f3b28f735accd1459e7a325dbbd5e9120ccb2be.png",
-        "large": "http://media.steampowered.com/apps/440/icons/ds_can_grenades_large.132a9d8ab756bd34529029a79fcbc5a50c4a13da.png"
-      },
-      "price": {
-        "state": "priced",
-        "referenceVariant": {
-          "quality": "unique",
-          "craftable": true
-        },
-        "currency": "metal",
-        "blanket": false,
-        "spread": {
-          "low": {
-            "value": 1.22,
-            "metal": {
-              "scrap": 11,
-              "refined": 1.2222,
-              "notation": "1.22 ref"
-            }
-          },
-          "mid": {
-            "value": 1.275,
-            "metal": {
-              "scrap": 11,
-              "refined": 1.2222,
-              "notation": "1.22 ref"
-            }
-          },
-          "high": {
-            "value": 1.33,
-            "metal": {
-              "scrap": 12,
-              "refined": 1.3333,
-              "notation": "1.33 ref"
-            }
-          }
-        },
-        "lastUpdatedAt": "2026-07-07T12:42:59.000Z"
-      }
-    },
-    {
       "slug": "captain-space-mann",
       "name": "Captain Space Mann",
       "defindex": 30646,
@@ -16832,7 +16778,61 @@
       }
     },
     {
-      "slug": "cardiologist-s-cardigan",
+      "slug": "captains-cocktails",
+      "name": "Captain's Cocktails",
+      "defindex": 731,
+      "aliases": [],
+      "slot": "misc",
+      "classes": [
+        "soldier"
+      ],
+      "kind": "class-exclusive",
+      "paintable": false,
+      "eventRestriction": null,
+      "styles": [],
+      "backpackIcon": {
+        "small": "http://media.steampowered.com/apps/440/icons/ds_can_grenades.9f3b28f735accd1459e7a325dbbd5e9120ccb2be.png",
+        "large": "http://media.steampowered.com/apps/440/icons/ds_can_grenades_large.132a9d8ab756bd34529029a79fcbc5a50c4a13da.png"
+      },
+      "price": {
+        "state": "priced",
+        "referenceVariant": {
+          "quality": "unique",
+          "craftable": true
+        },
+        "currency": "metal",
+        "blanket": false,
+        "spread": {
+          "low": {
+            "value": 1.22,
+            "metal": {
+              "scrap": 11,
+              "refined": 1.2222,
+              "notation": "1.22 ref"
+            }
+          },
+          "mid": {
+            "value": 1.275,
+            "metal": {
+              "scrap": 11,
+              "refined": 1.2222,
+              "notation": "1.22 ref"
+            }
+          },
+          "high": {
+            "value": 1.33,
+            "metal": {
+              "scrap": 12,
+              "refined": 1.3333,
+              "notation": "1.33 ref"
+            }
+          }
+        },
+        "lastUpdatedAt": "2026-07-07T12:42:59.000Z"
+      }
+    },
+    {
+      "slug": "cardiologists-cardigan",
       "name": "Cardiologist's Cardigan",
       "defindex": 31600,
       "aliases": [],
@@ -17164,7 +17164,7 @@
       }
     },
     {
-      "slug": "carouser-s-capotain",
+      "slug": "carousers-capotain",
       "name": "Carouser's Capotain",
       "defindex": 259,
       "aliases": [],
@@ -17380,60 +17380,6 @@
       }
     },
     {
-      "slug": "cat-s-pajamas",
-      "name": "Cat's Pajamas",
-      "defindex": 30937,
-      "aliases": [],
-      "slot": "head",
-      "classes": [
-        "pyro"
-      ],
-      "kind": "class-exclusive",
-      "paintable": true,
-      "eventRestriction": null,
-      "styles": [],
-      "backpackIcon": {
-        "small": "http://media.steampowered.com/apps/440/icons/dec17_cats_pajamas.dd85ee26930a6a6f5783dc4439ea851d33f04ea5.png",
-        "large": "http://media.steampowered.com/apps/440/icons/dec17_cats_pajamas_large.ccb5db279410ebde239b8836f74b065af93f705f.png"
-      },
-      "price": {
-        "state": "priced",
-        "referenceVariant": {
-          "quality": "unique",
-          "craftable": true
-        },
-        "currency": "keys",
-        "blanket": false,
-        "spread": {
-          "low": {
-            "value": 4.8,
-            "metal": {
-              "scrap": 2770,
-              "refined": 307.7778,
-              "notation": "4 keys, 51.33 ref"
-            }
-          },
-          "mid": {
-            "value": 5.15,
-            "metal": {
-              "scrap": 2972,
-              "refined": 330.2222,
-              "notation": "5 keys, 9.66 ref"
-            }
-          },
-          "high": {
-            "value": 5.5,
-            "metal": {
-              "scrap": 3174,
-              "refined": 352.6667,
-              "notation": "5 keys, 32.11 ref"
-            }
-          }
-        },
-        "lastUpdatedAt": "2026-05-19T14:29:14.000Z"
-      }
-    },
-    {
       "slug": "catastrophic-companions",
       "name": "Catastrophic Companions",
       "defindex": 30706,
@@ -17496,7 +17442,7 @@
       }
     },
     {
-      "slug": "catcher-s-companion",
+      "slug": "catchers-companion",
       "name": "Catcher's Companion",
       "defindex": 31021,
       "aliases": [],
@@ -17559,7 +17505,61 @@
       }
     },
     {
-      "slug": "cattleman-s-kettle",
+      "slug": "cats-pajamas",
+      "name": "Cat's Pajamas",
+      "defindex": 30937,
+      "aliases": [],
+      "slot": "head",
+      "classes": [
+        "pyro"
+      ],
+      "kind": "class-exclusive",
+      "paintable": true,
+      "eventRestriction": null,
+      "styles": [],
+      "backpackIcon": {
+        "small": "http://media.steampowered.com/apps/440/icons/dec17_cats_pajamas.dd85ee26930a6a6f5783dc4439ea851d33f04ea5.png",
+        "large": "http://media.steampowered.com/apps/440/icons/dec17_cats_pajamas_large.ccb5db279410ebde239b8836f74b065af93f705f.png"
+      },
+      "price": {
+        "state": "priced",
+        "referenceVariant": {
+          "quality": "unique",
+          "craftable": true
+        },
+        "currency": "keys",
+        "blanket": false,
+        "spread": {
+          "low": {
+            "value": 4.8,
+            "metal": {
+              "scrap": 2770,
+              "refined": 307.7778,
+              "notation": "4 keys, 51.33 ref"
+            }
+          },
+          "mid": {
+            "value": 5.15,
+            "metal": {
+              "scrap": 2972,
+              "refined": 330.2222,
+              "notation": "5 keys, 9.66 ref"
+            }
+          },
+          "high": {
+            "value": 5.5,
+            "metal": {
+              "scrap": 3174,
+              "refined": 352.6667,
+              "notation": "5 keys, 32.11 ref"
+            }
+          }
+        },
+        "lastUpdatedAt": "2026-05-19T14:29:14.000Z"
+      }
+    },
+    {
+      "slug": "cattlemans-kettle",
       "name": "Cattleman's Kettle",
       "defindex": 31523,
       "aliases": [],
@@ -17622,7 +17622,7 @@
       }
     },
     {
-      "slug": "cauterizer-s-caudal-appendage",
+      "slug": "cauterizers-caudal-appendage",
       "name": "Cauterizer's Caudal Appendage",
       "defindex": 30225,
       "aliases": [],
@@ -17789,7 +17789,7 @@
       }
     },
     {
-      "slug": "charmer-s-chapeau",
+      "slug": "charmers-chapeau",
       "name": "Charmer's Chapeau",
       "defindex": 397,
       "aliases": [],
@@ -18265,7 +18265,7 @@
       }
     },
     {
-      "slug": "chieftain-s-challenge",
+      "slug": "chieftains-challenge",
       "name": "Chieftain's Challenge",
       "defindex": 250,
       "aliases": [],
@@ -18444,7 +18444,7 @@
       }
     },
     {
-      "slug": "chiromancer-s-kit",
+      "slug": "chiromancers-kit",
       "name": "Chiromancer's Kit",
       "defindex": 31478,
       "aliases": [],
@@ -19164,7 +19164,7 @@
       }
     },
     {
-      "slug": "cleaner-s-cap",
+      "slug": "cleaners-cap",
       "name": "Cleaner's Cap",
       "defindex": 31376,
       "aliases": [],
@@ -19464,7 +19464,7 @@
       }
     },
     {
-      "slug": "clown-s-cover-up",
+      "slug": "clowns-cover-up",
       "name": "Clown's Cover-Up",
       "defindex": 31386,
       "aliases": [],
@@ -20453,7 +20453,7 @@
       }
     },
     {
-      "slug": "colonel-s-coat",
+      "slug": "colonels-coat",
       "name": "Colonel's Coat",
       "defindex": 30361,
       "aliases": [],
@@ -20686,7 +20686,7 @@
       }
     },
     {
-      "slug": "combat-medic-s-crusher-cap",
+      "slug": "combat-medics-crusher-cap",
       "name": "Combat Medic's Crusher Cap",
       "defindex": 867,
       "aliases": [],
@@ -21019,7 +21019,7 @@
       }
     },
     {
-      "slug": "commissar-s-coat",
+      "slug": "commissars-coat",
       "name": "Commissar's Coat",
       "defindex": 30633,
       "aliases": [],
@@ -21426,7 +21426,7 @@
       }
     },
     {
-      "slug": "conagher-s-combover",
+      "slug": "conaghers-combover",
       "name": "Conagher's Combover",
       "defindex": 30592,
       "aliases": [],
@@ -21480,7 +21480,7 @@
       }
     },
     {
-      "slug": "conagher-s-utility-idol",
+      "slug": "conaghers-utility-idol",
       "name": "Conagher's Utility Idol",
       "defindex": 30908,
       "aliases": [],
@@ -21651,7 +21651,7 @@
       }
     },
     {
-      "slug": "conjurer-s-cowl",
+      "slug": "conjurers-cowl",
       "name": "Conjurer's Cowl",
       "defindex": 465,
       "aliases": [],
@@ -21705,7 +21705,7 @@
       }
     },
     {
-      "slug": "connoisseur-s-cap",
+      "slug": "connoisseurs-cap",
       "name": "Connoisseur's Cap",
       "defindex": 394,
       "aliases": [],
@@ -21813,7 +21813,7 @@
       }
     },
     {
-      "slug": "consigliere-s-coverup",
+      "slug": "consiglieres-coverup",
       "name": "Consigliere's Coverup",
       "defindex": 31504,
       "aliases": [],
@@ -21939,7 +21939,7 @@
       }
     },
     {
-      "slug": "constructor-s-cover",
+      "slug": "constructors-cover",
       "name": "Constructor's Cover",
       "defindex": 31395,
       "aliases": [],
@@ -22461,7 +22461,7 @@
       }
     },
     {
-      "slug": "copper-s-hard-top",
+      "slug": "coppers-hard-top",
       "name": "Copper's Hard Top",
       "defindex": 478,
       "aliases": [],
@@ -22982,7 +22982,7 @@
       }
     },
     {
-      "slug": "coupe-d-isaster",
+      "slug": "coupe-disaster",
       "name": "Coupe D'isaster",
       "defindex": 330,
       "aliases": [],
@@ -23036,7 +23036,7 @@
       }
     },
     {
-      "slug": "courtier-s-collar",
+      "slug": "courtiers-collar",
       "name": "Courtier's Collar",
       "defindex": 30574,
       "aliases": [],
@@ -23972,7 +23972,7 @@
       }
     },
     {
-      "slug": "creature-s-grin",
+      "slug": "creatures-grin",
       "name": "Creature's Grin",
       "defindex": 30525,
       "aliases": [],
@@ -24097,7 +24097,7 @@
       }
     },
     {
-      "slug": "cremator-s-conscience",
+      "slug": "cremators-conscience",
       "name": "Cremator's Conscience",
       "defindex": 632,
       "aliases": [],
@@ -24645,7 +24645,7 @@
       }
     },
     {
-      "slug": "croft-s-crest",
+      "slug": "crofts-crest",
       "name": "Croft's Crest",
       "defindex": 1024,
       "aliases": [],
@@ -24707,7 +24707,7 @@
       }
     },
     {
-      "slug": "crone-s-dome",
+      "slug": "crones-dome",
       "name": "Crone's Dome",
       "defindex": 920,
       "aliases": [],
@@ -24823,7 +24823,7 @@
       }
     },
     {
-      "slug": "crook-s-cap",
+      "slug": "crooks-cap",
       "name": "Crook's Cap",
       "defindex": 31452,
       "aliases": [],
@@ -25039,7 +25039,7 @@
       }
     },
     {
-      "slug": "crosslinker-s-coil",
+      "slug": "crosslinkers-coil",
       "name": "Crosslinker's Coil",
       "defindex": 30058,
       "aliases": [],
@@ -25172,7 +25172,7 @@
       }
     },
     {
-      "slug": "crusader-s-getup",
+      "slug": "crusaders-getup",
       "name": "Crusader's Getup",
       "defindex": 30716,
       "aliases": [],
@@ -27017,60 +27017,6 @@
       }
     },
     {
-      "slug": "dead-er-alive",
-      "name": "Dead'er Alive",
-      "defindex": 30707,
-      "aliases": [],
-      "slot": "misc",
-      "classes": [
-        "engineer"
-      ],
-      "kind": "class-exclusive",
-      "paintable": false,
-      "eventRestriction": null,
-      "styles": [],
-      "backpackIcon": {
-        "small": "http://media.steampowered.com/apps/440/icons/hwn2015_mechanical_engineer.8bd0f39accd667b6941981ca3a599309d2dc2f9a.png",
-        "large": "http://media.steampowered.com/apps/440/icons/hwn2015_mechanical_engineer_large.803d6032bb0c58e7aabb1215e547cc8d1586d25f.png"
-      },
-      "price": {
-        "state": "priced",
-        "referenceVariant": {
-          "quality": "unique",
-          "craftable": true
-        },
-        "currency": "keys",
-        "blanket": false,
-        "spread": {
-          "low": {
-            "value": 7.45,
-            "metal": {
-              "scrap": 4299,
-              "refined": 477.6667,
-              "notation": "7 keys, 28.88 ref"
-            }
-          },
-          "mid": {
-            "value": 7.65,
-            "metal": {
-              "scrap": 4414,
-              "refined": 490.4444,
-              "notation": "7 keys, 41.66 ref"
-            }
-          },
-          "high": {
-            "value": 7.85,
-            "metal": {
-              "scrap": 4529,
-              "refined": 503.2222,
-              "notation": "7 keys, 54.44 ref"
-            }
-          }
-        },
-        "lastUpdatedAt": "2026-01-30T13:40:43.000Z"
-      }
-    },
-    {
       "slug": "dead-head",
       "name": "Dead Head",
       "defindex": 30775,
@@ -27391,6 +27337,60 @@
       }
     },
     {
+      "slug": "deader-alive",
+      "name": "Dead'er Alive",
+      "defindex": 30707,
+      "aliases": [],
+      "slot": "misc",
+      "classes": [
+        "engineer"
+      ],
+      "kind": "class-exclusive",
+      "paintable": false,
+      "eventRestriction": null,
+      "styles": [],
+      "backpackIcon": {
+        "small": "http://media.steampowered.com/apps/440/icons/hwn2015_mechanical_engineer.8bd0f39accd667b6941981ca3a599309d2dc2f9a.png",
+        "large": "http://media.steampowered.com/apps/440/icons/hwn2015_mechanical_engineer_large.803d6032bb0c58e7aabb1215e547cc8d1586d25f.png"
+      },
+      "price": {
+        "state": "priced",
+        "referenceVariant": {
+          "quality": "unique",
+          "craftable": true
+        },
+        "currency": "keys",
+        "blanket": false,
+        "spread": {
+          "low": {
+            "value": 7.45,
+            "metal": {
+              "scrap": 4299,
+              "refined": 477.6667,
+              "notation": "7 keys, 28.88 ref"
+            }
+          },
+          "mid": {
+            "value": 7.65,
+            "metal": {
+              "scrap": 4414,
+              "refined": 490.4444,
+              "notation": "7 keys, 41.66 ref"
+            }
+          },
+          "high": {
+            "value": 7.85,
+            "metal": {
+              "scrap": 4529,
+              "refined": 503.2222,
+              "notation": "7 keys, 54.44 ref"
+            }
+          }
+        },
+        "lastUpdatedAt": "2026-01-30T13:40:43.000Z"
+      }
+    },
+    {
       "slug": "deadliest-duckling",
       "name": "Deadliest Duckling",
       "defindex": 948,
@@ -27551,7 +27551,7 @@
       }
     },
     {
-      "slug": "dealer-s-visor",
+      "slug": "dealers-visor",
       "name": "Dealer's Visor",
       "defindex": 292,
       "aliases": [],
@@ -27605,7 +27605,7 @@
       }
     },
     {
-      "slug": "death-racer-s-helmet",
+      "slug": "death-racers-helmet",
       "name": "Death Racer's Helmet",
       "defindex": 30686,
       "aliases": [],
@@ -28068,7 +28068,7 @@
       }
     },
     {
-      "slug": "deity-s-dress",
+      "slug": "deitys-dress",
       "name": "Deity's Dress",
       "defindex": 30902,
       "aliases": [],
@@ -28122,7 +28122,7 @@
       }
     },
     {
-      "slug": "delinquent-s-down-vest",
+      "slug": "delinquents-down-vest",
       "name": "Delinquent's Down Vest",
       "defindex": 30134,
       "aliases": [],
@@ -28414,60 +28414,6 @@
       }
     },
     {
-      "slug": "demo-s-dustcatcher",
-      "name": "Demo's Dustcatcher",
-      "defindex": 30788,
-      "aliases": [],
-      "slot": "misc",
-      "classes": [
-        "demoman"
-      ],
-      "kind": "class-exclusive",
-      "paintable": true,
-      "eventRestriction": null,
-      "styles": [],
-      "backpackIcon": {
-        "small": "http://media.steampowered.com/apps/440/icons/demolitionists_dustcatcher.81635dfc108335cca5fae7d864829c16d6aca074.png",
-        "large": "http://media.steampowered.com/apps/440/icons/demolitionists_dustcatcher_large.f765d637738991ed82c1c330f99832c35736f810.png"
-      },
-      "price": {
-        "state": "priced",
-        "referenceVariant": {
-          "quality": "unique",
-          "craftable": true
-        },
-        "currency": "metal",
-        "blanket": false,
-        "spread": {
-          "low": {
-            "value": 2.88,
-            "metal": {
-              "scrap": 26,
-              "refined": 2.8889,
-              "notation": "2.88 ref"
-            }
-          },
-          "mid": {
-            "value": 2.995,
-            "metal": {
-              "scrap": 27,
-              "refined": 3,
-              "notation": "3 ref"
-            }
-          },
-          "high": {
-            "value": 3.11,
-            "metal": {
-              "scrap": 28,
-              "refined": 3.1111,
-              "notation": "3.11 ref"
-            }
-          }
-        },
-        "lastUpdatedAt": "2026-02-01T13:03:45.000Z"
-      }
-    },
-    {
       "slug": "demobot-armor",
       "name": "Demobot Armor",
       "defindex": 30143,
@@ -28574,7 +28520,7 @@
       }
     },
     {
-      "slug": "demoman-s-fro",
+      "slug": "demomans-fro",
       "name": "Demoman's Fro",
       "defindex": 47,
       "aliases": [],
@@ -28687,6 +28633,60 @@
           }
         },
         "lastUpdatedAt": "2026-05-02T16:01:52.000Z"
+      }
+    },
+    {
+      "slug": "demos-dustcatcher",
+      "name": "Demo's Dustcatcher",
+      "defindex": 30788,
+      "aliases": [],
+      "slot": "misc",
+      "classes": [
+        "demoman"
+      ],
+      "kind": "class-exclusive",
+      "paintable": true,
+      "eventRestriction": null,
+      "styles": [],
+      "backpackIcon": {
+        "small": "http://media.steampowered.com/apps/440/icons/demolitionists_dustcatcher.81635dfc108335cca5fae7d864829c16d6aca074.png",
+        "large": "http://media.steampowered.com/apps/440/icons/demolitionists_dustcatcher_large.f765d637738991ed82c1c330f99832c35736f810.png"
+      },
+      "price": {
+        "state": "priced",
+        "referenceVariant": {
+          "quality": "unique",
+          "craftable": true
+        },
+        "currency": "metal",
+        "blanket": false,
+        "spread": {
+          "low": {
+            "value": 2.88,
+            "metal": {
+              "scrap": 26,
+              "refined": 2.8889,
+              "notation": "2.88 ref"
+            }
+          },
+          "mid": {
+            "value": 2.995,
+            "metal": {
+              "scrap": 27,
+              "refined": 3,
+              "notation": "3 ref"
+            }
+          },
+          "high": {
+            "value": 3.11,
+            "metal": {
+              "scrap": 28,
+              "refined": 3.1111,
+              "notation": "3.11 ref"
+            }
+          }
+        },
+        "lastUpdatedAt": "2026-02-01T13:03:45.000Z"
       }
     },
     {
@@ -28915,7 +28915,7 @@
       }
     },
     {
-      "slug": "deserter-s-duster",
+      "slug": "deserters-duster",
       "name": "Deserter's Duster",
       "defindex": 31588,
       "aliases": [],
@@ -29486,7 +29486,7 @@
       }
     },
     {
-      "slug": "dillinger-s-duffel",
+      "slug": "dillingers-duffel",
       "name": "Dillinger's Duffel",
       "defindex": 781,
       "aliases": [],
@@ -29711,7 +29711,7 @@
       }
     },
     {
-      "slug": "doc-s-holiday",
+      "slug": "docs-holiday",
       "name": "Doc's Holiday",
       "defindex": 982,
       "aliases": [],
@@ -29778,7 +29778,7 @@
       }
     },
     {
-      "slug": "doctor-s-sack",
+      "slug": "doctors-sack",
       "name": "Doctor's Sack",
       "defindex": 398,
       "aliases": [],
@@ -30328,7 +30328,7 @@
       }
     },
     {
-      "slug": "dr-grordbort-s-copper-crest",
+      "slug": "dr-grordborts-copper-crest",
       "name": "Dr. Grordbort's Copper Crest",
       "defindex": 592,
       "aliases": [],
@@ -30390,7 +30390,7 @@
       }
     },
     {
-      "slug": "dr-grordbort-s-crest",
+      "slug": "dr-grordborts-crest",
       "name": "Dr. Grordbort's Crest",
       "defindex": 443,
       "aliases": [],
@@ -30452,7 +30452,7 @@
       }
     },
     {
-      "slug": "dr-grordbort-s-silver-crest",
+      "slug": "dr-grordborts-silver-crest",
       "name": "Dr. Grordbort's Silver Crest",
       "defindex": 636,
       "aliases": [],
@@ -30511,68 +30511,6 @@
           }
         },
         "lastUpdatedAt": "2026-04-26T14:28:19.000Z"
-      }
-    },
-    {
-      "slug": "dr-s-dapper-topper",
-      "name": "Dr's Dapper Topper",
-      "defindex": 252,
-      "aliases": [],
-      "slot": "head",
-      "classes": [
-        "scout",
-        "soldier",
-        "pyro",
-        "demoman",
-        "heavy",
-        "engineer",
-        "medic",
-        "sniper",
-        "spy"
-      ],
-      "kind": "all-class",
-      "paintable": true,
-      "eventRestriction": null,
-      "styles": [],
-      "backpackIcon": {
-        "small": "http://media.steampowered.com/apps/440/icons/dappertopper.e925afc37b04b511c94b3ce83f3c75d933e935cc.png",
-        "large": "http://media.steampowered.com/apps/440/icons/dappertopper_large.25fb3a4f74966e8633234154efaf48436f815b92.png"
-      },
-      "price": {
-        "state": "priced",
-        "referenceVariant": {
-          "quality": "unique",
-          "craftable": true
-        },
-        "currency": "metal",
-        "blanket": false,
-        "spread": {
-          "low": {
-            "value": 1.33,
-            "metal": {
-              "scrap": 12,
-              "refined": 1.3333,
-              "notation": "1.33 ref"
-            }
-          },
-          "mid": {
-            "value": 1.44,
-            "metal": {
-              "scrap": 13,
-              "refined": 1.4444,
-              "notation": "1.44 ref"
-            }
-          },
-          "high": {
-            "value": 1.55,
-            "metal": {
-              "scrap": 14,
-              "refined": 1.5556,
-              "notation": "1.55 ref"
-            }
-          }
-        },
-        "lastUpdatedAt": "2026-09-12T05:02:04.000Z"
       }
     },
     {
@@ -30844,6 +30782,68 @@
           }
         },
         "lastUpdatedAt": "2026-05-08T12:36:00.000Z"
+      }
+    },
+    {
+      "slug": "drs-dapper-topper",
+      "name": "Dr's Dapper Topper",
+      "defindex": 252,
+      "aliases": [],
+      "slot": "head",
+      "classes": [
+        "scout",
+        "soldier",
+        "pyro",
+        "demoman",
+        "heavy",
+        "engineer",
+        "medic",
+        "sniper",
+        "spy"
+      ],
+      "kind": "all-class",
+      "paintable": true,
+      "eventRestriction": null,
+      "styles": [],
+      "backpackIcon": {
+        "small": "http://media.steampowered.com/apps/440/icons/dappertopper.e925afc37b04b511c94b3ce83f3c75d933e935cc.png",
+        "large": "http://media.steampowered.com/apps/440/icons/dappertopper_large.25fb3a4f74966e8633234154efaf48436f815b92.png"
+      },
+      "price": {
+        "state": "priced",
+        "referenceVariant": {
+          "quality": "unique",
+          "craftable": true
+        },
+        "currency": "metal",
+        "blanket": false,
+        "spread": {
+          "low": {
+            "value": 1.33,
+            "metal": {
+              "scrap": 12,
+              "refined": 1.3333,
+              "notation": "1.33 ref"
+            }
+          },
+          "mid": {
+            "value": 1.44,
+            "metal": {
+              "scrap": 13,
+              "refined": 1.4444,
+              "notation": "1.44 ref"
+            }
+          },
+          "high": {
+            "value": 1.55,
+            "metal": {
+              "scrap": 14,
+              "refined": 1.5556,
+              "notation": "1.55 ref"
+            }
+          }
+        },
+        "lastUpdatedAt": "2026-09-12T05:02:04.000Z"
       }
     },
     {
@@ -31439,7 +31439,7 @@
       }
     },
     {
-      "slug": "egghead-s-overalls",
+      "slug": "eggheads-overalls",
       "name": "Egghead's Overalls",
       "defindex": 30408,
       "aliases": [],
@@ -31825,7 +31825,7 @@
       }
     },
     {
-      "slug": "el-gigante-s-gunbelt",
+      "slug": "el-gigantes-gunbelt",
       "name": "El Gigante's Gunbelt",
       "defindex": 31553,
       "aliases": [],
@@ -32607,7 +32607,7 @@
       }
     },
     {
-      "slug": "eliminator-s-safeguard",
+      "slug": "eliminators-safeguard",
       "name": "Eliminator's Safeguard",
       "defindex": 30369,
       "aliases": [],
@@ -33010,7 +33010,51 @@
       }
     },
     {
-      "slug": "engineer-s-cap",
+      "slug": "engineerbot-armor",
+      "name": "Engineerbot Armor",
+      "defindex": 30145,
+      "aliases": [],
+      "slot": "misc",
+      "classes": [
+        "engineer"
+      ],
+      "kind": "class-exclusive",
+      "paintable": false,
+      "eventRestriction": null,
+      "styles": [],
+      "backpackIcon": {
+        "small": "http://media.steampowered.com/apps/440/icons/tw_engineerbot_armor.9af3e51249156aa9048fbd2a381ecbe7b939ca7b.png",
+        "large": "http://media.steampowered.com/apps/440/icons/tw_engineerbot_armor_large.5589926cad76afba95ed7892264d1e12655bc85b.png"
+      },
+      "price": {
+        "state": "unpriced",
+        "reason": "missing-from-source"
+      }
+    },
+    {
+      "slug": "engineerbot-helmet",
+      "name": "Engineerbot Helmet",
+      "defindex": 30146,
+      "aliases": [],
+      "slot": "head",
+      "classes": [
+        "engineer"
+      ],
+      "kind": "class-exclusive",
+      "paintable": false,
+      "eventRestriction": null,
+      "styles": [],
+      "backpackIcon": {
+        "small": "http://media.steampowered.com/apps/440/icons/tw_engineerbot_helmet.9af3e51249156aa9048fbd2a381ecbe7b939ca7b.png",
+        "large": "http://media.steampowered.com/apps/440/icons/tw_engineerbot_helmet_large.5589926cad76afba95ed7892264d1e12655bc85b.png"
+      },
+      "price": {
+        "state": "unpriced",
+        "reason": "missing-from-source"
+      }
+    },
+    {
+      "slug": "engineers-cap",
       "name": "Engineer's Cap",
       "defindex": 95,
       "aliases": [],
@@ -33061,50 +33105,6 @@
           }
         },
         "lastUpdatedAt": "2025-08-11T06:43:50.000Z"
-      }
-    },
-    {
-      "slug": "engineerbot-armor",
-      "name": "Engineerbot Armor",
-      "defindex": 30145,
-      "aliases": [],
-      "slot": "misc",
-      "classes": [
-        "engineer"
-      ],
-      "kind": "class-exclusive",
-      "paintable": false,
-      "eventRestriction": null,
-      "styles": [],
-      "backpackIcon": {
-        "small": "http://media.steampowered.com/apps/440/icons/tw_engineerbot_armor.9af3e51249156aa9048fbd2a381ecbe7b939ca7b.png",
-        "large": "http://media.steampowered.com/apps/440/icons/tw_engineerbot_armor_large.5589926cad76afba95ed7892264d1e12655bc85b.png"
-      },
-      "price": {
-        "state": "unpriced",
-        "reason": "missing-from-source"
-      }
-    },
-    {
-      "slug": "engineerbot-helmet",
-      "name": "Engineerbot Helmet",
-      "defindex": 30146,
-      "aliases": [],
-      "slot": "head",
-      "classes": [
-        "engineer"
-      ],
-      "kind": "class-exclusive",
-      "paintable": false,
-      "eventRestriction": null,
-      "styles": [],
-      "backpackIcon": {
-        "small": "http://media.steampowered.com/apps/440/icons/tw_engineerbot_helmet.9af3e51249156aa9048fbd2a381ecbe7b939ca7b.png",
-        "large": "http://media.steampowered.com/apps/440/icons/tw_engineerbot_helmet_large.5589926cad76afba95ed7892264d1e12655bc85b.png"
-      },
-      "price": {
-        "state": "unpriced",
-        "reason": "missing-from-source"
       }
     },
     {
@@ -34779,7 +34779,7 @@
       }
     },
     {
-      "slug": "fat-man-s-field-cap",
+      "slug": "fat-mans-field-cap",
       "name": "Fat Man's Field Cap",
       "defindex": 30911,
       "aliases": [],
@@ -36432,7 +36432,7 @@
       }
     },
     {
-      "slug": "fireman-s-essentials",
+      "slug": "firemans-essentials",
       "name": "Fireman's Essentials",
       "defindex": 30900,
       "aliases": [],
@@ -38022,7 +38022,7 @@
       }
     },
     {
-      "slug": "forgotten-king-s-pauldrons",
+      "slug": "forgotten-kings-pauldrons",
       "name": "Forgotten King's Pauldrons",
       "defindex": 30517,
       "aliases": [],
@@ -38076,7 +38076,7 @@
       }
     },
     {
-      "slug": "forgotten-king-s-restless-head",
+      "slug": "forgotten-kings-restless-head",
       "name": "Forgotten King's Restless Head",
       "defindex": 30516,
       "aliases": [],
@@ -38246,7 +38246,7 @@
       }
     },
     {
-      "slug": "foster-s-facade",
+      "slug": "fosters-facade",
       "name": "Foster's Facade",
       "defindex": 335,
       "aliases": [],
@@ -38570,7 +38570,7 @@
       }
     },
     {
-      "slug": "free-mann-s-fashion",
+      "slug": "free-manns-fashion",
       "name": "Free Mann's Fashion",
       "defindex": 31454,
       "aliases": [],
@@ -38691,7 +38691,7 @@
       }
     },
     {
-      "slug": "frenchman-s-beret",
+      "slug": "frenchmans-beret",
       "name": "Frenchman's Beret",
       "defindex": 180,
       "aliases": [],
@@ -38745,7 +38745,7 @@
       }
     },
     {
-      "slug": "frenchman-s-formals",
+      "slug": "frenchmans-formals",
       "name": "Frenchman's Formals",
       "defindex": 30189,
       "aliases": [],
@@ -39042,7 +39042,7 @@
       }
     },
     {
-      "slug": "frogmann-s-fittings",
+      "slug": "frogmanns-fittings",
       "name": "Frogmann's Fittings",
       "defindex": 31531,
       "aliases": [],
@@ -40631,7 +40631,7 @@
       }
     },
     {
-      "slug": "gentleman-s-gatsby",
+      "slug": "gentlemans-gatsby",
       "name": "Gentleman's Gatsby",
       "defindex": 184,
       "aliases": [],
@@ -40685,7 +40685,7 @@
       }
     },
     {
-      "slug": "gentleman-s-ushanka",
+      "slug": "gentlemans-ushanka",
       "name": "Gentleman's Ushanka",
       "defindex": 778,
       "aliases": [],
@@ -42850,7 +42850,7 @@
       }
     },
     {
-      "slug": "grenadier-s-softcap",
+      "slug": "grenadiers-softcap",
       "name": "Grenadier's Softcap",
       "defindex": 227,
       "aliases": [],
@@ -42958,7 +42958,7 @@
       }
     },
     {
-      "slug": "griffin-s-gog",
+      "slug": "griffins-gog",
       "name": "Griffin's Gog",
       "defindex": 559,
       "aliases": [],
@@ -44199,7 +44199,7 @@
       }
     },
     {
-      "slug": "handyman-s-handle",
+      "slug": "handymans-handle",
       "name": "Handyman's Handle",
       "defindex": 253,
       "aliases": [],
@@ -44650,7 +44650,7 @@
       }
     },
     {
-      "slug": "harlequin-s-hooves",
+      "slug": "harlequins-hooves",
       "name": "Harlequin's Hooves",
       "defindex": 30575,
       "aliases": [],
@@ -46209,7 +46209,7 @@
       }
     },
     {
-      "slug": "headhunter-s-brim",
+      "slug": "headhunters-brim",
       "name": "Headhunter's Brim",
       "defindex": 31313,
       "aliases": [],
@@ -46317,7 +46317,7 @@
       }
     },
     {
-      "slug": "headtaker-s-hood",
+      "slug": "headtakers-hood",
       "name": "Headtaker's Hood",
       "defindex": 30240,
       "aliases": [],
@@ -46496,7 +46496,7 @@
       }
     },
     {
-      "slug": "heavy-artillery-officer-s-cap",
+      "slug": "heavy-artillery-officers-cap",
       "name": "Heavy Artillery Officer's Cap",
       "defindex": 866,
       "aliases": [],
@@ -46904,60 +46904,6 @@
       }
     },
     {
-      "slug": "heavy-s-hockey-hair",
-      "name": "Heavy's Hockey Hair",
-      "defindex": 985,
-      "aliases": [],
-      "slot": "misc",
-      "classes": [
-        "heavy"
-      ],
-      "kind": "class-exclusive",
-      "paintable": true,
-      "eventRestriction": null,
-      "styles": [],
-      "backpackIcon": {
-        "small": "http://media.steampowered.com/apps/440/icons/skullet.f455e6c360bef5737aff853db7c46ce53b3b1b7f.png",
-        "large": "http://media.steampowered.com/apps/440/icons/skullet_large.6e1e20aeecf9ebc15472754b5e2d1a7f71ae4c93.png"
-      },
-      "price": {
-        "state": "priced",
-        "referenceVariant": {
-          "quality": "unique",
-          "craftable": true
-        },
-        "currency": "hat",
-        "blanket": true,
-        "spread": {
-          "low": {
-            "value": 1,
-            "metal": {
-              "scrap": 12,
-              "refined": 1.3333,
-              "notation": "1.33 ref"
-            }
-          },
-          "mid": {
-            "value": 1,
-            "metal": {
-              "scrap": 12,
-              "refined": 1.3333,
-              "notation": "1.33 ref"
-            }
-          },
-          "high": {
-            "value": 1,
-            "metal": {
-              "scrap": 12,
-              "refined": 1.3333,
-              "notation": "1.33 ref"
-            }
-          }
-        },
-        "lastUpdatedAt": "2026-05-19T23:02:09.000Z"
-      }
-    },
-    {
       "slug": "heavy-tourism",
       "name": "Heavy Tourism",
       "defindex": 30803,
@@ -47119,7 +47065,61 @@
       }
     },
     {
-      "slug": "heer-s-helmet",
+      "slug": "heavys-hockey-hair",
+      "name": "Heavy's Hockey Hair",
+      "defindex": 985,
+      "aliases": [],
+      "slot": "misc",
+      "classes": [
+        "heavy"
+      ],
+      "kind": "class-exclusive",
+      "paintable": true,
+      "eventRestriction": null,
+      "styles": [],
+      "backpackIcon": {
+        "small": "http://media.steampowered.com/apps/440/icons/skullet.f455e6c360bef5737aff853db7c46ce53b3b1b7f.png",
+        "large": "http://media.steampowered.com/apps/440/icons/skullet_large.6e1e20aeecf9ebc15472754b5e2d1a7f71ae4c93.png"
+      },
+      "price": {
+        "state": "priced",
+        "referenceVariant": {
+          "quality": "unique",
+          "craftable": true
+        },
+        "currency": "hat",
+        "blanket": true,
+        "spread": {
+          "low": {
+            "value": 1,
+            "metal": {
+              "scrap": 12,
+              "refined": 1.3333,
+              "notation": "1.33 ref"
+            }
+          },
+          "mid": {
+            "value": 1,
+            "metal": {
+              "scrap": 12,
+              "refined": 1.3333,
+              "notation": "1.33 ref"
+            }
+          },
+          "high": {
+            "value": 1,
+            "metal": {
+              "scrap": 12,
+              "refined": 1.3333,
+              "notation": "1.33 ref"
+            }
+          }
+        },
+        "lastUpdatedAt": "2026-05-19T23:02:09.000Z"
+      }
+    },
+    {
+      "slug": "heers-helmet",
       "name": "Heer's Helmet",
       "defindex": 30378,
       "aliases": [],
@@ -47173,7 +47173,7 @@
       }
     },
     {
-      "slug": "hellhunter-s-headpiece",
+      "slug": "hellhunters-headpiece",
       "name": "Hellhunter's Headpiece",
       "defindex": 30521,
       "aliases": [],
@@ -47551,7 +47551,7 @@
       }
     },
     {
-      "slug": "herald-s-helm",
+      "slug": "heralds-helm",
       "name": "Herald's Helm",
       "defindex": 30769,
       "aliases": [],
@@ -47659,123 +47659,6 @@
       }
     },
     {
-      "slug": "hero-s-hachimaki",
-      "name": "Hero's Hachimaki",
-      "defindex": 360,
-      "aliases": [],
-      "slot": "head",
-      "classes": [
-        "soldier"
-      ],
-      "kind": "class-exclusive",
-      "paintable": true,
-      "eventRestriction": null,
-      "styles": [],
-      "backpackIcon": {
-        "small": "http://media.steampowered.com/apps/440/icons/homefront_blindfold.527d947c330d46cf0130bcfa4efdcdb77e3ebaf4.png",
-        "large": "http://media.steampowered.com/apps/440/icons/homefront_blindfold_large.67071ab15ee96dde0fa96052b85c928c6ae58c93.png"
-      },
-      "price": {
-        "state": "priced",
-        "referenceVariant": {
-          "quality": "unique",
-          "craftable": true
-        },
-        "currency": "metal",
-        "blanket": false,
-        "spread": {
-          "low": {
-            "value": 1.33,
-            "metal": {
-              "scrap": 12,
-              "refined": 1.3333,
-              "notation": "1.33 ref"
-            }
-          },
-          "mid": {
-            "value": 1.665,
-            "metal": {
-              "scrap": 15,
-              "refined": 1.6667,
-              "notation": "1.66 ref"
-            }
-          },
-          "high": {
-            "value": 2,
-            "metal": {
-              "scrap": 18,
-              "refined": 2,
-              "notation": "2 ref"
-            }
-          }
-        },
-        "lastUpdatedAt": "2025-09-23T07:59:34.000Z"
-      }
-    },
-    {
-      "slug": "hero-s-tail",
-      "name": "Hero's Tail",
-      "defindex": 453,
-      "aliases": [],
-      "slot": "head",
-      "classes": [
-        "scout"
-      ],
-      "kind": "class-exclusive",
-      "paintable": true,
-      "eventRestriction": null,
-      "styles": [
-        {
-          "index": 0,
-          "name": "Pigmentation Lost"
-        },
-        {
-          "index": 1,
-          "name": "Pigmentation Gained"
-        }
-      ],
-      "backpackIcon": {
-        "small": "http://media.steampowered.com/apps/440/icons/scout_hair_icon.0e12ee088ee75e656e469b8ac4ca06b30ea8f5be.png",
-        "large": "http://media.steampowered.com/apps/440/icons/scout_hair_icon_large.8e330901ddbd0038f9f8dd8d4edfb21454e62c4a.png"
-      },
-      "price": {
-        "state": "priced",
-        "referenceVariant": {
-          "quality": "unique",
-          "craftable": true
-        },
-        "currency": "metal",
-        "blanket": false,
-        "spread": {
-          "low": {
-            "value": 7.22,
-            "metal": {
-              "scrap": 65,
-              "refined": 7.2222,
-              "notation": "7.22 ref"
-            }
-          },
-          "mid": {
-            "value": 7.775,
-            "metal": {
-              "scrap": 70,
-              "refined": 7.7778,
-              "notation": "7.77 ref"
-            }
-          },
-          "high": {
-            "value": 8.33,
-            "metal": {
-              "scrap": 75,
-              "refined": 8.3333,
-              "notation": "8.33 ref"
-            }
-          }
-        },
-        "lastUpdatedAt": "2026-04-20T22:46:38.000Z"
-      }
-    },
-    {
       "slug": "heroic-companion-badge",
       "name": "Heroic Companion Badge",
       "defindex": 868,
@@ -47847,6 +47730,123 @@
       }
     },
     {
+      "slug": "heros-hachimaki",
+      "name": "Hero's Hachimaki",
+      "defindex": 360,
+      "aliases": [],
+      "slot": "head",
+      "classes": [
+        "soldier"
+      ],
+      "kind": "class-exclusive",
+      "paintable": true,
+      "eventRestriction": null,
+      "styles": [],
+      "backpackIcon": {
+        "small": "http://media.steampowered.com/apps/440/icons/homefront_blindfold.527d947c330d46cf0130bcfa4efdcdb77e3ebaf4.png",
+        "large": "http://media.steampowered.com/apps/440/icons/homefront_blindfold_large.67071ab15ee96dde0fa96052b85c928c6ae58c93.png"
+      },
+      "price": {
+        "state": "priced",
+        "referenceVariant": {
+          "quality": "unique",
+          "craftable": true
+        },
+        "currency": "metal",
+        "blanket": false,
+        "spread": {
+          "low": {
+            "value": 1.33,
+            "metal": {
+              "scrap": 12,
+              "refined": 1.3333,
+              "notation": "1.33 ref"
+            }
+          },
+          "mid": {
+            "value": 1.665,
+            "metal": {
+              "scrap": 15,
+              "refined": 1.6667,
+              "notation": "1.66 ref"
+            }
+          },
+          "high": {
+            "value": 2,
+            "metal": {
+              "scrap": 18,
+              "refined": 2,
+              "notation": "2 ref"
+            }
+          }
+        },
+        "lastUpdatedAt": "2025-09-23T07:59:34.000Z"
+      }
+    },
+    {
+      "slug": "heros-tail",
+      "name": "Hero's Tail",
+      "defindex": 453,
+      "aliases": [],
+      "slot": "head",
+      "classes": [
+        "scout"
+      ],
+      "kind": "class-exclusive",
+      "paintable": true,
+      "eventRestriction": null,
+      "styles": [
+        {
+          "index": 0,
+          "name": "Pigmentation Lost"
+        },
+        {
+          "index": 1,
+          "name": "Pigmentation Gained"
+        }
+      ],
+      "backpackIcon": {
+        "small": "http://media.steampowered.com/apps/440/icons/scout_hair_icon.0e12ee088ee75e656e469b8ac4ca06b30ea8f5be.png",
+        "large": "http://media.steampowered.com/apps/440/icons/scout_hair_icon_large.8e330901ddbd0038f9f8dd8d4edfb21454e62c4a.png"
+      },
+      "price": {
+        "state": "priced",
+        "referenceVariant": {
+          "quality": "unique",
+          "craftable": true
+        },
+        "currency": "metal",
+        "blanket": false,
+        "spread": {
+          "low": {
+            "value": 7.22,
+            "metal": {
+              "scrap": 65,
+              "refined": 7.2222,
+              "notation": "7.22 ref"
+            }
+          },
+          "mid": {
+            "value": 7.775,
+            "metal": {
+              "scrap": 70,
+              "refined": 7.7778,
+              "notation": "7.77 ref"
+            }
+          },
+          "high": {
+            "value": 8.33,
+            "metal": {
+              "scrap": 75,
+              "refined": 8.3333,
+              "notation": "8.33 ref"
+            }
+          }
+        },
+        "lastUpdatedAt": "2026-04-20T22:46:38.000Z"
+      }
+    },
+    {
       "slug": "herzensbrecher",
       "name": "Herzensbrecher",
       "defindex": 30486,
@@ -47901,7 +47901,7 @@
       }
     },
     {
-      "slug": "hetman-s-headpiece",
+      "slug": "hetmans-headpiece",
       "name": "Hetman's Headpiece",
       "defindex": 436,
       "aliases": [],
@@ -48682,7 +48682,7 @@
       }
     },
     {
-      "slug": "honcho-s-headgear",
+      "slug": "honchos-headgear",
       "name": "Honcho's Headgear",
       "defindex": 391,
       "aliases": [],
@@ -49442,7 +49442,7 @@
       }
     },
     {
-      "slug": "horseless-headless-horsemann-s-head",
+      "slug": "horseless-headless-horsemanns-head",
       "name": "Horseless Headless Horsemann's Head",
       "defindex": 278,
       "aliases": [],
@@ -49504,7 +49504,7 @@
       }
     },
     {
-      "slug": "horsemann-s-hand-me-down",
+      "slug": "horsemanns-hand-me-down",
       "name": "Horsemann's Hand-Me-Down",
       "defindex": 30243,
       "aliases": [],
@@ -49890,7 +49890,7 @@
       }
     },
     {
-      "slug": "hottie-s-hoodie",
+      "slug": "hotties-hoodie",
       "name": "Hottie's Hoodie",
       "defindex": 377,
       "aliases": [],
@@ -49998,7 +49998,7 @@
       }
     },
     {
-      "slug": "hound-s-hood",
+      "slug": "hounds-hood",
       "name": "Hound's Hood",
       "defindex": 30207,
       "aliases": [],
@@ -50591,7 +50591,7 @@
       }
     },
     {
-      "slug": "huntsman-s-essentials",
+      "slug": "huntsmans-essentials",
       "name": "Huntsman's Essentials",
       "defindex": 30359,
       "aliases": [],
@@ -50699,7 +50699,7 @@
       }
     },
     {
-      "slug": "hustler-s-hallmark",
+      "slug": "hustlers-hallmark",
       "name": "Hustler's Hallmark",
       "defindex": 146,
       "aliases": [],
@@ -51040,60 +51040,6 @@
       }
     },
     {
-      "slug": "imp-s-imprint",
-      "name": "Imp's Imprint",
-      "defindex": 31302,
-      "aliases": [],
-      "slot": "misc",
-      "classes": [
-        "scout"
-      ],
-      "kind": "class-exclusive",
-      "paintable": true,
-      "eventRestriction": null,
-      "styles": [],
-      "backpackIcon": {
-        "small": "http://media.steampowered.com/apps/440/icons/hwn2022_imps_imprint.68a284c6655803b4a543396a13787f8affbeb3ad.png",
-        "large": "http://media.steampowered.com/apps/440/icons/hwn2022_imps_imprint_large.b2d9fc4c3ea83c1c452cd83cd18955dddb3815ea.png"
-      },
-      "price": {
-        "state": "priced",
-        "referenceVariant": {
-          "quality": "unique",
-          "craftable": true
-        },
-        "currency": "metal",
-        "blanket": false,
-        "spread": {
-          "low": {
-            "value": 3.33,
-            "metal": {
-              "scrap": 30,
-              "refined": 3.3333,
-              "notation": "3.33 ref"
-            }
-          },
-          "mid": {
-            "value": 3.605,
-            "metal": {
-              "scrap": 32,
-              "refined": 3.5556,
-              "notation": "3.55 ref"
-            }
-          },
-          "high": {
-            "value": 3.88,
-            "metal": {
-              "scrap": 35,
-              "refined": 3.8889,
-              "notation": "3.88 ref"
-            }
-          }
-        },
-        "lastUpdatedAt": "2026-08-26T21:16:34.000Z"
-      }
-    },
-    {
       "slug": "impact-impaler",
       "name": "Impact Impaler",
       "defindex": 31432,
@@ -51225,6 +51171,60 @@
           }
         },
         "lastUpdatedAt": "2026-08-22T03:51:07.000Z"
+      }
+    },
+    {
+      "slug": "imps-imprint",
+      "name": "Imp's Imprint",
+      "defindex": 31302,
+      "aliases": [],
+      "slot": "misc",
+      "classes": [
+        "scout"
+      ],
+      "kind": "class-exclusive",
+      "paintable": true,
+      "eventRestriction": null,
+      "styles": [],
+      "backpackIcon": {
+        "small": "http://media.steampowered.com/apps/440/icons/hwn2022_imps_imprint.68a284c6655803b4a543396a13787f8affbeb3ad.png",
+        "large": "http://media.steampowered.com/apps/440/icons/hwn2022_imps_imprint_large.b2d9fc4c3ea83c1c452cd83cd18955dddb3815ea.png"
+      },
+      "price": {
+        "state": "priced",
+        "referenceVariant": {
+          "quality": "unique",
+          "craftable": true
+        },
+        "currency": "metal",
+        "blanket": false,
+        "spread": {
+          "low": {
+            "value": 3.33,
+            "metal": {
+              "scrap": 30,
+              "refined": 3.3333,
+              "notation": "3.33 ref"
+            }
+          },
+          "mid": {
+            "value": 3.605,
+            "metal": {
+              "scrap": 32,
+              "refined": 3.5556,
+              "notation": "3.55 ref"
+            }
+          },
+          "high": {
+            "value": 3.88,
+            "metal": {
+              "scrap": 35,
+              "refined": 3.8889,
+              "notation": "3.88 ref"
+            }
+          }
+        },
+        "lastUpdatedAt": "2026-08-26T21:16:34.000Z"
       }
     },
     {
@@ -51453,7 +51453,7 @@
       }
     },
     {
-      "slug": "infiltrator-s-insulation",
+      "slug": "infiltrators-insulation",
       "name": "Infiltrator's Insulation",
       "defindex": 31338,
       "aliases": [],
@@ -52432,7 +52432,7 @@
       }
     },
     {
-      "slug": "jumper-s-jeepcap",
+      "slug": "jumpers-jeepcap",
       "name": "Jumper's Jeepcap",
       "defindex": 417,
       "aliases": [],
@@ -52881,7 +52881,7 @@
       }
     },
     {
-      "slug": "juvenile-s-jumper",
+      "slug": "juveniles-jumper",
       "name": "Juvenile's Jumper",
       "defindex": 31022,
       "aliases": [],
@@ -53057,7 +53057,7 @@
       }
     },
     {
-      "slug": "kapitan-s-kaftan",
+      "slug": "kapitans-kaftan",
       "name": "Kapitan's Kaftan",
       "defindex": 31053,
       "aliases": [],
@@ -53335,7 +53335,7 @@
       }
     },
     {
-      "slug": "killer-s-kabuto",
+      "slug": "killers-kabuto",
       "name": "Killer's Kabuto",
       "defindex": 152,
       "aliases": [],
@@ -53389,7 +53389,7 @@
       }
     },
     {
-      "slug": "killer-s-kit",
+      "slug": "killers-kit",
       "name": "Killer's Kit",
       "defindex": 30339,
       "aliases": [],
@@ -53855,168 +53855,6 @@
       }
     },
     {
-      "slug": "l-aire-filteure",
-      "name": "L'aire Filteure",
-      "defindex": 31499,
-      "aliases": [],
-      "slot": "misc",
-      "classes": [
-        "spy"
-      ],
-      "kind": "class-exclusive",
-      "paintable": true,
-      "eventRestriction": null,
-      "styles": [],
-      "backpackIcon": {
-        "small": "http://media.steampowered.com/apps/440/icons/dec24_laire_filteure.01e84edc6b9541e8c210814096f604b2a543b47c.png",
-        "large": "http://media.steampowered.com/apps/440/icons/dec24_laire_filteure_large.6cc3f1eb9d1622a6c9aae7dfaa488c1e6ffcf8ec.png"
-      },
-      "price": {
-        "state": "priced",
-        "referenceVariant": {
-          "quality": "unique",
-          "craftable": true
-        },
-        "currency": "metal",
-        "blanket": false,
-        "spread": {
-          "low": {
-            "value": 24,
-            "metal": {
-              "scrap": 216,
-              "refined": 24,
-              "notation": "24 ref"
-            }
-          },
-          "mid": {
-            "value": 29.11,
-            "metal": {
-              "scrap": 262,
-              "refined": 29.1111,
-              "notation": "29.11 ref"
-            }
-          },
-          "high": {
-            "value": 34.22,
-            "metal": {
-              "scrap": 308,
-              "refined": 34.2222,
-              "notation": "34.22 ref"
-            }
-          }
-        },
-        "lastUpdatedAt": "2026-04-20T18:19:08.000Z"
-      }
-    },
-    {
-      "slug": "l-homme-burglerre",
-      "name": "L'homme Burglerre",
-      "defindex": 30182,
-      "aliases": [],
-      "slot": "head",
-      "classes": [
-        "spy"
-      ],
-      "kind": "class-exclusive",
-      "paintable": true,
-      "eventRestriction": null,
-      "styles": [],
-      "backpackIcon": {
-        "small": "http://media.steampowered.com/apps/440/icons/fall2013_superthief.ceb8ebe75eb2848abd03ea6b68257a129ea1535d.png",
-        "large": "http://media.steampowered.com/apps/440/icons/fall2013_superthief_large.81e3e8f25a441293560fb3395c549a0b1022f39d.png"
-      },
-      "price": {
-        "state": "priced",
-        "referenceVariant": {
-          "quality": "unique",
-          "craftable": true
-        },
-        "currency": "metal",
-        "blanket": false,
-        "spread": {
-          "low": {
-            "value": 1.33,
-            "metal": {
-              "scrap": 12,
-              "refined": 1.3333,
-              "notation": "1.33 ref"
-            }
-          },
-          "mid": {
-            "value": 1.495,
-            "metal": {
-              "scrap": 13,
-              "refined": 1.4444,
-              "notation": "1.44 ref"
-            }
-          },
-          "high": {
-            "value": 1.66,
-            "metal": {
-              "scrap": 15,
-              "refined": 1.6667,
-              "notation": "1.66 ref"
-            }
-          }
-        },
-        "lastUpdatedAt": "2025-07-01T10:10:03.000Z"
-      }
-    },
-    {
-      "slug": "l-inspecteur",
-      "name": "L'Inspecteur",
-      "defindex": 622,
-      "aliases": [],
-      "slot": "head",
-      "classes": [
-        "spy"
-      ],
-      "kind": "class-exclusive",
-      "paintable": true,
-      "eventRestriction": null,
-      "styles": [],
-      "backpackIcon": {
-        "small": "http://media.steampowered.com/apps/440/icons/fwk_spy_inspector.d472897571d2c3df25ea46e7209ce487f47ee2d0.png",
-        "large": "http://media.steampowered.com/apps/440/icons/fwk_spy_inspector_large.de0c094d63bf0a648fe14561feff44453cbb4bad.png"
-      },
-      "price": {
-        "state": "priced",
-        "referenceVariant": {
-          "quality": "unique",
-          "craftable": true
-        },
-        "currency": "metal",
-        "blanket": false,
-        "spread": {
-          "low": {
-            "value": 1.33,
-            "metal": {
-              "scrap": 12,
-              "refined": 1.3333,
-              "notation": "1.33 ref"
-            }
-          },
-          "mid": {
-            "value": 1.44,
-            "metal": {
-              "scrap": 13,
-              "refined": 1.4444,
-              "notation": "1.44 ref"
-            }
-          },
-          "high": {
-            "value": 1.55,
-            "metal": {
-              "scrap": 14,
-              "refined": 1.5556,
-              "notation": "1.55 ref"
-            }
-          }
-        },
-        "lastUpdatedAt": "2026-04-25T09:14:50.000Z"
-      }
-    },
-    {
       "slug": "lacking-moral-fiber-mask",
       "name": "Lacking Moral Fiber Mask",
       "defindex": 872,
@@ -54122,6 +53960,60 @@
           }
         },
         "lastUpdatedAt": "2026-07-13T12:03:12.000Z"
+      }
+    },
+    {
+      "slug": "laire-filteure",
+      "name": "L'aire Filteure",
+      "defindex": 31499,
+      "aliases": [],
+      "slot": "misc",
+      "classes": [
+        "spy"
+      ],
+      "kind": "class-exclusive",
+      "paintable": true,
+      "eventRestriction": null,
+      "styles": [],
+      "backpackIcon": {
+        "small": "http://media.steampowered.com/apps/440/icons/dec24_laire_filteure.01e84edc6b9541e8c210814096f604b2a543b47c.png",
+        "large": "http://media.steampowered.com/apps/440/icons/dec24_laire_filteure_large.6cc3f1eb9d1622a6c9aae7dfaa488c1e6ffcf8ec.png"
+      },
+      "price": {
+        "state": "priced",
+        "referenceVariant": {
+          "quality": "unique",
+          "craftable": true
+        },
+        "currency": "metal",
+        "blanket": false,
+        "spread": {
+          "low": {
+            "value": 24,
+            "metal": {
+              "scrap": 216,
+              "refined": 24,
+              "notation": "24 ref"
+            }
+          },
+          "mid": {
+            "value": 29.11,
+            "metal": {
+              "scrap": 262,
+              "refined": 29.1111,
+              "notation": "29.11 ref"
+            }
+          },
+          "high": {
+            "value": 34.22,
+            "metal": {
+              "scrap": 308,
+              "refined": 34.2222,
+              "notation": "34.22 ref"
+            }
+          }
+        },
+        "lastUpdatedAt": "2026-04-20T18:19:08.000Z"
       }
     },
     {
@@ -55282,7 +55174,7 @@
       }
     },
     {
-      "slug": "letch-s-led",
+      "slug": "letchs-led",
       "name": "Letch's LED",
       "defindex": 30002,
       "aliases": [],
@@ -55390,83 +55282,21 @@
       }
     },
     {
-      "slug": "li-l-dutchman",
-      "name": "Li'l Dutchman",
-      "defindex": 30536,
+      "slug": "lhomme-burglerre",
+      "name": "L'homme Burglerre",
+      "defindex": 30182,
       "aliases": [],
-      "slot": "misc",
+      "slot": "head",
       "classes": [
-        "scout",
-        "soldier",
-        "pyro",
-        "demoman",
-        "heavy",
-        "engineer",
-        "medic",
-        "sniper",
         "spy"
-      ],
-      "kind": "all-class",
-      "paintable": true,
-      "eventRestriction": "halloween_or_fullmoon",
-      "styles": [],
-      "backpackIcon": {
-        "small": "http://media.steampowered.com/apps/440/icons/sf14_cursed_cruise.38b3dec07dc9d4fc5650c3b0882cadd42adbfd44.png",
-        "large": "http://media.steampowered.com/apps/440/icons/sf14_cursed_cruise_large.1ab999dd046f8d78baa31aeb765eed859fc00109.png"
-      },
-      "price": {
-        "state": "priced",
-        "referenceVariant": {
-          "quality": "unique",
-          "craftable": true
-        },
-        "currency": "keys",
-        "blanket": false,
-        "spread": {
-          "low": {
-            "value": 1.5,
-            "metal": {
-              "scrap": 866,
-              "refined": 96.2222,
-              "notation": "1 key, 32.11 ref"
-            }
-          },
-          "mid": {
-            "value": 1.775,
-            "metal": {
-              "scrap": 1024,
-              "refined": 113.7778,
-              "notation": "1 key, 49.66 ref"
-            }
-          },
-          "high": {
-            "value": 2.05,
-            "metal": {
-              "scrap": 1183,
-              "refined": 131.4444,
-              "notation": "2 keys, 3.22 ref"
-            }
-          }
-        },
-        "lastUpdatedAt": "2025-09-18T12:52:02.000Z"
-      }
-    },
-    {
-      "slug": "li-l-snaggletooth",
-      "name": "Li'l Snaggletooth",
-      "defindex": 30181,
-      "aliases": [],
-      "slot": "misc",
-      "classes": [
-        "sniper"
       ],
       "kind": "class-exclusive",
       "paintable": true,
       "eventRestriction": null,
       "styles": [],
       "backpackIcon": {
-        "small": "http://media.steampowered.com/apps/440/icons/fall2013_lil_snaggletooth.cd4fc36bb22160cc7013efcc174d2b8d77fe0a29.png",
-        "large": "http://media.steampowered.com/apps/440/icons/fall2013_lil_snaggletooth_large.8f9f2bf7e3a1532d524670483f4521d4ab2ee0f3.png"
+        "small": "http://media.steampowered.com/apps/440/icons/fall2013_superthief.ceb8ebe75eb2848abd03ea6b68257a129ea1535d.png",
+        "large": "http://media.steampowered.com/apps/440/icons/fall2013_superthief_large.81e3e8f25a441293560fb3395c549a0b1022f39d.png"
       },
       "price": {
         "state": "priced",
@@ -55486,7 +55316,7 @@
             }
           },
           "mid": {
-            "value": 1.44,
+            "value": 1.495,
             "metal": {
               "scrap": 13,
               "refined": 1.4444,
@@ -55494,15 +55324,15 @@
             }
           },
           "high": {
-            "value": 1.55,
+            "value": 1.66,
             "metal": {
-              "scrap": 14,
-              "refined": 1.5556,
-              "notation": "1.55 ref"
+              "scrap": 15,
+              "refined": 1.6667,
+              "notation": "1.66 ref"
             }
           }
         },
-        "lastUpdatedAt": "2026-01-05T05:28:42.000Z"
+        "lastUpdatedAt": "2025-07-01T10:10:03.000Z"
       }
     },
     {
@@ -55676,7 +55506,7 @@
       }
     },
     {
-      "slug": "lieutenant-s-cut",
+      "slug": "lieutenants-cut",
       "name": "Lieutenant's Cut",
       "defindex": 31624,
       "aliases": [],
@@ -55885,7 +55715,177 @@
       }
     },
     {
-      "slug": "liquidator-s-lid",
+      "slug": "lil-dutchman",
+      "name": "Li'l Dutchman",
+      "defindex": 30536,
+      "aliases": [],
+      "slot": "misc",
+      "classes": [
+        "scout",
+        "soldier",
+        "pyro",
+        "demoman",
+        "heavy",
+        "engineer",
+        "medic",
+        "sniper",
+        "spy"
+      ],
+      "kind": "all-class",
+      "paintable": true,
+      "eventRestriction": "halloween_or_fullmoon",
+      "styles": [],
+      "backpackIcon": {
+        "small": "http://media.steampowered.com/apps/440/icons/sf14_cursed_cruise.38b3dec07dc9d4fc5650c3b0882cadd42adbfd44.png",
+        "large": "http://media.steampowered.com/apps/440/icons/sf14_cursed_cruise_large.1ab999dd046f8d78baa31aeb765eed859fc00109.png"
+      },
+      "price": {
+        "state": "priced",
+        "referenceVariant": {
+          "quality": "unique",
+          "craftable": true
+        },
+        "currency": "keys",
+        "blanket": false,
+        "spread": {
+          "low": {
+            "value": 1.5,
+            "metal": {
+              "scrap": 866,
+              "refined": 96.2222,
+              "notation": "1 key, 32.11 ref"
+            }
+          },
+          "mid": {
+            "value": 1.775,
+            "metal": {
+              "scrap": 1024,
+              "refined": 113.7778,
+              "notation": "1 key, 49.66 ref"
+            }
+          },
+          "high": {
+            "value": 2.05,
+            "metal": {
+              "scrap": 1183,
+              "refined": 131.4444,
+              "notation": "2 keys, 3.22 ref"
+            }
+          }
+        },
+        "lastUpdatedAt": "2025-09-18T12:52:02.000Z"
+      }
+    },
+    {
+      "slug": "lil-snaggletooth",
+      "name": "Li'l Snaggletooth",
+      "defindex": 30181,
+      "aliases": [],
+      "slot": "misc",
+      "classes": [
+        "sniper"
+      ],
+      "kind": "class-exclusive",
+      "paintable": true,
+      "eventRestriction": null,
+      "styles": [],
+      "backpackIcon": {
+        "small": "http://media.steampowered.com/apps/440/icons/fall2013_lil_snaggletooth.cd4fc36bb22160cc7013efcc174d2b8d77fe0a29.png",
+        "large": "http://media.steampowered.com/apps/440/icons/fall2013_lil_snaggletooth_large.8f9f2bf7e3a1532d524670483f4521d4ab2ee0f3.png"
+      },
+      "price": {
+        "state": "priced",
+        "referenceVariant": {
+          "quality": "unique",
+          "craftable": true
+        },
+        "currency": "metal",
+        "blanket": false,
+        "spread": {
+          "low": {
+            "value": 1.33,
+            "metal": {
+              "scrap": 12,
+              "refined": 1.3333,
+              "notation": "1.33 ref"
+            }
+          },
+          "mid": {
+            "value": 1.44,
+            "metal": {
+              "scrap": 13,
+              "refined": 1.4444,
+              "notation": "1.44 ref"
+            }
+          },
+          "high": {
+            "value": 1.55,
+            "metal": {
+              "scrap": 14,
+              "refined": 1.5556,
+              "notation": "1.55 ref"
+            }
+          }
+        },
+        "lastUpdatedAt": "2026-01-05T05:28:42.000Z"
+      }
+    },
+    {
+      "slug": "linspecteur",
+      "name": "L'Inspecteur",
+      "defindex": 622,
+      "aliases": [],
+      "slot": "head",
+      "classes": [
+        "spy"
+      ],
+      "kind": "class-exclusive",
+      "paintable": true,
+      "eventRestriction": null,
+      "styles": [],
+      "backpackIcon": {
+        "small": "http://media.steampowered.com/apps/440/icons/fwk_spy_inspector.d472897571d2c3df25ea46e7209ce487f47ee2d0.png",
+        "large": "http://media.steampowered.com/apps/440/icons/fwk_spy_inspector_large.de0c094d63bf0a648fe14561feff44453cbb4bad.png"
+      },
+      "price": {
+        "state": "priced",
+        "referenceVariant": {
+          "quality": "unique",
+          "craftable": true
+        },
+        "currency": "metal",
+        "blanket": false,
+        "spread": {
+          "low": {
+            "value": 1.33,
+            "metal": {
+              "scrap": 12,
+              "refined": 1.3333,
+              "notation": "1.33 ref"
+            }
+          },
+          "mid": {
+            "value": 1.44,
+            "metal": {
+              "scrap": 13,
+              "refined": 1.4444,
+              "notation": "1.44 ref"
+            }
+          },
+          "high": {
+            "value": 1.55,
+            "metal": {
+              "scrap": 14,
+              "refined": 1.5556,
+              "notation": "1.55 ref"
+            }
+          }
+        },
+        "lastUpdatedAt": "2026-04-25T09:14:50.000Z"
+      }
+    },
+    {
+      "slug": "liquidators-lid",
       "name": "Liquidator's Lid",
       "defindex": 779,
       "aliases": [],
@@ -56630,7 +56630,7 @@
       }
     },
     {
-      "slug": "lord-cockswain-s-novelty-mutton-chops-and-pipe",
+      "slug": "lord-cockswains-novelty-mutton-chops-and-pipe",
       "name": "Lord Cockswain's Novelty Mutton Chops and Pipe",
       "defindex": 440,
       "aliases": [],
@@ -56693,7 +56693,7 @@
       }
     },
     {
-      "slug": "lord-cockswain-s-pith-helmet",
+      "slug": "lord-cockswains-pith-helmet",
       "name": "Lord Cockswain's Pith Helmet",
       "defindex": 439,
       "aliases": [],
@@ -57149,7 +57149,7 @@
       }
     },
     {
-      "slug": "lunatic-s-leathers",
+      "slug": "lunatics-leathers",
       "name": "Lunatic's Leathers",
       "defindex": 30400,
       "aliases": [],
@@ -57203,7 +57203,7 @@
       }
     },
     {
-      "slug": "lurker-s-leathers",
+      "slug": "lurkers-leathers",
       "name": "Lurker's Leathers",
       "defindex": 30631,
       "aliases": [],
@@ -57731,7 +57731,7 @@
       }
     },
     {
-      "slug": "madmann-s-muzzle",
+      "slug": "madmanns-muzzle",
       "name": "Madmann's Muzzle",
       "defindex": 31077,
       "aliases": [],
@@ -57901,7 +57901,7 @@
       }
     },
     {
-      "slug": "magistrate-s-mullet",
+      "slug": "magistrates-mullet",
       "name": "Magistrate's Mullet",
       "defindex": 147,
       "aliases": [],
@@ -58238,7 +58238,7 @@
       }
     },
     {
-      "slug": "maniac-s-manacles",
+      "slug": "maniacs-manacles",
       "name": "Maniac's Manacles",
       "defindex": 30196,
       "aliases": [],
@@ -59069,7 +59069,7 @@
       }
     },
     {
-      "slug": "marksman-s-mohair",
+      "slug": "marksmans-mohair",
       "name": "Marksman's Mohair",
       "defindex": 30599,
       "aliases": [],
@@ -59123,7 +59123,7 @@
       }
     },
     {
-      "slug": "marshall-s-mutton-chops",
+      "slug": "marshalls-mutton-chops",
       "name": "Marshall's Mutton Chops",
       "defindex": 30335,
       "aliases": [],
@@ -59596,7 +59596,7 @@
       }
     },
     {
-      "slug": "master-s-yellow-belt",
+      "slug": "masters-yellow-belt",
       "name": "Master's Yellow Belt",
       "defindex": 110,
       "aliases": [],
@@ -59650,7 +59650,7 @@
       }
     },
     {
-      "slug": "max-s-severed-head",
+      "slug": "maxs-severed-head",
       "name": "Max's Severed Head",
       "defindex": 162,
       "aliases": [],
@@ -60052,60 +60052,6 @@
       }
     },
     {
-      "slug": "medic-s-mountain-cap",
-      "name": "Medic's Mountain Cap",
-      "defindex": 381,
-      "aliases": [],
-      "slot": "head",
-      "classes": [
-        "medic"
-      ],
-      "kind": "class-exclusive",
-      "paintable": true,
-      "eventRestriction": null,
-      "styles": [],
-      "backpackIcon": {
-        "small": "http://media.steampowered.com/apps/440/icons/fieldcap.5ec2be963d3ce53f23faa13e11ef1bb63f50b157.png",
-        "large": "http://media.steampowered.com/apps/440/icons/fieldcap_large.9ed365201ef93ff212e32e11fe0e24bc27e1a746.png"
-      },
-      "price": {
-        "state": "priced",
-        "referenceVariant": {
-          "quality": "unique",
-          "craftable": true
-        },
-        "currency": "metal",
-        "blanket": false,
-        "spread": {
-          "low": {
-            "value": 1.33,
-            "metal": {
-              "scrap": 12,
-              "refined": 1.3333,
-              "notation": "1.33 ref"
-            }
-          },
-          "mid": {
-            "value": 1.44,
-            "metal": {
-              "scrap": 13,
-              "refined": 1.4444,
-              "notation": "1.44 ref"
-            }
-          },
-          "high": {
-            "value": 1.55,
-            "metal": {
-              "scrap": 14,
-              "refined": 1.5556,
-              "notation": "1.55 ref"
-            }
-          }
-        },
-        "lastUpdatedAt": "2025-04-16T02:06:33.000Z"
-      }
-    },
-    {
       "slug": "medical-emergency",
       "name": "Medical Emergency",
       "defindex": 31365,
@@ -60435,6 +60381,60 @@
           }
         },
         "lastUpdatedAt": "2026-04-24T13:13:43.000Z"
+      }
+    },
+    {
+      "slug": "medics-mountain-cap",
+      "name": "Medic's Mountain Cap",
+      "defindex": 381,
+      "aliases": [],
+      "slot": "head",
+      "classes": [
+        "medic"
+      ],
+      "kind": "class-exclusive",
+      "paintable": true,
+      "eventRestriction": null,
+      "styles": [],
+      "backpackIcon": {
+        "small": "http://media.steampowered.com/apps/440/icons/fieldcap.5ec2be963d3ce53f23faa13e11ef1bb63f50b157.png",
+        "large": "http://media.steampowered.com/apps/440/icons/fieldcap_large.9ed365201ef93ff212e32e11fe0e24bc27e1a746.png"
+      },
+      "price": {
+        "state": "priced",
+        "referenceVariant": {
+          "quality": "unique",
+          "craftable": true
+        },
+        "currency": "metal",
+        "blanket": false,
+        "spread": {
+          "low": {
+            "value": 1.33,
+            "metal": {
+              "scrap": 12,
+              "refined": 1.3333,
+              "notation": "1.33 ref"
+            }
+          },
+          "mid": {
+            "value": 1.44,
+            "metal": {
+              "scrap": 13,
+              "refined": 1.4444,
+              "notation": "1.44 ref"
+            }
+          },
+          "high": {
+            "value": 1.55,
+            "metal": {
+              "scrap": 14,
+              "refined": 1.5556,
+              "notation": "1.55 ref"
+            }
+          }
+        },
+        "lastUpdatedAt": "2025-04-16T02:06:33.000Z"
       }
     },
     {
@@ -60851,7 +60851,37 @@
       }
     },
     {
-      "slug": "merc-s-mohawk",
+      "slug": "mercenary-park",
+      "name": "Mercenary Park",
+      "defindex": 1191,
+      "aliases": [],
+      "slot": "head",
+      "classes": [
+        "scout",
+        "soldier",
+        "pyro",
+        "demoman",
+        "heavy",
+        "engineer",
+        "medic",
+        "sniper",
+        "spy"
+      ],
+      "kind": "all-class",
+      "paintable": false,
+      "eventRestriction": null,
+      "styles": [],
+      "backpackIcon": {
+        "small": "http://media.steampowered.com/apps/440/icons/mercenary_park_cap.7f3312b87481447743b18c3d4350b78841f3edb8.png",
+        "large": "http://media.steampowered.com/apps/440/icons/mercenary_park_cap_large.97e86500a7de3976d85fbefcb3739080d9d1e9d7.png"
+      },
+      "price": {
+        "state": "unpriced",
+        "reason": "missing-from-source"
+      }
+    },
+    {
+      "slug": "mercs-mohawk",
       "name": "Merc's Mohawk",
       "defindex": 30413,
       "aliases": [],
@@ -60913,7 +60943,7 @@
       }
     },
     {
-      "slug": "merc-s-muffler",
+      "slug": "mercs-muffler",
       "name": "Merc's Muffler",
       "defindex": 987,
       "aliases": [],
@@ -60975,7 +61005,7 @@
       }
     },
     {
-      "slug": "merc-s-pride-scarf",
+      "slug": "mercs-pride-scarf",
       "name": "Merc's Pride Scarf",
       "defindex": 541,
       "aliases": [],
@@ -61034,36 +61064,6 @@
           }
         },
         "lastUpdatedAt": "2026-05-17T18:01:13.000Z"
-      }
-    },
-    {
-      "slug": "mercenary-park",
-      "name": "Mercenary Park",
-      "defindex": 1191,
-      "aliases": [],
-      "slot": "head",
-      "classes": [
-        "scout",
-        "soldier",
-        "pyro",
-        "demoman",
-        "heavy",
-        "engineer",
-        "medic",
-        "sniper",
-        "spy"
-      ],
-      "kind": "all-class",
-      "paintable": false,
-      "eventRestriction": null,
-      "styles": [],
-      "backpackIcon": {
-        "small": "http://media.steampowered.com/apps/440/icons/mercenary_park_cap.7f3312b87481447743b18c3d4350b78841f3edb8.png",
-        "large": "http://media.steampowered.com/apps/440/icons/mercenary_park_cap_large.97e86500a7de3976d85fbefcb3739080d9d1e9d7.png"
-      },
-      "price": {
-        "state": "unpriced",
-        "reason": "missing-from-source"
       }
     },
     {
@@ -61129,7 +61129,7 @@
       }
     },
     {
-      "slug": "messenger-s-mail-bag",
+      "slug": "messengers-mail-bag",
       "name": "Messenger's Mail Bag",
       "defindex": 30869,
       "aliases": [],
@@ -61807,7 +61807,7 @@
       }
     },
     {
-      "slug": "miser-s-muttonchops",
+      "slug": "misers-muttonchops",
       "name": "Miser's Muttonchops",
       "defindex": 31027,
       "aliases": [],
@@ -61923,7 +61923,61 @@
       }
     },
     {
-      "slug": "misha-s-maw",
+      "slug": "mishap-mercenary",
+      "name": "Mishap Mercenary",
+      "defindex": 30475,
+      "aliases": [],
+      "slot": "head",
+      "classes": [
+        "pyro"
+      ],
+      "kind": "class-exclusive",
+      "paintable": true,
+      "eventRestriction": null,
+      "styles": [],
+      "backpackIcon": {
+        "small": "http://media.steampowered.com/apps/440/icons/sept2014_pyro_radioactive_mask.c9ccbae91e591c50cc1ab0d4a9f5daf4b9c5dbb9.png",
+        "large": "http://media.steampowered.com/apps/440/icons/sept2014_pyro_radioactive_mask_large.7b7daaf372adaa01436343848f098590dbd4148a.png"
+      },
+      "price": {
+        "state": "priced",
+        "referenceVariant": {
+          "quality": "unique",
+          "craftable": true
+        },
+        "currency": "keys",
+        "blanket": false,
+        "spread": {
+          "low": {
+            "value": 1.15,
+            "metal": {
+              "scrap": 664,
+              "refined": 73.7778,
+              "notation": "1 key, 9.66 ref"
+            }
+          },
+          "mid": {
+            "value": 1.2999999999999998,
+            "metal": {
+              "scrap": 750,
+              "refined": 83.3333,
+              "notation": "1 key, 19.22 ref"
+            }
+          },
+          "high": {
+            "value": 1.45,
+            "metal": {
+              "scrap": 837,
+              "refined": 93,
+              "notation": "1 key, 28.88 ref"
+            }
+          }
+        },
+        "lastUpdatedAt": "2026-04-22T16:54:01.000Z"
+      }
+    },
+    {
+      "slug": "mishas-maw",
       "name": "Misha's Maw",
       "defindex": 31315,
       "aliases": [],
@@ -61983,60 +62037,6 @@
           }
         },
         "lastUpdatedAt": "2026-04-15T12:55:11.000Z"
-      }
-    },
-    {
-      "slug": "mishap-mercenary",
-      "name": "Mishap Mercenary",
-      "defindex": 30475,
-      "aliases": [],
-      "slot": "head",
-      "classes": [
-        "pyro"
-      ],
-      "kind": "class-exclusive",
-      "paintable": true,
-      "eventRestriction": null,
-      "styles": [],
-      "backpackIcon": {
-        "small": "http://media.steampowered.com/apps/440/icons/sept2014_pyro_radioactive_mask.c9ccbae91e591c50cc1ab0d4a9f5daf4b9c5dbb9.png",
-        "large": "http://media.steampowered.com/apps/440/icons/sept2014_pyro_radioactive_mask_large.7b7daaf372adaa01436343848f098590dbd4148a.png"
-      },
-      "price": {
-        "state": "priced",
-        "referenceVariant": {
-          "quality": "unique",
-          "craftable": true
-        },
-        "currency": "keys",
-        "blanket": false,
-        "spread": {
-          "low": {
-            "value": 1.15,
-            "metal": {
-              "scrap": 664,
-              "refined": 73.7778,
-              "notation": "1 key, 9.66 ref"
-            }
-          },
-          "mid": {
-            "value": 1.2999999999999998,
-            "metal": {
-              "scrap": 750,
-              "refined": 83.3333,
-              "notation": "1 key, 19.22 ref"
-            }
-          },
-          "high": {
-            "value": 1.45,
-            "metal": {
-              "scrap": 837,
-              "refined": 93,
-              "notation": "1 key, 28.88 ref"
-            }
-          }
-        },
-        "lastUpdatedAt": "2026-04-22T16:54:01.000Z"
       }
     },
     {
@@ -62380,60 +62380,6 @@
       }
     },
     {
-      "slug": "mo-horn",
-      "name": "Mo'Horn",
-      "defindex": 30812,
-      "aliases": [],
-      "slot": "head",
-      "classes": [
-        "heavy"
-      ],
-      "kind": "class-exclusive",
-      "paintable": true,
-      "eventRestriction": null,
-      "styles": [],
-      "backpackIcon": {
-        "small": "http://media.steampowered.com/apps/440/icons/hwn2016_mo_horn.97f9d5eb9bf86229099c35a03a6e5356a773fc1d.png",
-        "large": "http://media.steampowered.com/apps/440/icons/hwn2016_mo_horn_large.bc340c9528e29684750c6d333cc1897c028f766c.png"
-      },
-      "price": {
-        "state": "priced",
-        "referenceVariant": {
-          "quality": "unique",
-          "craftable": true
-        },
-        "currency": "keys",
-        "blanket": false,
-        "spread": {
-          "low": {
-            "value": 2.45,
-            "metal": {
-              "scrap": 1414,
-              "refined": 157.1111,
-              "notation": "2 keys, 28.88 ref"
-            }
-          },
-          "mid": {
-            "value": 2.675,
-            "metal": {
-              "scrap": 1543,
-              "refined": 171.4444,
-              "notation": "2 keys, 43.22 ref"
-            }
-          },
-          "high": {
-            "value": 2.9,
-            "metal": {
-              "scrap": 1673,
-              "refined": 185.8889,
-              "notation": "2 keys, 57.66 ref"
-            }
-          }
-        },
-        "lastUpdatedAt": "2026-05-08T05:39:20.000Z"
-      }
-    },
-    {
       "slug": "moccasin-machinery",
       "name": "Moccasin Machinery",
       "defindex": 30527,
@@ -62612,6 +62558,60 @@
       }
     },
     {
+      "slug": "mohorn",
+      "name": "Mo'Horn",
+      "defindex": 30812,
+      "aliases": [],
+      "slot": "head",
+      "classes": [
+        "heavy"
+      ],
+      "kind": "class-exclusive",
+      "paintable": true,
+      "eventRestriction": null,
+      "styles": [],
+      "backpackIcon": {
+        "small": "http://media.steampowered.com/apps/440/icons/hwn2016_mo_horn.97f9d5eb9bf86229099c35a03a6e5356a773fc1d.png",
+        "large": "http://media.steampowered.com/apps/440/icons/hwn2016_mo_horn_large.bc340c9528e29684750c6d333cc1897c028f766c.png"
+      },
+      "price": {
+        "state": "priced",
+        "referenceVariant": {
+          "quality": "unique",
+          "craftable": true
+        },
+        "currency": "keys",
+        "blanket": false,
+        "spread": {
+          "low": {
+            "value": 2.45,
+            "metal": {
+              "scrap": 1414,
+              "refined": 157.1111,
+              "notation": "2 keys, 28.88 ref"
+            }
+          },
+          "mid": {
+            "value": 2.675,
+            "metal": {
+              "scrap": 1543,
+              "refined": 171.4444,
+              "notation": "2 keys, 43.22 ref"
+            }
+          },
+          "high": {
+            "value": 2.9,
+            "metal": {
+              "scrap": 1673,
+              "refined": 185.8889,
+              "notation": "2 keys, 57.66 ref"
+            }
+          }
+        },
+        "lastUpdatedAt": "2026-05-08T05:39:20.000Z"
+      }
+    },
+    {
       "slug": "momma-kiev",
       "name": "Momma Kiev",
       "defindex": 31123,
@@ -62768,7 +62768,7 @@
       }
     },
     {
-      "slug": "monster-s-stompers",
+      "slug": "monsters-stompers",
       "name": "Monster's Stompers",
       "defindex": 30259,
       "aliases": [],
@@ -63225,7 +63225,7 @@
       }
     },
     {
-      "slug": "mountebank-s-masque",
+      "slug": "mountebanks-masque",
       "name": "Mountebank's Masque",
       "defindex": 30573,
       "aliases": [],
@@ -63333,7 +63333,7 @@
       }
     },
     {
-      "slug": "mr-mundee-s-wild-ride",
+      "slug": "mr-mundees-wild-ride",
       "name": "Mr. Mundee's Wild Ride",
       "defindex": 30513,
       "aliases": [],
@@ -63558,7 +63558,7 @@
       }
     },
     {
-      "slug": "murderer-s-motif",
+      "slug": "murderers-motif",
       "name": "Murderer's Motif",
       "defindex": 31016,
       "aliases": [],
@@ -63905,7 +63905,7 @@
       }
     },
     {
-      "slug": "napper-s-respite",
+      "slug": "nappers-respite",
       "name": "Napper's Respite",
       "defindex": 248,
       "aliases": [],
@@ -64176,7 +64176,7 @@
       }
     },
     {
-      "slug": "neptune-s-nightmare",
+      "slug": "neptunes-nightmare",
       "name": "Neptune's Nightmare",
       "defindex": 30684,
       "aliases": [],
@@ -65294,7 +65294,7 @@
       }
     },
     {
-      "slug": "officer-s-ushanka",
+      "slug": "officers-ushanka",
       "name": "Officer's Ushanka",
       "defindex": 96,
       "aliases": [],
@@ -66277,7 +66277,7 @@
       }
     },
     {
-      "slug": "orion-s-belt",
+      "slug": "orions-belt",
       "name": "Orion's Belt",
       "defindex": 30564,
       "aliases": [],
@@ -66387,7 +66387,7 @@
       }
     },
     {
-      "slug": "otolaryngologist-s-mirror",
+      "slug": "otolaryngologists-mirror",
       "name": "Otolaryngologist's Mirror",
       "defindex": 104,
       "aliases": [],
@@ -67053,7 +67053,7 @@
       }
     },
     {
-      "slug": "pardner-s-pompadour",
+      "slug": "pardners-pompadour",
       "name": "Pardner's Pompadour",
       "defindex": 30099,
       "aliases": [],
@@ -67419,7 +67419,7 @@
       }
     },
     {
-      "slug": "patriot-s-pouches",
+      "slug": "patriots-pouches",
       "name": "Patriot's Pouches",
       "defindex": 30780,
       "aliases": [],
@@ -67536,7 +67536,7 @@
       }
     },
     {
-      "slug": "peacenik-s-ponytail",
+      "slug": "peaceniks-ponytail",
       "name": "Peacenik's Ponytail",
       "defindex": 30406,
       "aliases": [],
@@ -67769,7 +67769,64 @@
       }
     },
     {
-      "slug": "pest-s-pads",
+      "slug": "pestering-jester",
+      "name": "Pestering Jester",
+      "defindex": 30811,
+      "aliases": [],
+      "slot": "head",
+      "classes": [
+        "scout",
+        "soldier",
+        "pyro",
+        "heavy"
+      ],
+      "kind": "multi-class",
+      "paintable": true,
+      "eventRestriction": null,
+      "styles": [],
+      "backpackIcon": {
+        "small": "http://media.steampowered.com/apps/440/icons/hwn2016_pestering_jester.82cc1c57504249a8be6056b0a960ee0e9dd26f93.png",
+        "large": "http://media.steampowered.com/apps/440/icons/hwn2016_pestering_jester_large.b0bd5da5e2b172a1895bf8d0fa2ee076864d8419.png"
+      },
+      "price": {
+        "state": "priced",
+        "referenceVariant": {
+          "quality": "unique",
+          "craftable": true
+        },
+        "currency": "keys",
+        "blanket": false,
+        "spread": {
+          "low": {
+            "value": 5.15,
+            "metal": {
+              "scrap": 2972,
+              "refined": 330.2222,
+              "notation": "5 keys, 9.66 ref"
+            }
+          },
+          "mid": {
+            "value": 5.575,
+            "metal": {
+              "scrap": 3217,
+              "refined": 357.4444,
+              "notation": "5 keys, 36.88 ref"
+            }
+          },
+          "high": {
+            "value": 6,
+            "metal": {
+              "scrap": 3462,
+              "refined": 384.6667,
+              "notation": "6 keys"
+            }
+          }
+        },
+        "lastUpdatedAt": "2026-05-08T05:33:54.000Z"
+      }
+    },
+    {
+      "slug": "pests-pads",
       "name": "Pest's Pads",
       "defindex": 31285,
       "aliases": [],
@@ -67841,63 +67898,6 @@
           }
         },
         "lastUpdatedAt": "2026-04-21T14:13:39.000Z"
-      }
-    },
-    {
-      "slug": "pestering-jester",
-      "name": "Pestering Jester",
-      "defindex": 30811,
-      "aliases": [],
-      "slot": "head",
-      "classes": [
-        "scout",
-        "soldier",
-        "pyro",
-        "heavy"
-      ],
-      "kind": "multi-class",
-      "paintable": true,
-      "eventRestriction": null,
-      "styles": [],
-      "backpackIcon": {
-        "small": "http://media.steampowered.com/apps/440/icons/hwn2016_pestering_jester.82cc1c57504249a8be6056b0a960ee0e9dd26f93.png",
-        "large": "http://media.steampowered.com/apps/440/icons/hwn2016_pestering_jester_large.b0bd5da5e2b172a1895bf8d0fa2ee076864d8419.png"
-      },
-      "price": {
-        "state": "priced",
-        "referenceVariant": {
-          "quality": "unique",
-          "craftable": true
-        },
-        "currency": "keys",
-        "blanket": false,
-        "spread": {
-          "low": {
-            "value": 5.15,
-            "metal": {
-              "scrap": 2972,
-              "refined": 330.2222,
-              "notation": "5 keys, 9.66 ref"
-            }
-          },
-          "mid": {
-            "value": 5.575,
-            "metal": {
-              "scrap": 3217,
-              "refined": 357.4444,
-              "notation": "5 keys, 36.88 ref"
-            }
-          },
-          "high": {
-            "value": 6,
-            "metal": {
-              "scrap": 3462,
-              "refined": 384.6667,
-              "notation": "6 keys"
-            }
-          }
-        },
-        "lastUpdatedAt": "2026-05-08T05:33:54.000Z"
       }
     },
     {
@@ -68079,7 +68079,7 @@
       }
     },
     {
-      "slug": "physician-s-procedure-mask",
+      "slug": "physicians-procedure-mask",
       "name": "Physician's Procedure Mask",
       "defindex": 144,
       "aliases": [],
@@ -68133,7 +68133,7 @@
       }
     },
     {
-      "slug": "physician-s-protector",
+      "slug": "physicians-protector",
       "name": "Physician's Protector",
       "defindex": 30625,
       "aliases": [],
@@ -68803,7 +68803,7 @@
       }
     },
     {
-      "slug": "plumber-s-cap",
+      "slug": "plumbers-cap",
       "name": "Plumber's Cap",
       "defindex": 30846,
       "aliases": [],
@@ -68857,7 +68857,7 @@
       }
     },
     {
-      "slug": "plumber-s-pipe",
+      "slug": "plumbers-pipe",
       "name": "Plumber's Pipe",
       "defindex": 30022,
       "aliases": [],
@@ -68974,7 +68974,7 @@
       }
     },
     {
-      "slug": "poacher-s-safari-jacket",
+      "slug": "poachers-safari-jacket",
       "name": "Poacher's Safari Jacket",
       "defindex": 30478,
       "aliases": [],
@@ -71189,7 +71189,7 @@
       }
     },
     {
-      "slug": "practitioner-s-processing-mask",
+      "slug": "practitioners-processing-mask",
       "name": "Practitioner's Processing Mask",
       "defindex": 30046,
       "aliases": [],
@@ -71297,7 +71297,7 @@
       }
     },
     {
-      "slug": "prancer-s-pride",
+      "slug": "prancers-pride",
       "name": "Prancer's Pride",
       "defindex": 318,
       "aliases": [],
@@ -71467,7 +71467,7 @@
       }
     },
     {
-      "slug": "prince-tavish-s-crown",
+      "slug": "prince-tavishs-crown",
       "name": "Prince Tavish's Crown",
       "defindex": 342,
       "aliases": [],
@@ -71809,7 +71809,7 @@
       }
     },
     {
-      "slug": "professional-s-panama",
+      "slug": "professionals-panama",
       "name": "Professional's Panama",
       "defindex": 109,
       "aliases": [],
@@ -71863,7 +71863,7 @@
       }
     },
     {
-      "slug": "professional-s-pom-pom",
+      "slug": "professionals-pom-pom",
       "name": "Professional's Pom-Pom",
       "defindex": 31170,
       "aliases": [],
@@ -71925,7 +71925,7 @@
       }
     },
     {
-      "slug": "professional-s-ushanka",
+      "slug": "professionals-ushanka",
       "name": "Professional's Ushanka",
       "defindex": 30598,
       "aliases": [],
@@ -72050,7 +72050,7 @@
       }
     },
     {
-      "slug": "professor-s-peculiarity",
+      "slug": "professors-peculiarity",
       "name": "Professor's Peculiarity",
       "defindex": 384,
       "aliases": [],
@@ -72113,7 +72113,7 @@
       }
     },
     {
-      "slug": "professor-s-pineapple",
+      "slug": "professors-pineapple",
       "name": "Professor's Pineapple",
       "defindex": 768,
       "aliases": [],
@@ -72718,7 +72718,7 @@
       }
     },
     {
-      "slug": "pugilist-s-protector",
+      "slug": "pugilists-protector",
       "name": "Pugilist's Protector",
       "defindex": 246,
       "aliases": [],
@@ -72772,7 +72772,7 @@
       }
     },
     {
-      "slug": "puncher-s-polar-puffer",
+      "slug": "punchers-polar-puffer",
       "name": "Puncher's Polar Puffer",
       "defindex": 31585,
       "aliases": [],
@@ -72843,7 +72843,7 @@
       }
     },
     {
-      "slug": "punk-s-pomp",
+      "slug": "punks-pomp",
       "name": "Punk's Pomp",
       "defindex": 30993,
       "aliases": [],
@@ -73059,60 +73059,6 @@
       }
     },
     {
-      "slug": "pyr-o-lantern",
-      "name": "Pyr'o Lantern",
-      "defindex": 31076,
-      "aliases": [],
-      "slot": "misc",
-      "classes": [
-        "pyro"
-      ],
-      "kind": "class-exclusive",
-      "paintable": true,
-      "eventRestriction": null,
-      "styles": [],
-      "backpackIcon": {
-        "small": "http://media.steampowered.com/apps/440/icons/hwn2019_pyro_lantern.4a3589e5a7f694837fd194efedf3a49a3033ea38.png",
-        "large": "http://media.steampowered.com/apps/440/icons/hwn2019_pyro_lantern_large.4bb2278672f7f4a9d0b0dba43379a9fa3cae61db.png"
-      },
-      "price": {
-        "state": "priced",
-        "referenceVariant": {
-          "quality": "unique",
-          "craftable": true
-        },
-        "currency": "keys",
-        "blanket": false,
-        "spread": {
-          "low": {
-            "value": 1.2,
-            "metal": {
-              "scrap": 692,
-              "refined": 76.8889,
-              "notation": "1 key, 12.77 ref"
-            }
-          },
-          "mid": {
-            "value": 1.25,
-            "metal": {
-              "scrap": 721,
-              "refined": 80.1111,
-              "notation": "1 key, 16 ref"
-            }
-          },
-          "high": {
-            "value": 1.3,
-            "metal": {
-              "scrap": 750,
-              "refined": 83.3333,
-              "notation": "1 key, 19.22 ref"
-            }
-          }
-        },
-        "lastUpdatedAt": "2026-02-09T23:19:43.000Z"
-      }
-    },
-    {
       "slug": "pyro-in-chinatown",
       "name": "Pyro in Chinatown",
       "defindex": 31004,
@@ -73176,6 +73122,60 @@
       }
     },
     {
+      "slug": "pyro-lantern",
+      "name": "Pyr'o Lantern",
+      "defindex": 31076,
+      "aliases": [],
+      "slot": "misc",
+      "classes": [
+        "pyro"
+      ],
+      "kind": "class-exclusive",
+      "paintable": true,
+      "eventRestriction": null,
+      "styles": [],
+      "backpackIcon": {
+        "small": "http://media.steampowered.com/apps/440/icons/hwn2019_pyro_lantern.4a3589e5a7f694837fd194efedf3a49a3033ea38.png",
+        "large": "http://media.steampowered.com/apps/440/icons/hwn2019_pyro_lantern_large.4bb2278672f7f4a9d0b0dba43379a9fa3cae61db.png"
+      },
+      "price": {
+        "state": "priced",
+        "referenceVariant": {
+          "quality": "unique",
+          "craftable": true
+        },
+        "currency": "keys",
+        "blanket": false,
+        "spread": {
+          "low": {
+            "value": 1.2,
+            "metal": {
+              "scrap": 692,
+              "refined": 76.8889,
+              "notation": "1 key, 12.77 ref"
+            }
+          },
+          "mid": {
+            "value": 1.25,
+            "metal": {
+              "scrap": 721,
+              "refined": 80.1111,
+              "notation": "1 key, 16 ref"
+            }
+          },
+          "high": {
+            "value": 1.3,
+            "metal": {
+              "scrap": 750,
+              "refined": 83.3333,
+              "notation": "1 key, 19.22 ref"
+            }
+          }
+        },
+        "lastUpdatedAt": "2026-02-09T23:19:43.000Z"
+      }
+    },
+    {
       "slug": "pyro-mask",
       "name": "Pyro Mask",
       "defindex": 276,
@@ -73235,149 +73235,6 @@
           }
         },
         "lastUpdatedAt": "2026-04-22T11:00:32.000Z"
-      }
-    },
-    {
-      "slug": "pyro-s-beanie",
-      "name": "Pyro's Beanie",
-      "defindex": 51,
-      "aliases": [],
-      "slot": "head",
-      "classes": [
-        "pyro"
-      ],
-      "kind": "class-exclusive",
-      "paintable": true,
-      "eventRestriction": null,
-      "styles": [],
-      "backpackIcon": {
-        "small": "http://media.steampowered.com/apps/440/icons/pyro_hat.fd9f6176a6b78f08bb572b37d9af537ddee2e189.png",
-        "large": "http://media.steampowered.com/apps/440/icons/pyro_hat_large.1d851f1875a3f8f1f29b428799ee23f0c46f6671.png"
-      },
-      "price": {
-        "state": "priced",
-        "referenceVariant": {
-          "quality": "unique",
-          "craftable": true
-        },
-        "currency": "keys",
-        "blanket": false,
-        "spread": {
-          "low": {
-            "value": 1,
-            "metal": {
-              "scrap": 577,
-              "refined": 64.1111,
-              "notation": "1 key"
-            }
-          },
-          "mid": {
-            "value": 1.05,
-            "metal": {
-              "scrap": 606,
-              "refined": 67.3333,
-              "notation": "1 key, 3.22 ref"
-            }
-          },
-          "high": {
-            "value": 1.1,
-            "metal": {
-              "scrap": 635,
-              "refined": 70.5556,
-              "notation": "1 key, 6.44 ref"
-            }
-          }
-        },
-        "lastUpdatedAt": "2026-04-21T19:11:18.000Z"
-      }
-    },
-    {
-      "slug": "pyro-s-boron-beanie",
-      "name": "Pyro's Boron Beanie",
-      "defindex": 30040,
-      "aliases": [],
-      "slot": "head",
-      "classes": [
-        "pyro"
-      ],
-      "kind": "class-exclusive",
-      "paintable": true,
-      "eventRestriction": null,
-      "styles": [],
-      "backpackIcon": {
-        "small": "http://media.steampowered.com/apps/440/icons/robo_pyro_whirly_bird.7a5a7dede50e1fae0df7741ee25a893c021fd207.png",
-        "large": "http://media.steampowered.com/apps/440/icons/robo_pyro_whirly_bird_large.e1b177805185c8363c143e802fe64a27a9b1ad6b.png"
-      },
-      "price": {
-        "state": "priced",
-        "referenceVariant": {
-          "quality": "unique",
-          "craftable": true
-        },
-        "currency": "metal",
-        "blanket": false,
-        "spread": {
-          "low": {
-            "value": 1.88,
-            "metal": {
-              "scrap": 17,
-              "refined": 1.8889,
-              "notation": "1.88 ref"
-            }
-          },
-          "mid": {
-            "value": 1.94,
-            "metal": {
-              "scrap": 17,
-              "refined": 1.8889,
-              "notation": "1.88 ref"
-            }
-          },
-          "high": {
-            "value": 2,
-            "metal": {
-              "scrap": 18,
-              "refined": 2,
-              "notation": "2 ref"
-            }
-          }
-        },
-        "lastUpdatedAt": "2026-04-05T10:22:52.000Z"
-      }
-    },
-    {
-      "slug": "pyro-s-overalls",
-      "name": "Pyro's Overalls",
-      "defindex": 31616,
-      "aliases": [],
-      "slot": "misc",
-      "classes": [
-        "pyro"
-      ],
-      "kind": "class-exclusive",
-      "paintable": true,
-      "eventRestriction": null,
-      "styles": [
-        {
-          "index": 0,
-          "name": "First Grade"
-        },
-        {
-          "index": 1,
-          "name": "Second Grade"
-        },
-        {
-          "index": 2,
-          "name": "Third Grade"
-        }
-      ],
-      "backpackIcon": {
-        "small": "http://media.steampowered.com/apps/440/icons/sum26_pyros_overalls.b889f093fdfe2598c37da4d8ce17c8452cb0e15f.png",
-        "large": "http://media.steampowered.com/apps/440/icons/sum26_pyros_overalls_large.c2de8a5cee51f0bb8addbaafd0d1cbf3e5429ad2.png"
-      },
-      "price": {
-        "state": "unpriced",
-        "reason": "missing-from-source"
       }
     },
     {
@@ -73587,7 +73444,7 @@
       }
     },
     {
-      "slug": "pyromancer-s-hood",
+      "slug": "pyromancers-hood",
       "name": "Pyromancer's Hood",
       "defindex": 30580,
       "aliases": [],
@@ -73641,7 +73498,7 @@
       }
     },
     {
-      "slug": "pyromancer-s-mask",
+      "slug": "pyromancers-mask",
       "name": "Pyromancer's Mask",
       "defindex": 316,
       "aliases": [],
@@ -73708,7 +73565,7 @@
       }
     },
     {
-      "slug": "pyromancer-s-raiments",
+      "slug": "pyromancers-raiments",
       "name": "Pyromancer's Raiments",
       "defindex": 30581,
       "aliases": [],
@@ -73813,6 +73670,149 @@
           }
         },
         "lastUpdatedAt": "2026-04-25T04:10:01.000Z"
+      }
+    },
+    {
+      "slug": "pyros-beanie",
+      "name": "Pyro's Beanie",
+      "defindex": 51,
+      "aliases": [],
+      "slot": "head",
+      "classes": [
+        "pyro"
+      ],
+      "kind": "class-exclusive",
+      "paintable": true,
+      "eventRestriction": null,
+      "styles": [],
+      "backpackIcon": {
+        "small": "http://media.steampowered.com/apps/440/icons/pyro_hat.fd9f6176a6b78f08bb572b37d9af537ddee2e189.png",
+        "large": "http://media.steampowered.com/apps/440/icons/pyro_hat_large.1d851f1875a3f8f1f29b428799ee23f0c46f6671.png"
+      },
+      "price": {
+        "state": "priced",
+        "referenceVariant": {
+          "quality": "unique",
+          "craftable": true
+        },
+        "currency": "keys",
+        "blanket": false,
+        "spread": {
+          "low": {
+            "value": 1,
+            "metal": {
+              "scrap": 577,
+              "refined": 64.1111,
+              "notation": "1 key"
+            }
+          },
+          "mid": {
+            "value": 1.05,
+            "metal": {
+              "scrap": 606,
+              "refined": 67.3333,
+              "notation": "1 key, 3.22 ref"
+            }
+          },
+          "high": {
+            "value": 1.1,
+            "metal": {
+              "scrap": 635,
+              "refined": 70.5556,
+              "notation": "1 key, 6.44 ref"
+            }
+          }
+        },
+        "lastUpdatedAt": "2026-04-21T19:11:18.000Z"
+      }
+    },
+    {
+      "slug": "pyros-boron-beanie",
+      "name": "Pyro's Boron Beanie",
+      "defindex": 30040,
+      "aliases": [],
+      "slot": "head",
+      "classes": [
+        "pyro"
+      ],
+      "kind": "class-exclusive",
+      "paintable": true,
+      "eventRestriction": null,
+      "styles": [],
+      "backpackIcon": {
+        "small": "http://media.steampowered.com/apps/440/icons/robo_pyro_whirly_bird.7a5a7dede50e1fae0df7741ee25a893c021fd207.png",
+        "large": "http://media.steampowered.com/apps/440/icons/robo_pyro_whirly_bird_large.e1b177805185c8363c143e802fe64a27a9b1ad6b.png"
+      },
+      "price": {
+        "state": "priced",
+        "referenceVariant": {
+          "quality": "unique",
+          "craftable": true
+        },
+        "currency": "metal",
+        "blanket": false,
+        "spread": {
+          "low": {
+            "value": 1.88,
+            "metal": {
+              "scrap": 17,
+              "refined": 1.8889,
+              "notation": "1.88 ref"
+            }
+          },
+          "mid": {
+            "value": 1.94,
+            "metal": {
+              "scrap": 17,
+              "refined": 1.8889,
+              "notation": "1.88 ref"
+            }
+          },
+          "high": {
+            "value": 2,
+            "metal": {
+              "scrap": 18,
+              "refined": 2,
+              "notation": "2 ref"
+            }
+          }
+        },
+        "lastUpdatedAt": "2026-04-05T10:22:52.000Z"
+      }
+    },
+    {
+      "slug": "pyros-overalls",
+      "name": "Pyro's Overalls",
+      "defindex": 31616,
+      "aliases": [],
+      "slot": "misc",
+      "classes": [
+        "pyro"
+      ],
+      "kind": "class-exclusive",
+      "paintable": true,
+      "eventRestriction": null,
+      "styles": [
+        {
+          "index": 0,
+          "name": "First Grade"
+        },
+        {
+          "index": 1,
+          "name": "Second Grade"
+        },
+        {
+          "index": 2,
+          "name": "Third Grade"
+        }
+      ],
+      "backpackIcon": {
+        "small": "http://media.steampowered.com/apps/440/icons/sum26_pyros_overalls.b889f093fdfe2598c37da4d8ce17c8452cb0e15f.png",
+        "large": "http://media.steampowered.com/apps/440/icons/sum26_pyros_overalls_large.c2de8a5cee51f0bb8addbaafd0d1cbf3e5429ad2.png"
+      },
+      "price": {
+        "state": "unpriced",
+        "reason": "missing-from-source"
       }
     },
     {
@@ -74350,7 +74350,7 @@
       }
     },
     {
-      "slug": "raven-s-visage",
+      "slug": "ravens-visage",
       "name": "Raven's Visage",
       "defindex": 30298,
       "aliases": [],
@@ -74458,7 +74458,7 @@
       }
     },
     {
-      "slug": "reader-s-choice",
+      "slug": "readers-choice",
       "name": "Reader's Choice",
       "defindex": 30831,
       "aliases": [],
@@ -75013,7 +75013,7 @@
       }
     },
     {
-      "slug": "reissued-dealer-s-visor",
+      "slug": "reissued-dealers-visor",
       "name": "Reissued Dealer's Visor",
       "defindex": 1201,
       "aliases": [],
@@ -75321,7 +75321,7 @@
       }
     },
     {
-      "slug": "rifleman-s-regalia",
+      "slug": "riflemans-regalia",
       "name": "Rifleman's Regalia",
       "defindex": 30895,
       "aliases": [],
@@ -75537,7 +75537,7 @@
       }
     },
     {
-      "slug": "ritzy-rick-s-hair-fixative",
+      "slug": "ritzy-ricks-hair-fixative",
       "name": "Ritzy Rick's Hair Fixative",
       "defindex": 117,
       "aliases": [],
@@ -76164,7 +76164,7 @@
       }
     },
     {
-      "slug": "rogue-s-brogues",
+      "slug": "rogues-brogues",
       "name": "Rogue's Brogues",
       "defindex": 30125,
       "aliases": [],
@@ -76218,7 +76218,7 @@
       }
     },
     {
-      "slug": "rogue-s-col-roule",
+      "slug": "rogues-col-roule",
       "name": "Rogue's Col Roule",
       "defindex": 483,
       "aliases": [],
@@ -76272,7 +76272,7 @@
       }
     },
     {
-      "slug": "rogue-s-rabbit",
+      "slug": "rogues-rabbit",
       "name": "Rogue's Rabbit",
       "defindex": 30507,
       "aliases": [],
@@ -76326,7 +76326,7 @@
       }
     },
     {
-      "slug": "rogue-s-robe",
+      "slug": "rogues-robe",
       "name": "Rogue's Robe",
       "defindex": 30389,
       "aliases": [],
@@ -76837,7 +76837,7 @@
       }
     },
     {
-      "slug": "runner-s-warm-up",
+      "slug": "runners-warm-up",
       "name": "Runner's Warm-Up",
       "defindex": 30332,
       "aliases": [],
@@ -77169,7 +77169,7 @@
       }
     },
     {
-      "slug": "safe-n-sound",
+      "slug": "safensound",
       "name": "Safe'n'Sound",
       "defindex": 178,
       "aliases": [],
@@ -77519,7 +77519,7 @@
       }
     },
     {
-      "slug": "sandmann-s-brush",
+      "slug": "sandmanns-brush",
       "name": "SandMann's Brush",
       "defindex": 31178,
       "aliases": [],
@@ -78146,7 +78146,7 @@
       }
     },
     {
-      "slug": "scoper-s-scales",
+      "slug": "scopers-scales",
       "name": "Scoper's Scales",
       "defindex": 31005,
       "aliases": [],
@@ -78200,7 +78200,7 @@
       }
     },
     {
-      "slug": "scoper-s-smoke",
+      "slug": "scopers-smoke",
       "name": "Scoper's Smoke",
       "defindex": 30423,
       "aliases": [],
@@ -78533,7 +78533,7 @@
       }
     },
     {
-      "slug": "scotsman-s-stove-pipe",
+      "slug": "scotsmans-stove-pipe",
       "name": "Scotsman's Stove Pipe",
       "defindex": 120,
       "aliases": [],
@@ -79323,7 +79323,7 @@
       }
     },
     {
-      "slug": "seamann-s-stubble",
+      "slug": "seamanns-stubble",
       "name": "Seamann's Stubble",
       "defindex": 31565,
       "aliases": [],
@@ -79932,7 +79932,7 @@
       }
     },
     {
-      "slug": "semi-tame-trapper-s-hat",
+      "slug": "semi-tame-trappers-hat",
       "name": "Semi-Tame Trapper's Hat",
       "defindex": 31147,
       "aliases": [],
@@ -80071,7 +80071,7 @@
       }
     },
     {
-      "slug": "sergeant-s-drill-hat",
+      "slug": "sergeants-drill-hat",
       "name": "Sergeant's Drill Hat",
       "defindex": 183,
       "aliases": [],
@@ -80305,7 +80305,7 @@
       }
     },
     {
-      "slug": "shadowman-s-shade",
+      "slug": "shadowmans-shade",
       "name": "Shadowman's Shade",
       "defindex": 30505,
       "aliases": [],
@@ -80413,7 +80413,7 @@
       }
     },
     {
-      "slug": "shaman-s-skull",
+      "slug": "shamans-skull",
       "name": "Shaman's Skull",
       "defindex": 30270,
       "aliases": [],
@@ -80575,7 +80575,7 @@
       }
     },
     {
-      "slug": "sharpshooter-s-shroud",
+      "slug": "sharpshooters-shroud",
       "name": "Sharpshooter's Shroud",
       "defindex": 31405,
       "aliases": [],
@@ -80683,7 +80683,7 @@
       }
     },
     {
-      "slug": "sheriff-s-stetson",
+      "slug": "sheriffs-stetson",
       "name": "Sheriff's Stetson",
       "defindex": 30634,
       "aliases": [],
@@ -80916,7 +80916,7 @@
       }
     },
     {
-      "slug": "shogun-s-shoulder-guard",
+      "slug": "shoguns-shoulder-guard",
       "name": "Shogun's Shoulder Guard",
       "defindex": 30126,
       "aliases": [],
@@ -80970,7 +80970,7 @@
       }
     },
     {
-      "slug": "shooter-s-sola-topi",
+      "slug": "shooters-sola-topi",
       "name": "Shooter's Sola Topi",
       "defindex": 158,
       "aliases": [],
@@ -81024,7 +81024,7 @@
       }
     },
     {
-      "slug": "shooter-s-tin-topi",
+      "slug": "shooters-tin-topi",
       "name": "Shooter's Tin Topi",
       "defindex": 30005,
       "aliases": [],
@@ -81613,7 +81613,7 @@
       }
     },
     {
-      "slug": "sidekick-s-side-slick",
+      "slug": "sidekicks-side-slick",
       "name": "Sidekick's Side Slick",
       "defindex": 30735,
       "aliases": [],
@@ -81855,7 +81855,7 @@
       }
     },
     {
-      "slug": "sign-of-the-wolf-s-school",
+      "slug": "sign-of-the-wolfs-school",
       "name": "Sign of the Wolf's School",
       "defindex": 454,
       "aliases": [],
@@ -81963,7 +81963,7 @@
       }
     },
     {
-      "slug": "sinner-s-shade",
+      "slug": "sinners-shade",
       "name": "Sinner's Shade",
       "defindex": 30959,
       "aliases": [],
@@ -82613,7 +82613,7 @@
       }
     },
     {
-      "slug": "sledder-s-sidekick",
+      "slug": "sledders-sidekick",
       "name": "Sledder's Sidekick",
       "defindex": 30923,
       "aliases": [],
@@ -84903,7 +84903,51 @@
       }
     },
     {
-      "slug": "soldier-s-slope-scopers",
+      "slug": "soldierbot-armor",
+      "name": "Soldierbot Armor",
+      "defindex": 30157,
+      "aliases": [],
+      "slot": "misc",
+      "classes": [
+        "soldier"
+      ],
+      "kind": "class-exclusive",
+      "paintable": false,
+      "eventRestriction": null,
+      "styles": [],
+      "backpackIcon": {
+        "small": "http://media.steampowered.com/apps/440/icons/tw_soldierbot_armor.9af3e51249156aa9048fbd2a381ecbe7b939ca7b.png",
+        "large": "http://media.steampowered.com/apps/440/icons/tw_soldierbot_armor_large.5589926cad76afba95ed7892264d1e12655bc85b.png"
+      },
+      "price": {
+        "state": "unpriced",
+        "reason": "missing-from-source"
+      }
+    },
+    {
+      "slug": "soldierbot-helmet",
+      "name": "Soldierbot Helmet",
+      "defindex": 30158,
+      "aliases": [],
+      "slot": "head",
+      "classes": [
+        "soldier"
+      ],
+      "kind": "class-exclusive",
+      "paintable": false,
+      "eventRestriction": null,
+      "styles": [],
+      "backpackIcon": {
+        "small": "http://media.steampowered.com/apps/440/icons/tw_soldierbot_helmet.9af3e51249156aa9048fbd2a381ecbe7b939ca7b.png",
+        "large": "http://media.steampowered.com/apps/440/icons/tw_soldierbot_helmet_large.5589926cad76afba95ed7892264d1e12655bc85b.png"
+      },
+      "price": {
+        "state": "unpriced",
+        "reason": "missing-from-source"
+      }
+    },
+    {
+      "slug": "soldiers-slope-scopers",
       "name": "Soldier's Slope Scopers",
       "defindex": 980,
       "aliases": [],
@@ -84966,7 +85010,7 @@
       }
     },
     {
-      "slug": "soldier-s-sparkplug",
+      "slug": "soldiers-sparkplug",
       "name": "Soldier's Sparkplug",
       "defindex": 30033,
       "aliases": [],
@@ -85020,7 +85064,7 @@
       }
     },
     {
-      "slug": "soldier-s-stash",
+      "slug": "soldiers-stash",
       "name": "Soldier's Stash",
       "defindex": 54,
       "aliases": [],
@@ -85074,7 +85118,7 @@
       }
     },
     {
-      "slug": "soldier-s-stogie",
+      "slug": "soldiers-stogie",
       "name": "Soldier's Stogie",
       "defindex": 852,
       "aliases": [],
@@ -85125,50 +85169,6 @@
           }
         },
         "lastUpdatedAt": "2026-01-30T05:32:56.000Z"
-      }
-    },
-    {
-      "slug": "soldierbot-armor",
-      "name": "Soldierbot Armor",
-      "defindex": 30157,
-      "aliases": [],
-      "slot": "misc",
-      "classes": [
-        "soldier"
-      ],
-      "kind": "class-exclusive",
-      "paintable": false,
-      "eventRestriction": null,
-      "styles": [],
-      "backpackIcon": {
-        "small": "http://media.steampowered.com/apps/440/icons/tw_soldierbot_armor.9af3e51249156aa9048fbd2a381ecbe7b939ca7b.png",
-        "large": "http://media.steampowered.com/apps/440/icons/tw_soldierbot_armor_large.5589926cad76afba95ed7892264d1e12655bc85b.png"
-      },
-      "price": {
-        "state": "unpriced",
-        "reason": "missing-from-source"
-      }
-    },
-    {
-      "slug": "soldierbot-helmet",
-      "name": "Soldierbot Helmet",
-      "defindex": 30158,
-      "aliases": [],
-      "slot": "head",
-      "classes": [
-        "soldier"
-      ],
-      "kind": "class-exclusive",
-      "paintable": false,
-      "eventRestriction": null,
-      "styles": [],
-      "backpackIcon": {
-        "small": "http://media.steampowered.com/apps/440/icons/tw_soldierbot_helmet.9af3e51249156aa9048fbd2a381ecbe7b939ca7b.png",
-        "large": "http://media.steampowered.com/apps/440/icons/tw_soldierbot_helmet_large.5589926cad76afba95ed7892264d1e12655bc85b.png"
-      },
-      "price": {
-        "state": "unpriced",
-        "reason": "missing-from-source"
       }
     },
     {
@@ -86142,7 +86142,7 @@
       }
     },
     {
-      "slug": "spectre-s-spectacles",
+      "slug": "spectres-spectacles",
       "name": "Spectre's Spectacles",
       "defindex": 629,
       "aliases": [],
@@ -86196,7 +86196,7 @@
       }
     },
     {
-      "slug": "speedster-s-spandex",
+      "slug": "speedsters-spandex",
       "name": "Speedster's Spandex",
       "defindex": 30875,
       "aliases": [],
@@ -86317,7 +86317,7 @@
       }
     },
     {
-      "slug": "spellbinder-s-bonnet",
+      "slug": "spellbinders-bonnet",
       "name": "Spellbinder's Bonnet",
       "defindex": 30268,
       "aliases": [],
@@ -87549,7 +87549,7 @@
       }
     },
     {
-      "slug": "squatter-s-right",
+      "slug": "squatters-right",
       "name": "Squatter's Right",
       "defindex": 31267,
       "aliases": [],
@@ -87612,7 +87612,7 @@
       }
     },
     {
-      "slug": "squid-s-lid",
+      "slug": "squids-lid",
       "name": "Squid's Lid",
       "defindex": 30219,
       "aliases": [],
@@ -87666,7 +87666,7 @@
       }
     },
     {
-      "slug": "squire-s-sabatons",
+      "slug": "squires-sabatons",
       "name": "Squire's Sabatons",
       "defindex": 30771,
       "aliases": [],
@@ -87891,7 +87891,7 @@
       }
     },
     {
-      "slug": "stapler-s-specs",
+      "slug": "staplers-specs",
       "name": "Stapler's Specs",
       "defindex": 31036,
       "aliases": [],
@@ -88744,7 +88744,7 @@
       }
     },
     {
-      "slug": "stockbroker-s-scarf",
+      "slug": "stockbrokers-scarf",
       "name": "Stockbroker's Scarf",
       "defindex": 336,
       "aliases": [],
@@ -89536,7 +89536,7 @@
       }
     },
     {
-      "slug": "sultan-s-ceremonial",
+      "slug": "sultans-ceremonial",
       "name": "Sultan's Ceremonial",
       "defindex": 403,
       "aliases": [],
@@ -89957,7 +89957,7 @@
       }
     },
     {
-      "slug": "surgeon-s-shako",
+      "slug": "surgeons-shako",
       "name": "Surgeon's Shako",
       "defindex": 30596,
       "aliases": [],
@@ -90011,7 +90011,7 @@
       }
     },
     {
-      "slug": "surgeon-s-side-satchel",
+      "slug": "surgeons-side-satchel",
       "name": "Surgeon's Side Satchel",
       "defindex": 770,
       "aliases": [],
@@ -90065,7 +90065,7 @@
       }
     },
     {
-      "slug": "surgeon-s-sidearms",
+      "slug": "surgeons-sidearms",
       "name": "Surgeon's Sidearms",
       "defindex": 30813,
       "aliases": [],
@@ -90119,7 +90119,7 @@
       }
     },
     {
-      "slug": "surgeon-s-space-suit",
+      "slug": "surgeons-space-suit",
       "name": "Surgeon's Space Suit",
       "defindex": 30230,
       "aliases": [],
@@ -90173,7 +90173,7 @@
       }
     },
     {
-      "slug": "surgeon-s-stahlhelm",
+      "slug": "surgeons-stahlhelm",
       "name": "Surgeon's Stahlhelm",
       "defindex": 616,
       "aliases": [],
@@ -90227,7 +90227,7 @@
       }
     },
     {
-      "slug": "surgeon-s-stethoscope",
+      "slug": "surgeons-stethoscope",
       "name": "Surgeon's Stethoscope",
       "defindex": 621,
       "aliases": [],
@@ -90357,7 +90357,7 @@
       }
     },
     {
-      "slug": "swagman-s-swatter",
+      "slug": "swagmans-swatter",
       "name": "Swagman's Swatter",
       "defindex": 626,
       "aliases": [],
@@ -90843,7 +90843,7 @@
       }
     },
     {
-      "slug": "tanker-s-top",
+      "slug": "tankers-top",
       "name": "Tanker's Top",
       "defindex": 31460,
       "aliases": [],
@@ -91356,7 +91356,7 @@
       }
     },
     {
-      "slug": "technician-s-tunic",
+      "slug": "technicians-tunic",
       "name": "Technician's Tunic",
       "defindex": 31550,
       "aliases": [],
@@ -91581,7 +91581,7 @@
       }
     },
     {
-      "slug": "templar-s-spirit",
+      "slug": "templars-spirit",
       "name": "Templar's Spirit",
       "defindex": 30514,
       "aliases": [],
@@ -92041,7 +92041,7 @@
       }
     },
     {
-      "slug": "texas-slim-s-dome-shine",
+      "slug": "texas-slims-dome-shine",
       "name": "Texas Slim's Dome Shine",
       "defindex": 118,
       "aliases": [],
@@ -93123,7 +93123,7 @@
       }
     },
     {
-      "slug": "tippler-s-tricorne",
+      "slug": "tipplers-tricorne",
       "name": "Tippler's Tricorne",
       "defindex": 179,
       "aliases": [],
@@ -93698,7 +93698,7 @@
       }
     },
     {
-      "slug": "torcher-s-tabard",
+      "slug": "torchers-tabard",
       "name": "Torcher's Tabard",
       "defindex": 30583,
       "aliases": [],
@@ -93752,7 +93752,7 @@
       }
     },
     {
-      "slug": "torcher-s-trench-coat",
+      "slug": "torchers-trench-coat",
       "name": "Torcher's Trench Coat",
       "defindex": 31433,
       "aliases": [],
@@ -93923,7 +93923,7 @@
       }
     },
     {
-      "slug": "tough-guy-s-toque",
+      "slug": "tough-guys-toque",
       "name": "Tough Guy's Toque",
       "defindex": 97,
       "aliases": [],
@@ -94816,7 +94816,7 @@
       }
     },
     {
-      "slug": "trapper-s-flap",
+      "slug": "trappers-flap",
       "name": "Trapper's Flap",
       "defindex": 31323,
       "aliases": [],
@@ -95174,7 +95174,7 @@
       }
     },
     {
-      "slug": "trencher-s-topper",
+      "slug": "trenchers-topper",
       "name": "Trencher's Topper",
       "defindex": 30336,
       "aliases": [],
@@ -95237,7 +95237,7 @@
       }
     },
     {
-      "slug": "trencher-s-tunic",
+      "slug": "trenchers-tunic",
       "name": "Trencher's Tunic",
       "defindex": 30337,
       "aliases": [],
@@ -95639,7 +95639,7 @@
       }
     },
     {
-      "slug": "trickster-s-treats",
+      "slug": "tricksters-treats",
       "name": "Trickster's Treats",
       "defindex": 31220,
       "aliases": [],
@@ -95704,7 +95704,7 @@
       }
     },
     {
-      "slug": "trickster-s-turnout-gear",
+      "slug": "tricksters-turnout-gear",
       "name": "Trickster's Turnout Gear",
       "defindex": 30169,
       "aliases": [],
@@ -95758,7 +95758,7 @@
       }
     },
     {
-      "slug": "triggerman-s-tacticals",
+      "slug": "triggermans-tacticals",
       "name": "Triggerman's Tacticals",
       "defindex": 30424,
       "aliases": [],
@@ -96225,7 +96225,7 @@
       }
     },
     {
-      "slug": "troublemaker-s-tossle-cap",
+      "slug": "troublemakers-tossle-cap",
       "name": "Troublemaker's Tossle Cap",
       "defindex": 150,
       "aliases": [],
@@ -96296,7 +96296,7 @@
       }
     },
     {
-      "slug": "trucker-s-topper",
+      "slug": "truckers-topper",
       "name": "Trucker's Topper",
       "defindex": 30930,
       "aliases": [],
@@ -96990,60 +96990,6 @@
       }
     },
     {
-      "slug": "tyrant-s-helm",
-      "name": "Tyrant's Helm",
-      "defindex": 99,
-      "aliases": [],
-      "slot": "head",
-      "classes": [
-        "soldier"
-      ],
-      "kind": "class-exclusive",
-      "paintable": true,
-      "eventRestriction": null,
-      "styles": [],
-      "backpackIcon": {
-        "small": "http://media.steampowered.com/apps/440/icons/soldier_viking.240bb98c4c03b1aa1fdc64de3b1f55ddf80245e7.png",
-        "large": "http://media.steampowered.com/apps/440/icons/soldier_viking_large.174c9ede578bf6cfa8956e307daa33f2d51432d3.png"
-      },
-      "price": {
-        "state": "priced",
-        "referenceVariant": {
-          "quality": "unique",
-          "craftable": true
-        },
-        "currency": "metal",
-        "blanket": false,
-        "spread": {
-          "low": {
-            "value": 1.33,
-            "metal": {
-              "scrap": 12,
-              "refined": 1.3333,
-              "notation": "1.33 ref"
-            }
-          },
-          "mid": {
-            "value": 1.495,
-            "metal": {
-              "scrap": 13,
-              "refined": 1.4444,
-              "notation": "1.44 ref"
-            }
-          },
-          "high": {
-            "value": 1.66,
-            "metal": {
-              "scrap": 15,
-              "refined": 1.6667,
-              "notation": "1.66 ref"
-            }
-          }
-        },
-        "lastUpdatedAt": "2026-04-25T08:57:11.000Z"
-      }
-    },
-    {
       "slug": "tyrantium-helmet",
       "name": "Tyrantium Helmet",
       "defindex": 30014,
@@ -97095,6 +97041,60 @@
           }
         },
         "lastUpdatedAt": "2026-04-26T14:27:18.000Z"
+      }
+    },
+    {
+      "slug": "tyrants-helm",
+      "name": "Tyrant's Helm",
+      "defindex": 99,
+      "aliases": [],
+      "slot": "head",
+      "classes": [
+        "soldier"
+      ],
+      "kind": "class-exclusive",
+      "paintable": true,
+      "eventRestriction": null,
+      "styles": [],
+      "backpackIcon": {
+        "small": "http://media.steampowered.com/apps/440/icons/soldier_viking.240bb98c4c03b1aa1fdc64de3b1f55ddf80245e7.png",
+        "large": "http://media.steampowered.com/apps/440/icons/soldier_viking_large.174c9ede578bf6cfa8956e307daa33f2d51432d3.png"
+      },
+      "price": {
+        "state": "priced",
+        "referenceVariant": {
+          "quality": "unique",
+          "craftable": true
+        },
+        "currency": "metal",
+        "blanket": false,
+        "spread": {
+          "low": {
+            "value": 1.33,
+            "metal": {
+              "scrap": 12,
+              "refined": 1.3333,
+              "notation": "1.33 ref"
+            }
+          },
+          "mid": {
+            "value": 1.495,
+            "metal": {
+              "scrap": 13,
+              "refined": 1.4444,
+              "notation": "1.44 ref"
+            }
+          },
+          "high": {
+            "value": 1.66,
+            "metal": {
+              "scrap": 15,
+              "refined": 1.6667,
+              "notation": "1.66 ref"
+            }
+          }
+        },
+        "lastUpdatedAt": "2026-04-25T08:57:11.000Z"
       }
     },
     {
@@ -97376,7 +97376,7 @@
       }
     },
     {
-      "slug": "underminer-s-overcoat",
+      "slug": "underminers-overcoat",
       "name": "Underminer's Overcoat",
       "defindex": 31334,
       "aliases": [],
@@ -98569,7 +98569,7 @@
       }
     },
     {
-      "slug": "vested-investor-s-vest",
+      "slug": "vested-investors-vest",
       "name": "Vested Investor's Vest",
       "defindex": 31610,
       "aliases": [],
@@ -98632,7 +98632,7 @@
       }
     },
     {
-      "slug": "veteran-s-attire",
+      "slug": "veterans-attire",
       "name": "Veteran's Attire",
       "defindex": 30983,
       "aliases": [],
@@ -98686,7 +98686,7 @@
       }
     },
     {
-      "slug": "veteran-s-visor",
+      "slug": "veterans-visor",
       "name": "Veteran's Visor",
       "defindex": 31587,
       "aliases": [],
@@ -98740,7 +98740,7 @@
       }
     },
     {
-      "slug": "vicar-s-vestments",
+      "slug": "vicars-vestments",
       "name": "Vicar's Vestments",
       "defindex": 30263,
       "aliases": [],
@@ -99033,7 +99033,7 @@
       }
     },
     {
-      "slug": "villain-s-veil",
+      "slug": "villains-veil",
       "name": "Villain's Veil",
       "defindex": 393,
       "aliases": [],
@@ -100429,7 +100429,7 @@
       }
     },
     {
-      "slug": "wanderer-s-wear",
+      "slug": "wanderers-wear",
       "name": "Wanderer's Wear",
       "defindex": 31051,
       "aliases": [],
@@ -100483,7 +100483,7 @@
       }
     },
     {
-      "slug": "wanderer-s-wool",
+      "slug": "wanderers-wool",
       "name": "Wanderer's Wool",
       "defindex": 31419,
       "aliases": [],
@@ -101185,7 +101185,7 @@
       }
     },
     {
-      "slug": "warlock-s-warcloak",
+      "slug": "warlocks-warcloak",
       "name": "Warlock's Warcloak",
       "defindex": 31388,
       "aliases": [],
@@ -101409,7 +101409,7 @@
       }
     },
     {
-      "slug": "watchmann-s-wetsuit",
+      "slug": "watchmanns-wetsuit",
       "name": "Watchmann's Wetsuit",
       "defindex": 31457,
       "aliases": [],
@@ -103994,7 +103994,7 @@
       }
     },
     {
-      "slug": "yuri-s-revenge",
+      "slug": "yuris-revenge",
       "name": "Yuri's Revenge",
       "defindex": 30401,
       "aliases": [],
@@ -104156,7 +104156,7 @@
       }
     },
     {
-      "slug": "zepheniah-s-shroud",
+      "slug": "zepheniahs-shroud",
       "name": "Zepheniah's Shroud",
       "defindex": 31575,
       "aliases": [],

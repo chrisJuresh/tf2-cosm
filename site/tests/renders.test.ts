@@ -81,7 +81,7 @@ describe("picking the render", () => {
     // The Scotsman's Stove Pipe is rendered on RED Style 0 and nothing else.
     const chosen = pickRender(
       fixtureManifest(),
-      { slug: "scotsman-s-stove-pipe", gameClass: "demoman", team: "blu", style: 2 },
+      { slug: "scotsmans-stove-pipe", gameClass: "demoman", team: "blu", style: 2 },
       LIST_SIZE,
     );
     expect(chosen).toMatchObject({ team: "red", style: 0, fellBack: true });

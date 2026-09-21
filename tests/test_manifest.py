@@ -204,6 +204,42 @@ def test_an_unknown_failure_reason_is_refused():
         Manifest().fail(a_job(), "red", reason="it broke", detail=None, at=AT)
 
 
+def test_forgetting_the_last_render_of_a_cosmetic_takes_the_whole_branch():
+    """The site joins the catalogue to this document by the slug alone, so an empty husk
+    would read as 'this Cosmetic has renders' and shadow its Backpack Icon fallback."""
+    manifest = Manifest()
+    manifest.record(a_job(), "red", path="p.png", width=1024, height=1024, at=AT)
+
+    manifest.forget_render("team-captain", "soldier", "red", 0)
+
+    assert manifest.to_document()["renders"] == {}
+
+
+def test_forgetting_one_render_leaves_its_siblings_and_their_branches():
+    manifest = Manifest()
+    manifest.record(a_job(), "red", path="red.png", width=1024, height=1024, at=AT)
+    manifest.record(a_job(), "blu", path="blu.png", width=1024, height=1024, at=AT)
+    manifest.record(a_job(**{"class": "scout"}), "red", path="scout.png", width=1024, height=1024, at=AT)
+
+    manifest.forget_render("team-captain", "soldier", "red", 0)
+
+    assert manifest.entry("team-captain", "soldier", "red", 0) is None
+    assert manifest.entry("team-captain", "soldier", "blu", 0)["master"]["path"] == "blu.png"
+    assert manifest.entry("team-captain", "scout", "red", 0)["master"]["path"] == "scout.png"
+
+
+def test_forgetting_a_render_that_was_never_there_changes_nothing():
+    manifest = Manifest()
+    manifest.record(a_job(), "red", path="p.png", width=1024, height=1024, at=AT)
+
+    manifest.forget_render("ghastly-gibus", "soldier", "red", 0)
+    manifest.forget_render("team-captain", "sniper", "red", 0)
+    manifest.forget_render("team-captain", "soldier", "red", 3)
+
+    assert manifest.entry("team-captain", "soldier", "red", 0)["master"]["path"] == "p.png"
+    assert set(manifest.to_document()["renders"]) == {"team-captain"}
+
+
 def test_an_unknown_team_is_refused():
     with pytest.raises(ValueError, match="unknown Team"):
         Manifest().record(a_job(), "green", path="p.png", width=8, height=8, at=AT)

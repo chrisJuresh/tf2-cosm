@@ -16,7 +16,7 @@
 import { expect, expectClean, modal, openCard, card, cards, slugs, test } from "./catalogue-page";
 
 /** From the golden catalogue: one Cosmetic of each of the three kinds. */
-const DEMOMAN_ONLY = "scotsman-s-stove-pipe";
+const DEMOMAN_ONLY = "scotsmans-stove-pipe";
 const MULTI_CLASS = "team-captain";
 const ALL_CLASS = "ghastly-gibus";
 /** Two Styles, both Teams, and a render for each — the one Cosmetic that exercises every control. */
