@@ -1,17 +1,18 @@
 "use client";
 
 /**
- * The two controls an open row gains: which Style of the Cosmetic to look at,
- * and which Team's paint.
+ * The three controls an open Cosmetic gains: which Style of it to look at, which
+ * Team's paint, and whether the Class is in the picture at all.
  *
- * Both appear only when they have something to offer, but they are asked
+ * They appear only when they have something to offer, but they are asked
  * different questions, and deliberately so. The Styles are the Cosmetic's own,
  * out of the catalogue: a Style the render job has not reached yet is a gap in
  * the runs, not a fact about the hat, and hiding it would make the switcher
  * flicker from one run to the next. The Team toggle is asked of the manifest,
  * because RED and BLU are not a fact about the hat at all — plenty of models
  * have no BLU skin, and there the toggle would flip between two copies of one
- * picture.
+ * picture. The View toggle is asked of the manifest for the same reason: until
+ * a run has rendered this Cosmetic on its own, there is nothing to switch to.
  *
  * They are buttons rather than a select because there are two or three of each
  * and a viewer comparing looks wants them all visible at once. `aria-pressed`
@@ -20,11 +21,20 @@
 import type { Style } from "@tf2-cosm/data/catalogue";
 import type { ReactNode } from "react";
 
-import type { Team } from "@/renders/manifest";
+import type { Team, Variant } from "@/renders/manifest";
+import { VARIANTS } from "@/renders/manifest";
 import { DEFAULT_STYLE } from "@/renders/select";
 
 /** What each Team is called where a viewer picks it. */
 const TEAM_LABELS: Record<Team, string> = { red: "RED", blu: "BLU" };
+
+/**
+ * What each picture is called where a viewer picks it.
+ *
+ * Not "Worn Render" and "Item Render", which are what we call the files: a
+ * viewer is choosing between seeing the hat on somebody and seeing the hat.
+ */
+const VARIANT_LABELS: Record<Variant, string> = { worn: "On the Class", alone: "On its own" };
 
 /** What the default Style is called when the Cosmetic's own list does not name it. */
 const DEFAULT_STYLE_LABEL = "Default";
@@ -101,6 +111,31 @@ export function TeamToggle({ chosen, onChoose }: TeamToggleProps) {
     <Switcher label="Team">
       {(["red", "blu"] as const).map((team) => (
         <Choice key={team} label={TEAM_LABELS[team]} chosen={team === chosen} onChoose={() => onChoose(team)} />
+      ))}
+    </Switcher>
+  );
+}
+
+export interface ViewToggleProps {
+  readonly chosen: Variant;
+  readonly onChoose: (variant: Variant) => void;
+}
+
+/**
+ * The Cosmetic on the Class, or the Cosmetic on its own.
+ *
+ * Rendered only where an Item Render of its own exists — see `hasItemRender`.
+ */
+export function ViewToggle({ chosen, onChoose }: ViewToggleProps) {
+  return (
+    <Switcher label="View">
+      {VARIANTS.map((variant) => (
+        <Choice
+          key={variant}
+          label={VARIANT_LABELS[variant]}
+          chosen={variant === chosen}
+          onChoose={() => onChoose(variant)}
+        />
       ))}
     </Switcher>
   );

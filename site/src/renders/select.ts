@@ -1,12 +1,20 @@
 /**
  * Which picture a row shows, and where it comes from.
  *
- * A Worn Render is identified by four things — the Cosmetic, the Class wearing
- * it, the Team, and the Style — and the manifest holds only the ones that were
- * actually rendered. So every lookup here is a walk down a fallback chain rather
- * than a hit: the asked-for render, then that Class's default Style, then the
- * same on RED, then RED's default Style, and finally nothing at all, which is
- * the caller's cue to show the Backpack Icon (ADR-0001).
+ * A render is identified by five things — the Cosmetic, the Class wearing it,
+ * the Team, the Style, and whether the Class is in the picture at all — and the
+ * manifest holds only the ones that were actually rendered. So every lookup here
+ * is a walk down a fallback chain rather than a hit: the asked-for render, then
+ * that Class's default Style, then the same on RED, then RED's default Style,
+ * and finally nothing at all, which is the caller's cue to show the Backpack
+ * Icon (ADR-0001).
+ *
+ * The variant is the one thing the chain does not fall back on. Style and Team
+ * are the same Cosmetic in another look or another colour, and showing one for
+ * the other is showing a viewer nearly what they asked for; the Worn Render in
+ * place of the Item Render is the Class they just took out of the picture. So a
+ * variant with nothing under it walks to the icon instead, and the control that
+ * asks for it is only offered where there is one — see `hasItemRender`.
  *
  * Everything in this file is pure and takes only the manifest and the
  * catalogue's own vocabulary, so the fallback chain is driven directly by tests
@@ -14,7 +22,7 @@
  */
 import type { ClassName, Cosmetic } from "@tf2-cosm/data/catalogue";
 
-import type { RenderImage, RenderManifest, RenderPicture, Team } from "@/renders/manifest";
+import type { RenderImage, RenderManifest, RenderPicture, Team, Variant } from "@/renders/manifest";
 
 /** The Team every Cosmetic is rendered for, and the one everything falls back to. */
 export const DEFAULT_TEAM: Team = "red";
@@ -22,12 +30,16 @@ export const DEFAULT_TEAM: Team = "red";
 /** The Style every Cosmetic has; the index the game gives its default look. */
 export const DEFAULT_STYLE = 0;
 
+/** The picture a Cosmetic is shown in until a viewer asks for the other one. */
+export const DEFAULT_VARIANT: Variant = "worn";
+
 /** What a chosen render is: the image, and which of the four it actually turned out to be. */
 export interface ChosenRender {
   readonly image: RenderImage;
   readonly gameClass: ClassName;
   readonly team: Team;
   readonly style: number;
+  readonly variant: Variant;
   /** True when this is not the render that was asked for, but one further down the chain. */
   readonly fellBack: boolean;
 }
@@ -49,11 +61,12 @@ export function displayedClass(cosmetic: Cosmetic, classView: ClassName | null):
 }
 
 /**
- * The Worn Render recorded for one rung of the chain, if there is one.
+ * The picture of one variant recorded at one rung of the chain, if there is one.
  *
- * An entry is a job and a job makes two pictures, so an entry can exist holding only the
- * Cosmetic on its own. That is not a Worn Render, and a rung that has only it is a rung with
- * nothing on it: the walk goes past it rather than stopping there with nothing to show.
+ * An entry is a job and a job makes two pictures, either of which a run may not have reached,
+ * so an entry can exist holding only the other one. A rung that has only the other one is a
+ * rung with nothing on it: the walk goes past it rather than stopping there with nothing to
+ * show.
  */
 function pictureAt(
   manifest: RenderManifest,
@@ -61,8 +74,9 @@ function pictureAt(
   gameClass: ClassName,
   team: Team,
   style: number,
+  variant: Variant,
 ): RenderPicture | undefined {
-  return manifest.renders[slug]?.[gameClass]?.[team]?.[String(style)]?.worn ?? undefined;
+  return manifest.renders[slug]?.[gameClass]?.[team]?.[String(style)]?.[variant] ?? undefined;
 }
 
 /**
@@ -76,20 +90,22 @@ function pictureAt(
  */
 export function pickRender(
   manifest: RenderManifest,
-  asked: { slug: string; gameClass: ClassName; team: Team; style: number },
+  asked: { slug: string; gameClass: ClassName; team: Team; style: number; variant?: Variant },
   size: number,
 ): ChosenRender | null {
+  const variant = asked.variant ?? DEFAULT_VARIANT;
   const styles = asked.style === DEFAULT_STYLE ? [asked.style] : [asked.style, DEFAULT_STYLE];
   const teams: Team[] = asked.team === DEFAULT_TEAM ? [asked.team] : [asked.team, DEFAULT_TEAM];
   for (const team of teams) {
     for (const style of styles) {
-      const picture = pictureAt(manifest, asked.slug, asked.gameClass, team, style);
+      const picture = pictureAt(manifest, asked.slug, asked.gameClass, team, style, variant);
       if (picture === undefined) continue;
       return {
         image: imageAt(picture, size),
         gameClass: asked.gameClass,
         team,
         style,
+        variant,
         fellBack: team !== asked.team || style !== asked.style,
       };
     }
@@ -124,6 +140,21 @@ export function imageAt(picture: RenderPicture, size: number): RenderImage {
  * picture to show, and it is not a second Team worth offering: the toggle would
  * flip between two copies of one image.
  */
+/**
+ * Whether this Cosmetic has been rendered on its own for this Class, which is exactly when the
+ * open Cosmetic offers the control that takes the Class out of the picture.
+ *
+ * Asked of the Class on show and of no particular Team or Style, because the chain covers
+ * those: one Item Render anywhere under this Class is a picture the toggle can reach.
+ */
+export function hasItemRender(manifest: RenderManifest, slug: string, gameClass: ClassName): boolean {
+  const byTeam = manifest.renders[slug]?.[gameClass];
+  if (byTeam === undefined) return false;
+  return Object.values(byTeam).some((byStyle) =>
+    Object.values(byStyle).some((entry) => entry.alone !== null),
+  );
+}
+
 export function hasBluRender(manifest: RenderManifest, slug: string, gameClass: ClassName): boolean {
   const blu = manifest.renders[slug]?.[gameClass]?.blu;
   if (blu === undefined) return false;

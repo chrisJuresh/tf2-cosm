@@ -7,12 +7,12 @@
  * may not have looked since — every one of which changes what the figure is
  * worth knowing. This panel is those four facts plus who can wear the thing.
  *
- * It also shows the Cosmetic as big as the screen allows: the larger Worn
- * Render, with a Style switcher and a Team toggle where there is more than one
- * look to see. Those two are the only state the panel holds, and it holds them
- * rather than the grid because they are how this Cosmetic is being looked at
- * right now — closing it is done looking, and the next one opens on its own
- * default.
+ * It also shows the Cosmetic as big as the screen allows: the larger render,
+ * with a Style switcher, a Team toggle and a View toggle — the Cosmetic worn on
+ * the Class, or the Cosmetic on its own — where there is more than one look to
+ * see. Those three are the only state the panel holds, and it holds them rather
+ * than the grid because they are how this Cosmetic is being looked at right now
+ * — closing it is done looking, and the next one opens on its own default.
  *
  * It is drawn inside the modal (`@/components/cosmetic-modal`), which is what
  * gives it the room: the picture is the point of opening a Cosmetic, so it takes
@@ -32,10 +32,16 @@ import {
 } from "@/catalogue/describe";
 
 import { formatTraderNotation } from "@/prices/format";
-import { StyleSwitcher, TeamToggle } from "@/components/render-controls";
+import { StyleSwitcher, TeamToggle, ViewToggle } from "@/components/render-controls";
 import { WornRender } from "@/components/worn-render";
-import type { RenderManifest, Team } from "@/renders/manifest";
-import { DEFAULT_STYLE, DEFAULT_TEAM, hasBluRender } from "@/renders/select";
+import type { RenderManifest, Team, Variant } from "@/renders/manifest";
+import {
+  DEFAULT_STYLE,
+  DEFAULT_TEAM,
+  DEFAULT_VARIANT,
+  hasBluRender,
+  hasItemRender,
+} from "@/renders/select";
 
 /** How big the modal draws the Cosmetic, and which derivative it asks for. */
 const DETAIL_SIZE = 512;
@@ -62,7 +68,7 @@ export interface CosmeticDetailProps {
   readonly cosmetic: Cosmetic;
   /** The snapshot's Key Rate, or null when it carried no prices. */
   readonly keyRate: Metal | null;
-  /** Which Worn Renders exist; empty when no run has produced any. */
+  /** Which renders exist; empty when no run has produced any. */
   readonly manifest: RenderManifest;
   /** The Class the picture shows — settled by the grid, so the card and the panel agree. */
   readonly gameClass: ClassName;
@@ -74,9 +80,12 @@ export function CosmeticDetail({ cosmetic, keyRate, manifest, gameClass, id }: C
   const { price } = cosmetic;
   const [style, setStyle] = useState(DEFAULT_STYLE);
   const [team, setTeam] = useState<Team>(DEFAULT_TEAM);
-  // Asked of the Class on show: an All-Class Cosmetic can have a BLU render on
-  // one Class and only RED on another, and the toggle answers for this picture.
+  const [variant, setVariant] = useState<Variant>(DEFAULT_VARIANT);
+  // Both asked of the Class on show: an All-Class Cosmetic can have a BLU render
+  // on one Class and only RED on another, or have been rendered on its own for
+  // one Class and not yet for the next, and the toggles answer for this picture.
   const teamed = hasBluRender(manifest, cosmetic.slug, gameClass);
+  const alone = hasItemRender(manifest, cosmetic.slug, gameClass);
 
   return (
     <div id={id} className="mt-3 flex flex-col gap-4 sm:flex-row sm:gap-6">
@@ -87,6 +96,7 @@ export function CosmeticDetail({ cosmetic, keyRate, manifest, gameClass, id }: C
           gameClass={gameClass}
           team={teamed ? team : DEFAULT_TEAM}
           style={style}
+          variant={alone ? variant : DEFAULT_VARIANT}
           size={DETAIL_SIZE}
           icon="large"
           // As big as the modal can give it without the fields beside it
@@ -95,6 +105,7 @@ export function CosmeticDetail({ cosmetic, keyRate, manifest, gameClass, id }: C
         />
         <StyleSwitcher styles={cosmetic.styles} chosen={style} onChoose={setStyle} />
         {teamed ? <TeamToggle chosen={team} onChoose={setTeam} /> : null}
+        {alone ? <ViewToggle chosen={variant} onChoose={setVariant} /> : null}
       </div>
       <dl className="grid min-w-0 flex-1 content-start gap-x-6 gap-y-3 text-xs sm:text-sm">
         {/* The three states a price is in, said once: a snapshot built without a

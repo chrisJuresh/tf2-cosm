@@ -47,15 +47,24 @@ the time a run picks it up.
 
 ## Where the pictures come from
 
-A row shows the Cosmetic's **Worn Render** where the manifest has one and its
-**Backpack Icon** where it does not (ADR-0001). The render is identified by four
-things — the Cosmetic, the Class wearing it, the Team and the Style — and the
-manifest holds only what has actually been rendered, so every lookup walks a
-fallback chain: the render asked for, then that Class's default Style, then the
-same on RED, then RED's default Style, then the icon. Style before Team, because
-the wrong Style is a different hat and the wrong Team is the same hat in the
-other colour. A render that fails to *load* falls back to the icon as well: the
-manifest says an image was written, not that it is being served.
+A card shows the Cosmetic's **Worn Render** where the manifest has one and its
+**Backpack Icon** where it does not (ADR-0001). The render is identified by five
+things — the Cosmetic, the Class wearing it, the Team, the Style, and whether the
+Class is in the picture at all — and the manifest holds only what has actually
+been rendered, so every lookup walks a fallback chain: the render asked for, then
+that Class's default Style, then the same on RED, then RED's default Style, then
+the icon. Style before Team, because the wrong Style is a different hat and the
+wrong Team is the same hat in the other colour. A render that fails to *load*
+falls back to the icon as well: the manifest says an image was written, not that
+it is being served.
+
+The fifth thing does not fall back. An open Cosmetic has a **View** toggle
+between its Worn Render and its **Item Render** — the same Cosmetic with no Class
+in the picture — and where a viewer asks for the one on its own, the Worn Render
+is not a near miss to show them instead: it is the Class they just took out. So
+that walk ends at the icon, and the toggle is offered only where this Class has
+an Item Render to switch to. Cards always show the Worn Render; the toggle is
+this Cosmetic being looked at right now, and closing it is done looking.
 
 The images themselves are never committed. Only the manifest is, and every path
 in it is relative to an image base that is configuration on both sides:

@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * The picture of a Cosmetic: its Worn Render where one exists, and its Backpack
- * Icon where one does not (ADR-0001).
+ * The picture of a Cosmetic: the render asked for where one exists, and its
+ * Backpack Icon where none does (ADR-0001).
  *
  * Which render that is comes from `@/renders/select`, a pure walk down the
  * fallback chain; this component is the surface over it, plus the one thing the
@@ -17,8 +17,8 @@ import { useState } from "react";
 import { secureIconUrl } from "@/catalogue/icon";
 import { classRead } from "@/catalogue/describe";
 import { renderUrl } from "@/renders/base-url";
-import type { RenderManifest, Team } from "@/renders/manifest";
-import { pickRender } from "@/renders/select";
+import type { RenderManifest, Team, Variant } from "@/renders/manifest";
+import { DEFAULT_VARIANT, pickRender } from "@/renders/select";
 
 export interface WornRenderProps {
   readonly cosmetic: Cosmetic;
@@ -27,6 +27,12 @@ export interface WornRenderProps {
   readonly gameClass: ClassName;
   readonly team: Team;
   readonly style: number;
+  /**
+   * Which picture to show: the Cosmetic worn on the Class, or the Cosmetic on
+   * its own. Worn unless the caller says otherwise, because that is what a
+   * Cosmetic is for and what every card shows.
+   */
+  readonly variant?: Variant;
   /** Which web derivative of the render to ask for, by its size in pixels. */
   readonly size: number;
   /**
@@ -49,11 +55,17 @@ interface Picture {
 
 function wornRender(props: WornRenderProps): Picture | null {
   const { cosmetic, manifest, gameClass, team, style, size } = props;
-  const chosen = pickRender(manifest, { slug: cosmetic.slug, gameClass, team, style }, size);
+  const variant = props.variant ?? DEFAULT_VARIANT;
+  const chosen = pickRender(manifest, { slug: cosmetic.slug, gameClass, team, style, variant }, size);
   if (chosen === null) return null;
   return {
     src: renderUrl(chosen.image.path),
-    alt: `${cosmetic.name} worn by the ${classRead(chosen.gameClass)}`,
+    // What the picture is of, which is the whole difference between the two: a
+    // screen reader is told the Class only when the Class is in the picture.
+    alt:
+      chosen.variant === "alone"
+        ? `${cosmetic.name}, on its own`
+        : `${cosmetic.name} worn by the ${classRead(chosen.gameClass)}`,
     width: chosen.image.width,
     height: chosen.image.height,
   };
