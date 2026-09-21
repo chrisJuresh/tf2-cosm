@@ -82,6 +82,7 @@ afterEach(() => {
   vi.unstubAllGlobals();
   vi.unstubAllEnvs();
   localStorage.clear();
+  history.replaceState(null, "", "/");
 });
 
 function renderBrowser() {
@@ -309,6 +310,64 @@ describe("what the browser remembers", () => {
     await user.click(screen.getByRole("button", { name: "Forget" }));
     await waitFor(() => expect(localStorage.getItem(PROFILE_STORAGE_KEY)).toBeNull());
     expect(screen.getByLabelText("Only what I own")).toBeDisabled();
+  });
+});
+
+describe("the profile in the address bar", () => {
+  it("puts the profile a viewer looked up in the URL, so the page they are on is the page they can send", async () => {
+    serve(() => answer(inventory([{ defindex: defindexOf("team-captain") }])));
+    const before = history.length;
+    const user = renderBrowser();
+    await look(user, "robinwalker");
+
+    await waitFor(() => expect(location.search).toBe("?profile=robinwalker"));
+    // Replaced rather than pushed: a lookup is what this page does, not
+    // somewhere else the viewer went.
+    expect(history.length).toBe(before);
+  });
+
+  it("reads the backpack a link names, without being asked twice", async () => {
+    history.replaceState(null, "", "/?profile=robinwalker");
+    serve(() => answer(inventory([{ defindex: defindexOf("team-captain") }])));
+    renderBrowser();
+
+    await waitFor(() => expect(within(cardFor("team-captain") as HTMLElement).getByText("Owned")).toBeInTheDocument());
+    expect((screen.getByLabelText("Your Steam profile") as HTMLInputElement).value).toBe("robinwalker");
+  });
+
+  it("does not take somebody else's profile to be the viewer's own", async () => {
+    // A link is about whoever sent it. Coming back to the page tomorrow should
+    // show the viewer their own backpack, not the one they were once shown.
+    history.replaceState(null, "", "/?profile=gaben");
+    localStorage.setItem(PROFILE_STORAGE_KEY, "robinwalker");
+    serve(() => answer(inventory([{ defindex: defindexOf("team-captain") }])));
+    renderBrowser();
+
+    await waitFor(() => expect(cardFor("team-captain")).not.toBeNull());
+    expect(localStorage.getItem(PROFILE_STORAGE_KEY)).toBe("robinwalker");
+  });
+
+  it("takes the profile back out of the URL when the viewer forgets it", async () => {
+    history.replaceState(null, "", "/?profile=robinwalker");
+    serve(() => answer(inventory([{ defindex: defindexOf("team-captain") }])));
+    const user = renderBrowser();
+    await waitFor(() => expect(screen.getByRole("button", { name: "Forget" })).toBeInTheDocument());
+
+    await user.click(screen.getByRole("button", { name: "Forget" }));
+    await waitFor(() => expect(location.search).toBe(""));
+  });
+
+  it("leaves a remembered profile out of the URL until it is asked for", async () => {
+    // What this browser remembers fills the box; it does not make the address
+    // bar claim to be a link about somebody.
+    localStorage.setItem(PROFILE_STORAGE_KEY, "robinwalker");
+    serve(() => answer(inventory([{ defindex: defindexOf("team-captain") }])));
+    renderBrowser();
+
+    await waitFor(() =>
+      expect((screen.getByLabelText("Your Steam profile") as HTMLInputElement).value).toBe("robinwalker"),
+    );
+    expect(location.search).toBe("");
   });
 });
 

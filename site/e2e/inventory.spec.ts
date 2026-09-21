@@ -132,3 +132,29 @@ test("the Steam profile box can be worked from the keyboard, and is named", asyn
   await expect(card(page, "team-captain").getByText("Owned")).toBeVisible();
   expectClean(faults);
 });
+
+test("a backpack is a link: the profile lands in the URL, and the URL reads the backpack", async ({ catalogue }) => {
+  // The whole point of the query parameter is that it survives being typed into
+  // a different browser, which only a real one can show: the static export has
+  // to serve `/?profile=...`, and the hydrated page has to pick the profile back
+  // up out of the address bar and make the request off it.
+  const { page, faults, serveInventory } = catalogue;
+  serveInventory({ status: 200, body: backpack([{ defindex: TEAM_CAPTAIN }]) });
+
+  await page.getByLabel("Your Steam profile").fill("robinwalker");
+  await page.getByRole("button", { name: "Show what I own" }).click();
+  await expect(card(page, "team-captain").getByText("Owned")).toBeVisible();
+  expect(new URL(page.url()).searchParams.get("profile")).toBe("robinwalker");
+
+  const shared = page.url();
+  // The page without the parameter is the catalogue, remembered box and all,
+  // and reaches for nobody's backpack.
+  await page.goto("/");
+  await expect(page.getByLabel("Your Steam profile")).toHaveValue("robinwalker");
+  await expect(card(page, "team-captain").getByText("Owned")).toBeHidden();
+
+  await page.goto(shared);
+  await expect(card(page, "team-captain").getByText("Owned")).toBeVisible();
+
+  expectClean(faults);
+});
