@@ -6,12 +6,13 @@
  * an address with a slug on the end. Nothing asserts how the grid holds which
  * Cosmetic is open.
  *
- * The one thing it cannot ask is whether a click anywhere on the card opens it.
- * The whole card is the control, by way of a pseudo-element stretched over it,
- * and a pseudo-element is painted rather than in the DOM — jsdom neither paints
- * nor hit-tests, so that one is the end-to-end suite's to answer.
+ * The one thing it cannot ask is whether a drag across a name really selects
+ * the name: jsdom neither paints nor hit-tests, so what it can be told is that
+ * a click arriving with a selection standing opens nothing, and whether the
+ * drag makes that selection in the first place is the end-to-end suite's to
+ * answer.
  */
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -39,6 +40,27 @@ function renderGrid(overrides: Partial<Parameters<typeof CosmeticGrid>[0]> = {})
 /** The control a viewer clicks or tabs to, which is the Cosmetic's own name. */
 function cardControlFor(name: string): HTMLElement {
   return screen.getByRole("button", { name });
+}
+
+/** A card by the Cosmetic it is for, so adding one to the fixture moves nothing. */
+function cardFor(slug: string): HTMLElement {
+  const card = document.querySelector<HTMLElement>(`[data-slug="${slug}"]`);
+  if (card === null) throw new Error(`no card for ${slug}`);
+  return card;
+}
+
+/**
+ * Select an element's text, the way dragging the mouse across it would. What the
+ * viewer did with the mouse is not the point — what the card sees afterwards is
+ * a standing selection and then a click, and that is what is set up here.
+ */
+function selectTextOf(element: Element): void {
+  const range = document.createRange();
+  range.selectNodeContents(element);
+  const selection = window.getSelection();
+  if (selection === null) throw new Error("no selection to make");
+  selection.removeAllRanges();
+  selection.addRange(range);
 }
 
 /** The modal, if one is open. Its name is the Cosmetic's, which is its heading. */
@@ -85,6 +107,28 @@ describe("opening and closing a Cosmetic", () => {
     expect(open).toHaveAttribute("aria-modal", "true");
     expect(open).toHaveAccessibleName("Team Captain");
     expect(panelFor("team-captain")).toHaveProperty("Reference Variant");
+  });
+
+  it("opens on a click anywhere on the card, not only on the name", async () => {
+    const user = userEvent.setup();
+    renderGrid();
+    await user.click(cardFor("team-captain"));
+    expect(openCosmetic()).toBe("Team Captain");
+  });
+
+  it("opens nothing when the click is the end of a drag across the name", () => {
+    renderGrid();
+
+    // A viewer dragging across the name to copy it lets go over the card, and
+    // the browser calls that a click. The click is fired rather than driven,
+    // because what is being set up is the state the drag leaves behind.
+    selectTextOf(cardControlFor("Team Captain"));
+    fireEvent.click(cardControlFor("Team Captain"));
+    expect(modal()).toBeNull();
+
+    // A selection standing somewhere else is nothing to do with this card.
+    fireEvent.click(cardControlFor("Tin Pot"));
+    expect(openCosmetic()).toBe("Tin Pot");
   });
 
   it("closes on the click that lands on the space around it", async () => {

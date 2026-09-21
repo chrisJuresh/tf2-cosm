@@ -10,8 +10,8 @@
  *
  * They run twice: on a desktop, and on an emulated phone. The phone is not a
  * formality — how many cards the grid puts across is the width divided, and
- * jsdom lays nothing out at all, so this is the only place that layout, or the
- * click target stretched over a whole card, is ever exercised.
+ * jsdom lays nothing out at all, so this is the only place that layout, or a
+ * drag of the mouse across a name, is ever exercised.
  */
 import { expect, expectClean, modal, openCard, card, cards, slugs, test } from "./catalogue-page";
 
@@ -87,12 +87,10 @@ test("the Class filter narrows the grid to what that Class can wear", async ({ c
 test("a click anywhere on a card opens the Cosmetic, and the space around it closes again", async ({
   catalogue: { page, faults },
 }) => {
-  // Two things only a real browser can answer. The whole card is the control: a
-  // viewer aims at the picture, not at the name under it, and that target is a
-  // pseudo-element stretched over the card, which jsdom neither paints nor
-  // hit-tests. Playwright clicks what is actually painted in the middle of the
-  // card, so a card whose overlay had not taken would open nothing, and one
-  // with the header spilling over it would refuse the click outright.
+  // Two things only a real browser can answer. The whole card is the click
+  // target: a viewer aims at the picture, not at the name under it. Playwright
+  // clicks what is actually painted in the middle of the card, so a card with
+  // the header spilling over it would refuse the click outright.
   await card(page, STYLED).click();
   await expect(modal(page)).toBeVisible();
   await expect(modal(page)).toBeFocused();
@@ -103,6 +101,34 @@ test("a click anywhere on a card opens the Cosmetic, and the space around it clo
   await page.mouse.click(4, 4);
   await expect(modal(page)).toHaveCount(0);
   await expect(card(page, STYLED).getByRole("button")).toBeFocused();
+
+  expectClean(faults);
+});
+
+test("a drag across a Cosmetic's name selects the name and opens nothing", async ({
+  catalogue: { page, faults },
+}) => {
+  // A name a viewer cannot drag over is a name they cannot copy, and a browser
+  // makes a button's own text unselectable unless it is told otherwise. Only a
+  // real browser selects anything, so this is the only suite that can ask.
+  const name = card(page, STYLED).getByRole("button");
+  const wanted = (await name.textContent())?.trim() ?? "";
+  const box = await name.boundingBox();
+  expect(box).not.toBeNull();
+
+  const firstLine = box!.y + 6;
+  await page.mouse.move(box!.x + 1, firstLine);
+  await page.mouse.down();
+  await page.mouse.move(box!.x + box!.width - 1, firstLine, { steps: 12 });
+  await page.mouse.up();
+
+  const selected = (await page.evaluate(() => window.getSelection()?.toString() ?? "")).trim();
+  expect(selected.length).toBeGreaterThan(0);
+  expect(wanted).toContain(selected);
+
+  // And letting go of the drag is not a click on the card: a modal would have
+  // gone straight over what the viewer had just selected.
+  await expect(modal(page)).toHaveCount(0);
 
   expectClean(faults);
 });
