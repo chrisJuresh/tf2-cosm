@@ -9,7 +9,8 @@
    "reason": "model-missing",
    "slug": "bolt-boy",
    "style": 0,
-   "team": "red"
+   "team": "red",
+   "variant": "worn"
   }
  ],
  "renders": {
@@ -17,17 +18,27 @@
    "engineer": {
     "red": {
      "0": {
-      "derivatives": {},
-      "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/baronial-badge/engineer-red-0.png",
-       "width": 1024
+      "alone": {
+       "derivatives": {},
+       "master": {
+        "height": 1024,
+        "path": "masters/baronial-badge/engineer-red-0-alone.png",
+        "width": 1024
+       }
       },
+      "job_version": 1,
       "model": "models/player/items/engineer/baronial_badge.mdl",
       "rendered_at": "2026-09-20T12:00:00+00:00",
       "style_name": null,
-      "team_fallback": false
+      "team_fallback": false,
+      "worn": {
+       "derivatives": {},
+       "master": {
+        "height": 1024,
+        "path": "masters/baronial-badge/engineer-red-0.png",
+        "width": 1024
+       }
+      }
      }
     }
    }
@@ -36,54 +47,60 @@
    "sniper": {
     "blu": {
      "0": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/crocodile-smile/sniper-blu-0@256.webp",
-        "width": 256
-       },
-       "512": {
-        "height": 512,
-        "path": "web/crocodile-smile/sniper-blu-0@512.webp",
-        "width": 512
-       }
-      },
+      "alone": null,
       "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/crocodile-smile/sniper-blu-0.png",
-       "width": 1024
-      },
       "model": "models/player/items/sniper/crocodile_smile.mdl",
       "rendered_at": "2026-09-20T12:00:00+00:00",
       "style_name": null,
-      "team_fallback": true
+      "team_fallback": true,
+      "worn": {
+       "derivatives": {
+        "256": {
+         "height": 256,
+         "path": "web/crocodile-smile/sniper-blu-0@256.webp",
+         "width": 256
+        },
+        "512": {
+         "height": 512,
+         "path": "web/crocodile-smile/sniper-blu-0@512.webp",
+         "width": 512
+        }
+       },
+       "master": {
+        "height": 1024,
+        "path": "masters/crocodile-smile/sniper-blu-0.png",
+        "width": 1024
+       }
+      }
      }
     },
     "red": {
      "0": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/crocodile-smile/sniper-red-0@256.webp",
-        "width": 256
-       },
-       "512": {
-        "height": 512,
-        "path": "web/crocodile-smile/sniper-red-0@512.webp",
-        "width": 512
-       }
-      },
+      "alone": null,
       "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/crocodile-smile/sniper-red-0.png",
-       "width": 1024
-      },
       "model": "models/player/items/sniper/crocodile_smile.mdl",
       "rendered_at": "2026-09-20T12:00:00+00:00",
       "style_name": null,
-      "team_fallback": false
+      "team_fallback": false,
+      "worn": {
+       "derivatives": {
+        "256": {
+         "height": 256,
+         "path": "web/crocodile-smile/sniper-red-0@256.webp",
+         "width": 256
+        },
+        "512": {
+         "height": 512,
+         "path": "web/crocodile-smile/sniper-red-0@512.webp",
+         "width": 512
+        }
+       },
+       "master": {
+        "height": 1024,
+        "path": "masters/crocodile-smile/sniper-red-0.png",
+        "width": 1024
+       }
+      }
      }
     }
    }
@@ -92,84 +109,93 @@
    "heavy": {
     "red": {
      "0": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/ghastly-gibus/heavy-red-0@256.webp",
-        "width": 256
-       },
-       "512": {
-        "height": 512,
-        "path": "web/ghastly-gibus/heavy-red-0@512.webp",
-        "width": 512
-       }
-      },
+      "alone": null,
       "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/ghastly-gibus/heavy-red-0.png",
-       "width": 1024
-      },
       "model": "models/player/items/all_class/all_gibus.mdl",
       "rendered_at": "2026-09-20T12:00:00+00:00",
       "style_name": null,
-      "team_fallback": false
+      "team_fallback": false,
+      "worn": {
+       "derivatives": {
+        "256": {
+         "height": 256,
+         "path": "web/ghastly-gibus/heavy-red-0@256.webp",
+         "width": 256
+        },
+        "512": {
+         "height": 512,
+         "path": "web/ghastly-gibus/heavy-red-0@512.webp",
+         "width": 512
+        }
+       },
+       "master": {
+        "height": 1024,
+        "path": "masters/ghastly-gibus/heavy-red-0.png",
+        "width": 1024
+       }
+      }
      }
     }
    },
    "scout": {
     "red": {
      "0": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/ghastly-gibus/scout-red-0@256.webp",
-        "width": 256
-       },
-       "512": {
-        "height": 512,
-        "path": "web/ghastly-gibus/scout-red-0@512.webp",
-        "width": 512
-       }
-      },
+      "alone": null,
       "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/ghastly-gibus/scout-red-0.png",
-       "width": 1024
-      },
       "model": "models/player/items/all_class/all_gibus.mdl",
       "rendered_at": "2026-09-20T12:00:00+00:00",
       "style_name": null,
-      "team_fallback": false
+      "team_fallback": false,
+      "worn": {
+       "derivatives": {
+        "256": {
+         "height": 256,
+         "path": "web/ghastly-gibus/scout-red-0@256.webp",
+         "width": 256
+        },
+        "512": {
+         "height": 512,
+         "path": "web/ghastly-gibus/scout-red-0@512.webp",
+         "width": 512
+        }
+       },
+       "master": {
+        "height": 1024,
+        "path": "masters/ghastly-gibus/scout-red-0.png",
+        "width": 1024
+       }
+      }
      }
     }
    },
    "soldier": {
     "red": {
      "0": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/ghastly-gibus/soldier-red-0@256.webp",
-        "width": 256
-       },
-       "512": {
-        "height": 512,
-        "path": "web/ghastly-gibus/soldier-red-0@512.webp",
-        "width": 512
-       }
-      },
+      "alone": null,
       "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/ghastly-gibus/soldier-red-0.png",
-       "width": 1024
-      },
       "model": "models/player/items/all_class/all_gibus.mdl",
       "rendered_at": "2026-09-20T12:00:00+00:00",
       "style_name": null,
-      "team_fallback": false
+      "team_fallback": false,
+      "worn": {
+       "derivatives": {
+        "256": {
+         "height": 256,
+         "path": "web/ghastly-gibus/soldier-red-0@256.webp",
+         "width": 256
+        },
+        "512": {
+         "height": 512,
+         "path": "web/ghastly-gibus/soldier-red-0@512.webp",
+         "width": 512
+        }
+       },
+       "master": {
+        "height": 1024,
+        "path": "masters/ghastly-gibus/soldier-red-0.png",
+        "width": 1024
+       }
+      }
      }
     }
    }
@@ -178,28 +204,31 @@
    "demoman": {
     "red": {
      "0": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/scotsmans-stove-pipe/demoman-red-0@256.webp",
-        "width": 256
-       },
-       "512": {
-        "height": 512,
-        "path": "web/scotsmans-stove-pipe/demoman-red-0@512.webp",
-        "width": 512
-       }
-      },
+      "alone": null,
       "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/scotsmans-stove-pipe/demoman-red-0.png",
-       "width": 1024
-      },
       "model": "models/player/items/demo/demo_stovepipe.mdl",
       "rendered_at": "2026-09-20T12:00:00+00:00",
       "style_name": null,
-      "team_fallback": false
+      "team_fallback": false,
+      "worn": {
+       "derivatives": {
+        "256": {
+         "height": 256,
+         "path": "web/scotsmans-stove-pipe/demoman-red-0@256.webp",
+         "width": 256
+        },
+        "512": {
+         "height": 512,
+         "path": "web/scotsmans-stove-pipe/demoman-red-0@512.webp",
+         "width": 512
+        }
+       },
+       "master": {
+        "height": 1024,
+        "path": "masters/scotsmans-stove-pipe/demoman-red-0.png",
+        "width": 1024
+       }
+      }
      }
     }
    }
@@ -208,82 +237,145 @@
    "demoman": {
     "red": {
      "0": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/team-captain/demoman-red-0@256.webp",
-        "width": 256
+      "alone": {
+       "derivatives": {
+        "256": {
+         "height": 256,
+         "path": "web/team-captain/demoman-red-0-alone@256.webp",
+         "width": 256
+        },
+        "512": {
+         "height": 512,
+         "path": "web/team-captain/demoman-red-0-alone@512.webp",
+         "width": 512
+        }
        },
-       "512": {
-        "height": 512,
-        "path": "web/team-captain/demoman-red-0@512.webp",
-        "width": 512
+       "master": {
+        "height": 1024,
+        "path": "masters/team-captain/demoman-red-0-alone.png",
+        "width": 1024
        }
       },
       "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/team-captain/demoman-red-0.png",
-       "width": 1024
-      },
       "model": "models/player/items/soldier/soldier_officer.mdl",
       "rendered_at": "2026-09-20T12:00:00+00:00",
       "style_name": null,
-      "team_fallback": false
+      "team_fallback": false,
+      "worn": {
+       "derivatives": {
+        "256": {
+         "height": 256,
+         "path": "web/team-captain/demoman-red-0@256.webp",
+         "width": 256
+        },
+        "512": {
+         "height": 512,
+         "path": "web/team-captain/demoman-red-0@512.webp",
+         "width": 512
+        }
+       },
+       "master": {
+        "height": 1024,
+        "path": "masters/team-captain/demoman-red-0.png",
+        "width": 1024
+       }
+      }
      }
     }
    },
    "soldier": {
     "blu": {
      "0": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/team-captain/soldier-blu-0@256.webp",
-        "width": 256
+      "alone": {
+       "derivatives": {
+        "256": {
+         "height": 256,
+         "path": "web/team-captain/soldier-blu-0-alone@256.webp",
+         "width": 256
+        },
+        "512": {
+         "height": 512,
+         "path": "web/team-captain/soldier-blu-0-alone@512.webp",
+         "width": 512
+        }
        },
-       "512": {
-        "height": 512,
-        "path": "web/team-captain/soldier-blu-0@512.webp",
-        "width": 512
+       "master": {
+        "height": 1024,
+        "path": "masters/team-captain/soldier-blu-0-alone.png",
+        "width": 1024
        }
       },
       "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/team-captain/soldier-blu-0.png",
-       "width": 1024
-      },
       "model": "models/player/items/soldier/soldier_officer.mdl",
       "rendered_at": "2026-09-20T12:00:00+00:00",
       "style_name": null,
-      "team_fallback": false
+      "team_fallback": false,
+      "worn": {
+       "derivatives": {
+        "256": {
+         "height": 256,
+         "path": "web/team-captain/soldier-blu-0@256.webp",
+         "width": 256
+        },
+        "512": {
+         "height": 512,
+         "path": "web/team-captain/soldier-blu-0@512.webp",
+         "width": 512
+        }
+       },
+       "master": {
+        "height": 1024,
+        "path": "masters/team-captain/soldier-blu-0.png",
+        "width": 1024
+       }
+      }
      }
     },
     "red": {
      "0": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/team-captain/soldier-red-0@256.webp",
-        "width": 256
+      "alone": {
+       "derivatives": {
+        "256": {
+         "height": 256,
+         "path": "web/team-captain/soldier-red-0-alone@256.webp",
+         "width": 256
+        },
+        "512": {
+         "height": 512,
+         "path": "web/team-captain/soldier-red-0-alone@512.webp",
+         "width": 512
+        }
        },
-       "512": {
-        "height": 512,
-        "path": "web/team-captain/soldier-red-0@512.webp",
-        "width": 512
+       "master": {
+        "height": 1024,
+        "path": "masters/team-captain/soldier-red-0-alone.png",
+        "width": 1024
        }
       },
       "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/team-captain/soldier-red-0.png",
-       "width": 1024
-      },
       "model": "models/player/items/soldier/soldier_officer.mdl",
       "rendered_at": "2026-09-20T12:00:00+00:00",
       "style_name": null,
-      "team_fallback": false
+      "team_fallback": false,
+      "worn": {
+       "derivatives": {
+        "256": {
+         "height": 256,
+         "path": "web/team-captain/soldier-red-0@256.webp",
+         "width": 256
+        },
+        "512": {
+         "height": 512,
+         "path": "web/team-captain/soldier-red-0@512.webp",
+         "width": 512
+        }
+       },
+       "master": {
+        "height": 1024,
+        "path": "masters/team-captain/soldier-red-0.png",
+        "width": 1024
+       }
+      }
      }
     }
    }
@@ -292,82 +384,127 @@
    "soldier": {
     "blu": {
      "0": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/tin-pot/soldier-blu-0@256.webp",
-        "width": 256
-       },
-       "512": {
-        "height": 512,
-        "path": "web/tin-pot/soldier-blu-0@512.webp",
-        "width": 512
-       }
-      },
+      "alone": null,
       "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/tin-pot/soldier-blu-0.png",
-       "width": 1024
-      },
       "model": "models/player/items/soldier/tin_pot.mdl",
       "rendered_at": "2026-09-20T12:00:00+00:00",
       "style_name": "Closed",
-      "team_fallback": false
+      "team_fallback": false,
+      "worn": {
+       "derivatives": {
+        "256": {
+         "height": 256,
+         "path": "web/tin-pot/soldier-blu-0@256.webp",
+         "width": 256
+        },
+        "512": {
+         "height": 512,
+         "path": "web/tin-pot/soldier-blu-0@512.webp",
+         "width": 512
+        }
+       },
+       "master": {
+        "height": 1024,
+        "path": "masters/tin-pot/soldier-blu-0.png",
+        "width": 1024
+       }
+      }
      }
     },
     "red": {
      "0": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/tin-pot/soldier-red-0@256.webp",
-        "width": 256
+      "alone": {
+       "derivatives": {
+        "256": {
+         "height": 256,
+         "path": "web/tin-pot/soldier-red-0-alone@256.webp",
+         "width": 256
+        },
+        "512": {
+         "height": 512,
+         "path": "web/tin-pot/soldier-red-0-alone@512.webp",
+         "width": 512
+        }
        },
-       "512": {
-        "height": 512,
-        "path": "web/tin-pot/soldier-red-0@512.webp",
-        "width": 512
+       "master": {
+        "height": 1024,
+        "path": "masters/tin-pot/soldier-red-0-alone.png",
+        "width": 1024
        }
       },
       "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/tin-pot/soldier-red-0.png",
-       "width": 1024
-      },
       "model": "models/player/items/soldier/tin_pot.mdl",
       "rendered_at": "2026-09-20T12:00:00+00:00",
       "style_name": "Closed",
-      "team_fallback": false
+      "team_fallback": false,
+      "worn": {
+       "derivatives": {
+        "256": {
+         "height": 256,
+         "path": "web/tin-pot/soldier-red-0@256.webp",
+         "width": 256
+        },
+        "512": {
+         "height": 512,
+         "path": "web/tin-pot/soldier-red-0@512.webp",
+         "width": 512
+        }
+       },
+       "master": {
+        "height": 1024,
+        "path": "masters/tin-pot/soldier-red-0.png",
+        "width": 1024
+       }
+      }
      },
      "1": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/tin-pot/soldier-red-1@256.webp",
-        "width": 256
+      "alone": {
+       "derivatives": {
+        "256": {
+         "height": 256,
+         "path": "web/tin-pot/soldier-red-1-alone@256.webp",
+         "width": 256
+        },
+        "512": {
+         "height": 512,
+         "path": "web/tin-pot/soldier-red-1-alone@512.webp",
+         "width": 512
+        }
        },
-       "512": {
-        "height": 512,
-        "path": "web/tin-pot/soldier-red-1@512.webp",
-        "width": 512
+       "master": {
+        "height": 1024,
+        "path": "masters/tin-pot/soldier-red-1-alone.png",
+        "width": 1024
        }
       },
       "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/tin-pot/soldier-red-1.png",
-       "width": 1024
-      },
       "model": "models/player/items/soldier/tin_pot.mdl",
       "rendered_at": "2026-09-20T12:00:00+00:00",
       "style_name": "Open",
-      "team_fallback": false
+      "team_fallback": false,
+      "worn": {
+       "derivatives": {
+        "256": {
+         "height": 256,
+         "path": "web/tin-pot/soldier-red-1@256.webp",
+         "width": 256
+        },
+        "512": {
+         "height": 512,
+         "path": "web/tin-pot/soldier-red-1@512.webp",
+         "width": 512
+        }
+       },
+       "master": {
+        "height": 1024,
+        "path": "masters/tin-pot/soldier-red-1.png",
+        "width": 1024
+       }
+      }
      }
     }
    }
   }
  },
- "version": 2
+ "version": 3
 }

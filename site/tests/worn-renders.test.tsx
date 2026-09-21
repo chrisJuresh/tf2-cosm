@@ -152,8 +152,11 @@ describe("the picture a card shows", () => {
       for (const byTeam of Object.values(entries)) {
         for (const byStyle of Object.values(byTeam)) {
           for (const entry of Object.values(byStyle)) {
-            paths.add(`/renders/${entry.master.path}`);
-            for (const image of Object.values(entry.derivatives)) paths.add(`/renders/${image.path}`);
+            for (const picture of [entry.worn, entry.alone]) {
+              if (picture === null) continue;
+              paths.add(`/renders/${picture.master.path}`);
+              for (const image of Object.values(picture.derivatives)) paths.add(`/renders/${image.path}`);
+            }
           }
         }
       }

@@ -18,11 +18,20 @@ import { z } from "zod";
 import { CLASSES } from "@tf2-cosm/data/catalogue";
 
 /** The current manifest version. A change to the shape is a change to this. */
-export const RENDER_MANIFEST_VERSION = 2;
+export const RENDER_MANIFEST_VERSION = 3;
 
 export const TEAMS = ["red", "blu"] as const;
 
 export type Team = (typeof TEAMS)[number];
+
+/**
+ * The two pictures one render job makes: the Cosmetic worn on the Class, and the Cosmetic
+ * alone. Either may be missing — a run renders what it can reach — so the site asks for one
+ * and takes what is there.
+ */
+export const VARIANTS = ["worn", "alone"] as const;
+
+export type Variant = (typeof VARIANTS)[number];
 
 /** One image file, by its path relative to the configured image base. */
 const imageSchema = z.object({
@@ -33,10 +42,18 @@ const imageSchema = z.object({
 
 export type RenderImage = z.infer<typeof imageSchema>;
 
-const entrySchema = z.object({
+/** One rendered master and the web sizes made from it. */
+const pictureSchema = z.object({
   master: imageSchema,
   /** The web sizes made from the master, keyed by their size in pixels. */
   derivatives: z.record(z.string().regex(/^[0-9]+$/), imageSchema),
+});
+
+export type RenderPicture = z.infer<typeof pictureSchema>;
+
+const entrySchema = z.object({
+  worn: pictureSchema.nullable(),
+  alone: pictureSchema.nullable(),
   model: z.string(),
   style_name: z.string().nullable(),
   rendered_at: z.string(),
@@ -58,6 +75,7 @@ const failureSchema = z.object({
   class: z.enum(CLASSES),
   team: z.enum(TEAMS),
   style: z.int(),
+  variant: z.enum(VARIANTS),
   model: z.string(),
   reason: z.enum(["model-missing", "import-error", "render-error", "no-skeleton", "derive-error"]),
   detail: z.string().nullable(),

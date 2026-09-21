@@ -45,9 +45,9 @@ class Outcome:
     failed: int = 0
 
 
-def _is_finished(entry: dict, wanted: dict[str, str], layout: OutputLayout) -> bool:
-    """Whether this entry's derivatives are both recorded as asked for and actually on disk."""
-    recorded = entry["derivatives"]
+def _is_finished(picture: dict, wanted: dict[str, str], layout: OutputLayout) -> bool:
+    """Whether this picture's derivatives are both recorded as asked for and on disk."""
+    recorded = picture["derivatives"]
     if set(recorded) != set(wanted):
         return False
     return all(
@@ -66,22 +66,27 @@ def derive_all(
     dry_run: bool = False,
     on_log: Callable[..., None] = log,
 ) -> Outcome:
-    """Give every recorded master the web sizes asked for, recording what could not be done."""
+    """Give every recorded master the web sizes asked for, recording what could not be done.
+
+    Every master, which since manifest v3 is up to two per job: a Cosmetic's Worn Render and
+    its Item Render are two image files and each needs its own web sizes.
+    """
     at = at or now()
     outcome = Outcome()
-    for slug, cls, team, style, entry in list(manifest.entries()):
-        where = f"{slug}/{cls}/{team}/{style}"
-        master = layout.path_for(entry["master"]["path"])
+    for slug, cls, team, style, variant, picture in list(manifest.pictures()):
+        where = f"{slug}/{cls}/{team}/{style}/{variant}"
+        relpath = picture["master"]["path"]
+        master = layout.path_for(relpath)
         try:
             # Inside the try with the rest: working out where a derivative goes is itself a
-            # step that can refuse an entry — one recorded under a masters folder this run is
-            # not configured for — and that must be a recorded failure like any other.
-            wanted = layout.derivative_relpaths(entry["master"]["path"], sizes)
-            if not force and _is_finished(entry, wanted, layout):
+            # step that can refuse a picture — one recorded under a masters folder this run
+            # is not configured for — and that must be a recorded failure like any other.
+            wanted = layout.derivative_relpaths(relpath, sizes)
+            if not force and _is_finished(picture, wanted, layout):
                 outcome.skipped += 1
                 continue
             if dry_run:
-                on_log(f"would derive {where} from {entry['master']['path']}")
+                on_log(f"would derive {where} from {relpath}")
                 outcome.derived += 1
                 continue
             written = write_derivatives(master, wanted, layout.root)
@@ -92,14 +97,15 @@ def derive_all(
                 cls,
                 team,
                 style,
-                model=entry["model"],
+                model=manifest.entry(slug, cls, team, style)["model"],
                 reason=REASON_DERIVE_ERROR,
-                detail=f"{entry['master']['path']}: {error!r}",
+                detail=f"{relpath}: {error!r}",
                 at=at,
+                variant=variant,
             )
             outcome.failed += 1
             continue
-        manifest.set_derivatives(slug, cls, team, style, written)
+        manifest.set_derivatives(slug, cls, team, style, written, variant)
         on_log(f"{where}: {', '.join(sorted(written))}")
         outcome.derived += 1
     return outcome

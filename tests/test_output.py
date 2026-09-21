@@ -34,6 +34,28 @@ def test_a_master_is_keyed_by_cosmetic_class_team_and_style(tmp_path):
     assert layout.master_relpath(a_job(style=2), "blu") == "masters/team-captain/soldier-blu-2.png"
 
 
+def test_the_item_render_sits_beside_the_worn_render_it_was_made_with(tmp_path):
+    layout = a_layout(tmp_path)
+
+    assert layout.master_relpath(a_job(), "red", "alone") == (
+        "masters/team-captain/soldier-red-0-alone.png"
+    )
+
+
+def test_a_variant_that_is_not_one_of_the_two_pictures_is_refused(tmp_path):
+    with pytest.raises(ValueError, match="unknown variant"):
+        a_layout(tmp_path).master_relpath(a_job(), "red", "floating")
+
+
+def test_the_item_render_gets_web_sizes_of_its_own(tmp_path):
+    layout = a_layout(tmp_path)
+    master = layout.master_relpath(a_job(), "red", "alone")
+
+    assert layout.derivative_relpath(master, 512) == (
+        "web/team-captain/soldier-red-0-alone@512.webp"
+    )
+
+
 def test_a_derivative_sits_beside_its_master_under_the_web_folder(tmp_path):
     layout = a_layout(tmp_path)
     master = layout.master_relpath(a_job(), "red")

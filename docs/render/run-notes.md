@@ -1,7 +1,12 @@
 # Render run notes
 
-How a Worn Render is actually made on this machine, and every workaround the job carries.
+How a render is actually made on this machine, and every workaround the job carries.
 The spike that established these facts is gone; this is what replaced it.
+
+A job makes two pictures: the **Worn Render** (the Cosmetic on the Class) and the **Item
+Render** (the same scene with the Class hidden and the camera brought in to the item). They
+are one import, which is what a render costs — the second frame is nearly free — so the run
+does both by default and `--variant worn` or `--variant alone` narrows it.
 
 ## Running it
 
@@ -34,7 +39,11 @@ Useful arguments to the batch runner (all optional):
 - `--dry-run` — list what would be rendered and open nothing. Check the counts after a game
   update.
 - `--slug`, `--class`, `--team`, `--style` — render a subset while fixing one item.
-- `--batch-size` — images per Blender process (default 40). Smaller loses less to a crash;
+- `--variant worn alone` — which of the two pictures to make; both by default. A job is only
+  up to date when every variant asked for is recorded, and one that is missing a picture
+  renders both again rather than carrying a plan for half a job.
+- `--batch-size` — images per Blender process (default 40), and a job on a Team is two of
+  them. Smaller loses less to a crash;
   larger amortises the mount and the Class import over more frames.
 - `--workers` — Blender processes at once (default 1). See below.
 - `--retry-failed` — render the jobs that failed on an earlier run. Without it they are left

@@ -5,8 +5,10 @@ configuration. Today it is a folder on this machine; the day it becomes a bucket
 uploader walks the manifest, pushes each relative path, and nothing else in the job changes
 (user story 22 of the Worn Render spec).
 
-    <root>/<masters_dir>/<slug>/<class>-<team>-<style>.png      the 1024 master
-    <root>/<derivatives_dir>/<slug>/<class>-<team>-<style>@<size>.webp   a web derivative
+    <root>/<masters_dir>/<slug>/<class>-<team>-<style>.png            the 1024 master
+    <root>/<masters_dir>/<slug>/<class>-<team>-<style>-alone.png      the Item Render's master
+    <root>/<derivatives_dir>/<slug>/<class>-<team>-<style>@<size>.webp        a web derivative
+    <root>/<derivatives_dir>/<slug>/<class>-<team>-<style>-alone@<size>.webp  and of the Item Render
 
 The manifest itself is not under the root: it is committed to the repository and the images
 never are (ADR-0001), so it has its own setting.
@@ -24,6 +26,8 @@ import os
 from dataclasses import dataclass, replace
 from pathlib import Path, PurePosixPath
 from typing import Mapping
+
+from render.scene import ALONE, VARIANTS, WORN
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
@@ -84,9 +88,18 @@ class OutputLayout:
                 given[name] = _image_folder(str(given[name]), name)
         return replace(self, **given)
 
-    def master_relpath(self, job: dict, team: str) -> str:
-        """Where one master lives, relative to the output root."""
-        return f"{self.masters_dir}/{job['slug']}/{job['class']}-{team}-{job['style']}.{MASTER_FORMAT}"
+    def master_relpath(self, job: dict, team: str, variant: str = WORN) -> str:
+        """Where one master lives, relative to the output root.
+
+        The Item Render of a job sits beside its Worn Render under the same name, suffixed:
+        the two pictures are of one Cosmetic on one Class, and a folder listing that keeps
+        them together is easier to read than one that files them apart.
+        """
+        if variant not in VARIANTS:
+            raise ValueError(f"unknown variant {variant!r}")
+        suffix = f"-{ALONE}" if variant == ALONE else ""
+        name = f"{job['class']}-{team}-{job['style']}{suffix}.{MASTER_FORMAT}"
+        return f"{self.masters_dir}/{job['slug']}/{name}"
 
     def derivative_relpath(self, master_relpath: str, size: int) -> str:
         """Where one derivative of `master_relpath` lives, relative to the output root."""

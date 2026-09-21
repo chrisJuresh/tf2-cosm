@@ -119,8 +119,8 @@ def derivative_paths(manifest: Manifest, sizes: Sequence[int] | None = None) -> 
     wanted = None if sizes is None else {str(size) for size in sizes}
     paths = {
         record["path"]
-        for _, _, _, _, entry in manifest.entries()
-        for size, record in entry["derivatives"].items()
+        for *_, picture in manifest.pictures()
+        for size, record in picture["derivatives"].items()
         if wanted is None or size in wanted
     }
     return sorted(paths)

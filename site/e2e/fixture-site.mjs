@@ -98,7 +98,10 @@ function imagePaths(manifest) {
     for (const byTeam of Object.values(byClass)) {
       for (const byStyle of Object.values(byTeam)) {
         for (const entry of Object.values(byStyle)) {
-          paths.push(entry.master.path, ...Object.values(entry.derivatives).map((image) => image.path));
+          for (const picture of [entry.worn, entry.alone]) {
+            if (picture === null) continue;
+            paths.push(picture.master.path, ...Object.values(picture.derivatives).map((i) => i.path));
+          }
         }
       }
     }

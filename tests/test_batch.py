@@ -28,6 +28,10 @@ def write_jobs(where: Path, *jobs: dict) -> Path:
     return path
 
 
+def teams_of(command: list[str]) -> list[str]:
+    return command[command.index("--teams") + 1 : command.index("--variant")]
+
+
 def args_for(workspace: Path, jobs: Path, **overrides) -> object:
     settings = {
         "jobs": jobs,
@@ -35,6 +39,7 @@ def args_for(workspace: Path, jobs: Path, **overrides) -> object:
         "classes": None,
         "styles": None,
         "teams": ["red", "blu"],
+        "variants": None,
         "batch_size": 8,
         "workers": 1,
         "dry_run": False,
@@ -74,7 +79,8 @@ class FakeBlender:
             self.commands.append(command)
         given = command[command.index("--jobs") + 1]
         root = Path(command[command.index("--root") + 1])
-        teams = command[command.index("--teams") + 1 :]
+        teams = command[command.index("--teams") + 1 : command.index("--variant")]
+        variants = command[command.index("--variant") + 1 :]
         # The manifest it writes is the one the runner named, which is a shard of its own:
         # a fake that wrote to the run's manifest instead would hide the very clobbering the
         # shards exist to prevent.
@@ -90,16 +96,30 @@ class FakeBlender:
                 crashed = True
                 break
             for team in teams:
-                if outcome == "failed":
-                    manifest.fail(job, team, reason=REASON_IMPORT_ERROR, detail="no", at=AT)
-                else:
-                    relative = master_relpath(job, team)
-                    image = root / relative
-                    image.parent.mkdir(parents=True, exist_ok=True)
-                    image.write_bytes(b"PNG")
-                    manifest.record(
-                        job, team, path=relative, width=1024, height=1024, at=AT
-                    )
+                for variant in variants:
+                    if outcome == "failed":
+                        manifest.fail(
+                            job,
+                            team,
+                            reason=REASON_IMPORT_ERROR,
+                            detail="no",
+                            at=AT,
+                            variant=variant,
+                        )
+                    else:
+                        relative = master_relpath(job, team, variant)
+                        image = root / relative
+                        image.parent.mkdir(parents=True, exist_ok=True)
+                        image.write_bytes(b"PNG")
+                        manifest.record(
+                            job,
+                            team,
+                            path=relative,
+                            width=1024,
+                            height=1024,
+                            at=AT,
+                            variant=variant,
+                        )
         manifest.write(into)
         return 1 if crashed else 0
 
@@ -115,7 +135,7 @@ def test_a_run_renders_every_job_and_writes_the_manifest(workspace: Path):
 
     assert code == 0
     manifest = load_manifest(workspace / "renders.json")
-    assert manifest.entry("team-captain", "soldier", "red", 0)["master"]["width"] == 1024
+    assert manifest.entry("team-captain", "soldier", "red", 0)["worn"]["master"]["width"] == 1024
     assert manifest.entry("batters-helmet", "scout", "blu", 1) is not None
 
 
@@ -145,16 +165,18 @@ def test_a_job_version_bump_re_renders_everything(workspace: Path, monkeypatch):
 def test_only_the_missing_teams_of_a_half_rendered_job_are_asked_for(workspace: Path):
     jobs = write_jobs(workspace, TEAM_CAPTAIN)
     manifest = Manifest()
-    manifest.record(
-        TEAM_CAPTAIN, "red", path="x.png", width=1024, height=1024, at=AT
-    )
+    for variant in ("worn", "alone"):
+        manifest.record(
+            TEAM_CAPTAIN, "red", path=f"x-{variant}.png", width=1024, height=1024, at=AT,
+            variant=variant,
+        )
     manifest.write(workspace / "renders.json")
     blender = FakeBlender()
 
     runner.run(args_for(workspace, jobs), launch=blender)
 
     command = blender.commands[0]
-    assert command[command.index("--teams") + 1 :] == ["blu"]
+    assert teams_of(command) == ["blu"]
 
 
 # --- batches and crashes ----------------------------------------------------------------
@@ -164,7 +186,7 @@ def test_the_run_is_cut_into_batches_of_the_size_asked_for(workspace: Path):
     jobs = write_jobs(workspace, TEAM_CAPTAIN, BATTERS, KILLER)
     blender = FakeBlender()
 
-    runner.run(args_for(workspace, jobs, batch_size=4), launch=blender)
+    runner.run(args_for(workspace, jobs, batch_size=8), launch=blender)
 
     assert blender.batch_sizes == [2, 1]
 
@@ -247,7 +269,7 @@ def test_a_dry_run_never_opens_blender_and_writes_nothing(workspace: Path, capsy
     assert blender.commands == []
     assert not (workspace / "renders.json").exists()
     printed = capsys.readouterr().out
-    assert "4 images" in printed
+    assert "8 images" in printed
     assert "team-captain" in printed, "a dry run says which jobs it means, job by job"
 
 
@@ -330,7 +352,7 @@ def test_a_run_with_nothing_left_to_do_still_reports_the_failures_it_is_standing
     runner.run(args_for(workspace, jobs), launch=FakeBlender())
 
     printed = capsys.readouterr().out
-    assert "2 failures" in printed
+    assert "4 failures" in printed
     assert "killer-exclusive" in printed
 
 
@@ -368,7 +390,8 @@ def test_the_batch_is_handed_to_blender_as_a_job_list_of_its_own(tmp_path: Path)
 
     assert command[1:5] == ["-b", "--factory-startup", "--python", str(runner.BLENDER_SCRIPT)]
     assert command[command.index("--jobs") + 1] == str(tmp_path / "batch-1.json")
-    assert command[command.index("--teams") + 1 :] == ["red", "blu"]
+    assert teams_of(command) == ["red", "blu"]
+    assert command[command.index("--variant") + 1 :] == ["worn", "alone"]
     # settled paths, not the flags that were typed: the child must not resolve the layout again
     assert command[command.index("--root") + 1] == str(tmp_path / "out")
     assert command[command.index("--masters-dir") + 1] == layout.masters_dir
@@ -391,14 +414,23 @@ def test_a_blender_that_is_not_there_is_never_swapped_for_another_one(tmp_path: 
 # --- what a batch came to -----------------------------------------------------------------
 
 
-def test_a_batch_is_accounted_for_render_by_render():
+def test_a_batch_is_accounted_for_image_by_image():
     manifest = Manifest()
     manifest.record(TEAM_CAPTAIN, "red", path="x.png", width=1, height=1, at=AT)
     manifest.fail(TEAM_CAPTAIN, "blu", reason=REASON_IMPORT_ERROR, detail="no", at=AT)
 
-    outcome = account_for(manifest, Batch((TEAM_CAPTAIN, KILLER), ("red", "blu")))
+    outcome = account_for(manifest, Batch((TEAM_CAPTAIN, KILLER), ("red", "blu"), ("worn",)))
 
     assert (outcome.rendered, outcome.failed, outcome.lost) == (1, 1, 2)
+
+
+def test_a_job_accounted_for_in_one_picture_is_not_accounted_for_in_the_other():
+    manifest = Manifest()
+    manifest.record(TEAM_CAPTAIN, "red", path="x.png", width=1, height=1, at=AT)
+
+    outcome = account_for(manifest, Batch((TEAM_CAPTAIN,), ("red",), ("worn", "alone")))
+
+    assert (outcome.rendered, outcome.failed, outcome.lost) == (1, 0, 1)
 
 
 # --- several Blenders at once -------------------------------------------------------------
