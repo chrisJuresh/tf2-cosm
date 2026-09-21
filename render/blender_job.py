@@ -23,7 +23,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import bpy
-from mathutils import Matrix
+from mathutils import Matrix, Vector
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_SITE_PACKAGES = REPO_ROOT / ".venv" / "Lib" / "site-packages"
@@ -246,6 +246,24 @@ def attach(class_armature: bpy.types.Object, item_armature: bpy.types.Object) ->
     log(f"  attached via {result.anchor!r} ({len(result.shared)} shared bones){note}")
 
 
+def visible_bounds(objects: list[bpy.types.Object]) -> scene_plan.Bounds | None:
+    """The world-space box the rendered meshes fill, or None when none of them render.
+
+    `bound_box` is the object's own corners in its local space, so every one is taken through
+    `matrix_world`; the meshes a hidden bodygroup owns are left out, because the frame is for
+    what the picture will show. The caller has just moved the armature these meshes hang off,
+    so the dependency graph has to be up to date before `matrix_world` is worth reading.
+    """
+    bpy.context.view_layer.update()
+    corners = [
+        Vec3(*(obj.matrix_world @ Vector(corner)))
+        for obj in objects
+        if obj.type == "MESH" and not obj.hide_render
+        for corner in obj.bound_box
+    ]
+    return scene_plan.Bounds.around(corners)
+
+
 def bone_position(armature: bpy.types.Object, name: str, fallback: Vec3) -> Vec3:
     bones = armature.data.bones
     if name not in bones:
@@ -365,11 +383,18 @@ def set_up_job(job: dict, cache: ModelCache, args: argparse.Namespace) -> Import
         raise RenderFailure(REASON_NO_SKELETON, f"{job['model']} imported without an armature")
     attach(class_armature, item_armature)
 
-    framing = scene_plan.framing_for(job["equip_regions"], job["slot"])
-    head = bone_position(class_armature, scene_plan.HEAD_BONE, Vec3(0.0, 1.45, 0.0))
-    pelvis = bone_position(class_armature, scene_plan.PELVIS_BONE, Vec3(0.0, 0.80, 0.0))
-    centre, span = scene_plan.frame_target(head, pelvis, framing)
-    log(f"  {framing} frame, centre {tuple(round(v, 3) for v in centre)}, span {span}")
+    bounds = visible_bounds(item_objects)
+    if bounds is None:
+        # Nothing of the Cosmetic renders, so there is no extent to frame on; the equip
+        # region's bust-or-body guess is all that is left to fall back on.
+        framing = scene_plan.framing_for(job["equip_regions"], job["slot"])
+        head = bone_position(class_armature, scene_plan.HEAD_BONE, Vec3(0.0, 1.45, 0.0))
+        pelvis = bone_position(class_armature, scene_plan.PELVIS_BONE, Vec3(0.0, 0.80, 0.0))
+        centre, span = scene_plan.frame_target(head, pelvis, framing)
+    else:
+        framing = "item"
+        centre, span = scene_plan.frame_for_bounds(bounds)
+    log(f"  {framing} frame, centre {tuple(round(v, 3) for v in centre)}, span {span:.3f}")
     build_camera_and_lights(centre, span)
     configure_render(args.size, args.samples)
     return ImportedJob(

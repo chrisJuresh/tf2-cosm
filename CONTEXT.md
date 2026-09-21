@@ -103,7 +103,7 @@ One of the other defindexes Valve's schema carries under a Cosmetic's name, fold
 ### Images
 
 **Worn Render**:
-A static image of one Class on one Team wearing one Cosmetic in one Style, framed as a bust with a wider frame for items worn below the head. An All-Class Cosmetic has up to nine per Style per Team.
+A static image of one Class on one Team wearing one Cosmetic in one Style, framed on the Cosmetic's own extent on that Class — as tight as the item is, within reason, with a little of the wearer around it. An All-Class Cosmetic has up to nine per Style per Team.
 _Avoid_: icon, thumbnail, preview
 
 **Backpack Icon**:

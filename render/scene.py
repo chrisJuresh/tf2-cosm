@@ -1,9 +1,9 @@
 """One job's scene, decided before Blender is touched.
 
-Everything the render step chooses — which framing a Cosmetic gets, where the camera and the
+Everything the render step chooses — which frame a Cosmetic gets, where the camera and the
 three lights stand, which class bodygroups stay visible, which skin family the Team wants and
 where the cosmetic's armature has to land — is a pure function of the job and of numbers read
-out of the model files. The Blender adapter (`render.blender_job`) does no arithmetic of its
+out of the model files, the Cosmetic's own bounding box among them. The Blender adapter (`render.blender_job`) does no arithmetic of its
 own; it applies what this module returns.
 
 World conventions come from SourceIO's import: Y is up, the model faces +Z, metres.
@@ -15,7 +15,16 @@ import re
 from dataclasses import dataclass
 from typing import Iterable, Mapping, NamedTuple, Sequence
 
-from render.geometry import Mat4, Vec3, inverse, look_at, multiply, placed_at, translation_of
+from render.geometry import (
+    WORLD_UP,
+    Mat4,
+    Vec3,
+    inverse,
+    look_at,
+    multiply,
+    placed_at,
+    translation_of,
+)
 
 BUST = "bust"
 BODY = "body"
@@ -62,6 +71,14 @@ BUST_SPAN = 0.64
 BODY_SPAN = 2.15
 BODY_FLOOR = -0.14
 
+#: A frame is the Cosmetic's own extent plus this much of the Class around it, as a fraction
+#: of that extent: enough that nothing sits flush against the edge and a top shows a little leg.
+FRAME_PADDING = 0.28
+#: Within reason at both ends. A shirt button magnified until it fills 1024px reads as a
+#: mystery object, so no frame is tighter than this; and nothing is wider than a whole body.
+MIN_SPAN = 0.44
+MAX_SPAN = BODY_SPAN
+
 LENS_MM = 85.0
 SENSOR_WIDTH_MM = 36.0
 CAMERA_YAW = math.radians(35.0)
@@ -87,6 +104,88 @@ def frame_target(head: Vec3, pelvis: Vec3, framing: str) -> tuple[Vec3, float]:
     if framing == BODY:
         return Vec3(pelvis.x, BODY_FLOOR + BODY_SPAN / 2, pelvis.z), BODY_SPAN
     raise ValueError(f"unknown framing {framing!r}")
+
+
+@dataclass(frozen=True)
+class Bounds:
+    """An axis-aligned box in world space: what a Cosmetic actually occupies on the Class."""
+
+    low: Vec3
+    high: Vec3
+
+    @classmethod
+    def around(cls, points: Iterable[Vec3]) -> "Bounds | None":
+        """The box holding every point, or None when there are no points to hold."""
+        listed = list(points)
+        if not listed:
+            return None
+        return cls(
+            Vec3(*(min(p[axis] for p in listed) for axis in range(3))),
+            Vec3(*(max(p[axis] for p in listed) for axis in range(3))),
+        )
+
+    @property
+    def centre(self) -> Vec3:
+        return (self.low + self.high).scaled(0.5)
+
+    @property
+    def half_extents(self) -> Vec3:
+        return (self.high - self.low).scaled(0.5)
+
+    def extent_along(self, axis: Vec3) -> float:
+        """How wide the box is measured along `axis` — the usual support-function of a box."""
+        half = self.half_extents
+        return 2 * (abs(axis.x) * half.x + abs(axis.y) * half.y + abs(axis.z) * half.z)
+
+
+def view_axes(*, yaw: float = CAMERA_YAW, rise: float = CAMERA_RISE) -> tuple[Vec3, Vec3]:
+    """The camera's right and up axes — the two directions a frame is measured in.
+
+    Built the same way `camera_placement` builds the camera's own rotation, so what this
+    module measures is exactly what the render puts across and up the square frame.
+    """
+    forward = Vec3(math.sin(yaw), -rise, -math.cos(yaw)).normalized()
+    right = forward.cross(WORLD_UP).normalized()
+    up = right.cross(forward).normalized()
+    return right, up
+
+
+def frame_for_bounds(
+    bounds: Bounds,
+    *,
+    padding: float = FRAME_PADDING,
+    min_span: float = MIN_SPAN,
+    max_span: float = MAX_SPAN,
+    floor: float = BODY_FLOOR,
+) -> tuple[Vec3, float]:
+    """The centre to look at and the span to fit, from the Cosmetic's own extent.
+
+    The frame holds the Cosmetic and nothing more than the padding around it: a shoulder
+    parrot gets the shoulder, a pair of trousers gets the legs, a whole-body Cosmetic gets
+    the whole body. The square render means both of the camera's axes have to fit, so the
+    span is the wider of the two. Within reason at both ends — a tiny pin is not magnified
+    past `min_span`, nothing is framed wider than a Class is tall, and the frame does not
+    dig below the ground the Class stands on.
+    """
+    right, up = view_axes()
+    tall = bounds.extent_along(up)
+    span = max(bounds.extent_along(right), tall) * (1 + padding)
+    span = min(max(span, min_span), max_span)
+    centre = bounds.centre + up.scaled(-_room_below(span, tall, padding))
+    if centre.y - span / 2 < floor:
+        centre = Vec3(centre.x, floor + span / 2, centre.z)
+    return centre, span
+
+
+def _room_below(span: float, tall: float, padding: float) -> float:
+    """How far to drop the frame so the room it has to spare falls on the wearer, not on sky.
+
+    A frame is square and is never tighter than `min_span`, so a small Cosmetic is given more
+    frame than it fills. That room is worth more below the Cosmetic than above it — a hat with
+    a face under it reads; a hat with empty air over it does not. The Cosmetic keeps the
+    padding it asked for above, and everything else goes downwards.
+    """
+    return max(0.0, span / 2 - tall / 2 - tall * padding / 2)
 
 
 def camera_placement(
