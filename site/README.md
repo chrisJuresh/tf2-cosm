@@ -95,6 +95,11 @@ they actually hold, each shown at the price of *their* copy's Quality rather tha
 at the Reference Price. A Genuine copy is worth the Genuine figure; the Reference
 Price is a different number about a different copy.
 
+The "Only what I own" toggle that does the narrowing starts ticked. It has
+nothing to narrow until a backpack is read, so it costs a viewer without one
+nothing, and a viewer who pasted a profile asked for their own backpack — having
+to tick a second control to see it is a step with no decision in it.
+
 Two things make it work and neither of them is on the page.
 
 **The inventory proxy.** Steam answers its inventory endpoint with JSON and no

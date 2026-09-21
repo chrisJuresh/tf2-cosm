@@ -57,11 +57,16 @@ test("reads a backpack, marks what is owned and narrows the catalogue to it", as
   // Genuine copy is priced as Genuine rather than as a craft hat.
   await expect(card(page, "scotsmans-stove-pipe").getByText("Genuine")).toBeVisible();
 
-  // And the toggle, which had nothing to narrow to before the backpack arrived.
+  // And the toggle, which had nothing to narrow to before the backpack arrived
+  // and narrows to it the moment it does, without being asked.
   const onlyOwned = page.getByLabel("Only what I own");
   await expect(onlyOwned).toBeEnabled();
-  await onlyOwned.check();
+  await expect(onlyOwned).toBeChecked();
   await expect(cards(page)).toHaveCount(2);
+
+  // Clearing it puts the rest of the catalogue back.
+  await onlyOwned.uncheck();
+  await expect(cards(page)).toHaveCount(everything);
 
   expectClean(faults);
 });

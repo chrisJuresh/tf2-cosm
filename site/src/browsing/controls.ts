@@ -106,9 +106,10 @@ export interface BrowsingControls {
   readonly slot: CosmeticSlot | null;
   readonly hideUnpriced: boolean;
   /**
-   * Whether the catalogue is narrowed to what the viewer owns. It has nothing to
-   * narrow until an Inventory has been read, so it does nothing before then —
-   * the control that turns it on is the one that asks for the Inventory.
+   * Whether the catalogue is narrowed to what the viewer owns. On by default,
+   * which costs a viewer with no Inventory nothing: it has nothing to narrow
+   * until an Inventory has been read, so it does nothing before then — and once
+   * one is read, what they own is what they came to look at.
    */
   readonly onlyOwned: boolean;
   /**
@@ -125,14 +126,15 @@ export interface BrowsingControls {
 
 /**
  * Where a viewer arrives, and where clearing the browser's storage returns them:
- * the catalogue bar its Event-Only Cosmetics, most valuable first.
+ * the catalogue bar its Event-Only Cosmetics, most valuable first — and, the
+ * moment an Inventory is read, only what that Inventory holds.
  */
 export const DEFAULT_CONTROLS: BrowsingControls = {
   classFilter: null,
   hideAllClass: false,
   slot: null,
   hideUnpriced: false,
-  onlyOwned: false,
+  onlyOwned: true,
   hideEventOnly: true,
   sort: "metal-value-high",
   search: "",
