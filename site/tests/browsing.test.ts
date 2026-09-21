@@ -23,7 +23,7 @@ describe("with no controls touched", () => {
       "bolt-boy",
       // The Crocodile Smile sits between these two on value, tied with the
       // Stove Pipe on a Blanket Price; it is Event-Only, so it is not here.
-      "scotsman-s-stove-pipe",
+      "scotsmans-stove-pipe",
       "ghastly-gibus",
       "dead-of-night",
     ]);
@@ -115,7 +115,7 @@ describe("hiding Event-Only Cosmetics", () => {
       "bolt-boy",
       // Two Blanket Prices at the same figure; the name settles the tie.
       "crocodile-smile",
-      "scotsman-s-stove-pipe",
+      "scotsmans-stove-pipe",
       "ghastly-gibus",
       "dead-of-night",
     ]);
@@ -135,7 +135,7 @@ describe("the sort orders", () => {
   it("puts the lowest first the other way round", () => {
     expect(slugsOf({ sort: "metal-value-low" }).slice(0, 3)).toEqual([
       "ghastly-gibus",
-      "scotsman-s-stove-pipe",
+      "scotsmans-stove-pipe",
       "bolt-boy",
     ]);
   });
@@ -151,7 +151,7 @@ describe("the sort orders", () => {
       "bolt-boy",
       "dead-of-night",
       "ghastly-gibus",
-      "scotsman-s-stove-pipe",
+      "scotsmans-stove-pipe",
       "team-captain",
       "tin-pot",
     ]);

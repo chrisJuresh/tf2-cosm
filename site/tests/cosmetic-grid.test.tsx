@@ -97,7 +97,7 @@ describe("the Cosmetic grid", () => {
     // figure backpack.tf lays over the whole class rather than one it observed
     // for this Cosmetic (ADR-0004).
     const shown = renderGrid();
-    expect(figuresOn(cardFor(shown, "scotsman-s-stove-pipe"))).toEqual({
+    expect(figuresOn(cardFor(shown, "scotsmans-stove-pipe"))).toEqual({
       "Trader Notation": "≈1.33 ref",
       "Metal Value": "≈1.33 ref",
       Dollars: "≈$0.04",
@@ -156,7 +156,7 @@ describe("the Cosmetic grid", () => {
       "crocodile-smile",
       "dead-of-night",
       "ghastly-gibus",
-      "scotsman-s-stove-pipe",
+      "scotsmans-stove-pipe",
       "team-captain",
       "tin-pot",
     ]);

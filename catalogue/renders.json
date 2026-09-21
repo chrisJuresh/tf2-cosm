@@ -28100,62 +28100,6 @@
     }
    }
   },
-  "ber-wear": {
-   "medic": {
-    "blu": {
-     "0": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/ber-wear/medic-blu-0@256.webp",
-        "width": 256
-       },
-       "512": {
-        "height": 512,
-        "path": "web/ber-wear/medic-blu-0@512.webp",
-        "width": 512
-       }
-      },
-      "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/ber-wear/medic-blu-0.png",
-       "width": 1024
-      },
-      "model": "models/workshop/player/items/medic/sum23_uber_wear/sum23_uber_wear.mdl",
-      "rendered_at": "2026-09-21T00:49:49+00:00",
-      "style_name": null,
-      "team_fallback": false
-     }
-    },
-    "red": {
-     "0": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/ber-wear/medic-red-0@256.webp",
-        "width": 256
-       },
-       "512": {
-        "height": 512,
-        "path": "web/ber-wear/medic-red-0@512.webp",
-        "width": 512
-       }
-      },
-      "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/ber-wear/medic-red-0.png",
-       "width": 1024
-      },
-      "model": "models/workshop/player/items/medic/sum23_uber_wear/sum23_uber_wear.mdl",
-      "rendered_at": "2026-09-21T00:49:49+00:00",
-      "style_name": null,
-      "team_fallback": false
-     }
-    }
-   }
-  },
   "berlin-brain-bowl": {
    "medic": {
     "blu": {
@@ -42428,926 +42372,6 @@
     }
    }
   },
-  "br-tal-bouffant": {
-   "demoman": {
-    "blu": {
-     "0": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/br-tal-bouffant/demoman-blu-0@256.webp",
-        "width": 256
-       },
-       "512": {
-        "height": 512,
-        "path": "web/br-tal-bouffant/demoman-blu-0@512.webp",
-        "width": 512
-       }
-      },
-      "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/br-tal-bouffant/demoman-blu-0.png",
-       "width": 1024
-      },
-      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_demo.mdl",
-      "rendered_at": "2026-09-21T00:21:09+00:00",
-      "style_name": "No Hat",
-      "team_fallback": true
-     },
-     "1": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/br-tal-bouffant/demoman-blu-1@256.webp",
-        "width": 256
-       },
-       "512": {
-        "height": 512,
-        "path": "web/br-tal-bouffant/demoman-blu-1@512.webp",
-        "width": 512
-       }
-      },
-      "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/br-tal-bouffant/demoman-blu-1.png",
-       "width": 1024
-      },
-      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_demo.mdl",
-      "rendered_at": "2026-09-21T00:21:36+00:00",
-      "style_name": "No Hat and No Headphones",
-      "team_fallback": true
-     }
-    },
-    "red": {
-     "0": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/br-tal-bouffant/demoman-red-0@256.webp",
-        "width": 256
-       },
-       "512": {
-        "height": 512,
-        "path": "web/br-tal-bouffant/demoman-red-0@512.webp",
-        "width": 512
-       }
-      },
-      "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/br-tal-bouffant/demoman-red-0.png",
-       "width": 1024
-      },
-      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_demo.mdl",
-      "rendered_at": "2026-09-21T00:21:08+00:00",
-      "style_name": "No Hat",
-      "team_fallback": false
-     },
-     "1": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/br-tal-bouffant/demoman-red-1@256.webp",
-        "width": 256
-       },
-       "512": {
-        "height": 512,
-        "path": "web/br-tal-bouffant/demoman-red-1@512.webp",
-        "width": 512
-       }
-      },
-      "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/br-tal-bouffant/demoman-red-1.png",
-       "width": 1024
-      },
-      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_demo.mdl",
-      "rendered_at": "2026-09-21T00:21:35+00:00",
-      "style_name": "No Hat and No Headphones",
-      "team_fallback": false
-     }
-    }
-   },
-   "engineer": {
-    "blu": {
-     "0": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/br-tal-bouffant/engineer-blu-0@256.webp",
-        "width": 256
-       },
-       "512": {
-        "height": 512,
-        "path": "web/br-tal-bouffant/engineer-blu-0@512.webp",
-        "width": 512
-       }
-      },
-      "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/br-tal-bouffant/engineer-blu-0.png",
-       "width": 1024
-      },
-      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_engineer.mdl",
-      "rendered_at": "2026-09-21T00:21:14+00:00",
-      "style_name": "No Hat",
-      "team_fallback": true
-     },
-     "1": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/br-tal-bouffant/engineer-blu-1@256.webp",
-        "width": 256
-       },
-       "512": {
-        "height": 512,
-        "path": "web/br-tal-bouffant/engineer-blu-1@512.webp",
-        "width": 512
-       }
-      },
-      "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/br-tal-bouffant/engineer-blu-1.png",
-       "width": 1024
-      },
-      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_engineer.mdl",
-      "rendered_at": "2026-09-21T00:21:43+00:00",
-      "style_name": "No Hat and No Headphones",
-      "team_fallback": true
-     }
-    },
-    "red": {
-     "0": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/br-tal-bouffant/engineer-red-0@256.webp",
-        "width": 256
-       },
-       "512": {
-        "height": 512,
-        "path": "web/br-tal-bouffant/engineer-red-0@512.webp",
-        "width": 512
-       }
-      },
-      "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/br-tal-bouffant/engineer-red-0.png",
-       "width": 1024
-      },
-      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_engineer.mdl",
-      "rendered_at": "2026-09-21T00:21:14+00:00",
-      "style_name": "No Hat",
-      "team_fallback": false
-     },
-     "1": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/br-tal-bouffant/engineer-red-1@256.webp",
-        "width": 256
-       },
-       "512": {
-        "height": 512,
-        "path": "web/br-tal-bouffant/engineer-red-1@512.webp",
-        "width": 512
-       }
-      },
-      "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/br-tal-bouffant/engineer-red-1.png",
-       "width": 1024
-      },
-      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_engineer.mdl",
-      "rendered_at": "2026-09-21T00:21:42+00:00",
-      "style_name": "No Hat and No Headphones",
-      "team_fallback": false
-     }
-    }
-   },
-   "heavy": {
-    "blu": {
-     "0": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/br-tal-bouffant/heavy-blu-0@256.webp",
-        "width": 256
-       },
-       "512": {
-        "height": 512,
-        "path": "web/br-tal-bouffant/heavy-blu-0@512.webp",
-        "width": 512
-       }
-      },
-      "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/br-tal-bouffant/heavy-blu-0.png",
-       "width": 1024
-      },
-      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_heavy.mdl",
-      "rendered_at": "2026-09-21T00:21:12+00:00",
-      "style_name": "No Hat",
-      "team_fallback": true
-     },
-     "1": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/br-tal-bouffant/heavy-blu-1@256.webp",
-        "width": 256
-       },
-       "512": {
-        "height": 512,
-        "path": "web/br-tal-bouffant/heavy-blu-1@512.webp",
-        "width": 512
-       }
-      },
-      "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/br-tal-bouffant/heavy-blu-1.png",
-       "width": 1024
-      },
-      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_heavy.mdl",
-      "rendered_at": "2026-09-21T00:21:39+00:00",
-      "style_name": "No Hat and No Headphones",
-      "team_fallback": true
-     }
-    },
-    "red": {
-     "0": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/br-tal-bouffant/heavy-red-0@256.webp",
-        "width": 256
-       },
-       "512": {
-        "height": 512,
-        "path": "web/br-tal-bouffant/heavy-red-0@512.webp",
-        "width": 512
-       }
-      },
-      "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/br-tal-bouffant/heavy-red-0.png",
-       "width": 1024
-      },
-      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_heavy.mdl",
-      "rendered_at": "2026-09-21T00:21:11+00:00",
-      "style_name": "No Hat",
-      "team_fallback": false
-     },
-     "1": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/br-tal-bouffant/heavy-red-1@256.webp",
-        "width": 256
-       },
-       "512": {
-        "height": 512,
-        "path": "web/br-tal-bouffant/heavy-red-1@512.webp",
-        "width": 512
-       }
-      },
-      "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/br-tal-bouffant/heavy-red-1.png",
-       "width": 1024
-      },
-      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_heavy.mdl",
-      "rendered_at": "2026-09-21T00:21:38+00:00",
-      "style_name": "No Hat and No Headphones",
-      "team_fallback": false
-     }
-    }
-   },
-   "medic": {
-    "blu": {
-     "0": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/br-tal-bouffant/medic-blu-0@256.webp",
-        "width": 256
-       },
-       "512": {
-        "height": 512,
-        "path": "web/br-tal-bouffant/medic-blu-0@512.webp",
-        "width": 512
-       }
-      },
-      "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/br-tal-bouffant/medic-blu-0.png",
-       "width": 1024
-      },
-      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_medic.mdl",
-      "rendered_at": "2026-09-21T00:21:18+00:00",
-      "style_name": "No Hat",
-      "team_fallback": true
-     },
-     "1": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/br-tal-bouffant/medic-blu-1@256.webp",
-        "width": 256
-       },
-       "512": {
-        "height": 512,
-        "path": "web/br-tal-bouffant/medic-blu-1@512.webp",
-        "width": 512
-       }
-      },
-      "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/br-tal-bouffant/medic-blu-1.png",
-       "width": 1024
-      },
-      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_medic.mdl",
-      "rendered_at": "2026-09-21T00:21:47+00:00",
-      "style_name": "No Hat and No Headphones",
-      "team_fallback": true
-     }
-    },
-    "red": {
-     "0": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/br-tal-bouffant/medic-red-0@256.webp",
-        "width": 256
-       },
-       "512": {
-        "height": 512,
-        "path": "web/br-tal-bouffant/medic-red-0@512.webp",
-        "width": 512
-       }
-      },
-      "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/br-tal-bouffant/medic-red-0.png",
-       "width": 1024
-      },
-      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_medic.mdl",
-      "rendered_at": "2026-09-21T00:21:17+00:00",
-      "style_name": "No Hat",
-      "team_fallback": false
-     },
-     "1": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/br-tal-bouffant/medic-red-1@256.webp",
-        "width": 256
-       },
-       "512": {
-        "height": 512,
-        "path": "web/br-tal-bouffant/medic-red-1@512.webp",
-        "width": 512
-       }
-      },
-      "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/br-tal-bouffant/medic-red-1.png",
-       "width": 1024
-      },
-      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_medic.mdl",
-      "rendered_at": "2026-09-21T00:21:45+00:00",
-      "style_name": "No Hat and No Headphones",
-      "team_fallback": false
-     }
-    }
-   },
-   "pyro": {
-    "blu": {
-     "0": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/br-tal-bouffant/pyro-blu-0@256.webp",
-        "width": 256
-       },
-       "512": {
-        "height": 512,
-        "path": "web/br-tal-bouffant/pyro-blu-0@512.webp",
-        "width": 512
-       }
-      },
-      "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/br-tal-bouffant/pyro-blu-0.png",
-       "width": 1024
-      },
-      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_pyro.mdl",
-      "rendered_at": "2026-09-21T00:21:05+00:00",
-      "style_name": "No Hat",
-      "team_fallback": true
-     },
-     "1": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/br-tal-bouffant/pyro-blu-1@256.webp",
-        "width": 256
-       },
-       "512": {
-        "height": 512,
-        "path": "web/br-tal-bouffant/pyro-blu-1@512.webp",
-        "width": 512
-       }
-      },
-      "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/br-tal-bouffant/pyro-blu-1.png",
-       "width": 1024
-      },
-      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_pyro.mdl",
-      "rendered_at": "2026-09-21T00:21:33+00:00",
-      "style_name": "No Hat and No Headphones",
-      "team_fallback": true
-     }
-    },
-    "red": {
-     "0": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/br-tal-bouffant/pyro-red-0@256.webp",
-        "width": 256
-       },
-       "512": {
-        "height": 512,
-        "path": "web/br-tal-bouffant/pyro-red-0@512.webp",
-        "width": 512
-       }
-      },
-      "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/br-tal-bouffant/pyro-red-0.png",
-       "width": 1024
-      },
-      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_pyro.mdl",
-      "rendered_at": "2026-09-21T00:21:05+00:00",
-      "style_name": "No Hat",
-      "team_fallback": false
-     },
-     "1": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/br-tal-bouffant/pyro-red-1@256.webp",
-        "width": 256
-       },
-       "512": {
-        "height": 512,
-        "path": "web/br-tal-bouffant/pyro-red-1@512.webp",
-        "width": 512
-       }
-      },
-      "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/br-tal-bouffant/pyro-red-1.png",
-       "width": 1024
-      },
-      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_pyro.mdl",
-      "rendered_at": "2026-09-21T00:21:32+00:00",
-      "style_name": "No Hat and No Headphones",
-      "team_fallback": false
-     }
-    }
-   },
-   "scout": {
-    "blu": {
-     "0": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/br-tal-bouffant/scout-blu-0@256.webp",
-        "width": 256
-       },
-       "512": {
-        "height": 512,
-        "path": "web/br-tal-bouffant/scout-blu-0@512.webp",
-        "width": 512
-       }
-      },
-      "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/br-tal-bouffant/scout-blu-0.png",
-       "width": 1024
-      },
-      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_scout.mdl",
-      "rendered_at": "2026-09-21T00:20:59+00:00",
-      "style_name": "No Hat",
-      "team_fallback": true
-     },
-     "1": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/br-tal-bouffant/scout-blu-1@256.webp",
-        "width": 256
-       },
-       "512": {
-        "height": 512,
-        "path": "web/br-tal-bouffant/scout-blu-1@512.webp",
-        "width": 512
-       }
-      },
-      "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/br-tal-bouffant/scout-blu-1.png",
-       "width": 1024
-      },
-      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_scout.mdl",
-      "rendered_at": "2026-09-21T00:21:28+00:00",
-      "style_name": "No Hat and No Headphones",
-      "team_fallback": true
-     }
-    },
-    "red": {
-     "0": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/br-tal-bouffant/scout-red-0@256.webp",
-        "width": 256
-       },
-       "512": {
-        "height": 512,
-        "path": "web/br-tal-bouffant/scout-red-0@512.webp",
-        "width": 512
-       }
-      },
-      "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/br-tal-bouffant/scout-red-0.png",
-       "width": 1024
-      },
-      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_scout.mdl",
-      "rendered_at": "2026-09-21T00:20:59+00:00",
-      "style_name": "No Hat",
-      "team_fallback": false
-     },
-     "1": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/br-tal-bouffant/scout-red-1@256.webp",
-        "width": 256
-       },
-       "512": {
-        "height": 512,
-        "path": "web/br-tal-bouffant/scout-red-1@512.webp",
-        "width": 512
-       }
-      },
-      "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/br-tal-bouffant/scout-red-1.png",
-       "width": 1024
-      },
-      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_scout.mdl",
-      "rendered_at": "2026-09-21T00:21:27+00:00",
-      "style_name": "No Hat and No Headphones",
-      "team_fallback": false
-     }
-    }
-   },
-   "sniper": {
-    "blu": {
-     "0": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/br-tal-bouffant/sniper-blu-0@256.webp",
-        "width": 256
-       },
-       "512": {
-        "height": 512,
-        "path": "web/br-tal-bouffant/sniper-blu-0@512.webp",
-        "width": 512
-       }
-      },
-      "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/br-tal-bouffant/sniper-blu-0.png",
-       "width": 1024
-      },
-      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_sniper.mdl",
-      "rendered_at": "2026-09-21T00:21:22+00:00",
-      "style_name": "No Hat",
-      "team_fallback": true
-     },
-     "1": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/br-tal-bouffant/sniper-blu-1@256.webp",
-        "width": 256
-       },
-       "512": {
-        "height": 512,
-        "path": "web/br-tal-bouffant/sniper-blu-1@512.webp",
-        "width": 512
-       }
-      },
-      "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/br-tal-bouffant/sniper-blu-1.png",
-       "width": 1024
-      },
-      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_sniper.mdl",
-      "rendered_at": "2026-09-21T00:21:50+00:00",
-      "style_name": "No Hat and No Headphones",
-      "team_fallback": true
-     }
-    },
-    "red": {
-     "0": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/br-tal-bouffant/sniper-red-0@256.webp",
-        "width": 256
-       },
-       "512": {
-        "height": 512,
-        "path": "web/br-tal-bouffant/sniper-red-0@512.webp",
-        "width": 512
-       }
-      },
-      "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/br-tal-bouffant/sniper-red-0.png",
-       "width": 1024
-      },
-      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_sniper.mdl",
-      "rendered_at": "2026-09-21T00:21:21+00:00",
-      "style_name": "No Hat",
-      "team_fallback": false
-     },
-     "1": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/br-tal-bouffant/sniper-red-1@256.webp",
-        "width": 256
-       },
-       "512": {
-        "height": 512,
-        "path": "web/br-tal-bouffant/sniper-red-1@512.webp",
-        "width": 512
-       }
-      },
-      "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/br-tal-bouffant/sniper-red-1.png",
-       "width": 1024
-      },
-      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_sniper.mdl",
-      "rendered_at": "2026-09-21T00:21:49+00:00",
-      "style_name": "No Hat and No Headphones",
-      "team_fallback": false
-     }
-    }
-   },
-   "soldier": {
-    "blu": {
-     "0": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/br-tal-bouffant/soldier-blu-0@256.webp",
-        "width": 256
-       },
-       "512": {
-        "height": 512,
-        "path": "web/br-tal-bouffant/soldier-blu-0@512.webp",
-        "width": 512
-       }
-      },
-      "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/br-tal-bouffant/soldier-blu-0.png",
-       "width": 1024
-      },
-      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_soldier.mdl",
-      "rendered_at": "2026-09-21T00:21:03+00:00",
-      "style_name": "No Hat",
-      "team_fallback": true
-     },
-     "1": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/br-tal-bouffant/soldier-blu-1@256.webp",
-        "width": 256
-       },
-       "512": {
-        "height": 512,
-        "path": "web/br-tal-bouffant/soldier-blu-1@512.webp",
-        "width": 512
-       }
-      },
-      "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/br-tal-bouffant/soldier-blu-1.png",
-       "width": 1024
-      },
-      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_soldier.mdl",
-      "rendered_at": "2026-09-21T00:21:30+00:00",
-      "style_name": "No Hat and No Headphones",
-      "team_fallback": true
-     }
-    },
-    "red": {
-     "0": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/br-tal-bouffant/soldier-red-0@256.webp",
-        "width": 256
-       },
-       "512": {
-        "height": 512,
-        "path": "web/br-tal-bouffant/soldier-red-0@512.webp",
-        "width": 512
-       }
-      },
-      "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/br-tal-bouffant/soldier-red-0.png",
-       "width": 1024
-      },
-      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_soldier.mdl",
-      "rendered_at": "2026-09-21T00:21:02+00:00",
-      "style_name": "No Hat",
-      "team_fallback": false
-     },
-     "1": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/br-tal-bouffant/soldier-red-1@256.webp",
-        "width": 256
-       },
-       "512": {
-        "height": 512,
-        "path": "web/br-tal-bouffant/soldier-red-1@512.webp",
-        "width": 512
-       }
-      },
-      "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/br-tal-bouffant/soldier-red-1.png",
-       "width": 1024
-      },
-      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_soldier.mdl",
-      "rendered_at": "2026-09-21T00:21:30+00:00",
-      "style_name": "No Hat and No Headphones",
-      "team_fallback": false
-     }
-    }
-   },
-   "spy": {
-    "blu": {
-     "0": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/br-tal-bouffant/spy-blu-0@256.webp",
-        "width": 256
-       },
-       "512": {
-        "height": 512,
-        "path": "web/br-tal-bouffant/spy-blu-0@512.webp",
-        "width": 512
-       }
-      },
-      "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/br-tal-bouffant/spy-blu-0.png",
-       "width": 1024
-      },
-      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_spy.mdl",
-      "rendered_at": "2026-09-21T00:21:25+00:00",
-      "style_name": "No Hat",
-      "team_fallback": true
-     },
-     "1": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/br-tal-bouffant/spy-blu-1@256.webp",
-        "width": 256
-       },
-       "512": {
-        "height": 512,
-        "path": "web/br-tal-bouffant/spy-blu-1@512.webp",
-        "width": 512
-       }
-      },
-      "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/br-tal-bouffant/spy-blu-1.png",
-       "width": 1024
-      },
-      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_spy.mdl",
-      "rendered_at": "2026-09-21T00:21:53+00:00",
-      "style_name": "No Hat and No Headphones",
-      "team_fallback": true
-     }
-    },
-    "red": {
-     "0": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/br-tal-bouffant/spy-red-0@256.webp",
-        "width": 256
-       },
-       "512": {
-        "height": 512,
-        "path": "web/br-tal-bouffant/spy-red-0@512.webp",
-        "width": 512
-       }
-      },
-      "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/br-tal-bouffant/spy-red-0.png",
-       "width": 1024
-      },
-      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_spy.mdl",
-      "rendered_at": "2026-09-21T00:21:24+00:00",
-      "style_name": "No Hat",
-      "team_fallback": false
-     },
-     "1": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/br-tal-bouffant/spy-red-1@256.webp",
-        "width": 256
-       },
-       "512": {
-        "height": 512,
-        "path": "web/br-tal-bouffant/spy-red-1@512.webp",
-        "width": 512
-       }
-      },
-      "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/br-tal-bouffant/spy-red-1.png",
-       "width": 1024
-      },
-      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_spy.mdl",
-      "rendered_at": "2026-09-21T00:21:52+00:00",
-      "style_name": "No Hat and No Headphones",
-      "team_fallback": false
-     }
-    }
-   }
-  },
   "brain-bucket": {
    "soldier": {
     "blu": {
@@ -51687,6 +50711,926 @@
       "model": "models/workshop/player/items/all_class/short2014_all_mercs_mask_s2/short2014_all_mercs_mask_s2_spy.mdl",
       "rendered_at": "2026-09-21T00:20:36+00:00",
       "style_name": "Skulls",
+      "team_fallback": false
+     }
+    }
+   }
+  },
+  "brutal-bouffant": {
+   "demoman": {
+    "blu": {
+     "0": {
+      "derivatives": {
+       "256": {
+        "height": 256,
+        "path": "web/brutal-bouffant/demoman-blu-0@256.webp",
+        "width": 256
+       },
+       "512": {
+        "height": 512,
+        "path": "web/brutal-bouffant/demoman-blu-0@512.webp",
+        "width": 512
+       }
+      },
+      "job_version": 1,
+      "master": {
+       "height": 1024,
+       "path": "masters/brutal-bouffant/demoman-blu-0.png",
+       "width": 1024
+      },
+      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_demo.mdl",
+      "rendered_at": "2026-09-21T02:37:09+00:00",
+      "style_name": "No Hat",
+      "team_fallback": true
+     },
+     "1": {
+      "derivatives": {
+       "256": {
+        "height": 256,
+        "path": "web/brutal-bouffant/demoman-blu-1@256.webp",
+        "width": 256
+       },
+       "512": {
+        "height": 512,
+        "path": "web/brutal-bouffant/demoman-blu-1@512.webp",
+        "width": 512
+       }
+      },
+      "job_version": 1,
+      "master": {
+       "height": 1024,
+       "path": "masters/brutal-bouffant/demoman-blu-1.png",
+       "width": 1024
+      },
+      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_demo.mdl",
+      "rendered_at": "2026-09-21T02:37:28+00:00",
+      "style_name": "No Hat and No Headphones",
+      "team_fallback": true
+     }
+    },
+    "red": {
+     "0": {
+      "derivatives": {
+       "256": {
+        "height": 256,
+        "path": "web/brutal-bouffant/demoman-red-0@256.webp",
+        "width": 256
+       },
+       "512": {
+        "height": 512,
+        "path": "web/brutal-bouffant/demoman-red-0@512.webp",
+        "width": 512
+       }
+      },
+      "job_version": 1,
+      "master": {
+       "height": 1024,
+       "path": "masters/brutal-bouffant/demoman-red-0.png",
+       "width": 1024
+      },
+      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_demo.mdl",
+      "rendered_at": "2026-09-21T02:37:08+00:00",
+      "style_name": "No Hat",
+      "team_fallback": false
+     },
+     "1": {
+      "derivatives": {
+       "256": {
+        "height": 256,
+        "path": "web/brutal-bouffant/demoman-red-1@256.webp",
+        "width": 256
+       },
+       "512": {
+        "height": 512,
+        "path": "web/brutal-bouffant/demoman-red-1@512.webp",
+        "width": 512
+       }
+      },
+      "job_version": 1,
+      "master": {
+       "height": 1024,
+       "path": "masters/brutal-bouffant/demoman-red-1.png",
+       "width": 1024
+      },
+      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_demo.mdl",
+      "rendered_at": "2026-09-21T02:37:27+00:00",
+      "style_name": "No Hat and No Headphones",
+      "team_fallback": false
+     }
+    }
+   },
+   "engineer": {
+    "blu": {
+     "0": {
+      "derivatives": {
+       "256": {
+        "height": 256,
+        "path": "web/brutal-bouffant/engineer-blu-0@256.webp",
+        "width": 256
+       },
+       "512": {
+        "height": 512,
+        "path": "web/brutal-bouffant/engineer-blu-0@512.webp",
+        "width": 512
+       }
+      },
+      "job_version": 1,
+      "master": {
+       "height": 1024,
+       "path": "masters/brutal-bouffant/engineer-blu-0.png",
+       "width": 1024
+      },
+      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_engineer.mdl",
+      "rendered_at": "2026-09-21T02:37:12+00:00",
+      "style_name": "No Hat",
+      "team_fallback": true
+     },
+     "1": {
+      "derivatives": {
+       "256": {
+        "height": 256,
+        "path": "web/brutal-bouffant/engineer-blu-1@256.webp",
+        "width": 256
+       },
+       "512": {
+        "height": 512,
+        "path": "web/brutal-bouffant/engineer-blu-1@512.webp",
+        "width": 512
+       }
+      },
+      "job_version": 1,
+      "master": {
+       "height": 1024,
+       "path": "masters/brutal-bouffant/engineer-blu-1.png",
+       "width": 1024
+      },
+      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_engineer.mdl",
+      "rendered_at": "2026-09-21T02:37:32+00:00",
+      "style_name": "No Hat and No Headphones",
+      "team_fallback": true
+     }
+    },
+    "red": {
+     "0": {
+      "derivatives": {
+       "256": {
+        "height": 256,
+        "path": "web/brutal-bouffant/engineer-red-0@256.webp",
+        "width": 256
+       },
+       "512": {
+        "height": 512,
+        "path": "web/brutal-bouffant/engineer-red-0@512.webp",
+        "width": 512
+       }
+      },
+      "job_version": 1,
+      "master": {
+       "height": 1024,
+       "path": "masters/brutal-bouffant/engineer-red-0.png",
+       "width": 1024
+      },
+      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_engineer.mdl",
+      "rendered_at": "2026-09-21T02:37:12+00:00",
+      "style_name": "No Hat",
+      "team_fallback": false
+     },
+     "1": {
+      "derivatives": {
+       "256": {
+        "height": 256,
+        "path": "web/brutal-bouffant/engineer-red-1@256.webp",
+        "width": 256
+       },
+       "512": {
+        "height": 512,
+        "path": "web/brutal-bouffant/engineer-red-1@512.webp",
+        "width": 512
+       }
+      },
+      "job_version": 1,
+      "master": {
+       "height": 1024,
+       "path": "masters/brutal-bouffant/engineer-red-1.png",
+       "width": 1024
+      },
+      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_engineer.mdl",
+      "rendered_at": "2026-09-21T02:37:31+00:00",
+      "style_name": "No Hat and No Headphones",
+      "team_fallback": false
+     }
+    }
+   },
+   "heavy": {
+    "blu": {
+     "0": {
+      "derivatives": {
+       "256": {
+        "height": 256,
+        "path": "web/brutal-bouffant/heavy-blu-0@256.webp",
+        "width": 256
+       },
+       "512": {
+        "height": 512,
+        "path": "web/brutal-bouffant/heavy-blu-0@512.webp",
+        "width": 512
+       }
+      },
+      "job_version": 1,
+      "master": {
+       "height": 1024,
+       "path": "masters/brutal-bouffant/heavy-blu-0.png",
+       "width": 1024
+      },
+      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_heavy.mdl",
+      "rendered_at": "2026-09-21T02:37:10+00:00",
+      "style_name": "No Hat",
+      "team_fallback": true
+     },
+     "1": {
+      "derivatives": {
+       "256": {
+        "height": 256,
+        "path": "web/brutal-bouffant/heavy-blu-1@256.webp",
+        "width": 256
+       },
+       "512": {
+        "height": 512,
+        "path": "web/brutal-bouffant/heavy-blu-1@512.webp",
+        "width": 512
+       }
+      },
+      "job_version": 1,
+      "master": {
+       "height": 1024,
+       "path": "masters/brutal-bouffant/heavy-blu-1.png",
+       "width": 1024
+      },
+      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_heavy.mdl",
+      "rendered_at": "2026-09-21T02:37:30+00:00",
+      "style_name": "No Hat and No Headphones",
+      "team_fallback": true
+     }
+    },
+    "red": {
+     "0": {
+      "derivatives": {
+       "256": {
+        "height": 256,
+        "path": "web/brutal-bouffant/heavy-red-0@256.webp",
+        "width": 256
+       },
+       "512": {
+        "height": 512,
+        "path": "web/brutal-bouffant/heavy-red-0@512.webp",
+        "width": 512
+       }
+      },
+      "job_version": 1,
+      "master": {
+       "height": 1024,
+       "path": "masters/brutal-bouffant/heavy-red-0.png",
+       "width": 1024
+      },
+      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_heavy.mdl",
+      "rendered_at": "2026-09-21T02:37:10+00:00",
+      "style_name": "No Hat",
+      "team_fallback": false
+     },
+     "1": {
+      "derivatives": {
+       "256": {
+        "height": 256,
+        "path": "web/brutal-bouffant/heavy-red-1@256.webp",
+        "width": 256
+       },
+       "512": {
+        "height": 512,
+        "path": "web/brutal-bouffant/heavy-red-1@512.webp",
+        "width": 512
+       }
+      },
+      "job_version": 1,
+      "master": {
+       "height": 1024,
+       "path": "masters/brutal-bouffant/heavy-red-1.png",
+       "width": 1024
+      },
+      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_heavy.mdl",
+      "rendered_at": "2026-09-21T02:37:29+00:00",
+      "style_name": "No Hat and No Headphones",
+      "team_fallback": false
+     }
+    }
+   },
+   "medic": {
+    "blu": {
+     "0": {
+      "derivatives": {
+       "256": {
+        "height": 256,
+        "path": "web/brutal-bouffant/medic-blu-0@256.webp",
+        "width": 256
+       },
+       "512": {
+        "height": 512,
+        "path": "web/brutal-bouffant/medic-blu-0@512.webp",
+        "width": 512
+       }
+      },
+      "job_version": 1,
+      "master": {
+       "height": 1024,
+       "path": "masters/brutal-bouffant/medic-blu-0.png",
+       "width": 1024
+      },
+      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_medic.mdl",
+      "rendered_at": "2026-09-21T02:37:15+00:00",
+      "style_name": "No Hat",
+      "team_fallback": true
+     },
+     "1": {
+      "derivatives": {
+       "256": {
+        "height": 256,
+        "path": "web/brutal-bouffant/medic-blu-1@256.webp",
+        "width": 256
+       },
+       "512": {
+        "height": 512,
+        "path": "web/brutal-bouffant/medic-blu-1@512.webp",
+        "width": 512
+       }
+      },
+      "job_version": 1,
+      "master": {
+       "height": 1024,
+       "path": "masters/brutal-bouffant/medic-blu-1.png",
+       "width": 1024
+      },
+      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_medic.mdl",
+      "rendered_at": "2026-09-21T02:37:34+00:00",
+      "style_name": "No Hat and No Headphones",
+      "team_fallback": true
+     }
+    },
+    "red": {
+     "0": {
+      "derivatives": {
+       "256": {
+        "height": 256,
+        "path": "web/brutal-bouffant/medic-red-0@256.webp",
+        "width": 256
+       },
+       "512": {
+        "height": 512,
+        "path": "web/brutal-bouffant/medic-red-0@512.webp",
+        "width": 512
+       }
+      },
+      "job_version": 1,
+      "master": {
+       "height": 1024,
+       "path": "masters/brutal-bouffant/medic-red-0.png",
+       "width": 1024
+      },
+      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_medic.mdl",
+      "rendered_at": "2026-09-21T02:37:14+00:00",
+      "style_name": "No Hat",
+      "team_fallback": false
+     },
+     "1": {
+      "derivatives": {
+       "256": {
+        "height": 256,
+        "path": "web/brutal-bouffant/medic-red-1@256.webp",
+        "width": 256
+       },
+       "512": {
+        "height": 512,
+        "path": "web/brutal-bouffant/medic-red-1@512.webp",
+        "width": 512
+       }
+      },
+      "job_version": 1,
+      "master": {
+       "height": 1024,
+       "path": "masters/brutal-bouffant/medic-red-1.png",
+       "width": 1024
+      },
+      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_medic.mdl",
+      "rendered_at": "2026-09-21T02:37:33+00:00",
+      "style_name": "No Hat and No Headphones",
+      "team_fallback": false
+     }
+    }
+   },
+   "pyro": {
+    "blu": {
+     "0": {
+      "derivatives": {
+       "256": {
+        "height": 256,
+        "path": "web/brutal-bouffant/pyro-blu-0@256.webp",
+        "width": 256
+       },
+       "512": {
+        "height": 512,
+        "path": "web/brutal-bouffant/pyro-blu-0@512.webp",
+        "width": 512
+       }
+      },
+      "job_version": 1,
+      "master": {
+       "height": 1024,
+       "path": "masters/brutal-bouffant/pyro-blu-0.png",
+       "width": 1024
+      },
+      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_pyro.mdl",
+      "rendered_at": "2026-09-21T02:37:07+00:00",
+      "style_name": "No Hat",
+      "team_fallback": true
+     },
+     "1": {
+      "derivatives": {
+       "256": {
+        "height": 256,
+        "path": "web/brutal-bouffant/pyro-blu-1@256.webp",
+        "width": 256
+       },
+       "512": {
+        "height": 512,
+        "path": "web/brutal-bouffant/pyro-blu-1@512.webp",
+        "width": 512
+       }
+      },
+      "job_version": 1,
+      "master": {
+       "height": 1024,
+       "path": "masters/brutal-bouffant/pyro-blu-1.png",
+       "width": 1024
+      },
+      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_pyro.mdl",
+      "rendered_at": "2026-09-21T02:37:25+00:00",
+      "style_name": "No Hat and No Headphones",
+      "team_fallback": true
+     }
+    },
+    "red": {
+     "0": {
+      "derivatives": {
+       "256": {
+        "height": 256,
+        "path": "web/brutal-bouffant/pyro-red-0@256.webp",
+        "width": 256
+       },
+       "512": {
+        "height": 512,
+        "path": "web/brutal-bouffant/pyro-red-0@512.webp",
+        "width": 512
+       }
+      },
+      "job_version": 1,
+      "master": {
+       "height": 1024,
+       "path": "masters/brutal-bouffant/pyro-red-0.png",
+       "width": 1024
+      },
+      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_pyro.mdl",
+      "rendered_at": "2026-09-21T02:37:07+00:00",
+      "style_name": "No Hat",
+      "team_fallback": false
+     },
+     "1": {
+      "derivatives": {
+       "256": {
+        "height": 256,
+        "path": "web/brutal-bouffant/pyro-red-1@256.webp",
+        "width": 256
+       },
+       "512": {
+        "height": 512,
+        "path": "web/brutal-bouffant/pyro-red-1@512.webp",
+        "width": 512
+       }
+      },
+      "job_version": 1,
+      "master": {
+       "height": 1024,
+       "path": "masters/brutal-bouffant/pyro-red-1.png",
+       "width": 1024
+      },
+      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_pyro.mdl",
+      "rendered_at": "2026-09-21T02:37:25+00:00",
+      "style_name": "No Hat and No Headphones",
+      "team_fallback": false
+     }
+    }
+   },
+   "scout": {
+    "blu": {
+     "0": {
+      "derivatives": {
+       "256": {
+        "height": 256,
+        "path": "web/brutal-bouffant/scout-blu-0@256.webp",
+        "width": 256
+       },
+       "512": {
+        "height": 512,
+        "path": "web/brutal-bouffant/scout-blu-0@512.webp",
+        "width": 512
+       }
+      },
+      "job_version": 1,
+      "master": {
+       "height": 1024,
+       "path": "masters/brutal-bouffant/scout-blu-0.png",
+       "width": 1024
+      },
+      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_scout.mdl",
+      "rendered_at": "2026-09-21T02:37:04+00:00",
+      "style_name": "No Hat",
+      "team_fallback": true
+     },
+     "1": {
+      "derivatives": {
+       "256": {
+        "height": 256,
+        "path": "web/brutal-bouffant/scout-blu-1@256.webp",
+        "width": 256
+       },
+       "512": {
+        "height": 512,
+        "path": "web/brutal-bouffant/scout-blu-1@512.webp",
+        "width": 512
+       }
+      },
+      "job_version": 1,
+      "master": {
+       "height": 1024,
+       "path": "masters/brutal-bouffant/scout-blu-1.png",
+       "width": 1024
+      },
+      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_scout.mdl",
+      "rendered_at": "2026-09-21T02:37:21+00:00",
+      "style_name": "No Hat and No Headphones",
+      "team_fallback": true
+     }
+    },
+    "red": {
+     "0": {
+      "derivatives": {
+       "256": {
+        "height": 256,
+        "path": "web/brutal-bouffant/scout-red-0@256.webp",
+        "width": 256
+       },
+       "512": {
+        "height": 512,
+        "path": "web/brutal-bouffant/scout-red-0@512.webp",
+        "width": 512
+       }
+      },
+      "job_version": 1,
+      "master": {
+       "height": 1024,
+       "path": "masters/brutal-bouffant/scout-red-0.png",
+       "width": 1024
+      },
+      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_scout.mdl",
+      "rendered_at": "2026-09-21T02:37:04+00:00",
+      "style_name": "No Hat",
+      "team_fallback": false
+     },
+     "1": {
+      "derivatives": {
+       "256": {
+        "height": 256,
+        "path": "web/brutal-bouffant/scout-red-1@256.webp",
+        "width": 256
+       },
+       "512": {
+        "height": 512,
+        "path": "web/brutal-bouffant/scout-red-1@512.webp",
+        "width": 512
+       }
+      },
+      "job_version": 1,
+      "master": {
+       "height": 1024,
+       "path": "masters/brutal-bouffant/scout-red-1.png",
+       "width": 1024
+      },
+      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_scout.mdl",
+      "rendered_at": "2026-09-21T02:37:21+00:00",
+      "style_name": "No Hat and No Headphones",
+      "team_fallback": false
+     }
+    }
+   },
+   "sniper": {
+    "blu": {
+     "0": {
+      "derivatives": {
+       "256": {
+        "height": 256,
+        "path": "web/brutal-bouffant/sniper-blu-0@256.webp",
+        "width": 256
+       },
+       "512": {
+        "height": 512,
+        "path": "web/brutal-bouffant/sniper-blu-0@512.webp",
+        "width": 512
+       }
+      },
+      "job_version": 1,
+      "master": {
+       "height": 1024,
+       "path": "masters/brutal-bouffant/sniper-blu-0.png",
+       "width": 1024
+      },
+      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_sniper.mdl",
+      "rendered_at": "2026-09-21T02:37:17+00:00",
+      "style_name": "No Hat",
+      "team_fallback": true
+     },
+     "1": {
+      "derivatives": {
+       "256": {
+        "height": 256,
+        "path": "web/brutal-bouffant/sniper-blu-1@256.webp",
+        "width": 256
+       },
+       "512": {
+        "height": 512,
+        "path": "web/brutal-bouffant/sniper-blu-1@512.webp",
+        "width": 512
+       }
+      },
+      "job_version": 1,
+      "master": {
+       "height": 1024,
+       "path": "masters/brutal-bouffant/sniper-blu-1.png",
+       "width": 1024
+      },
+      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_sniper.mdl",
+      "rendered_at": "2026-09-21T02:37:36+00:00",
+      "style_name": "No Hat and No Headphones",
+      "team_fallback": true
+     }
+    },
+    "red": {
+     "0": {
+      "derivatives": {
+       "256": {
+        "height": 256,
+        "path": "web/brutal-bouffant/sniper-red-0@256.webp",
+        "width": 256
+       },
+       "512": {
+        "height": 512,
+        "path": "web/brutal-bouffant/sniper-red-0@512.webp",
+        "width": 512
+       }
+      },
+      "job_version": 1,
+      "master": {
+       "height": 1024,
+       "path": "masters/brutal-bouffant/sniper-red-0.png",
+       "width": 1024
+      },
+      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_sniper.mdl",
+      "rendered_at": "2026-09-21T02:37:16+00:00",
+      "style_name": "No Hat",
+      "team_fallback": false
+     },
+     "1": {
+      "derivatives": {
+       "256": {
+        "height": 256,
+        "path": "web/brutal-bouffant/sniper-red-1@256.webp",
+        "width": 256
+       },
+       "512": {
+        "height": 512,
+        "path": "web/brutal-bouffant/sniper-red-1@512.webp",
+        "width": 512
+       }
+      },
+      "job_version": 1,
+      "master": {
+       "height": 1024,
+       "path": "masters/brutal-bouffant/sniper-red-1.png",
+       "width": 1024
+      },
+      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_sniper.mdl",
+      "rendered_at": "2026-09-21T02:37:35+00:00",
+      "style_name": "No Hat and No Headphones",
+      "team_fallback": false
+     }
+    }
+   },
+   "soldier": {
+    "blu": {
+     "0": {
+      "derivatives": {
+       "256": {
+        "height": 256,
+        "path": "web/brutal-bouffant/soldier-blu-0@256.webp",
+        "width": 256
+       },
+       "512": {
+        "height": 512,
+        "path": "web/brutal-bouffant/soldier-blu-0@512.webp",
+        "width": 512
+       }
+      },
+      "job_version": 1,
+      "master": {
+       "height": 1024,
+       "path": "masters/brutal-bouffant/soldier-blu-0.png",
+       "width": 1024
+      },
+      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_soldier.mdl",
+      "rendered_at": "2026-09-21T02:37:06+00:00",
+      "style_name": "No Hat",
+      "team_fallback": true
+     },
+     "1": {
+      "derivatives": {
+       "256": {
+        "height": 256,
+        "path": "web/brutal-bouffant/soldier-blu-1@256.webp",
+        "width": 256
+       },
+       "512": {
+        "height": 512,
+        "path": "web/brutal-bouffant/soldier-blu-1@512.webp",
+        "width": 512
+       }
+      },
+      "job_version": 1,
+      "master": {
+       "height": 1024,
+       "path": "masters/brutal-bouffant/soldier-blu-1.png",
+       "width": 1024
+      },
+      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_soldier.mdl",
+      "rendered_at": "2026-09-21T02:37:23+00:00",
+      "style_name": "No Hat and No Headphones",
+      "team_fallback": true
+     }
+    },
+    "red": {
+     "0": {
+      "derivatives": {
+       "256": {
+        "height": 256,
+        "path": "web/brutal-bouffant/soldier-red-0@256.webp",
+        "width": 256
+       },
+       "512": {
+        "height": 512,
+        "path": "web/brutal-bouffant/soldier-red-0@512.webp",
+        "width": 512
+       }
+      },
+      "job_version": 1,
+      "master": {
+       "height": 1024,
+       "path": "masters/brutal-bouffant/soldier-red-0.png",
+       "width": 1024
+      },
+      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_soldier.mdl",
+      "rendered_at": "2026-09-21T02:37:05+00:00",
+      "style_name": "No Hat",
+      "team_fallback": false
+     },
+     "1": {
+      "derivatives": {
+       "256": {
+        "height": 256,
+        "path": "web/brutal-bouffant/soldier-red-1@256.webp",
+        "width": 256
+       },
+       "512": {
+        "height": 512,
+        "path": "web/brutal-bouffant/soldier-red-1@512.webp",
+        "width": 512
+       }
+      },
+      "job_version": 1,
+      "master": {
+       "height": 1024,
+       "path": "masters/brutal-bouffant/soldier-red-1.png",
+       "width": 1024
+      },
+      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_soldier.mdl",
+      "rendered_at": "2026-09-21T02:37:23+00:00",
+      "style_name": "No Hat and No Headphones",
+      "team_fallback": false
+     }
+    }
+   },
+   "spy": {
+    "blu": {
+     "0": {
+      "derivatives": {
+       "256": {
+        "height": 256,
+        "path": "web/brutal-bouffant/spy-blu-0@256.webp",
+        "width": 256
+       },
+       "512": {
+        "height": 512,
+        "path": "web/brutal-bouffant/spy-blu-0@512.webp",
+        "width": 512
+       }
+      },
+      "job_version": 1,
+      "master": {
+       "height": 1024,
+       "path": "masters/brutal-bouffant/spy-blu-0.png",
+       "width": 1024
+      },
+      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_spy.mdl",
+      "rendered_at": "2026-09-21T02:37:19+00:00",
+      "style_name": "No Hat",
+      "team_fallback": true
+     },
+     "1": {
+      "derivatives": {
+       "256": {
+        "height": 256,
+        "path": "web/brutal-bouffant/spy-blu-1@256.webp",
+        "width": 256
+       },
+       "512": {
+        "height": 512,
+        "path": "web/brutal-bouffant/spy-blu-1@512.webp",
+        "width": 512
+       }
+      },
+      "job_version": 1,
+      "master": {
+       "height": 1024,
+       "path": "masters/brutal-bouffant/spy-blu-1.png",
+       "width": 1024
+      },
+      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_spy.mdl",
+      "rendered_at": "2026-09-21T02:37:38+00:00",
+      "style_name": "No Hat and No Headphones",
+      "team_fallback": true
+     }
+    },
+    "red": {
+     "0": {
+      "derivatives": {
+       "256": {
+        "height": 256,
+        "path": "web/brutal-bouffant/spy-red-0@256.webp",
+        "width": 256
+       },
+       "512": {
+        "height": 512,
+        "path": "web/brutal-bouffant/spy-red-0@512.webp",
+        "width": 512
+       }
+      },
+      "job_version": 1,
+      "master": {
+       "height": 1024,
+       "path": "masters/brutal-bouffant/spy-red-0.png",
+       "width": 1024
+      },
+      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_spy.mdl",
+      "rendered_at": "2026-09-21T02:37:19+00:00",
+      "style_name": "No Hat",
+      "team_fallback": false
+     },
+     "1": {
+      "derivatives": {
+       "256": {
+        "height": 256,
+        "path": "web/brutal-bouffant/spy-red-1@256.webp",
+        "width": 256
+       },
+       "512": {
+        "height": 512,
+        "path": "web/brutal-bouffant/spy-red-1@512.webp",
+        "width": 512
+       }
+      },
+      "job_version": 1,
+      "master": {
+       "height": 1024,
+       "path": "masters/brutal-bouffant/spy-red-1.png",
+       "width": 1024
+      },
+      "model": "models/workshop_partner/player/items/all_class/brutal_hair/brutal_hair_spy.mdl",
+      "rendered_at": "2026-09-21T02:37:38+00:00",
+      "style_name": "No Hat and No Headphones",
       "team_fallback": false
      }
     }
@@ -84022,62 +83966,6 @@
     }
    }
   },
-  "d-tective-noir": {
-   "spy": {
-    "blu": {
-     "0": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/d-tective-noir/spy-blu-0@256.webp",
-        "width": 256
-       },
-       "512": {
-        "height": 512,
-        "path": "web/d-tective-noir/spy-blu-0@512.webp",
-        "width": 512
-       }
-      },
-      "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/d-tective-noir/spy-blu-0.png",
-       "width": 1024
-      },
-      "model": "models/player/items/spy/spy_detective_noir.mdl",
-      "rendered_at": "2026-09-21T00:28:08+00:00",
-      "style_name": null,
-      "team_fallback": false
-     }
-    },
-    "red": {
-     "0": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/d-tective-noir/spy-red-0@256.webp",
-        "width": 256
-       },
-       "512": {
-        "height": 512,
-        "path": "web/d-tective-noir/spy-red-0@512.webp",
-        "width": 512
-       }
-      },
-      "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/d-tective-noir/spy-red-0.png",
-       "width": 1024
-      },
-      "model": "models/player/items/spy/spy_detective_noir.mdl",
-      "rendered_at": "2026-09-21T00:28:07+00:00",
-      "style_name": null,
-      "team_fallback": false
-     }
-    }
-   }
-  },
   "dad-duds": {
    "engineer": {
     "blu": {
@@ -87918,62 +87806,6 @@
     }
    }
   },
-  "das-bersternmann": {
-   "medic": {
-    "blu": {
-     "0": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/das-bersternmann/medic-blu-0@256.webp",
-        "width": 256
-       },
-       "512": {
-        "height": 512,
-        "path": "web/das-bersternmann/medic-blu-0@512.webp",
-        "width": 512
-       }
-      },
-      "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/das-bersternmann/medic-blu-0.png",
-       "width": 1024
-      },
-      "model": "models/workshop/player/items/medic/jul13_secret_state_surgeon/jul13_secret_state_surgeon.mdl",
-      "rendered_at": "2026-09-21T00:26:33+00:00",
-      "style_name": null,
-      "team_fallback": true
-     }
-    },
-    "red": {
-     "0": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/das-bersternmann/medic-red-0@256.webp",
-        "width": 256
-       },
-       "512": {
-        "height": 512,
-        "path": "web/das-bersternmann/medic-red-0@512.webp",
-        "width": 512
-       }
-      },
-      "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/das-bersternmann/medic-red-0.png",
-       "width": 1024
-      },
-      "model": "models/workshop/player/items/medic/jul13_secret_state_surgeon/jul13_secret_state_surgeon.mdl",
-      "rendered_at": "2026-09-21T00:26:32+00:00",
-      "style_name": null,
-      "team_fallback": false
-     }
-    }
-   }
-  },
   "das-blutliebhaber": {
    "medic": {
     "blu": {
@@ -88416,6 +88248,62 @@
       },
       "model": "models/workshop/player/items/medic/jul13_bro_plate/jul13_bro_plate.mdl",
       "rendered_at": "2026-09-21T00:26:29+00:00",
+      "style_name": null,
+      "team_fallback": false
+     }
+    }
+   }
+  },
+  "das-ubersternmann": {
+   "medic": {
+    "blu": {
+     "0": {
+      "derivatives": {
+       "256": {
+        "height": 256,
+        "path": "web/das-ubersternmann/medic-blu-0@256.webp",
+        "width": 256
+       },
+       "512": {
+        "height": 512,
+        "path": "web/das-ubersternmann/medic-blu-0@512.webp",
+        "width": 512
+       }
+      },
+      "job_version": 1,
+      "master": {
+       "height": 1024,
+       "path": "masters/das-ubersternmann/medic-blu-0.png",
+       "width": 1024
+      },
+      "model": "models/workshop/player/items/medic/jul13_secret_state_surgeon/jul13_secret_state_surgeon.mdl",
+      "rendered_at": "2026-09-21T02:37:41+00:00",
+      "style_name": null,
+      "team_fallback": true
+     }
+    },
+    "red": {
+     "0": {
+      "derivatives": {
+       "256": {
+        "height": 256,
+        "path": "web/das-ubersternmann/medic-red-0@256.webp",
+        "width": 256
+       },
+       "512": {
+        "height": 512,
+        "path": "web/das-ubersternmann/medic-red-0@512.webp",
+        "width": 512
+       }
+      },
+      "job_version": 1,
+      "master": {
+       "height": 1024,
+       "path": "masters/das-ubersternmann/medic-red-0.png",
+       "width": 1024
+      },
+      "model": "models/workshop/player/items/medic/jul13_secret_state_surgeon/jul13_secret_state_surgeon.mdl",
+      "rendered_at": "2026-09-21T02:37:41+00:00",
       "style_name": null,
       "team_fallback": false
      }
@@ -97319,6 +97207,62 @@
       "model": "models/workshop/player/items/soldier/sum22_detective_style2/sum22_detective_style2.mdl",
       "rendered_at": "2026-09-21T00:28:37+00:00",
       "style_name": "Paint Hat",
+      "team_fallback": false
+     }
+    }
+   }
+  },
+  "detective-noir": {
+   "spy": {
+    "blu": {
+     "0": {
+      "derivatives": {
+       "256": {
+        "height": 256,
+        "path": "web/detective-noir/spy-blu-0@256.webp",
+        "width": 256
+       },
+       "512": {
+        "height": 512,
+        "path": "web/detective-noir/spy-blu-0@512.webp",
+        "width": 512
+       }
+      },
+      "job_version": 1,
+      "master": {
+       "height": 1024,
+       "path": "masters/detective-noir/spy-blu-0.png",
+       "width": 1024
+      },
+      "model": "models/player/items/spy/spy_detective_noir.mdl",
+      "rendered_at": "2026-09-21T02:37:44+00:00",
+      "style_name": null,
+      "team_fallback": false
+     }
+    },
+    "red": {
+     "0": {
+      "derivatives": {
+       "256": {
+        "height": 256,
+        "path": "web/detective-noir/spy-red-0@256.webp",
+        "width": 256
+       },
+       "512": {
+        "height": 512,
+        "path": "web/detective-noir/spy-red-0@512.webp",
+        "width": 512
+       }
+      },
+      "job_version": 1,
+      "master": {
+       "height": 1024,
+       "path": "masters/detective-noir/spy-red-0.png",
+       "width": 1024
+      },
+      "model": "models/player/items/spy/spy_detective_noir.mdl",
+      "rendered_at": "2026-09-21T02:37:43+00:00",
+      "style_name": null,
       "team_fallback": false
      }
     }
@@ -309910,6 +309854,62 @@
     }
    }
   },
+  "uber-wear": {
+   "medic": {
+    "blu": {
+     "0": {
+      "derivatives": {
+       "256": {
+        "height": 256,
+        "path": "web/uber-wear/medic-blu-0@256.webp",
+        "width": 256
+       },
+       "512": {
+        "height": 512,
+        "path": "web/uber-wear/medic-blu-0@512.webp",
+        "width": 512
+       }
+      },
+      "job_version": 1,
+      "master": {
+       "height": 1024,
+       "path": "masters/uber-wear/medic-blu-0.png",
+       "width": 1024
+      },
+      "model": "models/workshop/player/items/medic/sum23_uber_wear/sum23_uber_wear.mdl",
+      "rendered_at": "2026-09-21T02:38:01+00:00",
+      "style_name": null,
+      "team_fallback": false
+     }
+    },
+    "red": {
+     "0": {
+      "derivatives": {
+       "256": {
+        "height": 256,
+        "path": "web/uber-wear/medic-red-0@256.webp",
+        "width": 256
+       },
+       "512": {
+        "height": 512,
+        "path": "web/uber-wear/medic-red-0@512.webp",
+        "width": 512
+       }
+      },
+      "job_version": 1,
+      "master": {
+       "height": 1024,
+       "path": "masters/uber-wear/medic-red-0.png",
+       "width": 1024
+      },
+      "model": "models/workshop/player/items/medic/sum23_uber_wear/sum23_uber_wear.mdl",
+      "rendered_at": "2026-09-21T02:38:01+00:00",
+      "style_name": null,
+      "team_fallback": false
+     }
+    }
+   }
+  },
   "under-cover": {
    "spy": {
     "blu": {
@@ -327070,62 +327070,6 @@
     }
    }
   },
-  "ze-bermensch": {
-   "medic": {
-    "blu": {
-     "0": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/ze-bermensch/medic-blu-0@256.webp",
-        "width": 256
-       },
-       "512": {
-        "height": 512,
-        "path": "web/ze-bermensch/medic-blu-0@512.webp",
-        "width": 512
-       }
-      },
-      "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/ze-bermensch/medic-blu-0.png",
-       "width": 1024
-      },
-      "model": "models/workshop/player/items/medic/short2014_medic_nietzsche/short2014_medic_nietzsche.mdl",
-      "rendered_at": "2026-09-21T00:51:30+00:00",
-      "style_name": null,
-      "team_fallback": true
-     }
-    },
-    "red": {
-     "0": {
-      "derivatives": {
-       "256": {
-        "height": 256,
-        "path": "web/ze-bermensch/medic-red-0@256.webp",
-        "width": 256
-       },
-       "512": {
-        "height": 512,
-        "path": "web/ze-bermensch/medic-red-0@512.webp",
-        "width": 512
-       }
-      },
-      "job_version": 1,
-      "master": {
-       "height": 1024,
-       "path": "masters/ze-bermensch/medic-red-0.png",
-       "width": 1024
-      },
-      "model": "models/workshop/player/items/medic/short2014_medic_nietzsche/short2014_medic_nietzsche.mdl",
-      "rendered_at": "2026-09-21T00:51:29+00:00",
-      "style_name": null,
-      "team_fallback": false
-     }
-    }
-   }
-  },
   "ze-goggles": {
    "medic": {
     "blu": {
@@ -327176,6 +327120,62 @@
       },
       "model": "models/player/items/medic/medic_goggles.mdl",
       "rendered_at": "2026-09-21T00:51:28+00:00",
+      "style_name": null,
+      "team_fallback": false
+     }
+    }
+   }
+  },
+  "ze-ubermensch": {
+   "medic": {
+    "blu": {
+     "0": {
+      "derivatives": {
+       "256": {
+        "height": 256,
+        "path": "web/ze-ubermensch/medic-blu-0@256.webp",
+        "width": 256
+       },
+       "512": {
+        "height": 512,
+        "path": "web/ze-ubermensch/medic-blu-0@512.webp",
+        "width": 512
+       }
+      },
+      "job_version": 1,
+      "master": {
+       "height": 1024,
+       "path": "masters/ze-ubermensch/medic-blu-0.png",
+       "width": 1024
+      },
+      "model": "models/workshop/player/items/medic/short2014_medic_nietzsche/short2014_medic_nietzsche.mdl",
+      "rendered_at": "2026-09-21T02:37:58+00:00",
+      "style_name": null,
+      "team_fallback": true
+     }
+    },
+    "red": {
+     "0": {
+      "derivatives": {
+       "256": {
+        "height": 256,
+        "path": "web/ze-ubermensch/medic-red-0@256.webp",
+        "width": 256
+       },
+       "512": {
+        "height": 512,
+        "path": "web/ze-ubermensch/medic-red-0@512.webp",
+        "width": 512
+       }
+      },
+      "job_version": 1,
+      "master": {
+       "height": 1024,
+       "path": "masters/ze-ubermensch/medic-red-0.png",
+       "width": 1024
+      },
+      "model": "models/workshop/player/items/medic/short2014_medic_nietzsche/short2014_medic_nietzsche.mdl",
+      "rendered_at": "2026-09-21T02:37:58+00:00",
       "style_name": null,
       "team_fallback": false
      }

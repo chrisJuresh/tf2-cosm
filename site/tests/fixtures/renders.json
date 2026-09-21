@@ -174,26 +174,26 @@
     }
    }
   },
-  "scotsman-s-stove-pipe": {
+  "scotsmans-stove-pipe": {
    "demoman": {
     "red": {
      "0": {
       "derivatives": {
        "256": {
         "height": 256,
-        "path": "web/scotsman-s-stove-pipe/demoman-red-0@256.webp",
+        "path": "web/scotsmans-stove-pipe/demoman-red-0@256.webp",
         "width": 256
        },
        "512": {
         "height": 512,
-        "path": "web/scotsman-s-stove-pipe/demoman-red-0@512.webp",
+        "path": "web/scotsmans-stove-pipe/demoman-red-0@512.webp",
         "width": 512
        }
       },
       "job_version": 1,
       "master": {
        "height": 1024,
-       "path": "masters/scotsman-s-stove-pipe/demoman-red-0.png",
+       "path": "masters/scotsmans-stove-pipe/demoman-red-0.png",
        "width": 1024
       },
       "model": "models/player/items/demo/demo_stovepipe.mdl",

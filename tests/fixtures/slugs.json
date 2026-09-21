@@ -1,0 +1,19 @@
+{
+  "comment": "The shared slug oracle. The catalogue data job and the render job each derive a Cosmetic's slug from its English name, and the site looks the render manifest up by it, so the two must agree exactly. Both suites assert this table; see docs/fixtures/cosmetic-oracle.md. Names are display names, after a leading 'The' is dropped.",
+  "slugs": {
+    "Team Captain": "team-captain",
+    "Dr. Whoa": "dr-whoa",
+    "Buckaroo's Hat": "buckaroos-hat",
+    "Scotsman's Stove Pipe": "scotsmans-stove-pipe",
+    "Cheater’s Lament": "cheaters-lament",
+    "B'aaarrgh-n-Bicorne": "baaarrgh-n-bicorne",
+    "Brütal Bouffant": "brutal-bouffant",
+    "Das Übersternmann": "das-ubersternmann",
+    "Détective Noir": "detective-noir",
+    "Über-Wear": "uber-wear",
+    "Cap & Gown": "cap-and-gown",
+    "Botler 2000": "botler-2000",
+    "  Spaced  Out  ": "spaced-out"
+  },
+  "unsluggable": ["!!!", "'"]
+}

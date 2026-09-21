@@ -2,6 +2,10 @@
  * Cosmetic identity: the English display name and the URL-safe slug derived from
  * it (ADR-0003). The leading "The" is stripped because traders and the price
  * sources leave it off, so names match across them and sort sensibly.
+ *
+ * The render job derives the same slug from the same name in `render/cosmetics.py`,
+ * and the site looks the render manifest up by it, so the two rules have to stay one
+ * rule. `docs/fixtures/cosmetic-oracle.md` pins them together.
  */
 
 /** The English name as the catalogue records it. */
@@ -11,6 +15,8 @@ export function displayName(englishName: string): string {
 }
 
 const DIACRITICS = /\p{Diacritic}/gu;
+/** Dropped outright, not separated: Buckaroo's Hat is `buckaroos-hat`, not `buckaroo-s-hat`. */
+const APOSTROPHES = /['‘’]/g;
 const NOT_SLUG = /[^a-z0-9]+/g;
 
 /** Lowercase, ASCII, hyphen-separated. Stable: it is the public identifier. */
@@ -20,6 +26,7 @@ export function slugify(name: string): string {
     .replaceAll(DIACRITICS, "")
     .toLowerCase()
     .replaceAll("&", " and ")
+    .replaceAll(APOSTROPHES, "")
     .replaceAll(NOT_SLUG, "-")
     .replace(/^-+|-+$/g, "");
   if (slug === "") throw new Error(`name "${name}" has no slug-able characters`);

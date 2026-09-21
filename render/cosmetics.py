@@ -7,6 +7,7 @@ Identity follows ADR-0003: the English name, with defindexes sharing it recorded
 from __future__ import annotations
 
 import re
+import unicodedata
 
 ALL_CLASSES = ("scout", "soldier", "pyro", "demoman", "heavy", "engineer", "medic", "sniper", "spy")
 COSMETIC_SLOTS = {"head", "misc"}
@@ -23,10 +24,26 @@ def display_name(name: str) -> str:
     return name[4:] if name.lower().startswith("the ") else name
 
 
+#: Dropped outright, not separated: Buckaroo's Hat is `buckaroos-hat`, not `buckaroo-s-hat`.
+APOSTROPHES = "'‘’"
+
+
 def slug(name: str) -> str:
-    """A URL-safe stable identifier derived from the display name (ADR-0003)."""
-    ascii_name = name.replace("'", "").replace("’", "")
-    return re.sub(r"-{2,}", "-", re.sub(r"[^a-z0-9]+", "-", ascii_name.lower())).strip("-")
+    """A URL-safe stable identifier derived from the display name (ADR-0003).
+
+    The catalogue data job derives the same slug from the same name in
+    `data/src/catalogue/identity.ts`, and the site looks this manifest's renders up by it,
+    so the two rules have to stay one rule. `docs/fixtures/cosmetic-oracle.md` pins them
+    together.
+    """
+    folded = unicodedata.normalize("NFKD", name)
+    ascii_name = "".join(c for c in folded if not unicodedata.combining(c))
+    ascii_name = ascii_name.lower().replace("&", " and ")
+    ascii_name = "".join(c for c in ascii_name if c not in APOSTROPHES)
+    out = re.sub(r"[^a-z0-9]+", "-", ascii_name).strip("-")
+    if not out:
+        raise ValueError(f"name {name!r} has no slug-able characters")
+    return out
 
 
 def wears_in_cosmetic_slot(item: dict) -> bool:
