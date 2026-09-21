@@ -5,7 +5,7 @@ The spike that established these facts is gone; this is what replaced it.
 
 ## Running it
 
-Three commands are the whole job: resolve, render, derive.
+Four commands are the whole job: resolve, render, derive, publish.
 
 ```bash
 ./.venv/Scripts/python.exe -m render.resolve --out jobs.json
@@ -19,7 +19,11 @@ Three commands are the whole job: resolve, render, derive.
 ./.venv/Scripts/python.exe -m render.derive
 ```
 
-The middle one renders everything the manifest does not already have, a batch of jobs per
+```bash
+./.venv/Scripts/python.exe -m render.publish
+```
+
+The second one renders everything the manifest does not already have, a batch of jobs per
 Blender process, and prints progress and an estimate of time remaining as it goes. Run it
 again and it renders only what is still missing, so stopping it with ctrl-c, a crash or a
 power cut costs the batch that was in flight and nothing more. A run over work that is
@@ -51,6 +55,13 @@ a Blender process died and took some with it (run it again; it picks up where it
 the same thing to every command that takes them — `render.batch` passes them on to the
 render step as settled paths, so the child never resolves the layout a second time.
 `render.derive` also takes `--derivatives-dir`, plus `--dry-run`, `--force` and `--sizes`.
+
+The last one uploads the web sizes to the bucket the deployed site reads them from, and is
+the only step that needs credentials — four settings in `.env`, and the deployment's image
+base pointed at the same bucket. It is resumable the way the others are: an object already
+there at the same number of bytes is skipped. `docs/render/publishing.md` is the whole of
+it, including what a deployment looks like when the two sides disagree (a page of Backpack
+Icons and a green build).
 
 To drive one Blender process yourself — debugging an import, mostly — the render step is
 still a command of its own, and takes the same filters:
