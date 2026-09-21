@@ -87,11 +87,14 @@ function Total({ state, keyRate, basis }: { state: InventoryState; keyRate: Meta
 
 export function InventoryControls({ state, actions, configured, keyRate, basis, shownOwned }: InventoryControlsProps) {
   const id = useId();
-  const [typed, setTyped] = useState("");
+  // Null until the viewer touches the box, which is not the same as empty: the
+  // box shows what they last looked up, so coming back to the page shows whose
+  // backpack this is, but emptying it has to leave it empty. Keying the
+  // fallback off an empty string instead would snap the remembered profile
+  // back the moment they selected it all and hit backspace.
+  const [typed, setTyped] = useState<string | null>(null);
 
-  // The box shows what the viewer last looked up until they start typing over
-  // it, so coming back to the page shows whose backpack this is.
-  const value = typed === "" && state.profile !== null ? state.profile : typed;
+  const value = typed ?? state.profile ?? "";
 
   if (!configured) return null;
 

@@ -276,6 +276,20 @@ describe("what the browser remembers", () => {
     await waitFor(() => expect(localStorage.getItem(PROFILE_STORAGE_KEY)).toBe("robinwalker"));
   });
 
+  it("lets the viewer empty the box they last looked up in", async () => {
+    serve(() => answer(inventory([{ defindex: defindexOf("team-captain") }])));
+    const user = renderBrowser();
+    await look(user, "robinwalker");
+    await waitFor(() => expect(cardFor("team-captain")).not.toBeNull());
+
+    const box = screen.getByLabelText("Your Steam profile") as HTMLInputElement;
+    await user.clear(box);
+    // Clearing it has to leave it cleared. The remembered profile is what the
+    // box starts at, not what it falls back to on every keystroke.
+    expect(box.value).toBe("");
+    expect(screen.getByRole("button", { name: "Show what I own" })).toBeDisabled();
+  });
+
   it("does not remember the backpack, which goes stale the moment they trade", async () => {
     serve(() => answer(inventory([{ defindex: defindexOf("team-captain") }])));
     const user = renderBrowser();
