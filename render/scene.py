@@ -29,6 +29,13 @@ from render.geometry import (
 BUST = "bust"
 BODY = "body"
 
+#: The two pictures one job produces. A Worn Render is the Cosmetic on the Class; an Item
+#: Render is the same import with the Class hidden, framed on the item's own bounds. They are
+#: one job and one import on purpose: the import is what a render costs, the frame is not.
+WORN = "worn"
+ALONE = "alone"
+VARIANTS = (WORN, ALONE)
+
 TEAMS = ("red", "blu")
 
 #: Equip regions worn on or around the head, as the installed schema spells them; anything
@@ -78,6 +85,14 @@ FRAME_PADDING = 0.28
 #: mystery object, so no frame is tighter than this; and nothing is wider than a whole body.
 MIN_SPAN = 0.44
 MAX_SPAN = BODY_SPAN
+
+#: An Item Render is the same extent with nobody around it, so it is framed tighter: there is
+#: no Class for the spare room to fall on, and the padding is only there to keep a silhouette
+#: off the edge of the master. The floor under the span is lower than a Worn Render's for the
+#: same reason — a pin with no shirt behind it may fill the frame — but it is still a floor,
+#: so a stud earring is not magnified until its texture is all a viewer can see.
+ITEM_PADDING = 0.12
+ITEM_MIN_SPAN = 0.15
 
 LENS_MM = 85.0
 SENSOR_WIDTH_MM = 36.0
@@ -186,6 +201,26 @@ def _room_below(span: float, tall: float, padding: float) -> float:
     padding it asked for above, and everything else goes downwards.
     """
     return max(0.0, span / 2 - tall / 2 - tall * padding / 2)
+
+
+def item_frame(
+    bounds: Bounds,
+    *,
+    padding: float = ITEM_PADDING,
+    min_span: float = ITEM_MIN_SPAN,
+) -> tuple[Vec3, float]:
+    """The centre to look at and the span to fit for the Cosmetic on its own.
+
+    The same bounds the Worn Render is framed from — the Cosmetic's meshes in world space,
+    taken after attachment, so the item is wherever the Class wears it and the camera comes to
+    it. What differs is everything the Class brought: no room dropped below for a face to fill,
+    no ceiling at a Class's height, and no floor to stay above, because there is nothing
+    standing on it. The frame is the item, centred, with just enough margin to keep it off the
+    edge.
+    """
+    right, up = view_axes()
+    span = max(bounds.extent_along(right), bounds.extent_along(up)) * (1 + padding)
+    return bounds.centre, max(span, min_span)
 
 
 def camera_placement(

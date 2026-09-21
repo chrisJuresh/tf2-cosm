@@ -7,7 +7,7 @@ import pytest
 from PIL import Image
 
 from render.derive import derive_all, main
-from render.manifest import REASON_DERIVE_ERROR, Manifest, load_manifest
+from render.manifest import ALONE, REASON_DERIVE_ERROR, WORN, Manifest, load_manifest
 from render.output import OutputLayout
 
 AT = "2026-09-20T12:00:00+00:00"
@@ -55,12 +55,31 @@ def test_every_master_gains_both_web_sizes(tmp_path):
     outcome = derive_all(manifest, layout, SIZES, at=AT)
 
     entry = manifest.entry("team-captain", "soldier", "red", 0)
-    assert sorted(entry["derivatives"]) == ["256", "512"]
+    assert sorted(entry["worn"]["derivatives"]) == ["256", "512"]
     for size in SIZES:
-        record = entry["derivatives"][str(size)]
+        record = entry["worn"]["derivatives"][str(size)]
         assert layout.path_for(record["path"]).exists()
         assert record["width"] == record["height"] == size
     assert outcome.derived == 1 and outcome.failed == 0
+
+
+def test_both_pictures_of_a_job_get_their_own_web_sizes(tmp_path):
+    layout = a_layout(tmp_path)
+    job = a_job()
+    manifest = Manifest()
+    for variant in (WORN, ALONE):
+        relpath = layout.master_relpath(job, "red", variant)
+        manifest.record(job, "red", path=relpath, width=64, height=64, at=AT, variant=variant)
+        write_master(layout, relpath)
+
+    outcome = derive_all(manifest, layout, SIZES, at=AT)
+
+    entry = manifest.entry("team-captain", "soldier", "red", 0)
+    worn = entry["worn"]["derivatives"]["256"]["path"]
+    alone = entry["alone"]["derivatives"]["256"]["path"]
+    assert worn != alone
+    assert layout.path_for(worn).exists() and layout.path_for(alone).exists()
+    assert outcome.derived == 2
 
 
 def test_a_derivative_keeps_the_transparent_background(tmp_path):
@@ -70,7 +89,7 @@ def test_a_derivative_keeps_the_transparent_background(tmp_path):
 
     derive_all(manifest, layout, SIZES, at=AT)
 
-    record = manifest.entry("team-captain", "soldier", "red", 0)["derivatives"]["256"]
+    record = manifest.entry("team-captain", "soldier", "red", 0)["worn"]["derivatives"]["256"]
     with Image.open(layout.path_for(record["path"])) as image:
         assert image.convert("RGBA").getpixel((0, 0))[3] == 0
 
@@ -92,12 +111,12 @@ def test_a_derivative_deleted_from_disk_is_made_again(tmp_path):
     write_master(layout, relpath)
     derive_all(manifest, layout, SIZES, at=AT)
     entry = manifest.entry("team-captain", "soldier", "red", 0)
-    layout.path_for(entry["derivatives"]["256"]["path"]).unlink()
+    layout.path_for(entry["worn"]["derivatives"]["256"]["path"]).unlink()
 
     outcome = derive_all(manifest, layout, SIZES, at=AT)
 
     assert outcome.derived == 1
-    assert layout.path_for(entry["derivatives"]["256"]["path"]).exists()
+    assert layout.path_for(entry["worn"]["derivatives"]["256"]["path"]).exists()
 
 
 def test_asking_for_a_different_set_of_sizes_makes_that_set(tmp_path):
@@ -108,7 +127,7 @@ def test_asking_for_a_different_set_of_sizes_makes_that_set(tmp_path):
 
     derive_all(manifest, layout, (128,), at=AT)
 
-    assert sorted(manifest.entry("team-captain", "soldier", "red", 0)["derivatives"]) == ["128"]
+    assert sorted(manifest.entry("team-captain", "soldier", "red", 0)["worn"]["derivatives"]) == ["128"]
 
 
 def test_forcing_remakes_derivatives_that_are_already_there(tmp_path):
@@ -158,7 +177,7 @@ def test_one_bad_master_never_stops_the_rest(tmp_path):
     outcome = derive_all(manifest, layout, SIZES, at=AT)
 
     assert outcome.derived == 1 and outcome.failed == 1
-    assert manifest.entry("team-captain", "soldier", "red", 1)["derivatives"]
+    assert manifest.entry("team-captain", "soldier", "red", 1)["worn"]["derivatives"]
 
 
 def test_a_master_left_by_an_older_layout_is_a_recorded_failure_not_a_stopped_run(tmp_path):
@@ -177,7 +196,7 @@ def test_a_master_left_by_an_older_layout_is_a_recorded_failure_not_a_stopped_ru
 
     assert outcome.derived == 1 and outcome.failed == 1
     assert manifest.to_document()["failures"][0]["reason"] == REASON_DERIVE_ERROR
-    assert manifest.entry("team-captain", "soldier", "red", 1)["derivatives"]
+    assert manifest.entry("team-captain", "soldier", "red", 1)["worn"]["derivatives"]
 
 
 def test_the_command_writes_the_manifest_it_finished(tmp_path):
@@ -189,7 +208,7 @@ def test_the_command_writes_the_manifest_it_finished(tmp_path):
     assert main(["--root", str(layout.root), "--manifest", str(layout.manifest)]) == 0
 
     entry = load_manifest(layout.manifest).entry("team-captain", "soldier", "red", 0)
-    assert sorted(entry["derivatives"]) == ["256", "512"]
+    assert sorted(entry["worn"]["derivatives"]) == ["256", "512"]
 
 
 def test_a_dry_run_writes_nothing(tmp_path, capsys):
@@ -233,7 +252,7 @@ def test_the_image_folders_can_be_moved_without_touching_the_code(tmp_path, monk
 
     derive_all(manifest, layout, (128,), at=AT)
 
-    record = manifest.entry("team-captain", "soldier", "red", 0)["derivatives"]["128"]
+    record = manifest.entry("team-captain", "soldier", "red", 0)["worn"]["derivatives"]["128"]
     assert record["path"].startswith("thumbs/")
     assert (tmp_path / "renders" / record["path"]).exists()
 

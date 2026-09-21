@@ -126,15 +126,17 @@ describe("the size the page asks for", () => {
     // A render recorded between the render step and `render.derive` has an empty
     // derivatives map. It is the right picture at the wrong size, which beats a
     // hole in the page.
-    const entry = fixtureManifest().renders["baronial-badge"]?.engineer?.red?.["0"];
-    expect(entry?.derivatives).toEqual({});
-    expect(imageAt(entry!, LIST_SIZE)).toMatchObject({ path: "masters/baronial-badge/engineer-red-0.png" });
+    const picture = fixtureManifest().renders["baronial-badge"]?.engineer?.red?.["0"]?.worn;
+    expect(picture?.derivatives).toEqual({});
+    expect(imageAt(picture!, LIST_SIZE)).toMatchObject({
+      path: "masters/baronial-badge/engineer-red-0.png",
+    });
   });
 
   it("takes the nearest size it has when the one asked for was never made", () => {
-    const entry = fixtureManifest().renders["team-captain"]?.soldier?.red?.["0"];
-    expect(imageAt(entry!, 300)).toMatchObject({ width: 256 });
-    expect(imageAt(entry!, 400)).toMatchObject({ width: 512 });
+    const picture = fixtureManifest().renders["team-captain"]?.soldier?.red?.["0"]?.worn;
+    expect(imageAt(picture!, 300)).toMatchObject({ width: 256 });
+    expect(imageAt(picture!, 400)).toMatchObject({ width: 512 });
   });
 });
 
@@ -171,16 +173,25 @@ describe("where the images are served from", () => {
 
 describe("the manifest contract", () => {
   it("accepts an empty manifest, which is what the render job writes before it has run", () => {
-    expect(assertValidRenderManifest({ version: 2, renders: {}, failures: [] })).toEqual(EMPTY_MANIFEST);
+    expect(assertValidRenderManifest({ version: 3, renders: {}, failures: [] })).toEqual(EMPTY_MANIFEST);
   });
 
   it("refuses a manifest of another version rather than reading it as this one", () => {
-    expect(() => assertValidRenderManifest({ version: 1, renders: {}, failures: [] })).toThrow();
+    expect(() => assertValidRenderManifest({ version: 2, renders: {}, failures: [] })).toThrow();
   });
 
   it("refuses an entry whose image has no path, so a hole cannot reach the page", () => {
     const broken = fixtureManifest();
-    broken.renders["tin-pot"]!.soldier!.red!["0"]!.master.path = "";
+    broken.renders["tin-pot"]!.soldier!.red!["0"]!.worn!.master.path = "";
     expect(() => assertValidRenderManifest(broken)).toThrow();
+  });
+
+  it("reads an entry that holds the Cosmetic alone and no Worn Render", () => {
+    // A picture of each kind is optional, and the pair is what an entry is: the site must
+    // not refuse a manifest from a run that rendered only one of them.
+    const manifest = fixtureManifest();
+    const entry = manifest.renders["team-captain"]!.soldier!.red!["0"]!;
+    entry.worn = null;
+    expect(() => assertValidRenderManifest(manifest)).not.toThrow();
   });
 });

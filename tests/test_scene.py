@@ -15,6 +15,8 @@ from render.scene import (
     BODY_FLOOR,
     BODY_SPAN,
     BUST,
+    ITEM_MIN_SPAN,
+    ITEM_PADDING,
     LIGHT_RIG,
     MIN_SPAN,
     Bounds,
@@ -24,6 +26,7 @@ from render.scene import (
     frame_for_bounds,
     frame_target,
     framing_for,
+    item_frame,
     light_placement,
     skin_plan,
     view_axes,
@@ -198,6 +201,44 @@ class TestFrameForBounds:
         _, span = frame_for_bounds(box((0.0, 1.40, 0.0), (0.02, 1.42, 0.02)))
 
         assert span == pytest.approx(MIN_SPAN)
+
+
+class TestItemFrame:
+    """The Item Render is the same extent with nobody around it, so it is framed tighter."""
+
+    def test_the_frame_is_the_cosmetic_centred_in_it(self):
+        centre, _ = item_frame(HAT)
+
+        assert centre == pytest.approx(tuple(HAT.centre))
+
+    def test_the_cosmetic_is_not_dropped_in_the_frame_to_make_room_for_a_face(self):
+        """There is no Class under it to fill the room, so the room is not made."""
+        alone, span = item_frame(HAT)
+        worn, _ = frame_for_bounds(HAT)
+
+        assert alone.y > worn.y
+        assert alone.y - span / 2 == pytest.approx(HAT.centre.y - span / 2)
+
+    def test_it_is_a_tighter_frame_than_the_worn_render_beside_it(self):
+        assert item_frame(HAT)[1] < frame_for_bounds(HAT)[1]
+        assert item_frame(PARROT)[1] < frame_for_bounds(PARROT)[1]
+
+    def test_the_margin_is_all_that_stands_between_the_item_and_the_edge(self):
+        _, span = item_frame(WHOLE_BODY)
+        right, up = view_axes()
+        widest = max(WHOLE_BODY.extent_along(right), WHOLE_BODY.extent_along(up))
+
+        assert span == pytest.approx(widest * (1 + ITEM_PADDING))
+
+    def test_nothing_is_capped_at_a_class_height_because_no_class_is_in_it(self):
+        huge = box((-2.0, 0.0, -2.0), (2.0, 4.0, 2.0))
+
+        assert item_frame(huge)[1] > BODY_SPAN
+
+    def test_a_pin_is_still_not_magnified_until_its_texture_is_all_there_is(self):
+        _, span = item_frame(box((0.0, 1.40, 0.0), (0.02, 1.42, 0.02)))
+
+        assert span == pytest.approx(ITEM_MIN_SPAN)
 
 
 class TestCamera:

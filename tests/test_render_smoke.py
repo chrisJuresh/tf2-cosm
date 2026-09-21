@@ -117,11 +117,14 @@ def test_a_known_job_produces_an_image_the_manifest_can_find(rendered, slug, cls
 
     entry = document["renders"][slug][cls][team][str(style)]
 
-    assert entry["master"]["width"] == 1024 and entry["master"]["height"] == 1024
     assert entry["model"].endswith(".mdl")
     assert entry["rendered_at"].startswith("20")
     assert entry["job_version"] == JOB_LIST_VERSION
-    assert (out / entry["master"]["path"]).exists()
+    for variant in ("worn", "alone"):
+        picture = entry[variant]["master"]
+        assert picture["width"] == 1024 and picture["height"] == 1024
+        assert (out / picture["path"]).exists()
+    assert entry["worn"]["master"]["path"] != entry["alone"]["master"]["path"]
 
 
 @pytest.mark.parametrize("slug, cls, style", RENDERED)
@@ -133,13 +136,39 @@ def test_the_image_is_a_transparent_square_with_the_class_in_the_middle(
 
     document, out = rendered
 
-    image = Image.open(out / document["renders"][slug][cls][team][str(style)]["master"]["path"])
+    image = Image.open(
+        out / document["renders"][slug][cls][team][str(style)]["worn"]["master"]["path"]
+    )
 
     assert image.size == (1024, 1024)
     assert image.mode == "RGBA"
     # The top corners are sky in every framing; the bottom ones are shoulder in a bust.
     assert [image.getpixel(corner)[3] for corner in ((0, 0), (1023, 0))] == [0, 0]
     assert image.getpixel((512, 512))[3] == 255
+
+
+@pytest.mark.parametrize("slug, cls, style", RENDERED)
+def test_the_item_render_is_the_cosmetic_and_not_the_class(rendered, slug, cls, style):
+    """The Item Render is the same scene with the Class hidden and the camera brought in.
+
+    What says so from the outside is how much of the frame is filled: a bust is a head and
+    shoulders, and the hat on its own is a fraction of that, so the two pictures of one job
+    cannot have the same silhouette.
+    """
+    from PIL import Image
+
+    document, out = rendered
+    entry = document["renders"][slug][cls]["red"][str(style)]
+
+    def opaque_box(path):
+        with Image.open(out / path) as image:
+            return image.convert("RGBA").getchannel("A").getbbox()
+
+    worn = opaque_box(entry["worn"]["master"]["path"])
+    alone = opaque_box(entry["alone"]["master"]["path"])
+
+    assert alone is not None, "the Item Render is an empty frame"
+    assert worn != alone
 
 
 def test_a_cosmetic_with_no_blu_skin_renders_red_and_the_manifest_records_it(rendered):
@@ -155,6 +184,7 @@ def test_a_missing_model_is_recorded_as_a_failure_and_does_not_stop_the_run(rend
     failures = [f for f in document["failures"] if f["slug"] == "not-in-the-game"]
 
     assert {f["team"] for f in failures} == {"red", "blu"}
+    assert {f["variant"] for f in failures} == {"worn", "alone"}
     assert {f["reason"] for f in failures} == {REASON_MODEL_MISSING}
     assert all(f["detail"] for f in failures)
     assert "not-in-the-game" not in document["renders"]
@@ -167,14 +197,16 @@ def test_every_master_gains_its_web_sizes(rendered, slug, cls, style):
 
     document, out = rendered
 
-    derivatives = document["renders"][slug][cls]["red"][str(style)]["derivatives"]
+    entry = document["renders"][slug][cls]["red"][str(style)]
 
-    assert sorted(derivatives) == sorted(str(size) for size in DERIVATIVE_SIZES)
-    for size, record in derivatives.items():
-        assert record["width"] == record["height"] == int(size)
-        with Image.open(out / record["path"]) as image:
-            assert image.size == (int(size), int(size))
-            assert image.convert("RGBA").getpixel((0, 0))[3] == 0
+    for variant in ("worn", "alone"):
+        derivatives = entry[variant]["derivatives"]
+        assert sorted(derivatives) == sorted(str(size) for size in DERIVATIVE_SIZES)
+        for size, record in derivatives.items():
+            assert record["width"] == record["height"] == int(size)
+            with Image.open(out / record["path"]) as image:
+                assert image.size == (int(size), int(size))
+                assert image.convert("RGBA").getpixel((0, 0))[3] == 0
 
 
 def test_every_texture_is_cached_under_its_own_path(rendered):

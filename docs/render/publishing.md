@@ -21,9 +21,10 @@ both, so a prefix on one side and not the other is a page of 404s with a green b
 ### 1. A bucket
 
 Cloudflare R2, at https://dash.cloudflare.com → R2. Create a bucket — `tf2-cosm-renders` is
-the name the rest of this assumes — in an automatic location. 465 MB of derivatives sits
-inside the 10 GB free tier, and R2 charges nothing for egress, which for a page that is
-mostly images is the number that matters.
+the name the rest of this assumes — in an automatic location. A full run's derivatives —
+about 465 MB of Worn Renders and as much again of Item Renders — sit inside the 10 GB free
+tier, and R2 charges nothing for egress, which for a page that is mostly images is the
+number that matters.
 
 ### 2. Credentials for it
 

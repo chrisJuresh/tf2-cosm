@@ -14,7 +14,7 @@
  */
 import type { ClassName, Cosmetic } from "@tf2-cosm/data/catalogue";
 
-import type { RenderEntry, RenderImage, RenderManifest, Team } from "@/renders/manifest";
+import type { RenderImage, RenderManifest, RenderPicture, Team } from "@/renders/manifest";
 
 /** The Team every Cosmetic is rendered for, and the one everything falls back to. */
 export const DEFAULT_TEAM: Team = "red";
@@ -48,14 +48,21 @@ export function displayedClass(cosmetic: Cosmetic, classView: ClassName | null):
   return cosmetic.classes[0] ?? "scout";
 }
 
-function entryAt(
+/**
+ * The Worn Render recorded for one rung of the chain, if there is one.
+ *
+ * An entry is a job and a job makes two pictures, so an entry can exist holding only the
+ * Cosmetic on its own. That is not a Worn Render, and a rung that has only it is a rung with
+ * nothing on it: the walk goes past it rather than stopping there with nothing to show.
+ */
+function pictureAt(
   manifest: RenderManifest,
   slug: string,
   gameClass: ClassName,
   team: Team,
   style: number,
-): RenderEntry | undefined {
-  return manifest.renders[slug]?.[gameClass]?.[team]?.[String(style)];
+): RenderPicture | undefined {
+  return manifest.renders[slug]?.[gameClass]?.[team]?.[String(style)]?.worn ?? undefined;
 }
 
 /**
@@ -76,10 +83,10 @@ export function pickRender(
   const teams: Team[] = asked.team === DEFAULT_TEAM ? [asked.team] : [asked.team, DEFAULT_TEAM];
   for (const team of teams) {
     for (const style of styles) {
-      const entry = entryAt(manifest, asked.slug, asked.gameClass, team, style);
-      if (entry === undefined) continue;
+      const picture = pictureAt(manifest, asked.slug, asked.gameClass, team, style);
+      if (picture === undefined) continue;
       return {
-        image: imageAt(entry, size),
+        image: imageAt(picture, size),
         gameClass: asked.gameClass,
         team,
         style,
@@ -97,13 +104,13 @@ export function pickRender(
  * did not run or did not finish for this render, and the master is a real image
  * of the right thing at the wrong size, which a browser scales. A hole is not.
  */
-export function imageAt(entry: RenderEntry, size: number): RenderImage {
-  const sizes = Object.keys(entry.derivatives)
+export function imageAt(picture: RenderPicture, size: number): RenderImage {
+  const sizes = Object.keys(picture.derivatives)
     .map(Number)
     .sort((a, b) => Math.abs(a - size) - Math.abs(b - size));
   const closest = sizes[0];
-  if (closest === undefined) return entry.master;
-  return entry.derivatives[String(closest)] ?? entry.master;
+  if (closest === undefined) return picture.master;
+  return picture.derivatives[String(closest)] ?? picture.master;
 }
 
 /**

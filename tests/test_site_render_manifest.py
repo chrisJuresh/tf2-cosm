@@ -50,7 +50,11 @@ def test_the_site_fixture_covers_the_rungs_of_the_fallback_chain() -> None:
     # A BLU entry that is the RED image, which is not a second Team to offer.
     assert renders["crocodile-smile"]["sniper"]["blu"]["0"]["team_fallback"] is True
     # A master with no web derivative yet.
-    assert renders["baronial-badge"]["engineer"]["red"]["0"]["derivatives"] == {}
+    assert renders["baronial-badge"]["engineer"]["red"]["0"]["worn"]["derivatives"] == {}
+    # A Cosmetic with an Item Render beside its Worn Render, and one with none, so the site's
+    # toggle is exercised both where it is offered and where it is not.
+    assert renders["team-captain"]["soldier"]["red"]["0"]["alone"] is not None
+    assert renders["ghastly-gibus"]["scout"]["red"]["0"]["alone"] is None
     # A Cosmetic that failed, and one never attempted: both fall back to the icon.
     assert [failure["slug"] for failure in manifest.to_document()["failures"]] == ["bolt-boy"]
     assert "dead-of-night" not in renders

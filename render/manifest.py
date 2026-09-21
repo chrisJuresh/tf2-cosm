@@ -1,23 +1,30 @@
 """The manifest: the render job's output as the site reads it, and the contract it reads it by.
 
-Shape, version 2:
+Shape, version 3:
 
     {
-      "version": 2,                       # MANIFEST_VERSION
+      "version": 3,                       # MANIFEST_VERSION
       "renders": {
         "team-captain": {                 # Cosmetic slug (ADR-0003)
           "soldier": {                    # Class
             "red": {                      # Team
               "0": {                      # Style index, as a string (JSON object keys are strings)
-                "master": {               # the 1024 PNG, kept locally, never committed
-                  "path": "masters/team-captain/soldier-red-0.png",  # relative to the output root
-                  "width": 1024, "height": 1024
+                "worn": {                 # the Worn Render: the Cosmetic on the Class
+                  "master": {             # the 1024 PNG, kept locally, never committed
+                    "path": "masters/team-captain/soldier-red-0.png",  # relative to the root
+                    "width": 1024, "height": 1024
+                  },
+                  "derivatives": {        # one per web size, keyed by the size in pixels
+                    "512": {"path": "web/team-captain/soldier-red-0@512.webp",
+                            "width": 512, "height": 512},
+                    "256": {"path": "web/team-captain/soldier-red-0@256.webp",
+                            "width": 256, "height": 256}
+                  }
                 },
-                "derivatives": {          # one per web size, keyed by the size in pixels
-                  "512": {"path": "web/team-captain/soldier-red-0@512.webp",
-                          "width": 512, "height": 512},
-                  "256": {"path": "web/team-captain/soldier-red-0@256.webp",
-                          "width": 256, "height": 256}
+                "alone": {                # the Item Render: the same Cosmetic with no Class
+                  "master": {"path": "masters/team-captain/soldier-red-0-alone.png",
+                             "width": 1024, "height": 1024},
+                  "derivatives": {}
                 },
                 "model": "models/player/items/soldier/soldier_officer.mdl",
                 "style_name": null,
@@ -30,10 +37,14 @@ Shape, version 2:
         }
       },
       "failures": [
-        {"slug", "class", "team", "style", "model", "reason", "detail", "failed_at",
-         "job_version"}
+        {"slug", "class", "team", "style", "variant", "model", "reason", "detail",
+         "failed_at", "job_version"}
       ]
     }
+
+Either picture may be null: they are rendered from one import but as two frames, and a frame
+that fails is recorded as a failure for that variant while the other one stands. An entry with
+neither picture is not written at all.
 
 Every path is relative to the output root, which is configuration (`render.output`), so the
 day the folder becomes a bucket the manifest does not change. Derivatives are empty between
@@ -55,9 +66,9 @@ from typing import Iterator, Mapping
 
 from render.cosmetics import ALL_CLASSES
 from render.jobs import JOB_LIST_VERSION
-from render.scene import TEAMS
+from render.scene import ALONE, TEAMS, VARIANTS, WORN
 
-MANIFEST_VERSION = 2
+MANIFEST_VERSION = 3
 
 REASON_MODEL_MISSING = "model-missing"
 REASON_IMPORT_ERROR = "import-error"
@@ -91,6 +102,7 @@ FAILURE_FIELD_TYPES: dict[str, type | tuple[type, ...]] = {
     "class": str,
     "team": str,
     "style": int,
+    "variant": str,
     "model": str,
     "reason": str,
     "detail": (str, type(None)),
@@ -126,29 +138,52 @@ class Manifest:
             .get(str(style))
         )
 
-    def failure(self, slug: str, cls: str, team: str, style: int) -> dict | None:
-        """Why one job produced no image last time, or None if it has never been tried."""
-        identity = (slug, cls, team, style)
+    def picture(self, slug: str, cls: str, team: str, style: int, variant: str) -> dict | None:
+        """One of an entry's two pictures — its master and its derivatives — or None.
+
+        None means the same thing whether the entry is missing or the entry holds no picture
+        of this variant: nobody has rendered it. Every caller treats the two alike, so the
+        distinction is not one worth making them make.
+        """
+        _check_variant(variant)
+        entry = self.entry(slug, cls, team, style)
+        return None if entry is None else entry.get(variant)
+
+    def failure(
+        self, slug: str, cls: str, team: str, style: int, variant: str = WORN
+    ) -> dict | None:
+        """Why one image was not made last time, or None if it has never been tried."""
+        identity = (slug, cls, team, style, variant)
         for failure in self._document["failures"]:
-            if (failure["slug"], failure["class"], failure["team"], failure["style"]) == identity:
+            if _identity_of(failure) == identity:
                 return failure
         return None
 
-    def failures_for(self, identities: set[tuple[str, str, str, int]]) -> list[dict]:
-        """Every recorded failure among `identities`, each a (slug, Class, Team, Style) tuple."""
+    def failures_for(self, identities: set[tuple[str, str, str, int, str]]) -> list[dict]:
+        """Every recorded failure among `identities`, each (slug, Class, Team, Style, variant)."""
         return [
-            failure
-            for failure in self._document["failures"]
-            if (failure["slug"], failure["class"], failure["team"], failure["style"]) in identities
+            failure for failure in self._document["failures"] if _identity_of(failure) in identities
         ]
 
     def entries(self) -> Iterator[tuple[str, str, str, int, dict]]:
-        """Every recorded render, as (slug, Class, Team, Style, entry) — what `render.derive` walks."""
+        """Every recorded entry, as (slug, Class, Team, Style, entry)."""
         for slug, by_class in self._document["renders"].items():
             for cls, by_team in by_class.items():
                 for team, by_style in by_team.items():
                     for style, entry in by_style.items():
                         yield slug, cls, team, int(style), entry
+
+    def pictures(self) -> Iterator[tuple[str, str, str, int, str, dict]]:
+        """Every picture recorded, variant by variant.
+
+        What `render.derive` and the publish step walk, because both are about image files
+        rather than about jobs: an entry is one job, and a job now makes two pictures.
+        """
+        for slug, cls, team, style, entry in self.entries():
+            for variant in VARIANTS:
+                picture = entry.get(variant)
+                if picture is not None:
+                    yield slug, cls, team, style, variant, picture
 
     def record(
         self,
@@ -160,43 +195,68 @@ class Manifest:
         height: int,
         at: str,
         fell_back_to_red: bool = False,
+        variant: str = WORN,
     ) -> dict:
-        """Record one rendered master, replacing any earlier render or failure for the same job.
+        """Record one rendered master, replacing any earlier one or failure for that image.
 
-        The derivatives start empty: they are made from the master afterwards, outside Blender.
+        The two variants of a job arrive here one at a time and share an entry, so recording
+        an Item Render keeps the Worn Render already in it rather than starting the entry
+        over. The metadata is the job's and is the same either way; the derivatives start
+        empty, because they are made from the master afterwards, outside Blender.
         """
         self._check_team(team)
-        entry = {
-            "master": image_record(path, width, height),
-            "derivatives": {},
-            "model": job["model"],
-            "style_name": job["style_name"],
-            "rendered_at": at,
-            "job_version": JOB_LIST_VERSION,
-            "team_fallback": fell_back_to_red,
-        }
-        renders = self._document["renders"]
-        by_class = renders.setdefault(job["slug"], {}).setdefault(job["class"], {})
-        by_class.setdefault(team, {})[str(job["style"])] = entry
-        self.forget_failure(job["slug"], job["class"], team, job["style"])
+        _check_variant(variant)
+        by_team = (
+            self._document["renders"]
+            .setdefault(job["slug"], {})
+            .setdefault(job["class"], {})
+            .setdefault(team, {})
+        )
+        entry = by_team.setdefault(str(job["style"]), {name: None for name in VARIANTS})
+        entry[variant] = {"master": image_record(path, width, height), "derivatives": {}}
+        entry.update(
+            {
+                "model": job["model"],
+                "style_name": job["style_name"],
+                "rendered_at": at,
+                "job_version": JOB_LIST_VERSION,
+                "team_fallback": fell_back_to_red,
+            }
+        )
+        self.forget_failure(job["slug"], job["class"], team, job["style"], variant)
         return entry
 
     def set_derivatives(
-        self, slug: str, cls: str, team: str, style: int, derivatives: Mapping[str, dict]
+        self,
+        slug: str,
+        cls: str,
+        team: str,
+        style: int,
+        derivatives: Mapping[str, dict],
+        variant: str = WORN,
     ) -> dict:
         """Attach the web sizes made from one master, replacing whatever was recorded before."""
-        entry = self.entry(slug, cls, team, style)
-        if entry is None:
-            raise KeyError(f"no render recorded for {slug}/{cls}/{team}/{style}")
-        entry["derivatives"] = {
+        picture = self.picture(slug, cls, team, style, variant)
+        if picture is None:
+            raise KeyError(f"no {variant} render recorded for {slug}/{cls}/{team}/{style}")
+        picture["derivatives"] = {
             size: image_record(record["path"], record["width"], record["height"])
             for size, record in derivatives.items()
         }
-        self.forget_failure(slug, cls, team, style)
-        return entry
+        self.forget_failure(slug, cls, team, style, variant)
+        return picture
 
-    def fail(self, job: dict, team: str, *, reason: str, detail: str | None, at: str) -> dict:
-        """Record why one job produced no image, so the site can fall back and the run can go on."""
+    def fail(
+        self,
+        job: dict,
+        team: str,
+        *,
+        reason: str,
+        detail: str | None,
+        at: str,
+        variant: str = WORN,
+    ) -> dict:
+        """Record why one image was not made, so the site can fall back and the run can go on."""
         return self.fail_render(
             job["slug"],
             job["class"],
@@ -206,6 +266,7 @@ class Manifest:
             reason=reason,
             detail=detail,
             at=at,
+            variant=variant,
         )
 
     def fail_render(
@@ -219,17 +280,20 @@ class Manifest:
         reason: str,
         detail: str | None,
         at: str,
+        variant: str = WORN,
     ) -> dict:
         """The same, for a step that holds a manifest entry rather than a job — `render.derive`."""
         self._check_team(team)
+        _check_variant(variant)
         if reason not in FAILURE_REASONS:
             raise ValueError(f"unknown failure reason {reason!r}")
-        self.forget_failure(slug, cls, team, style)
+        self.forget_failure(slug, cls, team, style, variant)
         failure = {
             "slug": slug,
             "class": cls,
             "team": team,
             "style": style,
+            "variant": variant,
             "model": model,
             "reason": reason,
             "detail": detail,
@@ -239,27 +303,35 @@ class Manifest:
         self._document["failures"].append(failure)
         return failure
 
-    def forget_failure(self, slug: str, cls: str, team: str, style: int) -> None:
-        """Drop any failure recorded for one job, because it has just been done successfully."""
-        identity = (slug, cls, team, style)
+    def forget_failure(
+        self, slug: str, cls: str, team: str, style: int, variant: str = WORN
+    ) -> None:
+        """Drop any failure recorded for one image, because it has just been done."""
+        identity = (slug, cls, team, style, variant)
         self._document["failures"] = [
-            failure
-            for failure in self._document["failures"]
-            if (failure["slug"], failure["class"], failure["team"], failure["style"]) != identity
+            failure for failure in self._document["failures"] if _identity_of(failure) != identity
         ]
 
-    def forget_render(self, slug: str, cls: str, team: str, style: int) -> None:
-        """Drop any render recorded for one job, because it has just been found to fail.
+    def forget_render(
+        self, slug: str, cls: str, team: str, style: int, variant: str = WORN
+    ) -> None:
+        """Drop one recorded picture, because it has just been found to fail.
 
-        A branch left with nothing under it goes too. An empty Class or slug would otherwise
-        read as "this Cosmetic has renders" to the site, which joins the catalogue to this
-        document by the slug alone.
+        The entry goes with it once neither variant is left — an entry is a record of images,
+        and one holding no image at all would read as a render that exists and cannot be found
+        rather than as one nobody has made — and so does any branch left with nothing under it.
+        An empty Class or slug would otherwise read as "this Cosmetic has renders" to the site,
+        which joins the catalogue to this document by the slug alone.
         """
         renders = self._document["renders"]
         by_class = renders.get(slug)
         by_team = (by_class or {}).get(cls)
         by_style = (by_team or {}).get(team)
-        if by_style is None:
+        entry = None if by_style is None else by_style.get(str(style))
+        if entry is None:
+            return
+        entry[variant] = None
+        if any(entry.get(name) is not None for name in VARIANTS):
             return
         by_style.pop(str(style), None)
         if not by_style:
@@ -284,9 +356,11 @@ class Manifest:
         for slug, cls, team, style, entry in list(other.entries()):
             by_class = self._document["renders"].setdefault(slug, {}).setdefault(cls, {})
             by_class.setdefault(team, {})[str(style)] = entry
-            self.forget_failure(slug, cls, team, style)
+            for variant in VARIANTS:
+                if entry.get(variant) is not None:
+                    self.forget_failure(slug, cls, team, style, variant)
         for failure in other._document["failures"]:
-            identity = (failure["slug"], failure["class"], failure["team"], failure["style"])
+            identity = _identity_of(failure)
             self.forget_failure(*identity)
             self.forget_render(*identity)
             self._document["failures"].append(failure)
@@ -305,6 +379,22 @@ class Manifest:
     def _check_team(team: str) -> None:
         if team not in TEAMS:
             raise ValueError(f"unknown Team {team!r}")
+
+
+def _check_variant(variant: str) -> None:
+    if variant not in VARIANTS:
+        raise ValueError(f"unknown variant {variant!r}")
+
+
+def _identity_of(failure: Mapping[str, object]) -> tuple:
+    """What a failure is about: one image, which is a job and one of its two pictures."""
+    return (
+        failure["slug"],
+        failure["class"],
+        failure["team"],
+        failure["style"],
+        failure["variant"],
+    )
 
 
 def _replace(out: Path, text: str) -> None:
@@ -352,19 +442,31 @@ def _check_image(where: str, record: object) -> None:
             raise InvalidManifest(f"{where} field {side!r} must be at least 1 pixel")
 
 
-def _check_entry(where: str, entry: object) -> None:
-    if not isinstance(entry, dict):
-        raise InvalidManifest(f"{where} is not an object")
-    _check_fields(where, entry, {**ENTRY_FIELD_TYPES, "master": dict, "derivatives": dict})
-    _check_image(f"{where}/master", entry["master"])
-    for size, record in entry["derivatives"].items():
+def _check_picture(where: str, picture: object) -> None:
+    _check_fields(where, picture, {"master": dict, "derivatives": dict})
+    assert isinstance(picture, dict)
+    _check_image(f"{where}/master", picture["master"])
+    for size, record in picture["derivatives"].items():
         if not size.isdigit():
             raise InvalidManifest(f"{where}/derivatives has a size {size!r} that is not pixels")
         _check_image(f"{where}/derivatives/{size}", record)
 
 
+def _check_entry(where: str, entry: object) -> None:
+    if not isinstance(entry, dict):
+        raise InvalidManifest(f"{where} is not an object")
+    _check_fields(
+        where, entry, {**ENTRY_FIELD_TYPES, **{variant: (dict, type(None)) for variant in VARIANTS}}
+    )
+    for variant in VARIANTS:
+        if entry[variant] is not None:
+            _check_picture(f"{where}/{variant}", entry[variant])
+    if all(entry[variant] is None for variant in VARIANTS):
+        raise InvalidManifest(f"{where} records no picture at all")
+
+
 def validate_manifest(document: object) -> None:
-    """Raise InvalidManifest unless `document` is a version-2 manifest, entry by entry."""
+    """Raise InvalidManifest unless `document` is a version-3 manifest, entry by entry."""
     if not isinstance(document, dict):
         raise InvalidManifest(f"manifest must be an object, got {type(document).__name__}")
     if document.get("version") != MANIFEST_VERSION:
@@ -409,6 +511,8 @@ def validate_manifest(document: object) -> None:
             raise InvalidManifest(f"{where} has unknown class {failure['class']!r}")
         if failure["team"] not in TEAMS:
             raise InvalidManifest(f"{where} has unknown Team {failure['team']!r}")
+        if failure["variant"] not in VARIANTS:
+            raise InvalidManifest(f"{where} has unknown variant {failure['variant']!r}")
         if failure["reason"] not in FAILURE_REASONS:
             raise InvalidManifest(f"{where} has unknown failure reason {failure['reason']!r}")
 
@@ -446,28 +550,46 @@ def manifest_json_schema() -> dict:
     image["properties"]["height"]["minimum"] = 1
     image["description"] = "One image file, by its path relative to the output root."
 
+    picture = {
+        "type": "object",
+        "description": "One rendered master and the web sizes made from it.",
+        "required": ["master", "derivatives"],
+        "additionalProperties": False,
+        "properties": {
+            "master": image,
+            "derivatives": {
+                "type": "object",
+                "description": "Web sizes made from the master, keyed by their size in pixels.",
+                "propertyNames": {"pattern": "^[0-9]+$"},
+                "additionalProperties": image,
+            },
+        },
+    }
+    nullable_picture = {
+        "description": "A picture, or null where this variant has not been rendered.",
+        "oneOf": [picture, {"type": "null"}],
+    }
     entry = _object_of(
         ENTRY_FIELD_TYPES,
-        master=image,
-        derivatives={
-            "type": "object",
-            "description": "Web sizes made from the master, keyed by their size in pixels.",
-            "propertyNames": {"pattern": "^[0-9]+$"},
-            "additionalProperties": image,
-        },
+        worn={**nullable_picture, "title": "The Worn Render: the Cosmetic on the Class"},
+        alone={**nullable_picture, "title": "The Item Render: the Cosmetic with no Class"},
     )
+    entry["not"] = {"properties": {variant: {"type": "null"} for variant in VARIANTS}}
+    entry["description"] = "One Cosmetic on one Class, Team and Style, in up to two pictures."
     failure = _object_of(FAILURE_FIELD_TYPES)
     failure["properties"]["class"]["enum"] = list(ALL_CLASSES)
     failure["properties"]["team"]["enum"] = list(TEAMS)
+    failure["properties"]["variant"]["enum"] = list(VARIANTS)
     failure["properties"]["reason"]["enum"] = list(FAILURE_REASONS)
 
     return {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "$id": f"https://github.com/chrisJuresh/tf2-cosm/catalogue/renders/v{MANIFEST_VERSION}",
-        "title": f"TF2 Cosmetics Worn Render manifest v{MANIFEST_VERSION}",
+        "title": f"TF2 Cosmetics render manifest v{MANIFEST_VERSION}",
         "description": (
-            "Which Worn Renders exist and which failed. Keyed by Cosmetic slug, then Class, "
-            "then Team, then Style index; every path is relative to the configured output root."
+            "Which Worn Renders and Item Renders exist and which failed. Keyed by Cosmetic "
+            "slug, then Class, then Team, then Style index; every path is relative to the "
+            "configured output root."
         ),
         "type": "object",
         "required": ["version", "renders", "failures"],

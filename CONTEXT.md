@@ -119,5 +119,9 @@ One kind of item in an Inventory, and how many of it the viewer has: a defindex,
 A static image of one Class on one Team wearing one Cosmetic in one Style, framed on the Cosmetic's own extent on that Class — as tight as the item is, within reason, with a little of the wearer around it. An All-Class Cosmetic has up to nine per Style per Team.
 _Avoid_: icon, thumbnail, preview
 
+**Item Render**:
+A static image of one Cosmetic on its own, with no Class wearing it, framed on the item's own bounds. It is the same scene as the Worn Render beside it with the Class hidden, so it is still made per Class: the model a Class wears is its own. The site shows one or the other, and a viewer switches between them.
+_Avoid_: backpack render, isolated render
+
 **Backpack Icon**:
-The flat inventory picture of an item on its own, published by Valve. Not a Worn Render; shown only when no Worn Render exists.
+The flat inventory picture of an item on its own, published by Valve. Neither a Worn Render nor an Item Render — it is Valve's flat artwork, not ours — and shown only when we have no render at all.

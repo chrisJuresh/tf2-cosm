@@ -20,6 +20,7 @@ import argparse
 from pathlib import Path
 
 from render.extract import DEFAULT_TF
+from render.scene import VARIANTS
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_CACHE = REPO_ROOT / "assets-cache"
@@ -40,6 +41,15 @@ def add_job_filters(parser: argparse.ArgumentParser, *, teams_flag: str) -> None
     parser.add_argument("--class", dest="classes", nargs="+", default=None, help="Classes to render")
     parser.add_argument("--style", dest="styles", nargs="+", type=int, default=None, help="Style indices")
     parser.add_argument(teams_flag, dest="teams", nargs="+", help="Teams to render")
+    parser.add_argument(
+        "--variant",
+        dest="variants",
+        nargs="+",
+        default=None,
+        choices=list(VARIANTS),
+        help="which pictures to render: the Cosmetic worn on the Class, the Cosmetic alone, "
+        "or both, which is the default",
+    )
 
 
 def add_render_paths(parser: argparse.ArgumentParser) -> None:

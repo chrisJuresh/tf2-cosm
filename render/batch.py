@@ -1,4 +1,4 @@
-"""The batch runner: one command that renders every Worn Render still missing.
+"""The batch runner: one command that renders every picture still missing.
 
     python -m render.batch --jobs jobs.json
     python -m render.batch --jobs jobs.json --dry-run
@@ -37,7 +37,7 @@ from render.output import OutputLayout
 from render.plan import Batch, RunPlan, account_for, batches, plan_run
 from render.progress import format_duration, progress_line
 from render.scene import TEAMS
-from render.selection import NothingSelected
+from render.selection import NothingSelected, selected_variants
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 BLENDER_SCRIPT = REPO_ROOT / "render" / "blender_job.py"
@@ -65,6 +65,7 @@ class Settings:
     classes: list[str] | None
     styles: list[int] | None
     teams: list[str]
+    variants: list[str] | None
     batch_size: int
     workers: int
     dry_run: bool
@@ -160,6 +161,7 @@ def blender_command(
         "--samples", str(settings.samples),
         "--site-packages", str(settings.site_packages),
         "--teams", *batch.teams,
+        "--variant", *batch.variants,
     ]
 
 
@@ -209,9 +211,10 @@ def report_failures(layout: OutputLayout, plan: RunPlan) -> None:
     other nine hundred failures in the manifest still stay out of it.
     """
     selected = {
-        (job["slug"], job["class"], team, job["style"])
+        (job["slug"], job["class"], team, job["style"], variant)
         for job in plan.selected
         for team in plan.teams
+        for variant in plan.variants
     }
     failures = load_manifest(layout.manifest).failures_for(selected)
     if not failures:
@@ -241,6 +244,7 @@ def run(settings: Settings, *, launch=launch_blender) -> int:
             document,
             manifest,
             teams=settings.teams,
+            variants=selected_variants(settings.variants),
             slugs=settings.slug,
             classes=settings.classes,
             styles=settings.styles,
@@ -267,7 +271,7 @@ def run(settings: Settings, *, launch=launch_blender) -> int:
         print(f"[batch] {complaint}", file=sys.stderr, flush=True)
         return 2
 
-    return _render_batches(settings, layout, plan, batches(plan.work, settings.batch_size), launch)
+    return _render_batches(settings, layout, plan, batches(plan.work, settings.batch_size, plan.variants), launch)
 
 
 def texture_cache_for(settings: Settings, worker: int) -> Path:

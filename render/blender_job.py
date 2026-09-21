@@ -1,7 +1,7 @@
 """The render step: job list in, PNG masters and manifest entries out. Runs inside Blender.
 
     blender -b --factory-startup --python render/blender_job.py -- \
-        --jobs jobs.json --slug team-captain --teams red blu
+        --jobs jobs.json --slug team-captain --teams red blu --variant worn alone
 
 Everything after `--` is ours. This module is the Blender adapter and nothing else: it mounts
 the game, imports models, applies what `render.scene` decided, renders, and writes the
@@ -9,8 +9,12 @@ manifest. Every decision it applies — framing, camera, lights, bodygroup visib
 attachment — is computed in the pure modules, which are tested in the project venv.
 
 One Blender process handles the whole selection: the game mounts once and SourceIO is patched
-once (`render.sourceio_patch`). A job that fails is recorded in the manifest with a reason and
-the run carries on, so one bad model never stops a long run.
+once (`render.sourceio_patch`). Each job is imported once as well, and every picture it owes
+is a frame of that one scene: two Teams are a material swap, and the Item Render is the same
+scene with the Class hidden and the camera brought in to the item.
+
+A job that fails is recorded in the manifest with a reason and the run carries on, so one bad
+model never stops a long run.
 """
 from __future__ import annotations
 
@@ -60,7 +64,7 @@ from render.manifest import (  # noqa: E402
 from render.cli import add_job_filters, add_render_paths  # noqa: E402
 from render.mdlinfo import read_mdl  # noqa: E402
 from render.output import OutputLayout  # noqa: E402
-from render.selection import select_jobs, selected_teams  # noqa: E402
+from render.selection import select_jobs, selected_teams, selected_variants  # noqa: E402
 from render.sourceio_patch import apply_patches  # noqa: E402
 
 
@@ -299,6 +303,20 @@ def build_camera_and_lights(centre: Vec3, span: float) -> None:
         background.inputs["Strength"].default_value = scene_plan.WORLD_STRENGTH
 
 
+def reframe(centre: Vec3, span: float) -> None:
+    """Point the camera and the light rig at a different subject, without rebuilding either.
+
+    The rig is fixed (spec R1), so moving it is the whole of what a second framing needs: the
+    Item Render is lit exactly as the Worn Render it sits beside.
+    """
+    scene = bpy.context.scene
+    scene.camera.matrix_world = Matrix(scene_plan.camera_placement(centre, span))
+    for light in scene_plan.LIGHT_RIG:
+        obj = bpy.data.objects.get(light.name)
+        if obj is not None:
+            obj.matrix_world = Matrix(scene_plan.light_placement(light, centre))
+
+
 def configure_render(size: int, samples: int) -> None:
     scene = bpy.context.scene
     scene.render.engine = "BLENDER_EEVEE"
@@ -342,10 +360,13 @@ def as_failure(error: Exception, default_reason: str) -> RenderFailure:
 
 
 class ImportedJob:
-    """One job's scene: both models in, framed and lit, ready for either Team.
+    """One job's scene: both models in, framed and lit, ready for either Team and either picture.
 
     The Class and the Cosmetic keep their own skin tables: a Cosmetic with no BLU skin falls
     back to RED on its own, while the Class it is worn on still renders in the Team's colours.
+
+    It also holds the two framings — the Class as worn, and the item on its own — because both
+    are decided once, from the scene as imported, and then used once per Team.
     """
 
     def __init__(
@@ -354,11 +375,52 @@ class ImportedJob:
         class_families: int,
         item_objects: list[bpy.types.Object],
         item_families: int,
+        worn_frame: tuple[Vec3, float],
+        item_frame: tuple[Vec3, float] | None,
     ) -> None:
         self.class_objects = class_objects
         self.class_families = class_families
         self.item_objects = item_objects
         self.item_families = item_families
+        self.worn_frame = worn_frame
+        self.item_frame = item_frame
+        self._class_hidden = False
+
+    def show(self, variant: str) -> None:
+        """Make the scene the one this variant is a picture of, and frame it.
+
+        Hiding the Class is a render flag on its meshes rather than a deletion: the same
+        import renders the Cosmetic worn and alone, Team after Team, so nothing here may cost
+        anything that would have to be imported again.
+        """
+        if variant == scene_plan.ALONE:
+            if self.item_frame is None:
+                raise RenderFailure(
+                    REASON_RENDER_ERROR, "the Cosmetic has no visible mesh to frame on its own"
+                )
+            self._hide_class(True)
+            reframe(*self.item_frame)
+        else:
+            self._hide_class(False)
+            reframe(*self.worn_frame)
+
+    def _hide_class(self, hidden: bool) -> None:
+        """Hide or show the Class's meshes, leaving the ones its bodygroups already hid alone.
+
+        Only meshes the job decided to render are touched, and only while the Class is hidden,
+        so a bodygroup the Cosmetic hides stays hidden when the Class comes back.
+        """
+        if hidden == self._class_hidden:
+            return
+        for obj in self.class_objects:
+            if obj.type != "MESH":
+                continue
+            if hidden:
+                obj["worn_visible"] = not obj.hide_render
+                obj.hide_render = True
+            elif obj.get("worn_visible"):
+                obj.hide_render = False
+        self._class_hidden = hidden
 
 
 def set_up_job(job: dict, cache: ModelCache, args: argparse.Namespace) -> ImportedJob:
@@ -397,15 +459,31 @@ def set_up_job(job: dict, cache: ModelCache, args: argparse.Namespace) -> Import
     log(f"  {framing} frame, centre {tuple(round(v, 3) for v in centre)}, span {span:.3f}")
     build_camera_and_lights(centre, span)
     configure_render(args.size, args.samples)
+
+    # The Item Render is framed from the same box, tighter: see `scene.item_frame`. Without a
+    # box there is nothing to frame it on at all, so that job has no Item Render — the Worn
+    # Render can fall back on the skeleton, and this cannot.
+    item_frame = None if bounds is None else scene_plan.item_frame(bounds)
+    if item_frame is None:
+        log("  no visible item mesh: this job has no Item Render")
+    else:
+        log(
+            f"  item frame, centre {tuple(round(v, 3) for v in item_frame[0])}, "
+            f"span {item_frame[1]:.3f}"
+        )
+
     return ImportedJob(
-        class_objects, skin_families(class_path), item_objects, skin_families(item_path)
+        class_objects,
+        skin_families(class_path),
+        item_objects,
+        skin_families(item_path),
+        (centre, span),
+        item_frame,
     )
 
 
-def render_team(
-    imported: ImportedJob, job: dict, team: str, layout: OutputLayout
-) -> tuple[str, bool]:
-    """Render one Team from an already-imported job: its image path, and whether RED stood in."""
+def dress_for_team(imported: ImportedJob, job: dict, team: str) -> bool:
+    """Swap both models to this Team's skins; report whether RED had to stand in for either."""
     on_class = scene_plan.skin_plan(
         team,
         skin_red=scene_plan.CLASS_SKIN_RED,
@@ -424,11 +502,19 @@ def render_team(
         log(f"  {team}: the Class has no skin family {on_class.requested}, rendering it RED")
     apply_skin(imported.class_objects, on_class.family)
     apply_skin(imported.item_objects, choice.family)
-    relative = layout.master_relpath(job, team)
+    return choice.fell_back_to_red or on_class.fell_back_to_red
+
+
+def render_variant(
+    imported: ImportedJob, job: dict, team: str, variant: str, layout: OutputLayout
+) -> str:
+    """Render one picture of an already-dressed job, and say where it was written."""
+    imported.show(variant)
+    relative = layout.master_relpath(job, team, variant)
     started = time.perf_counter()
     render_to(layout.path_for(relative))
-    log(f"  {team}: {relative} in {time.perf_counter() - started:.2f}s")
-    return relative, choice.fell_back_to_red or on_class.fell_back_to_red
+    log(f"  {team} {variant}: {relative} in {time.perf_counter() - started:.2f}s")
+    return relative
 
 
 def run(args: argparse.Namespace) -> int:
@@ -439,8 +525,12 @@ def run(args: argparse.Namespace) -> int:
     validate_job_list(document)
     jobs = select_jobs(document, slugs=args.slug, classes=args.classes, styles=args.styles)
     teams = selected_teams(args.teams)
+    variants = selected_variants(args.variants)
     manifest = load_manifest(layout.manifest)
-    log(f"{len(jobs)} jobs x {len(teams)} teams -> {layout.path_for(layout.masters_dir)}")
+    log(
+        f"{len(jobs)} jobs x {len(teams)} teams x {len(variants)} variants "
+        f"-> {layout.path_for(layout.masters_dir)}"
+    )
 
     mount_game(args.tf, args.cache, args.texture_cache)
     cache = ModelCache.for_game(args.tf, args.cache)
@@ -453,28 +543,46 @@ def run(args: argparse.Namespace) -> int:
         except Exception as error:  # noqa: BLE001 - one bad model never stops a ten-hour run
             failure = as_failure(error, REASON_IMPORT_ERROR)
             for team in teams:
-                manifest.fail(job, team, reason=failure.reason, detail=failure.detail, at=now())
-            failed += len(teams)
+                for variant in variants:
+                    manifest.fail(
+                        job,
+                        team,
+                        reason=failure.reason,
+                        detail=failure.detail,
+                        at=now(),
+                        variant=variant,
+                    )
+            failed += len(teams) * len(variants)
             manifest.write(layout.manifest)
             continue
         for team in teams:
-            try:
-                relative, fell_back_to_red = render_team(imported, job, team, layout)
-            except Exception as error:  # noqa: BLE001 - as above, per Team
-                failure = as_failure(error, REASON_RENDER_ERROR)
-                manifest.fail(job, team, reason=failure.reason, detail=failure.detail, at=now())
-                failed += 1
-            else:
-                manifest.record(
-                    job,
-                    team,
-                    path=relative,
-                    width=args.size,
-                    height=args.size,
-                    at=now(),
-                    fell_back_to_red=fell_back_to_red,
-                )
-                rendered += 1
+            fell_back_to_red = dress_for_team(imported, job, team)
+            for variant in variants:
+                try:
+                    relative = render_variant(imported, job, team, variant, layout)
+                except Exception as error:  # noqa: BLE001 - as above, per picture
+                    failure = as_failure(error, REASON_RENDER_ERROR)
+                    manifest.fail(
+                        job,
+                        team,
+                        reason=failure.reason,
+                        detail=failure.detail,
+                        at=now(),
+                        variant=variant,
+                    )
+                    failed += 1
+                else:
+                    manifest.record(
+                        job,
+                        team,
+                        path=relative,
+                        width=args.size,
+                        height=args.size,
+                        at=now(),
+                        fell_back_to_red=fell_back_to_red,
+                        variant=variant,
+                    )
+                    rendered += 1
         # Once per job, not once per image: the manifest is rewritten whole, and a long run
         # would otherwise spend more time writing it than rendering.
         manifest.write(layout.manifest)

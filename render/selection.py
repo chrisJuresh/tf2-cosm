@@ -1,14 +1,15 @@
 """Which jobs a run renders, and on which Teams.
 
 The job list holds one job per Cosmetic, Class and Style; a Team is not a job because both
-Teams come from the same import with a material swap, so a run is the selected jobs times the
-Teams asked for — one image each.
+Teams come from the same import with a material swap, and neither is a variant, because the
+Worn Render and the Item Render are two frames of that same import. So a run is the selected
+jobs times the Teams asked for times the variants asked for — one image each.
 """
 from __future__ import annotations
 
 from typing import Iterable, Sequence
 
-from render.scene import TEAMS
+from render.scene import TEAMS, VARIANTS
 
 
 class NothingSelected(Exception):
@@ -54,3 +55,19 @@ def selected_teams(teams: Sequence[str]) -> list[str]:
         if team not in TEAMS:
             raise ValueError(f"unknown Team {team!r}")
     return list(teams)
+
+
+def selected_variants(variants: Sequence[str] | None) -> list[str]:
+    """The variants to render, in the order given; None is a run that wants both.
+
+    Both is the default because both come off one import: asking for only one is for a rerun
+    that is filling in a gap, not for an ordinary run.
+    """
+    if variants is None:
+        return list(VARIANTS)
+    for variant in variants:
+        if variant not in VARIANTS:
+            raise ValueError(f"unknown variant {variant!r}")
+    if not variants:
+        raise ValueError("a run renders at least one variant")
+    return list(variants)
