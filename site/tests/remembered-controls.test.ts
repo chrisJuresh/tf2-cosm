@@ -55,6 +55,26 @@ describe("reading the remembered controls", () => {
     });
   });
 
+  it("gives back the price range that was written", () => {
+    writeControls(localStorage, { ...DEFAULT_CONTROLS, minScrap: 9, maxScrap: 708 });
+    expect(readControls(localStorage)).toMatchObject({ minScrap: 9, maxScrap: 708 });
+  });
+
+  it("keeps an untouched end of the range untouched", () => {
+    writeControls(localStorage, { ...DEFAULT_CONTROLS, maxScrap: 708 });
+    expect(readControls(localStorage)).toMatchObject({ minScrap: null, maxScrap: 708 });
+  });
+
+  it("drops both ends of a range that crossed, rather than opening on an empty grid", () => {
+    localStorage.setItem(CONTROLS_STORAGE_KEY, JSON.stringify({ minScrap: 708, maxScrap: 9 }));
+    expect(readControls(localStorage)).toMatchObject({ minScrap: null, maxScrap: null });
+  });
+
+  it("drops a bound that is not a whole scrap count", () => {
+    localStorage.setItem(CONTROLS_STORAGE_KEY, JSON.stringify({ minScrap: "9", maxScrap: -1 }));
+    expect(readControls(localStorage)).toMatchObject({ minScrap: null, maxScrap: null });
+  });
+
   it("does not remember the search: a visit starts on the whole list, not mid-word", () => {
     writeControls(localStorage, { ...DEFAULT_CONTROLS, search: "gibus" });
     expect(readControls(localStorage).search).toBe("");

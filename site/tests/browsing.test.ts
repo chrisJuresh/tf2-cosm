@@ -159,6 +159,49 @@ describe("narrowing to what a viewer owns", () => {
   });
 });
 
+describe("the price range", () => {
+  // The fixture's Metal Values, in scrap: the Ghastly Gibus at 1, the Scotsman's
+  // Stove Pipe at 12, the Bolt Boy at 13, the Baronial Badge at 55, the Tin Pot
+  // at 174 and the Team Captain at 1593 — and the Dead of Night with none.
+  it("shows everything, Unpriced included, while neither end is bounded", () => {
+    expect(slugsOf({ minScrap: null, maxScrap: null })).toEqual(slugsOf());
+    expect(slugsOf()).toContain("dead-of-night");
+  });
+
+  it("drops what is dearer than the ceiling", () => {
+    expect(slugsOf({ maxScrap: 174 })).not.toContain("team-captain");
+    expect(slugsOf({ maxScrap: 174 })).toContain("tin-pot");
+  });
+
+  it("drops what is cheaper than the floor", () => {
+    expect(slugsOf({ minScrap: 55 }).toSorted()).toEqual(["baronial-badge", "team-captain", "tin-pot"]);
+  });
+
+  it("keeps a Cosmetic priced at either bound exactly", () => {
+    expect(slugsOf({ minScrap: 174, maxScrap: 174 })).toEqual(["tin-pot"]);
+  });
+
+  it("takes both ends at once", () => {
+    expect(slugsOf({ minScrap: 12, maxScrap: 55 }).toSorted()).toEqual([
+      "baronial-badge",
+      "bolt-boy",
+      "scotsmans-stove-pipe",
+    ]);
+  });
+
+  it("leaves out the Unpriced as soon as either end is bounded", () => {
+    // Not because an Unpriced Cosmetic is worth nothing — it is unknown, which
+    // is why the sorts put it last — but because it has no price to be within a
+    // range. The bound that says so can be either end.
+    expect(slugsOf({ maxScrap: 1593 })).not.toContain("dead-of-night");
+    expect(slugsOf({ minScrap: 0 })).not.toContain("dead-of-night");
+  });
+
+  it("shows nothing rather than everything when the range holds no Cosmetic", () => {
+    expect(slugsOf({ minScrap: 2, maxScrap: 11 })).toEqual([]);
+  });
+});
+
 describe("the sort orders", () => {
   it("puts the highest Metal Value first by default", () => {
     expect(slugsOf().slice(0, 3)).toEqual(["team-captain", "tin-pot", "baronial-badge"]);

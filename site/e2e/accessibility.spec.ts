@@ -24,9 +24,9 @@ import { expect, expectClean, modal, openCard, card, test } from "./catalogue-pa
 const STYLED = "tin-pot";
 
 /**
- * The bar's controls, by the accessible name each one has to have, in the order
- * a Tab walks them. A control that loses its label fails here by name rather
- * than as a count.
+ * The panel's controls, by the accessible name each one has to have, in the
+ * order a keyboard reaches them. A control that loses its label fails here by
+ * name rather than as a count.
  *
  * The two toggles that read a backpack — "Only what I own" and "Hide
  * untradable" — are not here, because with no Inventory they are disabled and a
@@ -37,6 +37,8 @@ const CONTROLS = [
   "Search by name",
   "Class",
   "Slot",
+  "Minimum",
+  "Maximum",
   "Sort by",
   "Hide All-Class Cosmetics",
   "Hide Unpriced",
@@ -67,24 +69,24 @@ test("nor does either of them in dark mode", async ({ catalogue: { page, faults 
 });
 
 test("every browsing control is named, and says so to a screen reader", async ({ catalogue: { page } }) => {
-  const bar = page.getByRole("region", { name: "Browsing controls" });
-  await expect(bar).toBeVisible();
+  const panel = page.getByRole("region", { name: "Browsing controls" });
+  await expect(panel).toBeVisible();
   for (const name of CONTROLS) {
-    await expect(bar.getByLabel(name, { exact: true })).toBeVisible();
+    await expect(panel.getByLabel(name, { exact: true })).toBeVisible();
   }
 });
 
 test("the controls are reachable from the keyboard, and visible once focused", async ({ catalogue: { page } }) => {
   // The All-Class toggle focuses a Class View, so outside one it is disabled and
   // a keyboard walks past it — correctly, since there is nothing for it to do.
-  // A Class is picked first so that every control in the bar is a live one.
+  // A Class is picked first so that every control in the panel is a live one.
   await page.getByLabel("Class", { exact: true }).selectOption("soldier");
 
   const search = page.getByLabel("Search by name", { exact: true });
   await search.focus();
 
-  // Tab walks the bar in the order it is written: search, Class, slot, sort,
-  // then the two toggles. Anything that cannot be tabbed to is a control a
+  // Tab walks the panel in the order it is written: search, Class, slot, the
+  // two price sliders, the sort, then the toggles. Anything that cannot be tabbed to is a control a
   // keyboard viewer does not have.
   const reached: string[] = [];
   for (let step = 0; step < CONTROLS.length; step += 1) {
@@ -94,7 +96,7 @@ test("the controls are reachable from the keyboard, and visible once focused", a
   expect(reached).toEqual([...CONTROLS]);
 
   // And focus is something you can see, on every control the page has and not
-  // only on the bar: the Dollar Basis switch, the card itself, and the ones the
+  // only on the panel: the Dollar Basis switch, the card itself, and the ones the
   // modal brings with it. Tailwind draws it as an outline; what matters is that
   // the browser computes one rather than `none`. The Dollar Basis radios are
   // `sr-only` and their label carries the outline, which is why the check walks
@@ -102,6 +104,7 @@ test("the controls are reachable from the keyboard, and visible once focused", a
   await checkFocusIsVisible(page, [
     page.getByLabel("Search by name", { exact: true }),
     page.getByLabel("Sort by", { exact: true }),
+    page.getByLabel("Maximum", { exact: true }),
     page.getByRole("radiogroup", { name: "Dollar Basis" }).getByRole("radio").first(),
     card(page, STYLED).getByRole("button"),
   ]);

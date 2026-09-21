@@ -1,18 +1,25 @@
 "use client";
 
 /**
- * The bar the catalogue is browsed with: a name search, the Class View picker,
- * the slot filter, the sort, and the three toggles.
+ * The panel the catalogue is browsed with: a name search, the Class picker, the
+ * slot filter, the price range, the sort, and the four toggles.
+ *
+ * It is a column down the right-hand side wherever there is room for one, and a
+ * wrapping bar above the grid where there is not. The reason is the grid: every
+ * line the controls take across the top is a whole row of Cosmetics nobody can
+ * see, and on a wide screen there is width to spare and height there is not —
+ * so on a wide screen the controls are spent sideways. A phone is the other way
+ * round, and gets the bar it always had.
  *
  * Every control is a plain form control with a real label. That is what makes
  * them keyboard operable and announced properly without a line of code for
  * either: a `select` opens with the keyboard, a checkbox works with the space
- * bar, and a `label` tied to its control gives the whole thing a name and a
- * bigger hit area on a phone. Nothing here decides what the controls mean — the
- * rules are `@/browsing/controls`, and this file only says which values a viewer
- * can pick.
+ * bar, a `range` moves under the arrow keys, and a `label` tied to its control
+ * gives the whole thing a name and a bigger hit area on a phone. Nothing here
+ * decides what the controls mean — the rules are `@/browsing/controls`, and this
+ * file only says which values a viewer can pick.
  */
-import { COSMETIC_SLOTS } from "@tf2-cosm/data/catalogue";
+import { COSMETIC_SLOTS, type Metal } from "@tf2-cosm/data/catalogue";
 import type { ChangeEvent } from "react";
 
 import {
@@ -25,6 +32,13 @@ import {
   type BrowsingControls,
   type SortOrder,
 } from "@/browsing/controls";
+import { PriceRange } from "@/components/price-range";
+
+/**
+ * How a control sits in the panel: side by side with the others while they are
+ * a bar, and full width once they are a column.
+ */
+const FIELD = "flex-1 basis-32 lg:flex-none lg:basis-auto lg:w-full";
 
 /** The label and the control below it, so every control is laid out alike. */
 function Field({
@@ -129,12 +143,16 @@ function Toggle({
   );
 }
 
-export interface BrowsingControlsBarProps {
+export interface BrowsingControlsPanelProps {
   readonly controls: BrowsingControls;
   readonly onChange: (change: Partial<BrowsingControls>) => void;
   /** How many Cosmetics the controls leave, out of how many there are. */
   readonly shown: number;
   readonly total: number;
+  /** What each notch of the price sliders is worth — `priceScale` of the catalogue. */
+  readonly priceScale: readonly number[];
+  /** The snapshot's Key Rate, so the price readout is in the cards' own words. */
+  readonly keyRate: Metal | null;
   /**
    * Whether there is a backpack to narrow to. False until one has been read, or
    * where the site was built with no inventory proxy configured at all.
@@ -142,23 +160,34 @@ export interface BrowsingControlsBarProps {
   readonly ownedOffered: boolean;
 }
 
-export function BrowsingControlsBar({ controls, onChange, shown, total, ownedOffered }: BrowsingControlsBarProps) {
+export function BrowsingControlsPanel({
+  controls,
+  onChange,
+  shown,
+  total,
+  priceScale,
+  keyRate,
+  ownedOffered,
+}: BrowsingControlsPanelProps) {
   const count = shown === total ? `${total.toLocaleString("en-US")} Cosmetics` : `${shown.toLocaleString("en-US")} of ${total.toLocaleString("en-US")} Cosmetics`;
 
   return (
-    // One line wherever there is room for one. Every line the bar takes is a row
-    // of Cosmetics the grid below it does not get, so the controls, the toggles
-    // and the count share a line and wrap onto a second only on a narrow screen.
+    // `shrink-0` for the same reason the header has it: the grid beside it takes
+    // every pixel it is offered, and a squeezed panel spills over the cards. As
+    // a column it scrolls on its own, so a short screen cannot cut the last
+    // toggle off with no way to reach it.
     <section
       aria-label="Browsing controls"
-      // `shrink-0` for the same reason the header has it: the grid below takes
-      // every pixel it is offered, and a squeezed bar spills over the cards.
-      className="flex shrink-0 flex-wrap items-end gap-x-3 gap-y-2 pt-1 pb-2"
+      className={
+        "flex shrink-0 flex-wrap items-end gap-x-3 gap-y-2 pt-1 pb-2" +
+        " lg:w-56 lg:min-h-0 lg:flex-col lg:flex-nowrap lg:items-stretch lg:gap-y-3" +
+        " lg:overflow-y-auto lg:border-l lg:border-black/10 lg:pt-0 lg:pb-3 lg:pl-4 lg:dark:border-white/15"
+      }
     >
       {/* The search is first because it is the control most often wanted, and a
           phone gives it the whole line before the pickers wrap under it. */}
-      <div className="flex w-full flex-wrap items-end gap-x-3 gap-y-2 sm:w-auto sm:flex-1 sm:flex-nowrap">
-        <Field label="Search by name" htmlFor="search" className="w-full sm:w-auto sm:min-w-40 sm:flex-1">
+      <div className="flex w-full flex-wrap items-end gap-x-3 gap-y-2 sm:w-auto sm:flex-1 lg:w-full lg:flex-none lg:flex-col lg:items-stretch lg:gap-y-3">
+        <Field label="Search by name" htmlFor="search" className="w-full sm:w-auto sm:min-w-40 sm:flex-1 lg:w-full lg:flex-none">
           <input
             id="search"
             type="search"
@@ -179,7 +208,7 @@ export function BrowsingControlsBar({ controls, onChange, shown, total, ownedOff
           everything="Every Cosmetic"
           options={CLASS_FILTERS}
           labels={CLASS_FILTER_LABELS}
-          className="flex-1 basis-28 sm:flex-none sm:basis-auto sm:w-32"
+          className={FIELD}
           value={controls.classFilter}
           onPick={(classFilter) => onChange({ classFilter })}
         />
@@ -190,12 +219,27 @@ export function BrowsingControlsBar({ controls, onChange, shown, total, ownedOff
           everything="Head and misc"
           options={COSMETIC_SLOTS}
           labels={SLOT_LABELS}
-          className="flex-1 basis-28 sm:flex-none sm:basis-auto sm:w-32"
+          className={FIELD}
           value={controls.slot}
           onPick={(slot) => onChange({ slot })}
         />
 
-        <Field label="Sort by" htmlFor="sort" className="flex-1 basis-40 sm:flex-none sm:basis-auto sm:w-48">
+        {/* Beside the two pickers, because it is the third question of the same
+            kind — which Cosmetics, not in what order and not how they look. It
+            shares a line with the sort on a phone rather than taking one of its
+            own: a line of the bar is a row of Cosmetics, and two sliders are
+            about as tall as the box beside them. */}
+        <div className="min-w-0 flex-1 basis-48 sm:basis-64 lg:w-full lg:flex-none lg:basis-auto">
+          <PriceRange
+            scale={priceScale}
+            minScrap={controls.minScrap}
+            maxScrap={controls.maxScrap}
+            keyRate={keyRate}
+            onChange={onChange}
+          />
+        </div>
+
+        <Field label="Sort by" htmlFor="sort" className="flex-1 basis-32 sm:flex-none sm:basis-auto sm:w-48 lg:w-full">
           <select
             id="sort"
             value={controls.sort}
@@ -211,9 +255,10 @@ export function BrowsingControlsBar({ controls, onChange, shown, total, ownedOff
         </Field>
       </div>
 
-      {/* The toggles sit on the controls' own line, level with the boxes rather
-          than with the labels above them. */}
-      <div className="flex w-full flex-wrap items-center gap-x-5 gap-y-1 sm:w-auto sm:pb-1">
+      {/* As a bar the toggles sit on the controls' own line, level with the
+          boxes rather than with the labels above them; as a column they are the
+          bottom of the panel. */}
+      <div className="flex w-full flex-wrap items-center gap-x-5 gap-y-1 sm:w-auto sm:pb-1 lg:flex-col lg:items-start lg:gap-y-0 lg:pb-0">
         {/* The toggle focuses a Class View, so outside one there is nothing for
             it to do; it is disabled rather than left to tick and change nothing. */}
         <Toggle
@@ -257,8 +302,8 @@ export function BrowsingControlsBar({ controls, onChange, shown, total, ownedOff
           onChange={(checked) => onChange({ hideEventOnly: checked })}
         />
         {/* Announced when it changes, so a viewer working the controls from the
-            keyboard hears what a sighted viewer sees the list do. */}
-        <p role="status" className="ml-auto text-sm tabular-nums text-black/60 dark:text-white/60">
+            keyboard hears what a sighted viewer sees the grid do. */}
+        <p role="status" className="ml-auto text-sm tabular-nums text-black/60 dark:text-white/60 lg:mt-2 lg:ml-0">
           {count}
         </p>
       </div>

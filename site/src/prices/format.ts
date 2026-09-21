@@ -123,8 +123,16 @@ export function chooseBasis(offered: readonly DollarBasis[], id: string | null):
  * which is still true, just longer.
  */
 export function formatTraderNotation(metal: Metal, keyRate: Metal | null): string {
-  if (keyRate === null) return formatMetalValue(metal);
-  return traderNotation(metal.scrap, keyRate.scrap);
+  return formatScrap(metal.scrap, keyRate);
+}
+
+/**
+ * The same words for a bare scrap count — a figure the page worked out, such as
+ * a price bound a slider landed on, rather than one it read off a Cosmetic.
+ */
+export function formatScrap(scrap: number, keyRate: Metal | null): string {
+  if (keyRate === null) return `${formatRefined(scrap)} ref`;
+  return traderNotation(scrap, keyRate.scrap);
 }
 
 /**
