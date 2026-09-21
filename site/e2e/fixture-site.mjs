@@ -49,8 +49,21 @@ export const SITE_DIR = join(WORK_DIR, "site");
 export const PORT = 4173;
 export const BASE_URL = `http://127.0.0.1:${PORT}`;
 
+/**
+ * The inventory proxy the fixture site is built against (ADR-0006).
+ *
+ * A name that resolves to nothing, deliberately. `NEXT_PUBLIC_*` is inlined at
+ * build time, so this is baked into the exported JavaScript and is what the page
+ * will actually try to reach; `e2e/catalogue-page.ts` intercepts it and answers
+ * with a fixture backpack. If that interception were ever removed the requests
+ * would fail rather than reach anybody, which is the right way round.
+ */
+export const INVENTORY_API_URL = "https://inventory.invalid.test";
+
 /** The golden catalogue, read where it lives rather than copied into a fixture of our own. */
 export const GOLDEN_CATALOGUE = join(repoRoot, "data", "tests", "golden", "catalogue.json");
+/** Its other half: the same run's Variant Prices, which the Inventory view fetches. */
+export const GOLDEN_VARIANT_PRICES = join(repoRoot, "data", "tests", "golden", "variant-prices.json");
 /** The render job's own fixture manifest, the one `tests/test_site_render_manifest.py` validates. */
 export const FIXTURE_MANIFEST = join(siteRoot, "tests", "fixtures", "renders.json");
 
@@ -132,6 +145,14 @@ export function buildFixtureSite() {
 
   cpSync(GOLDEN_CATALOGUE, join(DATA_DIR, "catalogue.json"));
   cpSync(FIXTURE_MANIFEST, join(DATA_DIR, "renders.json"));
+  cpSync(GOLDEN_VARIANT_PRICES, join(DATA_DIR, "variant-prices.json"));
+  // The Variant Prices are served beside the page rather than baked into it
+  // (ADR-0005), which `scripts/copy-variant-prices.mjs` does before a real
+  // build. This build runs `next build` directly, so the copy is made here —
+  // and it has to be the same run's document as the catalogue above, because
+  // the site refuses a mismatched pair.
+  mkdirSync(join(siteRoot, "public"), { recursive: true });
+  cpSync(GOLDEN_VARIANT_PRICES, join(siteRoot, "public", "variant-prices.json"));
   writePlaceholders(readFixtureManifest());
 
   const built = nextBuild(DATA_DIR);
@@ -154,7 +175,12 @@ export function nextBuild(catalogueDir) {
       cwd: siteRoot,
       encoding: "utf8",
       stdio: ["ignore", "pipe", "pipe"],
-      env: { ...process.env, CATALOGUE_DIR: catalogueDir, NEXT_TELEMETRY_DISABLED: "1" },
+      env: {
+        ...process.env,
+        CATALOGUE_DIR: catalogueDir,
+        NEXT_PUBLIC_INVENTORY_API_URL: INVENTORY_API_URL,
+        NEXT_TELEMETRY_DISABLED: "1",
+      },
     });
     return { ok: true, output };
   } catch (error) {

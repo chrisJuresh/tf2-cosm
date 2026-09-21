@@ -13,7 +13,7 @@
  * jsdom lays nothing out at all, so this is the only place that layout, or a
  * drag of the mouse across a name, is ever exercised.
  */
-import { expect, expectClean, modal, openCard, card, cards, slugs, test } from "./catalogue-page";
+import { expect, expectClean, modal, openCard, card, cards, shownCount, slugs, test } from "./catalogue-page";
 
 /** From the golden catalogue: one Cosmetic of each of the three kinds. */
 const DEMOMAN_ONLY = "scotsmans-stove-pipe";
@@ -32,7 +32,7 @@ test("the page loads and lists the catalogue bar its Event-Only Cosmetics", asyn
   // Seven of the fixture's eight: the eighth is Event-Only, and the toggle that
   // hides it is ticked when the page opens.
   await expect(cards(page)).toHaveCount(7);
-  await expect(page.getByRole("status")).toHaveText("7 of 8 Cosmetics");
+  await expect(shownCount(page)).toHaveText("7 of 8 Cosmetics");
   await expect(card(page, EVENT_ONLY)).toHaveCount(0);
 
   // Sorted by Metal Value, high to low, which is the default.
@@ -79,7 +79,7 @@ test("the Class filter narrows the grid to what that Class can wear", async ({ c
   await page.getByLabel("Class", { exact: true }).selectOption("");
   await page.getByLabel("Hide Event-Only").uncheck();
   await expect(card(page, EVENT_ONLY)).toBeVisible();
-  await expect(page.getByRole("status")).toHaveText("8 Cosmetics");
+  await expect(shownCount(page)).toHaveText("8 Cosmetics");
 
   expectClean(faults);
 });

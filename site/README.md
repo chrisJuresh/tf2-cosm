@@ -38,7 +38,8 @@ That exists for the end-to-end suite, which builds the whole site from the
 fixture pair — a build driven by the committed snapshot could only ever prove
 the page works for today's prices.
 
-The site's other setting is where the images live (below). Every rate it quotes — the Key Rate,
+The site's other settings are where the images live and where a viewer's own
+Steam inventory is read through (both below). Every rate it quotes — the Key Rate,
 and each of the three Dollar Bases a dollar figure can be computed from — comes
 out of the catalogue header, so there is nowhere for a number on the page to have
 come from but the snapshot. A rate's own date is shown alongside the snapshot's,
@@ -86,6 +87,57 @@ repository's own `renders/` folder (or `RENDER_OUTPUT_ROOT`, if that is set) to
 `site/public/renders` — so a local render run shows up on the page with nothing
 to copy and nothing to keep in step. No renders yet just means every row shows
 its icon, which is what production does for an unrendered Cosmetic too.
+
+## Showing a viewer what they own
+
+A viewer pastes their Steam profile and the catalogue narrows to the Cosmetics
+they actually hold, each shown at the price of *their* copy's Quality rather than
+at the Reference Price. A Genuine copy is worth the Genuine figure; the Reference
+Price is a different number about a different copy.
+
+Two things make it work and neither of them is on the page.
+
+**The inventory proxy.** Steam answers its inventory endpoint with JSON and no
+`Access-Control-Allow-Origin` header, so a static page cannot read a backpack
+itself. `worker/` at the repository root is a Cloudflare Worker that reads it and
+answers with CORS (ADR-0006). It is the one piece of server this project has, it
+holds no secret, and where it lives is configuration on the same terms as the
+image base:
+
+```bash
+NEXT_PUBLIC_INVENTORY_API_URL=https://tf2-cosm-inventory.example.workers.dev
+```
+
+Unset, the box is not offered at all and the "Only what I own" toggle stays
+disabled. A control that cannot work is worse than no control.
+
+**The Variant Prices.** The catalogue carries one price per Cosmetic and pricing
+a viewer's own copy needs the rest, which is a second committed document,
+`catalogue/variant-prices.json` (ADR-0005). It is *not* baked into the page.
+`scripts/copy-variant-prices.mjs` copies it into `public/` before `dev` and
+`build`, and the page fetches it when a viewer asks for their backpack — a
+megabyte that most visits never open should not be in every visit. The exported
+HTML is the same size with the feature as without it.
+
+The site refuses a Variant Prices document whose `snapshotTakenAt` is not the
+catalogue's. The two files are committed separately, so a half-updated pair is
+the one way they can be wrong without either being malformed, and the figures
+would be at the wrong Key Rate rather than visibly broken.
+
+What is remembered is the profile and nothing else. The Owned Copies are a
+person's possessions and go stale the moment they trade, so they are fetched
+afresh — which costs Steam nothing, because the proxy caches.
+
+Nothing decides what is a Cosmetic twice. An Owned Copy carries a defindex, the
+catalogue is the Cosmetic rule, and a defindex it does not carry is not one — so
+weapons, taunts, tools, crates and Medals are left out by the rule that was
+already there rather than by a second one that could disagree with it.
+
+An owned Unusual is marked owned and shown as priced by its effect, with no
+figure, because a price source prices an Unusual per hat-and-effect pair. The
+total says out loud how many copies it left out and why: a viewer's Unusuals are
+the most valuable things they own, and a total that quietly dropped four of them
+would read as their backpack's worth.
 
 ## Shape
 
@@ -181,7 +233,28 @@ its icon, which is what production does for an unrendered Cosmetic too.
   with real labels, which is what makes them keyboard operable and properly
   announced without a line of code for either.
 - `src/components/catalogue-browser.tsx` — where the rules and the bar meet: it
-  holds what the viewer picked and hands the grid what is left.
+  holds what the viewer picked and hands the grid what is left. The viewer's own
+  Inventory lives here too, on the same terms: another thing that narrows the
+  list, with the grid handed the result rather than the reason.
+- `src/inventory/owned.ts` — what a viewer owns, matched to the catalogue and
+  priced as the copies they own. Pure, and driven directly by
+  `tests/owned.test.ts`. It settles two things: that a defindex the catalogue
+  does not carry is not a Cosmetic, and that a copy is worth its own Variant
+  Price rather than the Cosmetic's Reference Price.
+- `src/inventory/copies.ts` — the inventory proxy's answer, declared on the
+  reading side. A payload that arrives over the network at runtime is not one the
+  build could have checked, the same reason `src/renders/manifest.ts` exists.
+- `src/inventory/load.ts` — the only code on the site that makes a network call:
+  the proxy, the Variant Prices, and a sentence a person can act on for every way
+  either of them can fail.
+- `src/inventory/use-inventory.ts` — the Inventory the page is looking at. What
+  is remembered and what is not is the whole design of it: the profile, yes; the
+  Owned Copies, never.
+- `src/prices/variant-prices.ts` — the second price document, and the check that
+  it came out of the same run as the catalogue.
+- `src/components/inventory-controls.tsx` — the profile box and what the page
+  says back, in a live region so a viewer working the page from the keyboard
+  hears the answer rather than watching the grid stay as it was.
 
 The open Cosmetic's slug is the URL hash, so a card can be linked to, and every
 card carries its slug in `data-slug` — the hook the later wishlist and per-item
@@ -255,12 +328,22 @@ working page.
 - `e2e/serve.mjs` serves it: the export as plain files, with the placeholder
   renders mounted at `/renders`. Fifty lines rather than a dependency, and
   anything neither folder has is a 404, which the suite treats as a failure.
+- `e2e/inventory.spec.ts` pastes a profile and watches the catalogue narrow to
+  what that backpack holds. Three of the four things it needs are only real in a
+  browser: the Variant Prices have to actually be *there* as a file at the URL
+  the code asks for, the proxy's URL has to survive being inlined at build time,
+  and none of it runs before hydration.
 - `e2e/catalogue-page.ts` intercepts every request that would leave the machine.
   Valve's icon CDN is answered with a placeholder, because the fixture
   catalogue's icon URLs are made-up hashes and a suite that needs the internet
   fails for reasons that are nobody's fault. Anything else leaving the page is a
   fault in its own right — the site is meant to have no server, no analytics and
-  no third party but that CDN — and this is the one place that can check it.
+  no third party but that CDN and the inventory proxy — and this is the one place
+  that can check it. The proxy is not blanket-allowed either: a test asks for a
+  backpack with `serveInventory`, and until it does, a request to the proxy is a
+  fault like any other. The page is meant to reach for one when the viewer asks
+  and at no other moment, and a rule that let it through whenever could not tell
+  the difference.
 - `e2e/smoke.spec.ts` does what a viewer does: loads the page, filters to a
   Class, types a search, opens a Cosmetic and works its Style switcher and Team
   toggle. It also checks the three things only a laid-out page has: that the
@@ -293,4 +376,12 @@ not run against 7, so this package pins `typescript@5`. Both are checked by
 The whole catalogue and the whole manifest are handed to the client as one
 payload each, which is what makes the exported HTML large; trimming both to the
 fields a card and its picture need is worth doing now that the tickets have
-settled what those are.
+settled what those are. The Variant Prices dodged this by being a file beside
+the page rather than in it (ADR-0005), which is the same answer available to
+both of these and a bigger win on either.
+
+An owned Unusual is marked owned and priced by its effect with no figure. The
+Inventory does say which effect, and a price source does price a hat-and-effect
+pair, so a real figure for it is reachable — it wants the catalogue to carry
+Unusual prices per effect, which is hundreds of effects across hundreds of hats
+and so wants the payload question above settled first.

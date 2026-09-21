@@ -53,6 +53,12 @@ export interface BrowsingControls {
   readonly slot: CosmeticSlot | null;
   readonly hideUnpriced: boolean;
   /**
+   * Whether the catalogue is narrowed to what the viewer owns. It has nothing to
+   * narrow until an Inventory has been read, so it does nothing before then —
+   * the control that turns it on is the one that asks for the Inventory.
+   */
+  readonly onlyOwned: boolean;
+  /**
    * Whether the Event-Only Cosmetics are left out. On by default: they are a
    * seventh of the catalogue and, unless the event is running, not something a
    * player can wear, so they are clutter in front of the answer most of the
@@ -73,6 +79,7 @@ export const DEFAULT_CONTROLS: BrowsingControls = {
   hideAllClass: false,
   slot: null,
   hideUnpriced: false,
+  onlyOwned: false,
   hideEventOnly: true,
   sort: "metal-value-high",
   search: "",
@@ -144,15 +151,26 @@ function compareBy(sort: SortOrder): (a: Cosmetic, b: Cosmetic) => number {
   }
 }
 
-/** The Cosmetics these controls show, in the order they show them. */
+/**
+ * The Cosmetics these controls show, in the order they show them.
+ *
+ * `owned` is the slugs of what the viewer's Inventory holds, or null when no
+ * Inventory has been read. Null and `onlyOwned` together show the whole
+ * catalogue rather than nothing: the toggle is a view of an Inventory, and with
+ * no Inventory there is no view, not an empty one. An Inventory that is read and
+ * genuinely holds no Cosmetics is an empty set and does show nothing, which is
+ * the truth about that backpack.
+ */
 export function visibleCosmetics(
   cosmetics: readonly Cosmetic[],
   controls: BrowsingControls,
+  owned: ReadonlySet<string> | null = null,
 ): Cosmetic[] {
-  const { classView, hideAllClass, slot, hideUnpriced, hideEventOnly, search } = controls;
+  const { classView, hideAllClass, slot, hideUnpriced, onlyOwned, hideEventOnly, search } = controls;
   const term = search.trim().toLowerCase();
 
   const kept = cosmetics.filter((cosmetic) => {
+    if (onlyOwned && owned !== null && !owned.has(cosmetic.slug)) return false;
     if (classView !== null && !inClassView(cosmetic, classView, hideAllClass)) return false;
     if (slot !== null && cosmetic.slot !== slot) return false;
     if (hideUnpriced && isUnpriced(cosmetic)) return false;

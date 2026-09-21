@@ -133,9 +133,14 @@ export interface BrowsingControlsBarProps {
   /** How many Cosmetics the controls leave, out of how many there are. */
   readonly shown: number;
   readonly total: number;
+  /**
+   * Whether there is a backpack to narrow to. False until one has been read, or
+   * where the site was built with no inventory proxy configured at all.
+   */
+  readonly ownedOffered: boolean;
 }
 
-export function BrowsingControlsBar({ controls, onChange, shown, total }: BrowsingControlsBarProps) {
+export function BrowsingControlsBar({ controls, onChange, shown, total, ownedOffered }: BrowsingControlsBarProps) {
   const count = shown === total ? `${total.toLocaleString("en-US")} Cosmetics` : `${shown.toLocaleString("en-US")} of ${total.toLocaleString("en-US")} Cosmetics`;
 
   return (
@@ -218,6 +223,16 @@ export function BrowsingControlsBar({ controls, onChange, shown, total }: Browsi
           label="Hide Unpriced"
           checked={controls.hideUnpriced}
           onChange={(checked) => onChange({ hideUnpriced: checked })}
+        />
+        {/* Nothing to narrow to until a backpack has been read, so it is
+            disabled rather than left to tick and change nothing — the same rule
+            the All-Class toggle follows outside a Class View. */}
+        <Toggle
+          id="only-owned"
+          label="Only what I own"
+          checked={controls.onlyOwned}
+          disabled={!ownedOffered}
+          onChange={(checked) => onChange({ onlyOwned: checked })}
         />
         {/* Ticked when the page opens, so the toggle is also how a viewer finds
             out the Event-Only Cosmetics are in the catalogue at all. */}

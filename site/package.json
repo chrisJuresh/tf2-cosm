@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "predev": "node scripts/link-renders.mjs",
+    "predev": "node scripts/link-renders.mjs && node scripts/copy-variant-prices.mjs",
     "dev": "next dev",
-    "prebuild": "node scripts/link-renders.mjs",
+    "prebuild": "node scripts/link-renders.mjs && node scripts/copy-variant-prices.mjs",
     "build": "next build",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",

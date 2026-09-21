@@ -25,6 +25,14 @@ export function fixtureCosmetics(): Cosmetic[] {
   return fixtureCatalogue().cosmetics;
 }
 
+/**
+ * When the fixture snapshot was taken. The Variant Prices carry it too, and a
+ * pair that disagrees is refused rather than priced at the wrong Key Rate.
+ */
+export function fixtureSnapshotTakenAt(): string {
+  return fixtureCatalogue().header.snapshotTakenAt;
+}
+
 /** The fixture's Key Rate: 78.66 ref to the Key. */
 export function fixtureKeyRate(): Metal {
   const prices = fixtureCatalogue().header.prices;
