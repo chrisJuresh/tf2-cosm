@@ -55,6 +55,13 @@ in it is relative to an image base that is configuration on both sides:
 NEXT_PUBLIC_RENDER_BASE_URL=https://images.example.com/renders   # a bucket
 ```
 
+That bucket is filled by `python -m render.publish`, and the two settings have to
+agree: the base is the bucket's public URL, and the manifest's paths hang off it
+unchanged. A deployment with the base unset serves no images at all — every row
+falls back to its Backpack Icon — which is why setting it is the last step of
+`docs/render/publishing.md`. Next inlines `NEXT_PUBLIC_*` at build time, so a
+deployment already built does not pick up a new value; redeploy.
+
 Unset, the base is `/renders`, which the site serves itself. `pnpm dev` and
 `pnpm build-site` both first run `scripts/link-renders.mjs`, which links the
 repository's own `renders/` folder (or `RENDER_OUTPUT_ROOT`, if that is set) to
