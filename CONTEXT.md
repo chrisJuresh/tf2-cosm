@@ -104,6 +104,15 @@ The URL-safe identifier derived from a Cosmetic's name, and its stable public na
 **Alias**:
 One of the other defindexes Valve's schema carries under a Cosmetic's name, folded into the single Cosmetic that name identifies (ADR-0003). The catalogue records them; the site shows them so the merge is visible rather than silent.
 
+### Inventory
+
+**Inventory**:
+A viewer's own Team Fortress 2 backpack, as Steam reports it: app 440, context 2. It is the one thing the site cannot read from a committed file, because it is live, personal and different for every viewer, so it is read through the inventory proxy (ADR-0006). Only a backpack its owner has made public can be read at all.
+_Avoid_: backpack (in code; it is what players say and what Steam's own URLs do not)
+
+**Owned Copy**:
+One kind of item in an Inventory, and how many of it the viewer has: a defindex, a Quality, a craftability and whether it can be traded. A viewer may own several Owned Copies of one Cosmetic, each in a different Quality and each worth a different Variant Price. An Owned Copy that matches no Cosmetic in the catalogue is not a Cosmetic — which is how weapons, taunts, tools, crates and Medals are left out, without a second rule deciding it.
+
 ### Images
 
 **Worn Render**:

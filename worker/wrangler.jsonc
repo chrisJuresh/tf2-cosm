@@ -1,0 +1,13 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "tf2-cosm-inventory",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-01",
+  "observability": { "enabled": true },
+  // No bindings, no secrets, no storage. The Worker resolves a vanity name
+  // through the community profile's own `?xml=1`, which needs no Steam Web API
+  // key, and holds nothing between requests but Cloudflare's own edge cache.
+  // If a `vars` or `secrets` block ever appears here, something has gone wrong
+  // with the idea.
+  "placement": { "mode": "smart" }
+}

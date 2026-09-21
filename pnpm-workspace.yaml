@@ -1,8 +1,16 @@
 packages:
   - data
   - site
+  - worker
 
 # esbuild ships a prebuilt binary that its install script puts in place; tsx and
 # vitest do not run without it.
+#
+# workerd is the Cloudflare runtime itself, which `wrangler dev` runs the
+# inventory proxy in locally. It ships the same way. Nothing in CI or in the
+# tests needs it — the Worker's own suite drives its pure modules directly —
+# so a machine that declines the build can still run everything but `pnpm dev`
+# in `worker/`.
 allowBuilds:
   esbuild: true
+  workerd: true

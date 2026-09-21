@@ -24,6 +24,7 @@ export const CATALOGUE_SCHEMA_VERSION = 5;
  * Cosmetic's `classes` are among them.
  */
 export { CLASSES, COSMETIC_SLOTS, type ClassName, type CosmeticSlot } from "./cosmetic-rule.ts";
+export { QUALITIES, type Quality } from "../prices/price-source.ts";
 export { UNPRICED_REASONS, type UnpricedReason } from "../prices/reference-variant.ts";
 
 export const COSMETIC_KINDS = ["class-exclusive", "multi-class", "all-class"] as const;
