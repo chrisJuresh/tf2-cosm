@@ -21,13 +21,19 @@ const MULTI_CLASS = "team-captain";
 const ALL_CLASS = "ghastly-gibus";
 /** Two Styles, both Teams, and a render for each — the one row that exercises every control. */
 const STYLED = "tin-pot";
+/** The fixture's Event-Only Cosmetic, which the page opens with hidden. */
+const EVENT_ONLY = "crocodile-smile";
 
-test("the page loads and lists every Cosmetic in the catalogue", async ({ catalogue: { page, faults } }) => {
+test("the page loads and lists the catalogue bar its Event-Only Cosmetics", async ({
+  catalogue: { page, faults },
+}) => {
   await expect(page.getByRole("list", { name: "Cosmetics" })).toBeVisible();
 
-  // Eight, because that is what the fixture catalogue's own header says it has.
-  await expect(cards(page)).toHaveCount(8);
-  await expect(page.getByRole("status")).toHaveText("8 Cosmetics");
+  // Seven of the fixture's eight: the eighth is Event-Only, and the toggle that
+  // hides it is ticked when the page opens.
+  await expect(cards(page)).toHaveCount(7);
+  await expect(page.getByRole("status")).toHaveText("7 of 8 Cosmetics");
+  await expect(card(page, EVENT_ONLY)).toHaveCount(0);
 
   // Sorted by Metal Value, high to low, which is the default.
   const figures = await cards(page).evaluateAll((elements) =>
@@ -68,6 +74,12 @@ test("the Class filter narrows the grid to what that Class can wear", async ({ c
   await page.getByLabel("Hide All-Class Cosmetics").check();
   await expect(card(page, ALL_CLASS)).toHaveCount(0);
   await expect(card(page, MULTI_CLASS)).toBeVisible();
+
+  // And the Event-Only Cosmetics are there to be had, once asked for.
+  await page.getByLabel("Class", { exact: true }).selectOption("");
+  await page.getByLabel("Hide Event-Only").uncheck();
+  await expect(card(page, EVENT_ONLY)).toBeVisible();
+  await expect(page.getByRole("status")).toHaveText("8 Cosmetics");
 
   expectClean(faults);
 });

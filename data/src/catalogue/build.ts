@@ -13,6 +13,7 @@ import {
   stylesOf,
   wornModels,
 } from "./cosmetic-rule.ts";
+import { eventRestrictionOf } from "./event-restriction.ts";
 import { displayName, slugify } from "./identity.ts";
 import { issuedInPlay } from "./issued-in-play.ts";
 import {
@@ -107,6 +108,8 @@ interface Candidate {
   readonly slot: CosmeticSlot;
   readonly classes: readonly ClassName[];
   readonly paintable: boolean;
+  /** The event this defindex may be worn during, or null; see `event-restriction.ts`. */
+  readonly eventRestriction: string | null;
   readonly styles: readonly Style[];
   readonly backpackIcon: Cosmetic["backpackIcon"];
   readonly nativeQuality: Quality;
@@ -230,6 +233,7 @@ export function buildCatalogue(inputs: CatalogueInputs): BuildResult {
       slot,
       classes,
       paintable: scalar(block(item, "capabilities"), "paintable") === "1",
+      eventRestriction: eventRestrictionOf(item),
       styles: styleNames(item, webApiItem, englishTokens),
       backpackIcon: backpackIconOf(webApiItem),
       nativeQuality: nativeQualityOf(webApiItem),
@@ -292,6 +296,10 @@ export function buildCatalogue(inputs: CatalogueInputs): BuildResult {
       classes: [...primary.classes],
       kind: kindOf(primary.classes),
       paintable: primary.paintable,
+      // Any defindex under the name being gated makes the Cosmetic gated, for
+      // the reason aliases merge at all: they are the same item, and a viewer
+      // hiding Event-Only Cosmetics means the thing, not one of its defindexes.
+      eventRestriction: group.find((one) => one.eventRestriction !== null)?.eventRestriction ?? null,
       styles: [...primary.styles],
       backpackIcon: primary.backpackIcon ?? group.find((one) => one.backpackIcon)?.backpackIcon ?? null,
       price,
@@ -313,6 +321,7 @@ export function buildCatalogue(inputs: CatalogueInputs): BuildResult {
         aliasesMerged,
         withoutWebApiEntry,
         withoutBackpackIcon: cosmetics.filter((one) => one.backpackIcon === null).length,
+        eventOnly: cosmetics.filter((one) => one.eventRestriction !== null).length,
       },
       prices: tally.header(inputs.prices),
       // Every dollar rate is anchored to the snapshot's own Key Rate, so without

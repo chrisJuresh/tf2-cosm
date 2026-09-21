@@ -52,6 +52,13 @@ export interface BrowsingControls {
   /** The equip slot to show, or null for both. */
   readonly slot: CosmeticSlot | null;
   readonly hideUnpriced: boolean;
+  /**
+   * Whether the Event-Only Cosmetics are left out. On by default: they are a
+   * seventh of the catalogue and, unless the event is running, not something a
+   * player can wear, so they are clutter in front of the answer most of the
+   * year — and the toggle says plainly they are there to be had.
+   */
+  readonly hideEventOnly: boolean;
   readonly sort: SortOrder;
   /** What the viewer has typed into the name search; blank means no search. */
   readonly search: string;
@@ -59,13 +66,14 @@ export interface BrowsingControls {
 
 /**
  * Where a viewer arrives, and where clearing the browser's storage returns them:
- * the whole catalogue, most valuable first.
+ * the catalogue bar its Event-Only Cosmetics, most valuable first.
  */
 export const DEFAULT_CONTROLS: BrowsingControls = {
   classView: null,
   hideAllClass: false,
   slot: null,
   hideUnpriced: false,
+  hideEventOnly: true,
   sort: "metal-value-high",
   search: "",
 };
@@ -82,6 +90,11 @@ export const DEFAULT_CONTROLS: BrowsingControls = {
 export function inClassView(cosmetic: Cosmetic, classView: ClassName, hideAllClass: boolean): boolean {
   if (cosmetic.kind === "all-class") return !hideAllClass;
   return cosmetic.classes.includes(classView);
+}
+
+/** Whether the game only lets this Cosmetic be worn while an event is running. */
+export function isEventOnly(cosmetic: Cosmetic): boolean {
+  return cosmetic.eventRestriction !== null;
 }
 
 /** Whether the price source had no price for this Cosmetic's Reference Variant. */
@@ -136,13 +149,14 @@ export function visibleCosmetics(
   cosmetics: readonly Cosmetic[],
   controls: BrowsingControls,
 ): Cosmetic[] {
-  const { classView, hideAllClass, slot, hideUnpriced, search } = controls;
+  const { classView, hideAllClass, slot, hideUnpriced, hideEventOnly, search } = controls;
   const term = search.trim().toLowerCase();
 
   const kept = cosmetics.filter((cosmetic) => {
     if (classView !== null && !inClassView(cosmetic, classView, hideAllClass)) return false;
     if (slot !== null && cosmetic.slot !== slot) return false;
     if (hideUnpriced && isUnpriced(cosmetic)) return false;
+    if (hideEventOnly && isEventOnly(cosmetic)) return false;
     if (term !== "" && !cosmetic.name.toLowerCase().includes(term)) return false;
     return true;
   });

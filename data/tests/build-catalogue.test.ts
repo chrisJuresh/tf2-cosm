@@ -99,6 +99,26 @@ describe("Cosmetic fields", () => {
     expect(bySlug("dead-of-night")).toMatchObject({ slot: "misc", paintable: true });
   });
 
+  it("records which event an Event-Only Cosmetic is bound to, and nothing for the rest", () => {
+    expect(bySlug("crocodile-smile").eventRestriction).toBe("halloween_or_fullmoon");
+    expect(bySlug("bolt-boy").eventRestriction).toBeNull();
+  });
+
+  it("takes the restriction from any defindex under the name, alias or not (ADR-0003)", () => {
+    // 103 carries none and its alias 104 is given one. They are the same item,
+    // so the Cosmetic a viewer hides is gated whichever defindex says so.
+    const itemsGame = fixtureItemsGame();
+    const gated = {
+      ...itemsGame,
+      items: { ...itemsGame.items, "104": { ...itemsGame.items["104"], holiday_restriction: "halloween" } },
+    };
+    const built = buildCatalogue(fixtureInputs({ itemsGame: gated })).catalogue;
+    expect(built.cosmetics.find((one) => one.slug === "ghastly-gibus")).toMatchObject({
+      aliases: [104],
+      eventRestriction: "halloween",
+    });
+  });
+
   it("names the Styles from the Web API, and has none when the item has none", () => {
     expect(bySlug("tin-pot").styles).toEqual([
       { index: 0, name: "Closed" },

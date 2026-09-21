@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 4,
+  "schemaVersion": 5,
   "header": {
     "snapshotTakenAt": "2026-09-20T12:00:00.000Z",
     "sources": {
@@ -13,7 +13,8 @@
       "allClass": 1,
       "aliasesMerged": 1,
       "withoutWebApiEntry": 0,
-      "withoutBackpackIcon": 0
+      "withoutBackpackIcon": 0,
+      "eventOnly": 1
     },
     "prices": {
       "source": "backpack.tf (IGetPrices v4, IGetCurrencies v1)",
@@ -80,6 +81,7 @@
       ],
       "kind": "class-exclusive",
       "paintable": false,
+      "eventRestriction": null,
       "styles": [],
       "backpackIcon": {
         "small": "https://steamcdn-a.akamaihd.net/apps/440/icons/baronial_badge.77889900aabbccddeeff112233445566778899aa.png",
@@ -133,6 +135,7 @@
       ],
       "kind": "class-exclusive",
       "paintable": false,
+      "eventRestriction": null,
       "styles": [],
       "backpackIcon": {
         "small": "https://steamcdn-a.akamaihd.net/apps/440/icons/boltboy.1a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d.png",
@@ -186,6 +189,7 @@
       ],
       "kind": "class-exclusive",
       "paintable": false,
+      "eventRestriction": "halloween_or_fullmoon",
       "styles": [],
       "backpackIcon": {
         "small": "https://steamcdn-a.akamaihd.net/apps/440/icons/crocodile_smile.99aabbccddeeff00112233445566778899aabbcc.png",
@@ -239,6 +243,7 @@
       ],
       "kind": "class-exclusive",
       "paintable": true,
+      "eventRestriction": null,
       "styles": [],
       "backpackIcon": {
         "small": "https://steamcdn-a.akamaihd.net/apps/440/icons/dead_of_night.5f0e0bf1d3f3b5d4f2f8a9b0c1d2e3f4a5b6c7d8.png",
@@ -270,6 +275,7 @@
       ],
       "kind": "all-class",
       "paintable": false,
+      "eventRestriction": null,
       "styles": [],
       "backpackIcon": {
         "small": "https://steamcdn-a.akamaihd.net/apps/440/icons/gibus.0011223344556677889900aabbccddeeff001122.png",
@@ -323,6 +329,7 @@
       ],
       "kind": "class-exclusive",
       "paintable": false,
+      "eventRestriction": null,
       "styles": [],
       "backpackIcon": {
         "small": "https://steamcdn-a.akamaihd.net/apps/440/icons/stove_pipe.112233445566778899aabbccddeeff0011223344.png",
@@ -377,6 +384,7 @@
       ],
       "kind": "multi-class",
       "paintable": false,
+      "eventRestriction": null,
       "styles": [],
       "backpackIcon": {
         "small": "https://steamcdn-a.akamaihd.net/apps/440/icons/soldier_officer.9f8e7d6c5b4a39281706f5e4d3c2b1a099887766.png",
@@ -430,6 +438,7 @@
       ],
       "kind": "class-exclusive",
       "paintable": false,
+      "eventRestriction": null,
       "styles": [
         {
           "index": 0,

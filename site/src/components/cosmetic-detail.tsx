@@ -18,7 +18,13 @@
 import type { ClassName, Cosmetic, Metal } from "@tf2-cosm/data/catalogue";
 import { type ReactNode, useState } from "react";
 
-import { classesRead, priceDateRead, referenceVariantRead, unpricedReasonRead } from "@/catalogue/describe";
+import {
+  classesRead,
+  eventRestrictionRead,
+  priceDateRead,
+  referenceVariantRead,
+  unpricedReasonRead,
+} from "@/catalogue/describe";
 
 import { formatTraderNotation } from "@/prices/format";
 import { StyleSwitcher, TeamToggle } from "@/components/render-controls";
@@ -111,6 +117,11 @@ export function CosmeticDetail({ cosmetic, keyRate, manifest, gameClass, id }: C
           </>
         )}
         <Field term="Classes">{classesRead(cosmetic)}</Field>
+        {cosmetic.eventRestriction === null ? null : (
+          // The list hides these by default, so a row that is open is a row a
+          // viewer went looking for: it should say what it is gated behind.
+          <Field term="Worn during">Only {eventRestrictionRead(cosmetic.eventRestriction)}</Field>
+        )}
         {cosmetic.aliases.length === 0 ? null : (
           // ADR-0003: a Cosmetic is one name, and every other defindex Valve
           // carries under that name is folded into it. Saying which ones keeps

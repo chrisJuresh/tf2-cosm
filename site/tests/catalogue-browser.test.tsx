@@ -50,12 +50,13 @@ const SORT_PICKER = { name: "Sort by" };
 const SEARCH_BOX = { name: "Search by name" };
 const HIDE_ALL_CLASS = { name: "Hide All-Class Cosmetics" };
 const HIDE_UNPRICED = { name: "Hide Unpriced" };
+const HIDE_EVENT_ONLY = { name: "Hide Event-Only" };
 
 describe("the Class View picker", () => {
-  it("starts on the whole catalogue", async () => {
+  it("starts on the whole catalogue bar its Event-Only Cosmetics", async () => {
     renderBrowser();
     expect(screen.getByRole("combobox", CLASS_PICKER)).toHaveValue("");
-    await waitFor(() => expect(namesShown()).toHaveLength(8));
+    await waitFor(() => expect(namesShown()).toHaveLength(7));
   });
 
   it("narrows to a Class's own items, the Multi-Class items it wears and the All-Class items", async () => {
@@ -117,7 +118,7 @@ describe("the slot filter", () => {
     const user = renderBrowser();
     await user.selectOptions(screen.getByRole("combobox", SLOT_PICKER), "head");
     expect(namesShown()).not.toContain("Dead of Night");
-    expect(namesShown()).toHaveLength(6);
+    expect(namesShown()).toHaveLength(5);
   });
 });
 
@@ -126,6 +127,20 @@ describe("the hide Unpriced toggle", () => {
     const user = renderBrowser();
     await user.click(screen.getByRole("checkbox", HIDE_UNPRICED));
     expect(namesShown()).not.toContain("Dead of Night");
+  });
+});
+
+describe("the hide Event-Only toggle", () => {
+  it("is ticked when the page opens, so the gated Cosmetics start out of the way", async () => {
+    renderBrowser();
+    await waitFor(() => expect(screen.getByRole("checkbox", HIDE_EVENT_ONLY)).toBeChecked());
+    expect(namesShown()).not.toContain("Crocodile Smile");
+  });
+
+  it("brings them back when a viewer unticks it", async () => {
+    const user = renderBrowser();
+    await user.click(screen.getByRole("checkbox", HIDE_EVENT_ONLY));
+    expect(namesShown()).toContain("Crocodile Smile");
   });
 });
 
@@ -158,7 +173,6 @@ describe("the sort", () => {
     expect(namesShown()).toEqual([
       "Baronial Badge",
       "Bolt Boy",
-      "Crocodile Smile",
       "Dead of Night",
       "Ghastly Gibus",
       "Scotsman's Stove Pipe",
@@ -217,7 +231,7 @@ describe("what the browser remembers", () => {
 
     cleanup();
     renderBrowser();
-    await waitFor(() => expect(namesShown()).toHaveLength(8));
+    await waitFor(() => expect(namesShown()).toHaveLength(7));
     expect(screen.getByRole("searchbox", SEARCH_BOX)).toHaveValue("");
   });
 
@@ -230,7 +244,7 @@ describe("what the browser remembers", () => {
     cleanup();
     renderBrowser();
 
-    await waitFor(() => expect(namesShown()).toHaveLength(8));
+    await waitFor(() => expect(namesShown()).toHaveLength(7));
     expect(screen.getByRole("combobox", CLASS_PICKER)).toHaveValue("");
   });
 });
@@ -238,7 +252,7 @@ describe("what the browser remembers", () => {
 describe("working the controls from the keyboard", () => {
   it("reaches every one of them by tabbing, in the order they are read", async () => {
     const user = renderBrowser();
-    // In a Class View, where all six are live.
+    // In a Class View, where all seven are live.
     await user.selectOptions(screen.getByRole("combobox", CLASS_PICKER), "soldier");
     (document.activeElement as HTMLElement | null)?.blur();
     const inTabOrder = [
@@ -248,6 +262,7 @@ describe("working the controls from the keyboard", () => {
       screen.getByRole("combobox", SORT_PICKER),
       screen.getByRole("checkbox", HIDE_ALL_CLASS),
       screen.getByRole("checkbox", HIDE_UNPRICED),
+      screen.getByRole("checkbox", HIDE_EVENT_ONLY),
     ];
     for (const control of inTabOrder) {
       await user.tab();

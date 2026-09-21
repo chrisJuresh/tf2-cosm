@@ -46,6 +46,10 @@ A Cosmetic the game itself hands out: it drops, or a crate or case can contain i
 A Cosmetic that is not Issued in Play and that a price source prices in Genuine — the Quality Valve stamps on a promotional copy and on nothing else. Its only copies are the ones Valve gave away.
 _Avoid_: promo item (which also covers promos that later dropped)
 
+**Event-Only Cosmetic**:
+A Cosmetic the game only lets a player wear while a particular event is running: Halloween or a full moon, Christmas, or the game's birthday. It is a Cosmetic like any other and is priced and catalogued like one; the catalogue records which event it is bound to, and the site hides the lot by default.
+_Avoid_: Halloween item (most of those are wearable year round), seasonal
+
 **Reference Variant**:
 The single Quality and craftability combination whose price stands for the Cosmetic in the catalogue. Unique craftable if it exists, else Unique non-craftable, else the Native Quality. A Blanket Price is not offered to this rule for a Promo-Only Cosmetic (ADR-0004).
 

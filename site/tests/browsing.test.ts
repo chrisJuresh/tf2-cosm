@@ -9,20 +9,20 @@ import { fixtureCosmetics } from "./fixtures.ts";
 
 import { DEFAULT_CONTROLS, visibleCosmetics } from "@/browsing/controls";
 
-/** The fixture's five, by slug, for the shorthand the assertions read in. */
+/** The fixture's eight, by slug, for the shorthand the assertions read in. */
 function slugsOf(overrides: Partial<typeof DEFAULT_CONTROLS> = {}): string[] {
   return visibleCosmetics(fixtureCosmetics(), { ...DEFAULT_CONTROLS, ...overrides }).map((c) => c.slug);
 }
 
 describe("with no controls touched", () => {
-  it("shows every Cosmetic, most valuable first", () => {
+  it("shows every Cosmetic but the Event-Only one, most valuable first", () => {
     expect(slugsOf()).toEqual([
       "team-captain",
       "tin-pot",
       "baronial-badge",
       "bolt-boy",
-      // Two Blanket Prices at the same figure; the name settles the tie.
-      "crocodile-smile",
+      // The Crocodile Smile sits between these two on value, tied with the
+      // Stove Pipe on a Blanket Price; it is Event-Only, so it is not here.
       "scotsman-s-stove-pipe",
       "ghastly-gibus",
       "dead-of-night",
@@ -77,7 +77,7 @@ describe("the slot filter", () => {
   it("keeps only head Cosmetics", () => {
     expect(slugsOf({ slot: "head" })).not.toContain("dead-of-night");
     expect(slugsOf({ slot: "head" })).not.toContain("baronial-badge");
-    expect(slugsOf({ slot: "head" })).toHaveLength(6);
+    expect(slugsOf({ slot: "head" })).toHaveLength(5);
   });
 
   it("keeps only miscs", () => {
@@ -97,7 +97,33 @@ describe("hiding Unpriced Cosmetics", () => {
   it("keeps a Cosmetic whose snapshot carried no prices at all, which is not the same thing", () => {
     const priceless = fixtureCosmetics().map((cosmetic) => ({ ...cosmetic, price: null }));
     const visible = visibleCosmetics(priceless, { ...DEFAULT_CONTROLS, hideUnpriced: true });
-    expect(visible).toHaveLength(8);
+    expect(visible).toHaveLength(7);
+  });
+});
+
+describe("hiding Event-Only Cosmetics", () => {
+  it("is where a viewer starts, because the game will not draw them today", () => {
+    expect(DEFAULT_CONTROLS.hideEventOnly).toBe(true);
+    expect(slugsOf()).not.toContain("crocodile-smile");
+  });
+
+  it("shows them once the toggle is cleared, in their place in the order", () => {
+    expect(slugsOf({ hideEventOnly: false })).toEqual([
+      "team-captain",
+      "tin-pot",
+      "baronial-badge",
+      "bolt-boy",
+      // Two Blanket Prices at the same figure; the name settles the tie.
+      "crocodile-smile",
+      "scotsman-s-stove-pipe",
+      "ghastly-gibus",
+      "dead-of-night",
+    ]);
+  });
+
+  it("narrows a Class View like every other filter", () => {
+    expect(slugsOf({ classView: "sniper" })).not.toContain("crocodile-smile");
+    expect(slugsOf({ classView: "sniper", hideEventOnly: false })).toContain("crocodile-smile");
   });
 });
 
@@ -107,9 +133,8 @@ describe("the sort orders", () => {
   });
 
   it("puts the lowest first the other way round", () => {
-    expect(slugsOf({ sort: "metal-value-low" }).slice(0, 4)).toEqual([
+    expect(slugsOf({ sort: "metal-value-low" }).slice(0, 3)).toEqual([
       "ghastly-gibus",
-      "crocodile-smile",
       "scotsman-s-stove-pipe",
       "bolt-boy",
     ]);
@@ -124,7 +149,6 @@ describe("the sort orders", () => {
     expect(slugsOf({ sort: "name" })).toEqual([
       "baronial-badge",
       "bolt-boy",
-      "crocodile-smile",
       "dead-of-night",
       "ghastly-gibus",
       "scotsman-s-stove-pipe",

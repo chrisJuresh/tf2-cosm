@@ -33,6 +33,7 @@ const CONTROLS = [
   "Sort by",
   "Hide All-Class Cosmetics",
   "Hide Unpriced",
+  "Hide Event-Only",
 ] as const;
 
 test("the grid has no automatically detectable accessibility faults", async ({ catalogue: { page, faults } }) => {
