@@ -199,9 +199,15 @@ fifty times as long and saves nothing.
   Cosmetic are swapped separately**: an item with no BLU skin — the Killer Exclusive, the
   Heavy's Team Captain — renders RED on a BLU class, and the manifest entry says
   `team_fallback: true`.
-- Framing comes from the item's equip regions: head regions get the bust, everything else
-  (and anything unrecognised) gets the full body, which is fixed to the ground so every
-  class is at the same scale.
+- Framing comes from the Cosmetic itself: the render step measures the bounding box of the
+  item's visible meshes once it is bonemerged, and `render/scene.py` frames on that box plus
+  a little padding. A shoulder parrot gets the shoulder, trousers get the legs, a top cuts
+  the legs off below it, a coat that reaches the knees gets the whole body. Both of the
+  camera's axes have to fit, because the render is square, and the span is held between
+  `MIN_SPAN` (a pin is not magnified until it is unreadable) and a whole body. Where the
+  minimum leaves room the Cosmetic does not fill, that room is given to the wearer below it
+  rather than to empty air above. The old bust-or-body rule from the equip regions survives
+  only as the fallback for an item that imports with nothing visible.
 - EEVEE, Standard view transform, transparent film, the fixed three-light rig, 1024×1024.
   About 0.4 s a frame here once the class is imported; a class import is about 1 s.
 

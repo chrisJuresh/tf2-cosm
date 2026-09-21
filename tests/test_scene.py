@@ -12,15 +12,21 @@ import pytest
 from render.geometry import IDENTITY, Vec3, transform_point, translation_of
 from render.scene import (
     BODY,
+    BODY_FLOOR,
+    BODY_SPAN,
     BUST,
     LIGHT_RIG,
+    MIN_SPAN,
+    Bounds,
     alignment,
     bodygroup_named,
     camera_placement,
+    frame_for_bounds,
     frame_target,
     framing_for,
     light_placement,
     skin_plan,
+    view_axes,
     visible_bodygroups,
 )
 
@@ -87,6 +93,111 @@ class TestFrameTarget:
     def test_an_unknown_framing_is_refused(self):
         with pytest.raises(ValueError, match="unknown framing"):
             frame_target(self.head, self.pelvis, "portrait")
+
+
+def box(low, high) -> Bounds:
+    return Bounds(Vec3(*low), Vec3(*high))
+
+
+#: Roughly where each of these sits on a Class standing with its feet at y=0.
+PARROT = box((0.10, 1.34, -0.04), (0.26, 1.50, 0.10))
+HAT = box((-0.12, 1.62, -0.12), (0.12, 1.82, 0.12))
+TOP = box((-0.20, 0.92, -0.14), (0.20, 1.48, 0.14))
+TROUSERS = box((-0.18, 0.02, -0.12), (0.18, 0.96, 0.12))
+WHOLE_BODY = box((-0.30, 0.00, -0.20), (0.30, 1.80, 0.20))
+
+
+class TestBounds:
+    def test_a_box_holds_every_point_it_was_built_around(self):
+        bounds = Bounds.around([Vec3(0.0, 1.0, -0.5), Vec3(0.4, 1.6, 0.2)])
+
+        assert bounds.low == Vec3(0.0, 1.0, -0.5)
+        assert bounds.high == Vec3(0.4, 1.6, 0.2)
+        assert bounds.centre == Vec3(0.2, 1.3, -0.15)
+
+    def test_no_points_is_no_box(self):
+        assert Bounds.around([]) is None
+
+    def test_extent_along_an_axis_is_the_box_measured_in_that_direction(self):
+        bounds = box((-1.0, -2.0, -3.0), (1.0, 2.0, 3.0))
+
+        assert bounds.extent_along(Vec3(1.0, 0.0, 0.0)) == pytest.approx(2.0)
+        assert bounds.extent_along(Vec3(0.0, 1.0, 0.0)) == pytest.approx(4.0)
+        assert bounds.extent_along(Vec3(0.0, 0.0, -1.0)) == pytest.approx(6.0)
+
+
+class TestViewAxes:
+    def test_the_axes_are_the_camera_s_own_right_and_up(self):
+        right, up = view_axes()
+        centre = Vec3(0.0, 1.5, 0.0)
+
+        placement = camera_placement(centre, 1.0)
+        camera_right = Vec3(*(placement[row][0] for row in range(3)))
+        camera_up = Vec3(*(placement[row][1] for row in range(3)))
+
+        assert right == pytest.approx(tuple(camera_right), abs=1e-9)
+        assert up == pytest.approx(tuple(camera_up), abs=1e-9)
+
+
+class TestFrameForBounds:
+    """What the picture shows is the Cosmetic's own extent, with a little of the Class round it."""
+
+    def test_the_cosmetic_fits_with_room_to_spare_on_both_axes(self):
+        right, up = view_axes()
+
+        _, span = frame_for_bounds(WHOLE_BODY)
+
+        assert span > WHOLE_BODY.extent_along(right)
+        assert span > WHOLE_BODY.extent_along(up)
+
+    def test_a_parrot_is_framed_on_the_parrot_and_not_on_the_class(self):
+        centre, span = frame_for_bounds(PARROT)
+
+        assert span == pytest.approx(MIN_SPAN)
+        assert centre.y - span / 2 < PARROT.low.y and PARROT.high.y < centre.y + span / 2
+        assert centre.y - span / 2 > 1.0  # the Class's legs and feet are nowhere in it
+
+    def test_a_smaller_cosmetic_is_framed_tighter_than_a_larger_one(self):
+        assert frame_for_bounds(HAT)[1] < frame_for_bounds(TOP)[1] < frame_for_bounds(WHOLE_BODY)[1]
+
+    def test_a_top_cuts_the_legs_off_below_it(self):
+        centre, span = frame_for_bounds(TOP)
+
+        assert centre.y - span / 2 > 0.0
+
+    def test_trousers_show_the_legs_and_leave_the_head_out(self):
+        centre, span = frame_for_bounds(TROUSERS)
+
+        assert centre.y + span / 2 < 1.5
+
+    def test_nothing_is_framed_wider_than_a_whole_body(self):
+        _, span = frame_for_bounds(box((-2.0, 0.0, -2.0), (2.0, 4.0, 2.0)))
+
+        assert span == pytest.approx(BODY_SPAN)
+
+    def test_a_frame_never_digs_below_the_ground_the_class_stands_on(self):
+        centre, span = frame_for_bounds(TROUSERS)
+
+        assert centre.y - span / 2 >= BODY_FLOOR - 1e-9
+
+    def test_the_room_a_small_cosmetic_does_not_fill_goes_to_the_wearer_below_it(self):
+        """A hat with a face under it reads; a hat with empty air over it does not."""
+        centre, span = frame_for_bounds(HAT)
+
+        above = centre.y + span / 2 - HAT.high.y
+        below = HAT.low.y - (centre.y - span / 2)
+        assert 0.0 < above < below
+
+    def test_a_cosmetic_that_fills_its_frame_is_not_dropped_in_it(self):
+        centre, _ = frame_for_bounds(TROUSERS)
+        undropped, _ = frame_for_bounds(TROUSERS, min_span=0.0)
+
+        assert centre.y == pytest.approx(undropped.y)
+
+    def test_a_pin_is_not_magnified_past_what_reads_as_a_cosmetic(self):
+        _, span = frame_for_bounds(box((0.0, 1.40, 0.0), (0.02, 1.42, 0.02)))
+
+        assert span == pytest.approx(MIN_SPAN)
 
 
 class TestCamera:
