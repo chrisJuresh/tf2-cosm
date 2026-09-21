@@ -1,6 +1,6 @@
 /**
  * The browsing controls as a viewer meets them: the Class View picker, the
- * toggles, the slot filter, the sort and the search, what the list does as each
+ * toggles, the slot filter, the sort and the search, what the grid does as each
  * is worked, and what the browser remembers of them next visit.
  *
  * The rules themselves are covered in `browsing.test.ts`, driven directly. What
@@ -23,8 +23,8 @@ afterEach(() => {
 
 function renderBrowser() {
   render(
-    // What these controls do is the same whether a row has a picture or an icon;
-    // the Class View deciding which Class a picture shows is in
+    // What these controls do is the same whether a card has a picture or an
+    // icon; the Class View deciding which Class a picture shows is in
     // `worn-renders.test.tsx`.
     <CatalogueBrowser
       cosmetics={fixtureCosmetics()}
@@ -36,13 +36,12 @@ function renderBrowser() {
   return userEvent.setup();
 }
 
-/** The Cosmetic names on screen, in the order they are listed. */
+/** The Cosmetic names on screen, in the order the grid draws them. */
 function namesShown(): string[] {
-  const [, body] = screen.getAllByRole("rowgroup");
-  if (body === undefined) throw new Error("the list should have a header and a body");
-  return within(body)
-    .queryAllByRole("row")
-    .map((row) => within(row).getAllByRole("cell")[1]?.textContent?.trim() ?? "");
+  return screen
+    .queryAllByRole("listitem")
+    .filter((card) => card.dataset["slug"] !== undefined)
+    .map((card) => within(card).getByRole("button").textContent?.trim() ?? "");
 }
 
 const CLASS_PICKER = { name: "Class" };
@@ -130,14 +129,14 @@ describe("the hide Unpriced toggle", () => {
   });
 });
 
-describe("an Unpriced row", () => {
+describe("an Unpriced card", () => {
   it("says why there is no price rather than leaving a blank", () => {
     renderBrowser();
-    const row = screen.getAllByRole("row").find((candidate) => candidate.dataset["slug"] === "dead-of-night");
-    expect(row).toBeDefined();
-    expect(row!.textContent).toContain("Unpriced");
+    const card = screen.getAllByRole("listitem").find((one) => one.dataset["slug"] === "dead-of-night");
+    expect(card).toBeDefined();
+    expect(card!.textContent).toContain("Unpriced");
     // The fixture's Dead of Night is missing from the price source's list.
-    expect(row!.textContent).toContain("not listed");
+    expect(card!.textContent).toContain("not listed");
   });
 });
 

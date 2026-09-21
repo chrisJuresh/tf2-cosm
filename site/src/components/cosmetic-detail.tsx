@@ -68,7 +68,7 @@ export function CosmeticDetail({ cosmetic, keyRate, manifest, gameClass, id }: C
   const teamed = hasBluRender(manifest, cosmetic.slug, gameClass);
 
   return (
-    <div id={id} className="flex flex-col gap-3 px-2 pb-3 sm:flex-row sm:gap-5 sm:px-3 sm:pb-4">
+    <div id={id} className="flex flex-col gap-3 p-3 sm:flex-row sm:gap-5 sm:p-4">
       <div className="flex flex-col items-center gap-2 sm:items-start">
         <WornRender
           cosmetic={cosmetic}

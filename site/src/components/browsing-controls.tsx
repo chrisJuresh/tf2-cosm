@@ -33,7 +33,7 @@ function Field({
 }: {
   label: string;
   htmlFor: string;
-  className?: string;
+  className?: string | undefined;
   children: React.ReactNode;
 }) {
   return (
@@ -63,6 +63,7 @@ function NullablePicker<T extends string>({
   options,
   labels,
   value,
+  className,
   onPick,
 }: {
   id: string;
@@ -72,10 +73,11 @@ function NullablePicker<T extends string>({
   options: readonly T[];
   labels: Record<T, string>;
   value: T | null;
+  className?: string | undefined;
   onPick: (value: T | null) => void;
 }) {
   return (
-    <Field label={label} htmlFor={id}>
+    <Field label={label} htmlFor={id} className={className}>
       <select
         id={id}
         value={value ?? ""}
@@ -137,11 +139,19 @@ export function BrowsingControlsBar({ controls, onChange, shown, total }: Browsi
   const count = shown === total ? `${total.toLocaleString("en-US")} Cosmetics` : `${shown.toLocaleString("en-US")} of ${total.toLocaleString("en-US")} Cosmetics`;
 
   return (
-    <section aria-label="Browsing controls" className="flex flex-col gap-3 pb-3">
+    // One line wherever there is room for one. Every line the bar takes is a row
+    // of Cosmetics the grid below it does not get, so the controls, the toggles
+    // and the count share a line and wrap onto a second only on a narrow screen.
+    <section
+      aria-label="Browsing controls"
+      // `shrink-0` for the same reason the header has it: the grid below takes
+      // every pixel it is offered, and a squeezed bar spills over the cards.
+      className="flex shrink-0 flex-wrap items-end gap-x-3 gap-y-2 pt-1 pb-2"
+    >
       {/* The search is first because it is the control most often wanted, and a
-          phone shows it across the full width before the pickers wrap under it. */}
-      <div className="grid grid-cols-2 gap-x-3 gap-y-2 sm:grid-cols-[minmax(0,1fr)_8rem_8rem_12rem]">
-        <Field label="Search by name" htmlFor="search" className="col-span-2 sm:col-span-1">
+          phone gives it the whole line before the pickers wrap under it. */}
+      <div className="flex w-full flex-wrap items-end gap-x-3 gap-y-2 sm:w-auto sm:flex-1 sm:flex-nowrap">
+        <Field label="Search by name" htmlFor="search" className="w-full sm:w-auto sm:min-w-40 sm:flex-1">
           <input
             id="search"
             type="search"
@@ -159,6 +169,7 @@ export function BrowsingControlsBar({ controls, onChange, shown, total }: Browsi
           everything="Every Class"
           options={CLASSES}
           labels={CLASS_LABELS}
+          className="flex-1 basis-28 sm:flex-none sm:basis-auto sm:w-32"
           value={controls.classView}
           onPick={(classView) => onChange({ classView })}
         />
@@ -169,11 +180,12 @@ export function BrowsingControlsBar({ controls, onChange, shown, total }: Browsi
           everything="Head and misc"
           options={COSMETIC_SLOTS}
           labels={SLOT_LABELS}
+          className="flex-1 basis-28 sm:flex-none sm:basis-auto sm:w-32"
           value={controls.slot}
           onPick={(slot) => onChange({ slot })}
         />
 
-        <Field label="Sort by" htmlFor="sort">
+        <Field label="Sort by" htmlFor="sort" className="flex-1 basis-40 sm:flex-none sm:basis-auto sm:w-48">
           <select
             id="sort"
             value={controls.sort}
@@ -189,7 +201,9 @@ export function BrowsingControlsBar({ controls, onChange, shown, total }: Browsi
         </Field>
       </div>
 
-      <div className="flex flex-wrap items-center gap-x-5 gap-y-1">
+      {/* The toggles sit on the controls' own line, level with the boxes rather
+          than with the labels above them. */}
+      <div className="flex w-full flex-wrap items-center gap-x-5 gap-y-1 sm:w-auto sm:pb-1">
         {/* The toggle focuses a Class View, so outside one there is nothing for
             it to do; it is disabled rather than left to tick and change nothing. */}
         <Toggle

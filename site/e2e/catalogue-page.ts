@@ -85,23 +85,23 @@ export function expectClean(faults: PageFaults): void {
   expect(faults.offSiteRequests).toEqual([]);
 }
 
-/** Every Cosmetic row currently drawn, by its slug — the hook ADR-0003 put there. */
-export function rows(page: Page) {
-  return page.locator('[role="row"][data-slug]');
+/** Every Cosmetic card currently drawn, by its slug — the hook ADR-0003 put there. */
+export function cards(page: Page) {
+  return page.locator("[data-slug]");
 }
 
-export function row(page: Page, slug: string) {
-  return page.locator(`[role="row"][data-slug="${slug}"]`);
+export function card(page: Page, slug: string) {
+  return page.locator(`[data-slug="${slug}"]`);
 }
 
-/** The slugs on the page, in the order the list draws them. */
+/** The slugs on the page, in the order the grid draws them. */
 export async function slugs(page: Page): Promise<string[]> {
-  return rows(page).evaluateAll((elements) => elements.map((element) => element.getAttribute("data-slug") ?? ""));
+  return cards(page).evaluateAll((elements) => elements.map((element) => element.getAttribute("data-slug") ?? ""));
 }
 
-/** Open a row from the keyboard's point of view — by pressing its toggle. */
-export async function openRow(page: Page, slug: string) {
-  await row(page, slug).getByRole("button").click();
+/** Open a card from the keyboard's point of view — by pressing its toggle. */
+export async function openCard(page: Page, slug: string) {
+  await card(page, slug).getByRole("button").click();
   const detail = page.locator(`#cosmetic-detail-${slug}`);
   await expect(detail).toBeVisible();
   return detail;

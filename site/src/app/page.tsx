@@ -7,14 +7,8 @@
  */
 import { loadCatalogue } from "@/catalogue/load";
 import { CatalogueView } from "@/components/catalogue-view";
-import { SiteFooter } from "@/components/site-footer";
 import { loadRenderManifest } from "@/renders/load";
 
 export default function CataloguePage() {
-  return (
-    <>
-      <CatalogueView catalogue={loadCatalogue()} manifest={loadRenderManifest()} />
-      <SiteFooter />
-    </>
-  );
+  return <CatalogueView catalogue={loadCatalogue()} manifest={loadRenderManifest()} />;
 }

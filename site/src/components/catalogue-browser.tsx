@@ -1,11 +1,11 @@
 "use client";
 
 /**
- * The catalogue, browsed: the controls and the list they narrow, and the one
+ * The catalogue, browsed: the controls and the grid they narrow, and the one
  * place the two meet.
  *
  * The whole catalogue arrives once as a prop and never changes. What a viewer
- * picks lives here — and only here — so the list below stays a component that
+ * picks lives here — and only here — so the grid below stays a component that
  * draws the Cosmetics it is handed and knows nothing about why those are the
  * ones it got.
  */
@@ -15,7 +15,7 @@ import { useMemo } from "react";
 import { visibleCosmetics } from "@/browsing/controls";
 import { useRememberedControls } from "@/browser/remembered-controls";
 import { BrowsingControlsBar } from "@/components/browsing-controls";
-import { CosmeticList } from "@/components/cosmetic-list";
+import { CosmeticGrid } from "@/components/cosmetic-grid";
 import type { DollarBasis } from "@/prices/format";
 import type { RenderManifest } from "@/renders/manifest";
 
@@ -43,10 +43,10 @@ export function CatalogueBrowser({ cosmetics, manifest, keyRate, basis }: Catalo
         shown={visible.length}
         total={cosmetics.length}
       />
-      {/* The Class View reaches the list as well as the filter: it is what
+      {/* The Class View reaches the grid as well as the filter: it is what
           decides which Class each picture shows, so an All-Class Cosmetic in a
           Heavy's view is a Heavy wearing it. */}
-      <CosmeticList
+      <CosmeticGrid
         cosmetics={visible}
         manifest={manifest}
         classView={controls.classView}

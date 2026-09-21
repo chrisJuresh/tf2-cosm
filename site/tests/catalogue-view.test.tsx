@@ -1,7 +1,8 @@
 /**
- * What a viewer sees above the list and what changes when they change their mind
- * about what a dollar means: the Dollar Basis switch, the header's account of the
- * active basis, the Key Rate and how fresh the snapshot is.
+ * What a viewer sees around the grid and what changes when they change their
+ * mind about what a dollar means: the Dollar Basis switch, the header's account
+ * of the active basis and the Key Rate, and the footer's account of how fresh
+ * the snapshot and that basis's own rate are.
  */
 import type { Catalogue } from "@tf2-cosm/data/catalogue";
 import { fireEvent, render, screen, within } from "@testing-library/react";
@@ -23,16 +24,21 @@ function renderView(catalogue: Catalogue = fixtureCatalogue()) {
  * break on a change that has nothing to do with it.
  */
 function dollarFigures(): Record<string, string> {
-  const [, body] = screen.getAllByRole("rowgroup");
-  if (body === undefined) throw new Error("the list should have a header and a body");
   return Object.fromEntries(
-    within(body)
-      .getAllByRole("row")
-      .map((row) => {
-        const cells = within(row).getAllByRole("cell");
-        return [cells[1]?.textContent?.trim() ?? "", cells[4]?.textContent?.trim() ?? ""];
-      }),
+    screen
+      .getAllByRole("listitem")
+      .filter((card) => card.dataset["slug"] !== undefined)
+      .map((card) => [within(card).getByRole("button").textContent?.trim() ?? "", figureOn(card, "Dollars")]),
   );
+}
+
+/** One named figure on a card, found by the name a screen reader hears for it. */
+function figureOn(card: HTMLElement, term: string): string {
+  const terms = within(card).getAllByRole("term");
+  const values = within(card).getAllByRole("definition");
+  const at = terms.findIndex((one) => one.textContent?.trim() === term);
+  if (at === -1) throw new Error(`no ${term} on this card`);
+  return values[at]?.textContent?.trim() ?? "";
 }
 
 function chooseBasisNamed(name: RegExp): void {
@@ -108,17 +114,12 @@ describe("switching the Dollar Basis", () => {
   it("leaves the Trader Notation and the Metal Value alone, which no basis touches", () => {
     renderView();
     chooseBasisNamed(/Mann Co\. Store/);
-    const [, body] = screen.getAllByRole("rowgroup");
-    const teamCaptain = within(body!)
-      .getAllByRole("row")
-      .find((row) => row.getAttribute("data-slug") === "team-captain");
-    expect(within(teamCaptain!).getAllByRole("cell").map((cell) => cell.textContent?.trim())).toEqual([
-      "",
-      "Team Captain",
-      "2 keys, 19.66 ref",
-      "177 ref",
-      "$5.60",
-    ]);
+    const teamCaptain = screen
+      .getAllByRole("listitem")
+      .find((card) => card.getAttribute("data-slug") === "team-captain")!;
+    expect(figureOn(teamCaptain, "Trader Notation")).toBe("2 keys, 19.66 ref");
+    expect(figureOn(teamCaptain, "Metal Value")).toBe("177 ref");
+    expect(figureOn(teamCaptain, "Dollars")).toBe("$5.60");
   });
 
   it("says in the header which basis is active and what a Key costs under it", () => {
@@ -178,11 +179,18 @@ describe("the header", () => {
     expect(header).toHaveTextContent(/a Key is 78\.66 ref/);
   });
 
+  it("leaves the snapshot's own age to the footer, where the rest of the provenance is", () => {
+    renderView();
+    expect(screen.getByRole("banner")).not.toHaveTextContent(/Snapshot taken/);
+  });
+});
+
+describe("the provenance in the footer", () => {
   it("says when the snapshot was taken, in a form a machine can read too", () => {
     renderView();
-    const header = screen.getByRole("banner");
-    expect(header).toHaveTextContent(/Snapshot taken 20 September 2026 at 12:00 UTC/);
-    expect(within(header).getAllByRole("time")[0]).toHaveAttribute("dateTime", "2026-09-20T12:00:00.000Z");
+    const footer = screen.getByRole("contentinfo");
+    expect(footer).toHaveTextContent(/Snapshot taken 20 September 2026 at 12:00 UTC/);
+    expect(within(footer).getAllByRole("time")[0]).toHaveAttribute("dateTime", "2026-09-20T12:00:00.000Z");
   });
 
   it("says when the active basis's own rate was quoted, which can be weeks older", () => {
@@ -191,15 +199,15 @@ describe("the header", () => {
     // twelve days fresher than it is.
     renderView();
     chooseBasisNamed(/backpack\.tf estimate/);
-    const header = screen.getByRole("banner");
-    expect(header).toHaveTextContent(/backpack\.tf estimate rate quoted 08 September 2026 at 20:40 UTC/);
-    expect(within(header).getAllByRole("time")[1]).toHaveAttribute("dateTime", "2026-09-08T20:40:00.000Z");
+    const footer = screen.getByRole("contentinfo");
+    expect(footer).toHaveTextContent(/backpack\.tf estimate rate quoted 08 September 2026 at 20:40 UTC/);
+    expect(within(footer).getAllByRole("time")[1]).toHaveAttribute("dateTime", "2026-09-08T20:40:00.000Z");
   });
 
   it("claims no such date for the Mann Co. Store, whose constant has none", () => {
     renderView();
     chooseBasisNamed(/Mann Co\. Store/);
-    expect(screen.getByRole("banner")).not.toHaveTextContent(/rate quoted/);
+    expect(screen.getByRole("contentinfo")).not.toHaveTextContent(/rate quoted/);
   });
 });
 
