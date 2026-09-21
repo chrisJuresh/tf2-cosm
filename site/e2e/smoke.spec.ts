@@ -164,13 +164,14 @@ test("the open Cosmetic takes the Class out of the picture and puts it back", as
   const view = detail.getByRole("group", { name: "View" });
 
   await view.getByRole("button", { name: "On its own" }).click();
-  await expect(picture).toHaveAttribute("src", /soldier-red-0-alone@512\.webp$/);
+  // The version the URL is stamped with follows the file name — see `renderVersion`.
+  await expect(picture).toHaveAttribute("src", /soldier-red-0-alone@512\.webp\?v=\d+$/);
   // The picture really loads: an Item Render is a file of its own, published
   // separately, and a broken one falls back to the icon without a trace.
   expect(await picture.evaluate((image) => (image as HTMLImageElement).naturalWidth)).toBeGreaterThan(0);
 
   await view.getByRole("button", { name: "On the Class" }).click();
-  await expect(picture).toHaveAttribute("src", /soldier-red-0@512\.webp$/);
+  await expect(picture).toHaveAttribute("src", /soldier-red-0@512\.webp\?v=\d+$/);
 
   expectClean(faults);
 });
@@ -183,14 +184,14 @@ test("the open Cosmetic shows the Worn Render, its Styles and both Teams", async
   // The picture is a render served by the site, not the Backpack Icon: the
   // larger derivative, which is what the modal asks for.
   const picture = detail.locator("img");
-  await expect(picture).toHaveAttribute("src", /\/renders\/web\/tin-pot\/soldier-red-0@512\.webp$/);
+  await expect(picture).toHaveAttribute("src", /\/renders\/web\/tin-pot\/soldier-red-0@512\.webp\?v=\d+$/);
 
   // Both controls, because this Cosmetic has something to offer each of them.
   await detail.getByRole("group", { name: "Style" }).getByRole("button", { name: "Open" }).click();
-  await expect(picture).toHaveAttribute("src", /soldier-red-1@512\.webp$/);
+  await expect(picture).toHaveAttribute("src", /soldier-red-1@512\.webp\?v=\d+$/);
 
   await detail.getByRole("group", { name: "Team" }).getByRole("button", { name: "BLU" }).click();
-  await expect(picture).toHaveAttribute("src", /soldier-blu-0@512\.webp$/);
+  await expect(picture).toHaveAttribute("src", /soldier-blu-0@512\.webp\?v=\d+$/);
 
   // The context the figure needed, which is why the Cosmetic opens at all.
   await expect(detail).toContainText("Price Spread");

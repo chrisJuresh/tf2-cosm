@@ -7,7 +7,7 @@ import { describe, expect, it } from "vitest";
 
 import { fixtureManifest } from "./fixtures.ts";
 
-import { joinRenderUrl } from "@/renders/base-url";
+import { joinRenderUrl, renderVersion } from "@/renders/base-url";
 import { assertValidRenderManifest, EMPTY_MANIFEST } from "@/renders/manifest";
 import { displayedClass, hasBluRender, hasItemRender, imageAt, pickRender } from "@/renders/select";
 
@@ -233,6 +233,29 @@ describe("where the images are served from", () => {
     expect(joinRenderUrl("https://images.example.com/renders/", "/web/a.webp")).toBe(
       "https://images.example.com/renders/web/a.webp",
     );
+  });
+
+  it("stamps a URL with the render's version, so a re-render is not the URL a CDN is holding", () => {
+    expect(joinRenderUrl("/renders", "web/a.webp", "1758369600")).toBe("/renders/web/a.webp?v=1758369600");
+  });
+
+  it("leaves a URL unstamped when there is no version, rather than inventing one", () => {
+    expect(joinRenderUrl("/renders", "web/a.webp")).toBe("/renders/web/a.webp");
+    expect(joinRenderUrl("/renders", "web/a.webp", null)).toBe("/renders/web/a.webp");
+  });
+
+  it("turns the moment a render was made into a version, and two moments into two versions", () => {
+    const made = renderVersion("2026-09-20T12:00:00+00:00");
+    expect(made).toBe(String(Date.parse("2026-09-20T12:00:00+00:00") / 1000));
+    expect(renderVersion("2026-09-21T12:00:00+00:00")).not.toBe(made);
+  });
+
+  it("reads the same moment written two ways as one version, because it is one render", () => {
+    expect(renderVersion("2026-09-20T12:00:00+00:00")).toBe(renderVersion("2026-09-20T13:00:00+01:00"));
+  });
+
+  it("has no version for a timestamp it cannot read, rather than a URL that is nonsense", () => {
+    expect(renderVersion("whenever")).toBeNull();
   });
 });
 
