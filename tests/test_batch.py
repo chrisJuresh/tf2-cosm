@@ -522,29 +522,47 @@ def test_each_worker_gets_a_texture_cache_of_its_own(workspace: Path):
 
 
 def test_ctrl_c_stops_a_parallel_run_rather_than_draining_every_batch(workspace: Path, capsys):
-    """The pool's own shutdown waits for what is queued, so the stop flag has to beat it."""
+    """The pool's own shutdown waits for what is queued, so the stop flag has to beat it.
+
+    Timing is pinned rather than hoped for. The fake Blender holds every worker at a barrier
+    until all three are in flight, so the run is at its widest when the ctrl-c lands; the two
+    that did not raise then wait on the run's own stop signal before returning, so neither
+    can reach its second batch until the run has already given up on the rest. What is
+    launched is then exactly one batch per worker — no more scheduling in it.
+    """
+    workers = 3
     jobs = write_jobs(workspace, *[dict(TEAM_CAPTAIN, slug=f"hat-{n}") for n in range(24)])
     launched = []
     lock = threading.Lock()
+    in_flight = threading.Barrier(workers, timeout=30)
+    stopping = threading.Event()
+    signalled = []
 
     def interrupted(command: list[str]) -> int:
         with lock:
             launched.append(command)
             first = len(launched) == 1
+        in_flight.wait()
         if first:
             raise KeyboardInterrupt
+        # Waited on rather than asserted here: an assertion inside a worker thread is
+        # swallowed by the interrupt the run is already unwinding, so it is carried back
+        # out and checked below.
+        signalled.append(stopping.wait(timeout=30))
         return 0
 
     code = runner.run(
-        args_for(workspace, jobs, batch_size=2, workers=3), launch=interrupted
+        args_for(workspace, jobs, batch_size=2, workers=workers),
+        launch=interrupted,
+        stopping=stopping,
     )
 
     assert code == 130
     assert "run it again" in capsys.readouterr().out
-    # 24 batches over 3 workers. Stopping promptly means each worker gives up at its next
-    # batch, so only what was already in flight is launched — not the eight apiece they were
-    # each holding. A bound of one more than the worker count is generous about the race.
-    assert len(launched) <= 4, (
+    assert signalled == [True] * (workers - 1), "the run never raised its stop signal"
+    # 24 batches over 3 workers, eight apiece. Stopping promptly means each worker gives up
+    # at its next batch, so only the one it already had in flight was ever launched.
+    assert len(launched) == workers, (
         f"ctrl-c drained {len(launched)} batches instead of stopping the run"
     )
 
