@@ -32,40 +32,59 @@ describe("with no controls touched", () => {
 
 describe("the Class View", () => {
   it("includes the Class's own Class-Exclusive Cosmetics", () => {
-    expect(slugsOf({ classView: "scout" })).toContain("bolt-boy");
-    expect(slugsOf({ classView: "soldier" })).toContain("tin-pot");
+    expect(slugsOf({ classFilter: "scout" })).toContain("bolt-boy");
+    expect(slugsOf({ classFilter: "soldier" })).toContain("tin-pot");
   });
 
   it("includes a Multi-Class Cosmetic the Class can wear, and excludes one it cannot", () => {
     // The Team Captain is Soldier and Demoman.
-    expect(slugsOf({ classView: "soldier" })).toContain("team-captain");
-    expect(slugsOf({ classView: "demoman" })).toContain("team-captain");
-    expect(slugsOf({ classView: "scout" })).not.toContain("team-captain");
+    expect(slugsOf({ classFilter: "soldier" })).toContain("team-captain");
+    expect(slugsOf({ classFilter: "demoman" })).toContain("team-captain");
+    expect(slugsOf({ classFilter: "scout" })).not.toContain("team-captain");
   });
 
   it("includes every All-Class Cosmetic", () => {
     for (const className of ["scout", "soldier", "spy"] as const) {
-      expect(slugsOf({ classView: className })).toContain("ghastly-gibus");
+      expect(slugsOf({ classFilter: className })).toContain("ghastly-gibus");
     }
   });
 
   it("excludes another Class's Class-Exclusive Cosmetics", () => {
-    expect(slugsOf({ classView: "soldier" })).not.toContain("bolt-boy");
-    expect(slugsOf({ classView: "soldier" })).not.toContain("dead-of-night");
+    expect(slugsOf({ classFilter: "soldier" })).not.toContain("bolt-boy");
+    expect(slugsOf({ classFilter: "soldier" })).not.toContain("dead-of-night");
   });
 
   it("is exactly those three groups and nothing else", () => {
-    expect(slugsOf({ classView: "soldier" }).toSorted()).toEqual(["ghastly-gibus", "team-captain", "tin-pot"]);
+    expect(slugsOf({ classFilter: "soldier" }).toSorted()).toEqual(["ghastly-gibus", "team-captain", "tin-pot"]);
+  });
+});
+
+describe("picking a kind instead of a Class", () => {
+  it("keeps only the All-Class Cosmetics", () => {
+    expect(slugsOf({ classFilter: "all-class" })).toEqual(["ghastly-gibus"]);
+  });
+
+  it("keeps only the Multi-Class Cosmetics, which are not the All-Class ones", () => {
+    expect(slugsOf({ classFilter: "multi-class" })).toEqual(["team-captain"]);
+  });
+
+  it("is not a Class View, so the All-Class toggle does not reach it", () => {
+    expect(slugsOf({ classFilter: "all-class", hideAllClass: true })).toEqual(["ghastly-gibus"]);
+  });
+
+  it("narrows with the other filters rather than replacing them", () => {
+    expect(slugsOf({ classFilter: "all-class", slot: "misc" })).toEqual([]);
+    expect(slugsOf({ classFilter: "multi-class", search: "captain" })).toEqual(["team-captain"]);
   });
 });
 
 describe("hiding All-Class Cosmetics", () => {
   it("drops them from a Class View", () => {
-    expect(slugsOf({ classView: "soldier", hideAllClass: true })).not.toContain("ghastly-gibus");
+    expect(slugsOf({ classFilter: "soldier", hideAllClass: true })).not.toContain("ghastly-gibus");
   });
 
   it("leaves Multi-Class Cosmetics alone: one two Classes wear is still that Class's", () => {
-    expect(slugsOf({ classView: "soldier", hideAllClass: true }).toSorted()).toEqual(["team-captain", "tin-pot"]);
+    expect(slugsOf({ classFilter: "soldier", hideAllClass: true }).toSorted()).toEqual(["team-captain", "tin-pot"]);
   });
 
   it("does nothing with no Class chosen, where there is no Class View to focus", () => {
@@ -85,7 +104,7 @@ describe("the slot filter", () => {
   });
 
   it("narrows a Class View rather than replacing it", () => {
-    expect(slugsOf({ classView: "spy", slot: "head" })).toEqual(["ghastly-gibus"]);
+    expect(slugsOf({ classFilter: "spy", slot: "head" })).toEqual(["ghastly-gibus"]);
   });
 });
 
@@ -122,8 +141,8 @@ describe("hiding Event-Only Cosmetics", () => {
   });
 
   it("narrows a Class View like every other filter", () => {
-    expect(slugsOf({ classView: "sniper" })).not.toContain("crocodile-smile");
-    expect(slugsOf({ classView: "sniper", hideEventOnly: false })).toContain("crocodile-smile");
+    expect(slugsOf({ classFilter: "sniper" })).not.toContain("crocodile-smile");
+    expect(slugsOf({ classFilter: "sniper", hideEventOnly: false })).toContain("crocodile-smile");
   });
 });
 

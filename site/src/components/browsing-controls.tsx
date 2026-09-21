@@ -12,14 +12,16 @@
  * rules are `@/browsing/controls`, and this file only says which values a viewer
  * can pick.
  */
-import { CLASSES, COSMETIC_SLOTS } from "@tf2-cosm/data/catalogue";
+import { COSMETIC_SLOTS } from "@tf2-cosm/data/catalogue";
 import type { ChangeEvent } from "react";
 
 import {
-  CLASS_LABELS,
+  CLASS_FILTERS,
+  CLASS_FILTER_LABELS,
   SLOT_LABELS,
   SORT_ORDERS,
   SORT_ORDER_LABELS,
+  viewedClass,
   type BrowsingControls,
   type SortOrder,
 } from "@/browsing/controls";
@@ -68,7 +70,7 @@ function NullablePicker<T extends string>({
 }: {
   id: string;
   label: string;
-  /** What the empty option is called — "Every Class", "Head and misc". */
+  /** What the empty option is called — "Every Cosmetic", "Head and misc". */
   everything: string;
   options: readonly T[];
   labels: Record<T, string>;
@@ -168,15 +170,18 @@ export function BrowsingControlsBar({ controls, onChange, shown, total, ownedOff
           />
         </Field>
 
+        {/* The empty option names Cosmetics rather than Classes: "Every Class"
+            read as a property a Cosmetic has — the All-Class Cosmetics, which
+            are now their own option two lines below it. */}
         <NullablePicker
           id="class-view"
           label="Class"
-          everything="Every Class"
-          options={CLASSES}
-          labels={CLASS_LABELS}
+          everything="Every Cosmetic"
+          options={CLASS_FILTERS}
+          labels={CLASS_FILTER_LABELS}
           className="flex-1 basis-28 sm:flex-none sm:basis-auto sm:w-32"
-          value={controls.classView}
-          onPick={(classView) => onChange({ classView })}
+          value={controls.classFilter}
+          onPick={(classFilter) => onChange({ classFilter })}
         />
 
         <NullablePicker
@@ -215,7 +220,7 @@ export function BrowsingControlsBar({ controls, onChange, shown, total, ownedOff
           id="hide-all-class"
           label="Hide All-Class Cosmetics"
           checked={controls.hideAllClass}
-          disabled={controls.classView === null}
+          disabled={viewedClass(controls.classFilter) === null}
           onChange={(checked) => onChange({ hideAllClass: checked })}
         />
         <Toggle

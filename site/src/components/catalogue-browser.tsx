@@ -16,7 +16,7 @@
 import type { Cosmetic, Metal } from "@tf2-cosm/data/catalogue";
 import { useMemo } from "react";
 
-import { visibleCosmetics } from "@/browsing/controls";
+import { viewedClass, visibleCosmetics } from "@/browsing/controls";
 import { useRememberedControls } from "@/browser/remembered-controls";
 import { BrowsingControlsBar } from "@/components/browsing-controls";
 import { CosmeticGrid } from "@/components/cosmetic-grid";
@@ -96,7 +96,7 @@ export function CatalogueBrowser({ cosmetics, manifest, keyRate, basis, snapshot
       <CosmeticGrid
         cosmetics={visible}
         manifest={manifest}
-        classView={controls.classView}
+        classView={viewedClass(controls.classFilter)}
         keyRate={keyRate}
         basis={basis}
         owned={ownedBySlug}

@@ -25,7 +25,7 @@ describe("reading the remembered controls", () => {
   it("gives back the Class, sort, filters and toggles that were written", () => {
     const controls = {
       ...DEFAULT_CONTROLS,
-      classView: "demoman",
+      classFilter: "demoman",
       hideAllClass: true,
       slot: "misc",
       hideUnpriced: true,
@@ -37,7 +37,7 @@ describe("reading the remembered controls", () => {
   });
 
   it("returns to the defaults once the storage is cleared", () => {
-    writeControls(localStorage, { ...DEFAULT_CONTROLS, classView: "medic", hideUnpriced: true });
+    writeControls(localStorage, { ...DEFAULT_CONTROLS, classFilter: "medic", hideUnpriced: true });
     localStorage.clear();
     expect(readControls(localStorage)).toEqual(DEFAULT_CONTROLS);
   });
@@ -46,10 +46,10 @@ describe("reading the remembered controls", () => {
     // The document from an older build carries no such field. Read field by
     // field, an absent one costs its own default and not the rest — and the
     // default is the one a viewer who has never seen the toggle should get.
-    localStorage.setItem(CONTROLS_STORAGE_KEY, JSON.stringify({ classView: "medic", sort: "name" }));
+    localStorage.setItem(CONTROLS_STORAGE_KEY, JSON.stringify({ classFilter: "medic", sort: "name" }));
     expect(readControls(localStorage)).toEqual({
       ...DEFAULT_CONTROLS,
-      classView: "medic",
+      classFilter: "medic",
       sort: "name",
       hideEventOnly: true,
     });
@@ -79,7 +79,7 @@ describe("storage holding something it should not", () => {
     // throw away a good one.
     localStorage.setItem(
       CONTROLS_STORAGE_KEY,
-      JSON.stringify({ classView: "civilian", sort: "price", hideUnpriced: "yes", slot: "head" }),
+      JSON.stringify({ classFilter: "civilian", sort: "price", hideUnpriced: "yes", slot: "head" }),
     );
     expect(readControls(localStorage)).toEqual({ ...DEFAULT_CONTROLS, slot: "head" });
   });

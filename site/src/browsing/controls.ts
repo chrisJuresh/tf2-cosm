@@ -8,7 +8,7 @@
  * rather than the place they live. A control that does not change which
  * Cosmetics are shown, or the order they come in, does not belong in this file.
  */
-import type { ClassName, Cosmetic, CosmeticSlot } from "@tf2-cosm/data/catalogue";
+import { CLASSES, type ClassName, type Cosmetic, type CosmeticSlot } from "@tf2-cosm/data/catalogue";
 
 /** What each Class is called where a viewer picks it. */
 export const CLASS_LABELS: Record<ClassName, string> = {
@@ -22,6 +22,56 @@ export const CLASS_LABELS: Record<ClassName, string> = {
   sniper: "Sniper",
   spy: "Spy",
 };
+
+/**
+ * The kinds a viewer can narrow to instead of naming a Class. They are the two
+ * of the three the glossary names that more than one Cosmetic shares an answer
+ * on: a Class-Exclusive Cosmetic belongs to a Class, and asking for every
+ * Class-Exclusive Cosmetic at once is asking for a list of nine unrelated
+ * wardrobes.
+ */
+export const CLASS_KINDS = ["all-class", "multi-class"] as const;
+
+export type ClassKind = (typeof CLASS_KINDS)[number];
+
+/**
+ * What the Class picker narrows by: one Class, or one kind. They share a control
+ * because they are two ways of cutting the same axis — a Class View already says
+ * what an All-Class Cosmetic is doing in it, so picking both would say nothing
+ * the Class View does not.
+ */
+export const CLASS_FILTERS = [...CLASSES, ...CLASS_KINDS] as const;
+
+export type ClassFilter = ClassName | ClassKind;
+
+/** What each kind is called where a viewer picks it, beside the nine Classes. */
+export const CLASS_KIND_LABELS: Record<ClassKind, string> = {
+  "all-class": "All-Class only",
+  "multi-class": "Multi-Class only",
+};
+
+/** Every value the Class picker offers, labelled. */
+export const CLASS_FILTER_LABELS: Record<ClassFilter, string> = {
+  ...CLASS_LABELS,
+  ...CLASS_KIND_LABELS,
+};
+
+/** Whether a filter names a Class, which is what makes it a Class View. */
+export function isClassKind(filter: ClassFilter): filter is ClassKind {
+  return (CLASS_KINDS as readonly string[]).includes(filter);
+}
+
+/**
+ * The Class the viewer is looking at, or null when they are not looking at one.
+ *
+ * A Class View is more than a filter — it is the Class every row's picture shows
+ * the Cosmetic worn by — and a kind chooses no Class to wear anything, so under
+ * one every row falls back to the Cosmetic's own first Class.
+ */
+export function viewedClass(filter: ClassFilter | null): ClassName | null {
+  if (filter === null || isClassKind(filter)) return null;
+  return filter;
+}
 
 /** What each equip slot is called where a viewer picks it. */
 export const SLOT_LABELS: Record<CosmeticSlot, string> = {
@@ -41,12 +91,15 @@ export const SORT_ORDER_LABELS: Record<SortOrder, string> = {
 };
 
 export interface BrowsingControls {
-  /** The Class whose Class View is showing, or null for the whole catalogue. */
-  readonly classView: ClassName | null;
+  /**
+   * What the Class picker is narrowing by — a Class, whose Class View is then
+   * showing, or a kind — or null for the whole catalogue.
+   */
+  readonly classFilter: ClassFilter | null;
   /**
    * Whether a Class View leaves out the All-Class Cosmetics. It says nothing
-   * about Multi-Class Cosmetics, and it has nothing to focus with no Class
-   * chosen, so it does nothing there.
+   * about Multi-Class Cosmetics, and it has nothing to focus outside a Class
+   * View, so it does nothing there.
    */
   readonly hideAllClass: boolean;
   /** The equip slot to show, or null for both. */
@@ -75,7 +128,7 @@ export interface BrowsingControls {
  * the catalogue bar its Event-Only Cosmetics, most valuable first.
  */
 export const DEFAULT_CONTROLS: BrowsingControls = {
-  classView: null,
+  classFilter: null,
   hideAllClass: false,
   slot: null,
   hideUnpriced: false,
@@ -97,6 +150,15 @@ export const DEFAULT_CONTROLS: BrowsingControls = {
 export function inClassView(cosmetic: Cosmetic, classView: ClassName, hideAllClass: boolean): boolean {
   if (cosmetic.kind === "all-class") return !hideAllClass;
   return cosmetic.classes.includes(classView);
+}
+
+/**
+ * Whether the Class picker keeps this Cosmetic: a kind is the catalogue's own
+ * `kind` read straight off it, a Class is the Class View rule above.
+ */
+function passesClassFilter(cosmetic: Cosmetic, filter: ClassFilter, hideAllClass: boolean): boolean {
+  if (isClassKind(filter)) return cosmetic.kind === filter;
+  return inClassView(cosmetic, filter, hideAllClass);
 }
 
 /** Whether the game only lets this Cosmetic be worn while an event is running. */
@@ -166,12 +228,12 @@ export function visibleCosmetics(
   controls: BrowsingControls,
   owned: ReadonlySet<string> | null = null,
 ): Cosmetic[] {
-  const { classView, hideAllClass, slot, hideUnpriced, onlyOwned, hideEventOnly, search } = controls;
+  const { classFilter, hideAllClass, slot, hideUnpriced, onlyOwned, hideEventOnly, search } = controls;
   const term = search.trim().toLowerCase();
 
   const kept = cosmetics.filter((cosmetic) => {
     if (onlyOwned && owned !== null && !owned.has(cosmetic.slug)) return false;
-    if (classView !== null && !inClassView(cosmetic, classView, hideAllClass)) return false;
+    if (classFilter !== null && !passesClassFilter(cosmetic, classFilter, hideAllClass)) return false;
     if (slot !== null && cosmetic.slot !== slot) return false;
     if (hideUnpriced && isUnpriced(cosmetic)) return false;
     if (hideEventOnly && isEventOnly(cosmetic)) return false;
