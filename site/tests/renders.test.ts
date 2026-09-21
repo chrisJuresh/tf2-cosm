@@ -9,7 +9,7 @@ import { fixtureManifest } from "./fixtures.ts";
 
 import { joinRenderUrl } from "@/renders/base-url";
 import { assertValidRenderManifest, EMPTY_MANIFEST } from "@/renders/manifest";
-import { displayedClass, hasBluRender, imageAt, pickRender } from "@/renders/select";
+import { displayedClass, hasBluRender, hasItemRender, imageAt, pickRender } from "@/renders/select";
 
 import { fixtureCosmetics } from "./fixtures.ts";
 
@@ -106,6 +106,71 @@ describe("picking the render", () => {
     expect(
       pickRender(EMPTY_MANIFEST, { slug: "team-captain", gameClass: "soldier", team: "red", style: 0 }, LIST_SIZE),
     ).toBeNull();
+  });
+});
+
+describe("picking which of the two pictures to show", () => {
+  const asked = { slug: "team-captain", gameClass: "soldier", team: "red", style: 0 } as const;
+
+  it("shows the Cosmetic on the Class unless the viewer asks for the other one", () => {
+    const chosen = pickRender(fixtureManifest(), asked, DETAIL_SIZE);
+
+    expect(chosen?.variant).toBe("worn");
+    expect(chosen?.image.path).not.toContain("-alone");
+  });
+
+  it("shows the Cosmetic on its own when that is what was asked for", () => {
+    const chosen = pickRender(fixtureManifest(), { ...asked, variant: "alone" }, DETAIL_SIZE);
+
+    expect(chosen?.variant).toBe("alone");
+    expect(chosen?.image.path).toContain("-alone");
+  });
+
+  it("falls back down the chain within the variant asked for, not out of it", () => {
+    // Style 1 of the Tin Pot has an Item Render; BLU has no Style 1 at all, so
+    // this is the Style falling back to RED, still with the Class out of it.
+    const chosen = pickRender(
+      fixtureManifest(),
+      { slug: "tin-pot", gameClass: "soldier", team: "blu", style: 1, variant: "alone" },
+      DETAIL_SIZE,
+    );
+
+    expect(chosen?.team).toBe("red");
+    expect(chosen?.variant).toBe("alone");
+    expect(chosen?.fellBack).toBe(true);
+  });
+
+  it("gives nothing rather than the Class back when no Item Render was ever made", () => {
+    // The Backpack Icon is the honest answer: the picture asked for is one where
+    // the Class is not in it, and the Worn Render is not that picture.
+    const chosen = pickRender(
+      fixtureManifest(),
+      { slug: "ghastly-gibus", gameClass: "scout", team: "red", style: 0, variant: "alone" },
+      LIST_SIZE,
+    );
+
+    expect(chosen).toBeNull();
+  });
+});
+
+describe("whether the open Cosmetic offers a View toggle", () => {
+  it("offers one when this Class has been rendered with the Cosmetic on its own", () => {
+    expect(hasItemRender(fixtureManifest(), "team-captain", "soldier")).toBe(true);
+  });
+
+  it("offers none when only the Worn Render has been made", () => {
+    expect(hasItemRender(fixtureManifest(), "ghastly-gibus", "scout")).toBe(false);
+  });
+
+  it("offers none for a Cosmetic with no renders at all", () => {
+    expect(hasItemRender(fixtureManifest(), "dead-of-night", "spy")).toBe(false);
+  });
+
+  it("answers for the Class on show, not for the Cosmetic across every Class", () => {
+    // The fixture has the Team Captain on its own for the Soldier and the
+    // Demoman; a Class it was never rendered on has nothing to switch to.
+    expect(hasItemRender(fixtureManifest(), "team-captain", "demoman")).toBe(true);
+    expect(hasItemRender(fixtureManifest(), "tin-pot", "demoman")).toBe(false);
   });
 });
 

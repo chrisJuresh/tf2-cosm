@@ -1,7 +1,8 @@
 /**
  * The pictures, as a viewer meets them: the Worn Render on a card, the icon
  * where there is no render, the Class the picture shows following the Class
- * View, and the Style switcher and Team toggle in the open Cosmetic's modal.
+ * View, and the Style switcher, Team toggle and View toggle in the open
+ * Cosmetic's modal.
  *
  * Driven by the fixture manifest, which the render job itself wrote — see
  * `tests/fixtures.ts`. Nothing here asserts how the fallback chain is walked;
@@ -284,6 +285,81 @@ describe("the open card", () => {
     await user.keyboard("{Escape}");
     await user.click(screen.getByRole("button", { name: "Tin Pot" }));
     expect(pictureInPanel("tin-pot")).toHaveAttribute("src", "/renders/web/tin-pot/soldier-red-0@512.webp");
+  });
+
+  it("offers a View toggle where the Cosmetic was rendered on its own, and takes the Class out", async () => {
+    const user = userEvent.setup();
+    renderList();
+    await user.click(screen.getByRole("button", { name: "Team Captain" }));
+    const view = within(panelFor("team-captain")).getByRole("group", { name: "View" });
+    expect(within(view).getAllByRole("button").map((button) => button.textContent)).toEqual([
+      "On the Class",
+      "On its own",
+    ]);
+
+    await user.click(within(view).getByRole("button", { name: "On its own" }));
+    expect(pictureInPanel("team-captain")).toHaveAttribute(
+      "src",
+      "/renders/web/team-captain/soldier-red-0-alone@512.webp",
+    );
+    // The Class is out of the picture, so it is out of what the picture is called.
+    expect(pictureInPanel("team-captain")).toHaveAccessibleName("Team Captain, on its own");
+  });
+
+  it("goes back to the Class with the same toggle", async () => {
+    const user = userEvent.setup();
+    renderList();
+    await user.click(screen.getByRole("button", { name: "Team Captain" }));
+    const view = within(panelFor("team-captain")).getByRole("group", { name: "View" });
+
+    await user.click(within(view).getByRole("button", { name: "On its own" }));
+    await user.click(within(view).getByRole("button", { name: "On the Class" }));
+
+    expect(pictureInPanel("team-captain")).toHaveAttribute(
+      "src",
+      "/renders/web/team-captain/soldier-red-0@512.webp",
+    );
+    expect(within(view).getByRole("button", { name: "On the Class" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+  });
+
+  it("keeps the Team and the Style the viewer is on when the Class steps out", async () => {
+    const user = userEvent.setup();
+    renderList();
+    await user.click(screen.getByRole("button", { name: "Tin Pot" }));
+    const panel = panelFor("tin-pot");
+
+    await user.click(within(panel).getByRole("button", { name: "Open" }));
+    await user.click(within(panel).getByRole("button", { name: "On its own" }));
+
+    expect(pictureInPanel("tin-pot")).toHaveAttribute(
+      "src",
+      "/renders/web/tin-pot/soldier-red-1-alone@512.webp",
+    );
+  });
+
+  it("offers no View toggle for a Cosmetic nobody has rendered on its own", async () => {
+    const user = userEvent.setup();
+    renderList();
+    await user.click(screen.getByRole("button", { name: "Ghastly Gibus" }));
+    expect(within(panelFor("ghastly-gibus")).queryByRole("group", { name: "View" })).toBeNull();
+  });
+
+  it("opens the next Cosmetic on the Class, however the last one was left", async () => {
+    const user = userEvent.setup();
+    renderList();
+    await user.click(screen.getByRole("button", { name: "Team Captain" }));
+    await user.click(within(panelFor("team-captain")).getByRole("button", { name: "On its own" }));
+
+    await user.keyboard("{Escape}");
+    await user.click(screen.getByRole("button", { name: "Team Captain" }));
+
+    expect(pictureInPanel("team-captain")).toHaveAttribute(
+      "src",
+      "/renders/web/team-captain/soldier-red-0@512.webp",
+    );
   });
 
   it("shows the Backpack Icon in the panel too when there is no render at all", async () => {

@@ -156,6 +156,25 @@ test("the search narrows the grid as it is typed", async ({ catalogue: { page, f
   expectClean(faults);
 });
 
+test("the open Cosmetic takes the Class out of the picture and puts it back", async ({
+  catalogue: { page, faults },
+}) => {
+  const detail = await openCard(page, STYLED);
+  const picture = detail.locator("img");
+  const view = detail.getByRole("group", { name: "View" });
+
+  await view.getByRole("button", { name: "On its own" }).click();
+  await expect(picture).toHaveAttribute("src", /soldier-red-0-alone@512\.webp$/);
+  // The picture really loads: an Item Render is a file of its own, published
+  // separately, and a broken one falls back to the icon without a trace.
+  expect(await picture.evaluate((image) => (image as HTMLImageElement).naturalWidth)).toBeGreaterThan(0);
+
+  await view.getByRole("button", { name: "On the Class" }).click();
+  await expect(picture).toHaveAttribute("src", /soldier-red-0@512\.webp$/);
+
+  expectClean(faults);
+});
+
 test("the open Cosmetic shows the Worn Render, its Styles and both Teams", async ({
   catalogue: { page, faults },
 }) => {
