@@ -252,18 +252,32 @@ would read as their backpack's worth.
   after mount so the static markup React hydrates carries nobody's preference.
 - `src/browsing/controls.ts` — the browsing rules, pure: the Class View's three
   inclusion rules, the two kinds the Class picker offers beside the nine Classes
-  (All-Class and Multi-Class), the toggles, the slot filter, the sorts and the name search,
-  and the one function that turns the whole catalogue into the cards to draw. The
-  controls are a surface over this file, not the place the rules live.
+  (All-Class and Multi-Class), the toggles, the slot filter, the price range, the
+  sorts and the name search, and the one function that turns the whole catalogue
+  into the cards to draw. The controls are a surface over this file, not the
+  place the rules live.
+- `src/browsing/price-scale.ts` — what each notch of the price sliders is worth.
+  Geometric rather than linear, and a table rather than a formula, so the notch a
+  bound is drawn at and the bound a notch means cannot drift apart. The bounds
+  themselves are kept in scrap, because a bound is a fact about prices and a
+  notch is a fact about a slider.
 - `src/browser/remembered-controls.ts` — those controls as this browser remembers
   them, on the same terms as `remembered.ts` but for a whole document rather than
   one string, so every field is checked on the way back in. Everything but the
   search is kept: a Class, a sort and a set of toggles are where a viewer left the
   catalogue, and a half-typed name is not.
-- `src/components/browsing-controls.tsx` — the control bar. Plain form controls
-  with real labels, which is what makes them keyboard operable and properly
-  announced without a line of code for either.
-- `src/components/catalogue-browser.tsx` — where the rules and the bar meet: it
+- `src/components/browsing-controls.tsx` — the controls: a column down the
+  right-hand side wherever there is room for one, a wrapping bar above the grid
+  where there is not. Every line the controls take across the top is a row of
+  Cosmetics nobody can see, and a wide screen has width to spare where it has no
+  height. Plain form controls with real labels, which is what makes them keyboard
+  operable and properly announced without a line of code for either.
+- `src/components/price-range.tsx` — the price filter: two sliders rather than
+  one two-thumbed track, because a two-thumbed range is two overlapping inputs
+  that a keyboard and a screen reader see straight through. Neither can cross the
+  other, and each end of the track that means "no bound" means it rather than
+  today's cheapest or dearest Cosmetic.
+- `src/components/catalogue-browser.tsx` — where the rules and the controls meet: it
   holds what the viewer picked and hands the grid what is left. The viewer's own
   Inventory lives here too, on the same terms: another thing that narrows the
   list, with the grid handed the result rather than the reason.
@@ -387,7 +401,7 @@ working page.
   every picture actually decoded.
 - `e2e/accessibility.spec.ts` runs axe over the grid, over an open Cosmetic, and
   over both again in dark mode, and then asks the question axe cannot: whether
-  the bar can be *worked* from the keyboard — every control named, reached by
+  the controls can be *worked* from the keyboard — every one named, reached by
   Tab, and visibly focused, and a Cosmetic that opens, closes and hands the
   focus back.
 - `e2e/build-validation.spec.ts` runs `next build` against a broken catalogue and
