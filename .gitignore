@@ -60,3 +60,9 @@ Thumbs.db
 # file if git puts it there.
 .claude/worktrees/
 .claude/settings.local.json
+
+# `vercel link` writes both: .vercel/ is this machine's link to the deployment, and
+# .env.local is the OIDC token it pulls with it. Named rather than a blanket `.env*`,
+# because .env.example is tracked on purpose -- it is how the settings are documented.
+.vercel/
+.env.local
