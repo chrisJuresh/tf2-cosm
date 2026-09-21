@@ -221,7 +221,8 @@ would read as their backpack's worth.
   else. Every access is guarded, the page is right without it, and it is read
   after mount so the static markup React hydrates carries nobody's preference.
 - `src/browsing/controls.ts` — the browsing rules, pure: the Class View's three
-  inclusion rules, the toggles, the slot filter, the sorts and the name search,
+  inclusion rules, the two kinds the Class picker offers beside the nine Classes
+  (All-Class and Multi-Class), the toggles, the slot filter, the sorts and the name search,
   and the one function that turns the whole catalogue into the cards to draw. The
   controls are a surface over this file, not the place the rules live.
 - `src/browser/remembered-controls.ts` — those controls as this browser remembers

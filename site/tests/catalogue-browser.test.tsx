@@ -72,13 +72,13 @@ describe("the Class View picker", () => {
     expect(namesShown()).not.toContain("Tin Pot");
   });
 
-  it("offers all nine Classes and a way back to the whole catalogue", () => {
+  it("offers all nine Classes, the two kinds, and a way back to the whole catalogue", () => {
     renderBrowser();
     const options = within(screen.getByRole("combobox", CLASS_PICKER))
       .getAllByRole("option")
       .map((option) => option.textContent?.trim());
     expect(options).toEqual([
-      "Every Class",
+      "Every Cosmetic",
       "Scout",
       "Soldier",
       "Pyro",
@@ -88,7 +88,15 @@ describe("the Class View picker", () => {
       "Medic",
       "Sniper",
       "Spy",
+      "All-Class only",
+      "Multi-Class only",
     ]);
+  });
+
+  it("narrows to one kind, and shows each of those Cosmetics on its own first Class", async () => {
+    const user = renderBrowser();
+    await user.selectOptions(screen.getByRole("combobox", CLASS_PICKER), "multi-class");
+    expect(namesShown()).toEqual(["Team Captain"]);
   });
 });
 
@@ -105,6 +113,13 @@ describe("the hide All-Class toggle", () => {
     await waitFor(() => expect(screen.getByRole("checkbox", HIDE_ALL_CLASS)).toBeDisabled());
     await user.selectOptions(screen.getByRole("combobox", CLASS_PICKER), "soldier");
     expect(screen.getByRole("checkbox", HIDE_ALL_CLASS)).toBeEnabled();
+  });
+
+  it("cannot be worked under a kind either, which is a filter and not a Class View", async () => {
+    const user = renderBrowser();
+    await user.selectOptions(screen.getByRole("combobox", CLASS_PICKER), "soldier");
+    await user.selectOptions(screen.getByRole("combobox", CLASS_PICKER), "all-class");
+    expect(screen.getByRole("checkbox", HIDE_ALL_CLASS)).toBeDisabled();
   });
 });
 

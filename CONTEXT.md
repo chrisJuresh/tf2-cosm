@@ -98,6 +98,9 @@ The key-to-dollar rate a dollar price is computed from. One is active at a time.
 **Class View**:
 The catalogue filtered to one Class: its Class-Exclusive Cosmetics, the Multi-Class Cosmetics it can wear, and, unless hidden, every All-Class Cosmetic.
 
+**Class Filter**:
+What the catalogue's Class picker narrows by: one Class, which is a Class View, or one kind — All-Class or Multi-Class. A Class and a kind are alternatives, never both at once.
+
 **Slug**:
 The URL-safe identifier derived from a Cosmetic's name, and its stable public name: it addresses a row in the page and names it in the URL, and a later wishlist references it (ADR-0003).
 

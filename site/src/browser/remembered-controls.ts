@@ -16,10 +16,17 @@
  * can represent. Each field is read on its own, so one stale field costs its own
  * default and not the rest.
  */
-import { CLASSES, COSMETIC_SLOTS, type ClassName, type CosmeticSlot } from "@tf2-cosm/data/catalogue";
+import { COSMETIC_SLOTS, type CosmeticSlot } from "@tf2-cosm/data/catalogue";
 import { useCallback, useEffect, useState } from "react";
 
-import { DEFAULT_CONTROLS, SORT_ORDERS, type BrowsingControls, type SortOrder } from "@/browsing/controls";
+import {
+  CLASS_FILTERS,
+  DEFAULT_CONTROLS,
+  SORT_ORDERS,
+  type BrowsingControls,
+  type ClassFilter,
+  type SortOrder,
+} from "@/browsing/controls";
 
 /**
  * Versioned in the key rather than in the document: when the shape changes past
@@ -46,7 +53,7 @@ function asBoolean(value: unknown, fallback: boolean): boolean {
 
 function rememberedFrom(stored: Record<string, unknown>): RememberedControls {
   return {
-    classView: oneOf<ClassName>(CLASSES, stored["classView"], DEFAULT_CONTROLS.classView),
+    classFilter: oneOf<ClassFilter>(CLASS_FILTERS, stored["classFilter"], DEFAULT_CONTROLS.classFilter),
     hideAllClass: asBoolean(stored["hideAllClass"], DEFAULT_CONTROLS.hideAllClass),
     slot: oneOf<CosmeticSlot>(COSMETIC_SLOTS, stored["slot"], DEFAULT_CONTROLS.slot),
     hideUnpriced: asBoolean(stored["hideUnpriced"], DEFAULT_CONTROLS.hideUnpriced),
@@ -110,12 +117,12 @@ export function useRememberedControls(): readonly [BrowsingControls, (change: Pa
   // Only the remembered fields are watched. The search is not one of them, and
   // waking this up on every keystroke to write the same bytes back is work for
   // nothing.
-  const { classView, hideAllClass, slot, hideUnpriced, onlyOwned, hideEventOnly, sort } = state.controls;
+  const { classFilter, hideAllClass, slot, hideUnpriced, onlyOwned, hideEventOnly, sort } = state.controls;
   useEffect(() => {
     if (!state.restored) return;
     writeControls(browserStorage(), {
       ...DEFAULT_CONTROLS,
-      classView,
+      classFilter,
       hideAllClass,
       slot,
       hideUnpriced,
@@ -123,7 +130,7 @@ export function useRememberedControls(): readonly [BrowsingControls, (change: Pa
       hideEventOnly,
       sort,
     });
-  }, [state.restored, classView, hideAllClass, slot, hideUnpriced, onlyOwned, hideEventOnly, sort]);
+  }, [state.restored, classFilter, hideAllClass, slot, hideUnpriced, onlyOwned, hideEventOnly, sort]);
 
   const change = useCallback((patch: Partial<BrowsingControls>) => {
     setState((previous) => ({ ...previous, controls: { ...previous.controls, ...patch } }));
