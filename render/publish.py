@@ -23,6 +23,13 @@ images picks up where it stopped and a run over finished work uploads nothing. B
 than a checksum because that is what a listing gives for free — a derivative re-encoded to the
 same size to the byte is not a thing the encoder does, and `--force` is there for the day it
 is doubted.
+
+The bucket is on a free tier, and a free tier is a cliff rather than a wall: nothing at
+Cloudflare stops a run from crossing it, so the guard is here. Because the listing already
+says what the bucket holds, the run knows before its first upload what it would leave behind,
+and refuses to send anything at all when that is past `--max-bucket-bytes`. Today's whole
+catalogue is 465 MB against a 9 GB budget; what the guard is really for is the command that
+means to publish the 8 GB of masters by mistake.
 """
 from __future__ import annotations
 
@@ -32,7 +39,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Callable, Iterable, Sequence
+from typing import Callable, Iterable, Mapping, Sequence
 
 from render.bucket import (
     DEFAULT_CACHE_CONTROL,
@@ -51,6 +58,18 @@ DEFAULT_WORKERS = 8
 
 #: How often a run that takes an hour says where it is.
 PROGRESS_EVERY = 250
+
+#: Cloudflare R2's free tier: 10 GB of storage a month, egress free. Decimal GB, which is
+#: how the bill counts them.
+FREE_TIER_BYTES = 10_000_000_000
+
+#: What a run refuses to push the bucket past, with headroom under the free tier so that
+#: crossing it is a message rather than an invoice. `--max-bucket-bytes 0` lifts it.
+DEFAULT_MAX_BUCKET_BYTES = 9_000_000_000
+
+
+class OverBudget(Exception):
+    """The run would put the bucket past its budget, so none of it is sent."""
 
 
 def log(*parts: object) -> None:
@@ -137,6 +156,43 @@ def plan_publish(
     return plan
 
 
+def format_bytes(count: int) -> str:
+    """A size a human reads at a glance, in the decimal units a bill is counted in."""
+    for unit, scale in (("GB", 1_000_000_000), ("MB", 1_000_000), ("kB", 1_000)):
+        if count >= scale:
+            return f"{count / scale:.2f} {unit}".replace(".00 ", " ")
+    return f"{count} bytes"
+
+
+def project_bucket_bytes(plan: Plan, remote_sizes: Mapping[str, int]) -> int:
+    """How big the bucket would be once this plan has run.
+
+    What is there, less what this run overwrites, plus what it writes — an image re-uploaded
+    at a new size replaces its old bytes rather than adding to them, and counting it twice
+    would refuse a run that costs nothing.
+    """
+    replaced = sum(remote_sizes.get(upload.key, 0) for upload in plan.uploads)
+    return sum(remote_sizes.values()) - replaced + plan.bytes_to_upload
+
+
+def check_budget(plan: Plan, remote_sizes: Mapping[str, int], budget: int) -> int:
+    """Refuse a run that would take the bucket past `budget`; return what it would come to.
+
+    Checked before the first upload rather than as the run goes, because a guard that stops
+    halfway has already spent whatever it spent. A budget of 0 is no budget at all.
+    """
+    projected = project_bucket_bytes(plan, remote_sizes)
+    if budget and projected > budget:
+        raise OverBudget(
+            f"this run would leave {format_bytes(projected)} in the bucket, past the "
+            f"{format_bytes(budget)} budget"
+            + (f" (the free tier is {format_bytes(FREE_TIER_BYTES)})" if budget < FREE_TIER_BYTES else "")
+            + "; nothing was uploaded. Publish fewer sizes, or raise --max-bucket-bytes "
+            "knowing what it costs."
+        )
+    return projected
+
+
 def publish(
     plan: Plan,
     bucket: Bucket,
@@ -220,6 +276,12 @@ def parse_args(argv: list[str] | None) -> argparse.Namespace:
     parser.add_argument(
         "--workers", type=int, default=DEFAULT_WORKERS, help="uploads in flight at once"
     )
+    parser.add_argument(
+        "--max-bucket-bytes",
+        type=int,
+        default=DEFAULT_MAX_BUCKET_BYTES,
+        help="refuse a run that would leave the bucket bigger than this; 0 for no budget",
+    )
     parser.add_argument("--force", action="store_true", help="upload images that are already there")
     parser.add_argument("--dry-run", action="store_true", help="report what would go up, upload nothing")
     args = parser.parse_args(argv)
@@ -260,8 +322,13 @@ def main(argv: list[str] | None = None) -> int:
 
     remote: dict[str, int] = {}
     if bucket is not None:
-        remote = bucket.list_sizes(settings.prefix)
-        log(f"{len(remote)} objects already in {settings.bucket}/{settings.prefix}")
+        # The whole bucket, not just this run's prefix: the budget is what the account is
+        # billed for, and that is every object in it.
+        remote = bucket.list_sizes("")
+        log(
+            f"{len(remote)} objects already in {settings.bucket} "
+            f"({format_bytes(sum(remote.values()))})"
+        )
 
     plan = plan_publish(relpaths, layout, settings, remote, force=args.force)
     if plan.missing:
@@ -269,15 +336,22 @@ def main(argv: list[str] | None = None) -> int:
             f"{len(plan.missing)} recorded images are not on this machine and will not be "
             f"published, the first being {plan.missing[0]}"
         )
-    megabytes = plan.bytes_to_upload / 1048576
+    try:
+        projected = check_budget(plan, remote, args.max_bucket_bytes)
+    except OverBudget as refused:
+        log(refused)
+        return 2
+
+    size = format_bytes(plan.bytes_to_upload)
+    leaves = f"leaving {format_bytes(projected)} in the bucket"
     if args.dry_run:
         log(
-            f"would upload {len(plan.uploads)} images ({megabytes:.0f} MB), "
-            f"skip {plan.already_there} already there; nothing uploaded"
+            f"would upload {len(plan.uploads)} images ({size}), skip {plan.already_there} "
+            f"already there, {leaves}; nothing uploaded"
         )
         return 0
 
-    log(f"uploading {len(plan.uploads)} images ({megabytes:.0f} MB) to {settings.endpoint}")
+    log(f"uploading {len(plan.uploads)} images ({size}) to {settings.endpoint}, {leaves}")
     outcome = publish(
         plan,
         bucket,

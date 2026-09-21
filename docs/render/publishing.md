@@ -62,6 +62,10 @@ uploads nothing. `--force` re-uploads regardless, `--sizes 256` narrows to one w
 Masters stay on the machine that rendered them: 8 GB the site never asks for, and the archive
 every derivative can be remade from.
 
+A run refuses outright — before its first upload, with a non-zero exit and nothing sent — if
+what it would leave in the bucket crosses `--max-bucket-bytes`, 9 GB by default. See *Staying
+inside the free tier* below.
+
 ### 4. Point the deployment at it
 
 The bucket needs a public URL. In R2 → the bucket → **Settings** → **Public access**, either
@@ -90,6 +94,43 @@ curl -I https://<the public URL>/web/team-captain/soldier-red-0@256.webp
 `200` with `content-type: image/webp` is the answer. A 200 with
 `application/octet-stream` means the object went up without its type and the browser will
 download it instead of drawing it; re-upload with `--force`.
+
+## Staying inside the free tier
+
+R2's free tier, per month: **10 GB-month of storage**, **1 million Class A operations** (a
+`PutObject` or a page of `ListObjects`), **10 million Class B**, and **egress free** —
+which is the one that matters for a page that is mostly pictures, and the reason this is R2
+and not S3.
+
+What the catalogue actually costs against that:
+
+| | Free each month | A full publish |
+| --- | --- | --- |
+| Storage | 10 GB | 0.47 GB |
+| Class A (writes, listings) | 1,000,000 | ~24,700 the first time, ~25 on a run with nothing to do |
+| Egress | free | — |
+
+Two orders of magnitude of headroom, and a second run over finished work uploads nothing, so
+routine re-publishing costs a listing. The risk is not the catalogue growing into the tier —
+it is one wrong command, `--derivatives-dir masters` being the obvious one, putting 8 GB up
+in a single run.
+
+So the job refuses. Before it uploads anything, it knows what the bucket holds (it has just
+listed it) and what it is about to add, and if the two together cross `--max-bucket-bytes` —
+9 GB by default, headroom under the 10 — it sends nothing at all and exits non-zero:
+
+```
+[publish] this run would leave 8.51 GB in the bucket, past the 9 GB budget ...
+```
+
+Overwriting an object counts its new bytes, not both, so re-publishing the same catalogue at
+a new quality is never read as growth. `--max-bucket-bytes 0` lifts the guard for someone who
+means it.
+
+Nothing on Cloudflare's side is a hard cap — R2 has no spending limit to switch on, only
+notifications — so the guard in the job is the real one. Worth adding the notification as
+well, at **https://dash.cloudflare.com/?to=/:account/notifications**: **Add** → *Billing usage
+alert* → R2 storage, at 80% of the free tier. That one tells you; this one stops you.
 
 ## What a prefix changes
 
