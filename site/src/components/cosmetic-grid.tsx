@@ -35,7 +35,7 @@
  */
 import type { ClassName, Cosmetic, Metal } from "@tf2-cosm/data/catalogue";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { type CSSProperties, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { type CSSProperties, type MouseEvent, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import { CosmeticModal } from "@/components/cosmetic-modal";
 import { WornRender } from "@/components/worn-render";
@@ -196,6 +196,20 @@ function writeHash(slug: string | null): void {
 }
 
 /**
+ * Is the viewer's selection inside this element?
+ *
+ * Dragging across a Cosmetic's name is someone copying it, not a click on the
+ * card — but the browser fires a click at the end of the drag all the same, and
+ * opening the Cosmetic on it would throw a modal over what they were reading the
+ * moment they let go.
+ */
+function selectionInside(element: Element): boolean {
+  const selection = window.getSelection();
+  if (selection === null || selection.isCollapsed) return false;
+  return element.contains(selection.anchorNode) || element.contains(selection.focusNode);
+}
+
+/**
  * One figure, with the name of the figure alongside it for a screen reader.
  *
  * A row list could label its figures once, in a column heading over all
@@ -242,6 +256,12 @@ function CosmeticCard({
     [registerToggle, slug],
   );
 
+  /** A click anywhere on the card opens the Cosmetic — unless it ended a drag. */
+  const onCardClick = (event: MouseEvent<HTMLDivElement>) => {
+    if (selectionInside(event.currentTarget)) return;
+    onOpen(slug);
+  };
+
   return (
     <div
       role="listitem"
@@ -249,11 +269,14 @@ function CosmeticCard({
       aria-posinset={position}
       aria-setsize={total}
       style={{ height: CARD_HEIGHT }}
-      // `relative`, because the toggle below stretches over the whole card: the
-      // name is what a screen reader should hear the control called, and the
-      // picture is what a viewer aims at.
+      // The whole card is the click target: a viewer aims at the picture, not at
+      // the name under it. The control itself is only the name, so that the
+      // picture and the figures are not read out as part of what it is called —
+      // and so that the name is text a viewer can drag over and copy, which it
+      // would not be under a click target stretched over the card.
+      onClick={onCardClick}
       className={
-        "relative flex flex-col overflow-hidden rounded-lg border border-black/10 p-2 text-sm" +
+        "flex cursor-pointer flex-col overflow-hidden rounded-lg border border-black/10 p-2 text-sm" +
         " hover:bg-black/[0.03] dark:border-white/15 dark:hover:bg-white/[0.05]"
       }
     >
@@ -282,12 +305,18 @@ function CosmeticCard({
           // What the control does is open a modal, which is what a screen
           // reader should hear before it is pressed rather than after.
           aria-haspopup="dialog"
-          onClick={() => onOpen(slug)}
-          // The pseudo-element is the click target: the whole card takes a click
-          // that way, without the picture and the figures having to live inside
-          // the control and be read out as part of its name.
+          onClick={(event) => {
+            // The card around it takes the click too, and would open twice.
+            event.stopPropagation();
+            if (selectionInside(event.currentTarget)) return;
+            onOpen(slug);
+          }}
+          // `select-text` because a browser makes a button's own text
+          // unselectable, and the name is the one thing on the card a viewer
+          // wants to drag over and copy. Only a real button is reachable by
+          // keyboard, which is what the name being the control buys.
           className={
-            "line-clamp-2 text-left after:absolute after:inset-0 after:content-['']" +
+            "line-clamp-2 select-text text-left" +
             " focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current"
           }
         >
