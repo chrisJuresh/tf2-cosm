@@ -32,8 +32,14 @@ import {
   type PriceHeader,
   type Style,
 } from "./schema.ts";
+import {
+  assertValidVariantPrices,
+  type VariantPrice,
+  type VariantPrices,
+  VARIANT_PRICES_SCHEMA_VERSION,
+} from "./variant-prices.ts";
 import { dollarBasesOf, type MarketKeyPrice } from "../prices/dollar-basis.ts";
-import { keyRateMetal, priceOf } from "../prices/price-spread.ts";
+import { keyRateMetal, priceOf, variantPricesOf } from "../prices/price-spread.ts";
 import { type PriceList, type Quality, variantsFor } from "../prices/price-source.ts";
 import { referenceVariantLabel, type UnpricedReason } from "../prices/reference-variant.ts";
 import { backpackIconOf, nativeQualityOf, type WebApiSchemaItem } from "../sources/steam-web-api.ts";
@@ -72,6 +78,16 @@ export interface Exclusion {
 
 export interface BuildResult {
   readonly catalogue: Catalogue;
+  /**
+   * The Variant Prices document, or null when the run had no price source — the
+   * same condition that leaves every Cosmetic's `price` null.
+   *
+   * It is built here rather than in a job of its own because it has to be: both
+   * documents are one price list reduced two ways, and a slug is decided once.
+   * Split apart they could be written from different snapshots, which is exactly
+   * what the shared header exists to make visible.
+   */
+  readonly variantPrices: VariantPrices | null;
   readonly exclusions: readonly Exclusion[];
   readonly warnings: readonly string[];
 }
@@ -253,6 +269,7 @@ export function buildCatalogue(inputs: CatalogueInputs): BuildResult {
   const cosmetics: Cosmetic[] = [];
   const slugs = new Map<string, string>();
   const tally = new PriceTally();
+  const variantPricesBySlug = new Map<string, VariantPrice[]>();
 
   for (const [name, group] of byName) {
     const difference = collisionDifference(group);
@@ -273,9 +290,12 @@ export function buildCatalogue(inputs: CatalogueInputs): BuildResult {
     // Every defindex under one name is the same Cosmetic, so any of them finding
     // the price entry prices the whole group. The source's own defindex list is
     // the join; the name is what is left when it claims none.
+    const variants = inputs.prices
+      ? variantsFor(inputs.prices, [primary.defindex, ...aliases], name)
+      : undefined;
     const price = inputs.prices
       ? priceOf(
-          variantsFor(inputs.prices, [primary.defindex, ...aliases], name),
+          variants,
           {
             nativeQuality: primary.nativeQuality,
             // Any defindex under the name being issued in play makes the
@@ -286,6 +306,12 @@ export function buildCatalogue(inputs: CatalogueInputs): BuildResult {
         )
       : null;
     tally.record(price);
+
+    // Every Quality the source priced, not only the one the Reference Variant
+    // rule picked: the copy a viewer owns is in a Quality they did not choose.
+    // A Cosmetic with none is left out rather than written as an empty list.
+    const mine = inputs.prices ? variantPricesOf(variants, inputs.prices.rates) : [];
+    if (mine.length > 0) variantPricesBySlug.set(slug, mine);
 
     cosmetics.push({
       slug,
@@ -338,5 +364,55 @@ export function buildCatalogue(inputs: CatalogueInputs): BuildResult {
   } satisfies Catalogue);
 
   exclusions.sort((left, right) => left.defindex - right.defindex);
-  return { catalogue, exclusions, warnings };
+  return {
+    catalogue,
+    variantPrices: variantPricesDocument(inputs, catalogue, variantPricesBySlug),
+    exclusions,
+    warnings,
+  };
+}
+
+/**
+ * The Variant Prices document, from what the loop above already worked out.
+ *
+ * The header repeats the catalogue's snapshot time and its Key Rate rather than
+ * taking its own: the two documents are one run, and a reader holding both must
+ * be able to see whether they came from the same one.
+ *
+ * Slugs are written in order, so two runs over the same prices produce the same
+ * bytes and the committed diff shows only what moved.
+ */
+function variantPricesDocument(
+  inputs: CatalogueInputs,
+  catalogue: Catalogue,
+  bySlug: ReadonlyMap<string, VariantPrice[]>,
+): VariantPrices | null {
+  if (!inputs.prices) return null;
+  const byVariant = new Map<string, number>();
+  let variants = 0;
+  for (const priced of bySlug.values()) {
+    variants += priced.length;
+    for (const variant of priced) {
+      const label = referenceVariantLabel(variant.quality, variant.craftable);
+      byVariant.set(label, (byVariant.get(label) ?? 0) + 1);
+    }
+  }
+  return assertValidVariantPrices({
+    schemaVersion: VARIANT_PRICES_SCHEMA_VERSION,
+    header: {
+      snapshotTakenAt: catalogue.header.snapshotTakenAt,
+      source: inputs.prices.source,
+      takenAt: inputs.prices.takenAt,
+      keyRate: {
+        ...keyRateMetal(inputs.prices.rates.keyRate),
+        lastUpdatedAt: inputs.prices.rates.keyRate.lastUpdatedAt,
+      },
+      counts: {
+        cosmetics: bySlug.size,
+        variants,
+        byVariant: Object.fromEntries([...byVariant].sort()),
+      },
+    },
+    bySlug: Object.fromEntries([...bySlug].sort(([left], [right]) => (left < right ? -1 : left > right ? 1 : 0))),
+  } satisfies VariantPrices);
 }

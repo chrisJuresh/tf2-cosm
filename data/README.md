@@ -1,10 +1,25 @@
 # Catalogue data job
 
-Builds the catalogue file the site reads: every Cosmetic, with identity, Classes,
-slot, paintable flag, event restriction, Styles, Backpack Icons and its Reference
+Builds the two price documents the site reads.
+
+`catalogue/catalogue.json` is every Cosmetic, with identity, Classes, slot,
+paintable flag, event restriction, Styles, Backpack Icons and its Reference
 Price, under a header that records the snapshot time, the Key Rate, the three
 Dollar Bases and the counts. The catalogue's schema is versioned; this is
 version 5.
+
+`catalogue/variant-prices.json` is the same price list reduced the other way:
+every Quality-and-craftability pair the source priced, for every Cosmetic, keyed
+by slug. The catalogue answers what a Cosmetic costs; this answers what the copy
+in somebody's own backpack is worth, which is a different question — a Genuine
+copy is worth the Genuine figure. It is a second document rather than a field on
+the Cosmetic because it is four thousand small records against eighteen hundred
+large ones, and the site hands the catalogue to the browser whole (ADR-0005). Its
+schema is versioned separately; this is version 1.
+
+Both come out of one run, from one price list, at one Key Rate, and the second
+repeats the first's snapshot time and Key Rate so a reader holding both can see
+that.
 
 ## Running it
 
@@ -27,12 +42,16 @@ the repo root and fill in `STEAM_WEB_API_KEY` and `BPTF_API_KEY`.
 | `--out <path>` | where to write (default `catalogue/catalogue.json`) |
 | `--dry-run` | build and report, write nothing |
 
+`--out` names the catalogue; the Variant Prices and both JSON Schemas are written
+beside it, so a run into a scratch folder puts the whole set there together.
+
 The run prints the counts, the exclusions by reason, the Cosmetic defindex count
 next to the render job's own, which must agree, what every Cosmetic's Reference
-Variant turned out to be, how many took a fallback, the three Dollar Bases and
-the warnings.
+Variant turned out to be, how many took a fallback, how many Variant Prices came
+out and in which Qualities, the three Dollar Bases and the warnings.
 
-Two things stop it writing, both in `src/catalogue/write-guard.ts`: a run that
+Two things stop it writing, both in `src/catalogue/write-guard.ts`, and they
+cover both documents because the guard runs before either is written: a run that
 prices fewer than 1,780 Cosmetics, which means the price list came back partial
 or the names stopped matching, and a run that finds more than 2% fewer Cosmetics
 than the committed file already holds. Either would read as most of the site
@@ -51,10 +70,14 @@ it directly and every adapter around it stays thin.
 - `src/catalogue/identity.ts` — name and slug, per ADR-0003.
 - `src/catalogue/schema.ts` — the versioned catalogue shape. Nothing is written
   without passing it.
+- `src/catalogue/variant-prices.ts` — the second document's shape, versioned on
+  its own, and the reasoning for it being a second document at all. Nothing is
+  written without passing this either.
 - `src/prices/` — the price half of the job, all pure. `metal.ts` is Metal
   arithmetic in ninths and Trader Notation; `reference-variant.ts` picks the
   Reference Variant; `price-spread.ts` turns it into a Price Spread and its Metal
-  Values; `price-source.ts` is the one interface every price crosses (ADR-0002),
+  Values, and turns every other priced variant into a Variant Price over the same
+  arithmetic; `price-source.ts` is the one interface every price crosses (ADR-0002),
   so swapping backpack.tf for pricedb.io means writing one adapter and nothing
   else.
 
@@ -99,10 +122,10 @@ pnpm test
 pnpm typecheck
 ```
 
-`tests/golden/catalogue.json` is the whole document built from the shared oracle
-fixture and a recorded backpack.tf payload, so any change to the catalogue's
-shape shows up as a diff. Rewrite it deliberately with `UPDATE_GOLDEN=1 pnpm test`
-and read what changed.
+`tests/golden/catalogue.json` and `tests/golden/variant-prices.json` are the two
+whole documents built from the shared oracle fixture and a recorded backpack.tf
+payload, so any change to either shape shows up as a diff. Rewrite them
+deliberately with `UPDATE_GOLDEN=1 pnpm test` and read what changed.
 
 The price fixtures (`tests/fixtures/backpack-tf-*.json`) are read through the real
 adapter, not around it, and between them cover the eight cases the price rules have

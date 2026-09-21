@@ -1,0 +1,188 @@
+{
+  "$id": "https://github.com/chrisJuresh/tf2-cosm/catalogue/variant-prices/v1",
+  "title": "TF2 Cosmetics Variant Prices v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "type": "number",
+      "const": 1
+    },
+    "header": {
+      "type": "object",
+      "properties": {
+        "snapshotTakenAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "takenAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+        },
+        "keyRate": {
+          "type": "object",
+          "properties": {
+            "scrap": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "refined": {
+              "type": "number",
+              "minimum": 0
+            },
+            "notation": {
+              "type": "string",
+              "minLength": 1
+            },
+            "lastUpdatedAt": {
+              "type": "string",
+              "format": "date-time",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+            }
+          },
+          "required": [
+            "scrap",
+            "refined",
+            "notation",
+            "lastUpdatedAt"
+          ],
+          "additionalProperties": false
+        },
+        "counts": {
+          "type": "object",
+          "properties": {
+            "cosmetics": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "variants": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "byVariant": {
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              }
+            }
+          },
+          "required": [
+            "cosmetics",
+            "variants",
+            "byVariant"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "snapshotTakenAt",
+        "source",
+        "takenAt",
+        "keyRate",
+        "counts"
+      ],
+      "additionalProperties": false
+    },
+    "bySlug": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "minItems": 1,
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "quality": {
+              "type": "string",
+              "enum": [
+                "normal",
+                "genuine",
+                "rarity2",
+                "vintage",
+                "rarity3",
+                "unusual",
+                "unique",
+                "community",
+                "valve",
+                "self-made",
+                "customized",
+                "strange",
+                "completed",
+                "haunted",
+                "collectors",
+                "decorated"
+              ]
+            },
+            "craftable": {
+              "type": "boolean"
+            },
+            "blanket": {
+              "type": "boolean"
+            },
+            "scrap": {
+              "type": "object",
+              "properties": {
+                "low": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "mid": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "high": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": [
+                "low",
+                "mid",
+                "high"
+              ],
+              "additionalProperties": false
+            },
+            "lastUpdatedAt": {
+              "type": "string",
+              "format": "date-time",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+            }
+          },
+          "required": [
+            "quality",
+            "craftable",
+            "blanket",
+            "scrap",
+            "lastUpdatedAt"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "header",
+    "bySlug"
+  ],
+  "additionalProperties": false
+}

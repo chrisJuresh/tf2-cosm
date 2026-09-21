@@ -1,7 +1,7 @@
 {
   "schemaVersion": 5,
   "header": {
-    "snapshotTakenAt": "2026-09-21T02:06:55.894Z",
+    "snapshotTakenAt": "2026-09-21T02:36:02.383Z",
     "sources": {
       "itemDefinitions": "daily mirror (https://raw.githubusercontent.com/SteamDatabase/GameTracking-TF2/master/tf/scripts/items/items_game.txt)",
       "englishNames": "https://api.steampowered.com/IEconItems_440/GetSchemaItems/v0001/ (IEconItems_440/GetSchemaItems v0001)"
@@ -18,7 +18,7 @@
     },
     "prices": {
       "source": "backpack.tf (IGetPrices v4, IGetCurrencies v1)",
-      "takenAt": "2026-09-21T02:06:52.220Z",
+      "takenAt": "2026-09-21T02:36:00.274Z",
       "keyRate": {
         "scrap": 577,
         "refined": 64.1111,
@@ -43,14 +43,14 @@
     "dollarBases": {
       "steamCommunityMarket": {
         "source": "Steam Community Market price overview (Mann Co. Supply Crate Key, USD)",
-        "takenAt": "2026-09-21T02:06:55.532Z",
+        "takenAt": "2026-09-21T02:36:02.151Z",
         "lowest": {
-          "usdPerKey": 2.25,
-          "usdPerRefined": 0.035095
-        },
-        "median": {
           "usdPerKey": 2.27,
           "usdPerRefined": 0.035407
+        },
+        "median": {
+          "usdPerKey": 2.29,
+          "usdPerRefined": 0.035719
         }
       },
       "priceSource": {

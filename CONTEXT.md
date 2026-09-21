@@ -57,7 +57,11 @@ The single Quality and craftability combination whose price stands for the Cosme
 The price of a Cosmetic's Reference Variant.
 
 **Price Spread**:
-The low and high figures a price source reports for a Reference Variant. The catalogue shows the spread and its midpoint.
+The low and high figures a price source reports for a variant. The catalogue shows the Reference Variant's spread and its midpoint.
+
+**Variant Price**:
+The Price Spread of one Quality-and-craftability pair, as against the Reference Price, which is the Price Spread of the Reference Variant alone. A Cosmetic has a Variant Price for every Quality the price source listed it in, and they live in a document of their own (ADR-0005) because what a viewer's own copy is worth is a different question from what the Cosmetic costs. Never Unusual: a price source prices an Unusual by effect, so there is no one figure for the Cosmetic.
+_Avoid_: quality price (Quality alone does not identify one; craftability is half of it)
 
 **Unpriced**:
 A Cosmetic whose Reference Variant has no listed price at the price source. Unpriced Cosmetics stay in the catalogue.
