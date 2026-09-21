@@ -24,8 +24,14 @@ import { expect, expectClean, modal, openCard, card, test } from "./catalogue-pa
 const STYLED = "tin-pot";
 
 /**
- * The bar's controls, by the accessible name each one has to have. A control
- * that loses its label fails here by name rather than as a count.
+ * The bar's controls, by the accessible name each one has to have, in the order
+ * a Tab walks them. A control that loses its label fails here by name rather
+ * than as a count.
+ *
+ * The two toggles that read a backpack — "Only what I own" and "Hide
+ * untradable" — are not here, because with no Inventory they are disabled and a
+ * keyboard correctly walks past them. They are named and worked in
+ * `inventory.spec.ts`, where there is a backpack for them to act on.
  */
 const CONTROLS = [
   "Search by name",

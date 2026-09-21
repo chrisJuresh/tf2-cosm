@@ -113,6 +113,18 @@ export interface BrowsingControls {
    */
   readonly onlyOwned: boolean;
   /**
+   * Whether the viewer's untradable copies are left out of their Inventory.
+   *
+   * It narrows copies rather than Cosmetics, so it is the one control here that
+   * `visibleCosmetics` never reads: it is applied to the Inventory before the
+   * owned set is built, and reaches the grid only through that set — a Cosmetic
+   * the viewer owns no tradable copy of is one they no longer own for the
+   * purposes of every other control. It lives with the rest because it is a
+   * thing a viewer picks and it is remembered with them, and because the toggle
+   * sits in the same row.
+   */
+  readonly hideUntradable: boolean;
+  /**
    * Whether the Event-Only Cosmetics are left out. On by default: they are a
    * seventh of the catalogue and, unless the event is running, not something a
    * player can wear, so they are clutter in front of the answer most of the
@@ -135,6 +147,7 @@ export const DEFAULT_CONTROLS: BrowsingControls = {
   slot: null,
   hideUnpriced: false,
   onlyOwned: true,
+  hideUntradable: false,
   hideEventOnly: true,
   sort: "metal-value-high",
   search: "",

@@ -100,6 +100,15 @@ nothing to narrow until a backpack is read, so it costs a viewer without one
 nothing, and a viewer who pasted a profile asked for their own backpack — having
 to tick a second control to see it is a step with no decision in it.
 
+An untradable copy is worth $0. That is a figure, not a gap: nobody can be handed
+the thing, so nobody would give anything for it, and the card says so rather than
+showing what a tradable copy of the same hat fetches. It holds whatever Quality
+the copy is in — an untradable Unusual is worth nothing too. The **Hide
+untradable** toggle leaves those copies out of the Inventory altogether, which is
+usually what a viewer adding up their backpack means; a Cosmetic they own no
+tradable copy of then drops out of what they own, and the total does not move,
+because what it dropped was worth nothing.
+
 Two things make it work and neither of them is on the page.
 
 **The inventory proxy.** Steam answers its inventory endpoint with JSON and no
@@ -113,8 +122,9 @@ image base:
 NEXT_PUBLIC_INVENTORY_API_URL=https://tf2-cosm-inventory.example.workers.dev
 ```
 
-Unset, the box is not offered at all and the "Only what I own" toggle stays
-disabled. A control that cannot work is worse than no control.
+Unset, the box is not offered at all and the two toggles that read a backpack —
+"Only what I own" and "Hide untradable" — stay disabled. A control that cannot
+work is worse than no control.
 
 **The Variant Prices.** The catalogue carries one price per Cosmetic and pricing
 a viewer's own copy needs the rest, which is a second committed document,

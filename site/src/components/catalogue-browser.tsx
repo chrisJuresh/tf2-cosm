@@ -43,7 +43,10 @@ export interface CatalogueBrowserProps {
 
 export function CatalogueBrowser({ cosmetics, manifest, keyRate, basis, snapshotTakenAt }: CatalogueBrowserProps) {
   const [controls, change] = useRememberedControls();
-  const [inventory, inventoryActions] = useInventory(cosmetics, snapshotTakenAt);
+  // The untradable toggle goes in here rather than into the filter below: it
+  // takes copies out of the Inventory, and the owned set every other control
+  // reads is what is left of it.
+  const [inventory, inventoryActions] = useInventory(cosmetics, snapshotTakenAt, controls.hideUntradable);
   // Read once per render rather than per card: Next inlines it at build time, so
   // it cannot change while the page is open.
   const configured = inventoryApiUrl() !== null;

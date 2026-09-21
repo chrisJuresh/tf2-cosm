@@ -9,7 +9,7 @@ import { describe, expect, it } from "vitest";
 import { fixtureCosmetics } from "./fixtures.ts";
 
 import type { OwnedCopy } from "@/inventory/copies";
-import { inventoryTotal, ownedCosmetics, ownedSlugs } from "@/inventory/owned";
+import { inventoryTotal, ownedCosmetics, ownedSlugs, withoutUntradable } from "@/inventory/owned";
 import type { VariantPrices } from "@/prices/variant-prices";
 
 const cosmetics = fixtureCosmetics();
@@ -163,6 +163,39 @@ describe("pricing a copy as the copy it is", () => {
     expect(owned[0]?.scrap).toBe(0);
   });
 
+  it("prices an untradable copy at nothing, whatever the source says a tradable one is worth", () => {
+    const owned = ownedCosmetics(
+      cosmetics,
+      [copy({ defindex: teamCaptain.defindex, tradable: false })],
+      prices({ "team-captain": [{ quality: "unique", scrap: 900 }] }),
+    );
+    expect(owned[0]?.copies[0]).toMatchObject({ price: null, noPrice: "untradable" });
+    expect(owned[0]?.scrap).toBe(0);
+  });
+
+  it("prices an untradable Unusual at nothing too, rather than by its effect", () => {
+    // Untradable is settled first: what an effect would fetch does not matter
+    // for a copy nobody can be handed.
+    const owned = ownedCosmetics(
+      cosmetics,
+      [copy({ defindex: teamCaptain.defindex, quality: "unusual", tradable: false, effect: "Burning Flames" })],
+      prices({ "team-captain": [{ quality: "unique", scrap: 12 }] }),
+    );
+    expect(owned[0]?.copies[0]?.noPrice).toBe("untradable");
+  });
+
+  it("puts a tradable copy ahead of an untradable one, so the card shows the one worth something", () => {
+    const owned = ownedCosmetics(
+      cosmetics,
+      [
+        copy({ defindex: teamCaptain.defindex, tradable: false }),
+        copy({ defindex: teamCaptain.defindex, quality: "strange" }),
+      ],
+      prices({ "team-captain": [{ quality: "unique", scrap: 900 }, { quality: "strange", scrap: 100 }] }),
+    );
+    expect(owned[0]?.copies.map((one) => one.noPrice)).toEqual([null, "untradable"]);
+  });
+
   it("says so when the source has no figure for that Quality, which is not the same thing", () => {
     const owned = ownedCosmetics(
       cosmetics,
@@ -204,15 +237,71 @@ describe("what an Inventory comes to", () => {
       ],
       prices({ "team-captain": [{ quality: "unique", scrap: 100 }] }),
     );
-    expect(inventoryTotal(owned)).toEqual({ scrap: 200, counted: 2, pricedPerEffect: 1, unpriced: 1 });
+    expect(inventoryTotal(owned)).toEqual({ scrap: 200, counted: 2, untradable: 0, pricedPerEffect: 1, unpriced: 1 });
+  });
+
+  it("counts the untradable copies on their own, and adds nothing for them", () => {
+    const owned = ownedCosmetics(
+      cosmetics,
+      [copy({ defindex: teamCaptain.defindex }), copy({ defindex: teamCaptain.defindex, tradable: false, count: 4 })],
+      prices({ "team-captain": [{ quality: "unique", scrap: 100 }] }),
+    );
+    expect(inventoryTotal(owned)).toEqual({ scrap: 100, counted: 1, untradable: 4, pricedPerEffect: 0, unpriced: 0 });
   });
 
   it("comes to nothing, and says so, when nothing could be priced", () => {
     const owned = ownedCosmetics(cosmetics, [copy({ defindex: teamCaptain.defindex })], null);
-    expect(inventoryTotal(owned)).toEqual({ scrap: 0, counted: 0, pricedPerEffect: 0, unpriced: 1 });
+    expect(inventoryTotal(owned)).toEqual({ scrap: 0, counted: 0, untradable: 0, pricedPerEffect: 0, unpriced: 1 });
   });
 
   it("has nothing to say about an empty Inventory", () => {
-    expect(inventoryTotal([])).toEqual({ scrap: 0, counted: 0, pricedPerEffect: 0, unpriced: 0 });
+    expect(inventoryTotal([])).toEqual({ scrap: 0, counted: 0, untradable: 0, pricedPerEffect: 0, unpriced: 0 });
+  });
+});
+
+describe("leaving the untradable copies out", () => {
+  const teamCaptain = fixture("team-captain");
+  const other = cosmetics.find((one) => one.slug !== "team-captain");
+
+  it("drops the untradable copies and counts what is left", () => {
+    const owned = ownedCosmetics(
+      cosmetics,
+      [
+        copy({ defindex: teamCaptain.defindex, count: 2 }),
+        copy({ defindex: teamCaptain.defindex, quality: "strange", tradable: false, count: 3 }),
+      ],
+      prices({ "team-captain": [{ quality: "unique", scrap: 100 }, { quality: "strange", scrap: 200 }] }),
+    );
+    const kept = withoutUntradable(owned);
+    expect(kept[0]?.copies.map((one) => one.quality)).toEqual(["unique"]);
+    expect(kept[0]?.count).toBe(2);
+  });
+
+  it("drops a Cosmetic the viewer owns no tradable copy of, which is what narrows the grid", () => {
+    if (other === undefined) throw new Error("the fixture catalogue is meant to have more than one Cosmetic");
+    const owned = ownedCosmetics(
+      cosmetics,
+      [copy({ defindex: teamCaptain.defindex }), copy({ defindex: other.defindex, tradable: false })],
+      prices({ "team-captain": [{ quality: "unique", scrap: 100 }] }),
+    );
+    expect([...ownedSlugs(withoutUntradable(owned))]).toEqual(["team-captain"]);
+  });
+
+  it("leaves the Metal Value where it was, because what it dropped was worth nothing", () => {
+    const owned = ownedCosmetics(
+      cosmetics,
+      [copy({ defindex: teamCaptain.defindex }), copy({ defindex: teamCaptain.defindex, tradable: false })],
+      prices({ "team-captain": [{ quality: "unique", scrap: 100 }] }),
+    );
+    expect(inventoryTotal(withoutUntradable(owned)).scrap).toBe(inventoryTotal(owned).scrap);
+  });
+
+  it("does nothing to an Inventory with nothing untradable in it", () => {
+    const owned = ownedCosmetics(
+      cosmetics,
+      [copy({ defindex: teamCaptain.defindex })],
+      prices({ "team-captain": [{ quality: "unique", scrap: 100 }] }),
+    );
+    expect(withoutUntradable(owned)).toEqual(owned);
   });
 });

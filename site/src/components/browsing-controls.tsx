@@ -239,6 +239,15 @@ export function BrowsingControlsBar({ controls, onChange, shown, total, ownedOff
           disabled={!ownedOffered}
           onChange={(checked) => onChange({ onlyOwned: checked })}
         />
+        {/* About the viewer's own copies, so it has nothing to leave out until a
+            backpack has been read; disabled until then, like the one above it. */}
+        <Toggle
+          id="hide-untradable"
+          label="Hide untradable"
+          checked={controls.hideUntradable}
+          disabled={!ownedOffered}
+          onChange={(checked) => onChange({ hideUntradable: checked })}
+        />
         {/* Ticked when the page opens, so the toggle is also how a viewer finds
             out the Event-Only Cosmetics are in the catalogue at all. */}
         <Toggle

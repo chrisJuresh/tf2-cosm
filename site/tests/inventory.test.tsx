@@ -35,7 +35,16 @@ function defindexOf(slug: string): number {
 }
 
 /** What the proxy answers with, in its own shape. */
-function inventory(copies: { defindex: number; quality?: string; craftable?: boolean; count?: number; effect?: string }[]) {
+function inventory(
+  copies: {
+    defindex: number;
+    quality?: string;
+    craftable?: boolean;
+    tradable?: boolean;
+    count?: number;
+    effect?: string;
+  }[],
+) {
   return {
     steamId: "76561197960435530",
     takenAt: "2026-09-21T02:51:51.168Z",
@@ -43,7 +52,7 @@ function inventory(copies: { defindex: number; quality?: string; craftable?: boo
       defindex: one.defindex,
       quality: one.quality ?? "unique",
       craftable: one.craftable ?? true,
-      tradable: true,
+      tradable: one.tradable ?? true,
       count: one.count ?? 1,
       ...(one.effect === undefined ? {} : { effect: one.effect }),
     })),
@@ -163,6 +172,18 @@ describe("asking for a backpack", () => {
     });
   });
 
+  it("marks an untradable copy at nothing rather than at what a tradable one fetches", async () => {
+    serve(() => answer(inventory([{ defindex: defindexOf("team-captain"), tradable: false }])));
+    const user = renderBrowser();
+    await look(user, "robinwalker");
+
+    await waitFor(() => {
+      const card = cardFor("team-captain") as HTMLElement;
+      expect(within(card).getByText("Untradable")).toBeInTheDocument();
+      expect(within(card).getByText("$0.00")).toBeInTheDocument();
+    });
+  });
+
   it("totals what the backpack comes to, and says what it left out", async () => {
     serve(() =>
       answer(
@@ -222,6 +243,66 @@ describe("narrowing the catalogue to what a viewer owns", () => {
     await waitFor(() => expect(screen.getByLabelText("Only what I own")).toBeEnabled());
 
     await waitFor(() => expect(screen.getByText(/1 Cosmetics · 1 copies priced at/)).toBeInTheDocument());
+  });
+});
+
+describe("leaving the untradable copies out", () => {
+  it("leaves the toggle disabled until there is a backpack to leave them out of", async () => {
+    serve(() => answer(inventory([{ defindex: defindexOf("team-captain") }])));
+    const user = renderBrowser();
+    const toggle = screen.getByLabelText("Hide untradable");
+    expect(toggle).toBeDisabled();
+
+    await look(user, "robinwalker");
+    await waitFor(() => expect(toggle).toBeEnabled());
+  });
+
+  it("counts them at $0 until it is ticked, and says how many are hidden once it is", async () => {
+    serve(() =>
+      answer(
+        inventory([
+          { defindex: defindexOf("team-captain") },
+          { defindex: defindexOf("bolt-boy"), tradable: false, count: 2 },
+        ]),
+      ),
+    );
+    const user = renderBrowser();
+    await look(user, "robinwalker");
+    await waitFor(() => expect(screen.getByText(/2 untradable at \$0/)).toBeInTheDocument());
+
+    await user.click(screen.getByLabelText("Hide untradable"));
+    await waitFor(() => expect(screen.getByText(/2 untradable copies hidden/)).toBeInTheDocument());
+  });
+
+  it("drops a Cosmetic they own no tradable copy of out of what they own", async () => {
+    serve(() =>
+      answer(
+        inventory([
+          { defindex: defindexOf("team-captain") },
+          { defindex: defindexOf("bolt-boy"), tradable: false },
+        ]),
+      ),
+    );
+    const user = renderBrowser();
+    await look(user, "robinwalker");
+    // The grid is already narrowed to what they own, which is both of them.
+    await waitFor(() => expect(cardFor("bolt-boy")).not.toBeNull());
+
+    await user.click(screen.getByLabelText("Hide untradable"));
+    await waitFor(() => {
+      expect(cardFor("bolt-boy")).toBeNull();
+      expect(cardFor("team-captain")).not.toBeNull();
+    });
+  });
+
+  it("says a backpack of nothing but untradable Cosmetics is that, not one with no Cosmetics in it", async () => {
+    serve(() => answer(inventory([{ defindex: defindexOf("team-captain"), tradable: false, count: 3 }])));
+    const user = renderBrowser();
+    await look(user, "robinwalker");
+    await waitFor(() => expect(screen.getByLabelText("Hide untradable")).toBeEnabled());
+
+    await user.click(screen.getByLabelText("Hide untradable"));
+    await waitFor(() => expect(screen.getByText(/Every Cosmetic in that backpack is untradable/)).toBeInTheDocument());
   });
 });
 

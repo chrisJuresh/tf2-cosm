@@ -58,6 +58,7 @@ function rememberedFrom(stored: Record<string, unknown>): RememberedControls {
     slot: oneOf<CosmeticSlot>(COSMETIC_SLOTS, stored["slot"], DEFAULT_CONTROLS.slot),
     hideUnpriced: asBoolean(stored["hideUnpriced"], DEFAULT_CONTROLS.hideUnpriced),
     onlyOwned: asBoolean(stored["onlyOwned"], DEFAULT_CONTROLS.onlyOwned),
+    hideUntradable: asBoolean(stored["hideUntradable"], DEFAULT_CONTROLS.hideUntradable),
     hideEventOnly: asBoolean(stored["hideEventOnly"], DEFAULT_CONTROLS.hideEventOnly),
     sort: oneOf<SortOrder>(SORT_ORDERS, stored["sort"], DEFAULT_CONTROLS.sort) ?? DEFAULT_CONTROLS.sort,
   };
@@ -117,7 +118,8 @@ export function useRememberedControls(): readonly [BrowsingControls, (change: Pa
   // Only the remembered fields are watched. The search is not one of them, and
   // waking this up on every keystroke to write the same bytes back is work for
   // nothing.
-  const { classFilter, hideAllClass, slot, hideUnpriced, onlyOwned, hideEventOnly, sort } = state.controls;
+  const { classFilter, hideAllClass, slot, hideUnpriced, onlyOwned, hideUntradable, hideEventOnly, sort } =
+    state.controls;
   useEffect(() => {
     if (!state.restored) return;
     writeControls(browserStorage(), {
@@ -127,10 +129,11 @@ export function useRememberedControls(): readonly [BrowsingControls, (change: Pa
       slot,
       hideUnpriced,
       onlyOwned,
+      hideUntradable,
       hideEventOnly,
       sort,
     });
-  }, [state.restored, classFilter, hideAllClass, slot, hideUnpriced, onlyOwned, hideEventOnly, sort]);
+  }, [state.restored, classFilter, hideAllClass, slot, hideUnpriced, onlyOwned, hideUntradable, hideEventOnly, sort]);
 
   const change = useCallback((patch: Partial<BrowsingControls>) => {
     setState((previous) => ({ ...previous, controls: { ...previous.controls, ...patch } }));
