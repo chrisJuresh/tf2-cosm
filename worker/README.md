@@ -108,18 +108,29 @@ Nothing is deployed automatically and there is nothing to configure.
 
 ```bash
 pnpm --filter @tf2-cosm/inventory-proxy exec wrangler login
-pnpm --filter @tf2-cosm/inventory-proxy deploy
+pnpm --filter @tf2-cosm/inventory-proxy run deploy
 ```
+
+`run` is not optional there. `deploy` is a pnpm builtin of its own — it copies a
+workspace package into a directory — so `pnpm --filter ... deploy` never reaches
+this package's `deploy` script and stops at
+`[ERR_PNPM_INVALID_DEPLOY_TARGET] This command requires one parameter`.
 
 That puts it at `https://tf2-cosm-inventory.<your-subdomain>.workers.dev`. A
 custom domain is a route in the Cloudflare dashboard, the same account the render
 bucket is already on; `docs/render/publishing.md` covers how that account is set
 up.
 
-Whatever URL it ends at is the site's `NEXT_PUBLIC_INVENTORY_API_URL`. Next
-inlines `NEXT_PUBLIC_*` at build time, so a deployment already built does not
-pick up a new value — redeploy. Unset, the site does not offer the feature at
-all, rather than offering it broken.
+A subdomain created for the first deploy resolves in DNS a few minutes before its
+TLS certificate exists. In that gap `curl` fails the handshake and exits 35; it is
+not a 404 and not a bad URL, and the only fix is to wait and try again.
+
+Whatever URL it ends at is the site's `NEXT_PUBLIC_INVENTORY_API_URL`. Today that
+is `https://tf2-cosm-inventory.tf2-cosm-inventory-proxy.workers.dev`, which is
+what the variable holds in Vercel for Production and Preview. Next inlines
+`NEXT_PUBLIC_*` at build time, so a deployment already built does not pick up a
+new value — redeploy. Unset, the site does not offer the feature at all, rather
+than offering it broken.
 
 ## What it costs
 
