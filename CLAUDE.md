@@ -1,5 +1,9 @@
 # TF2 Cosmetics Catalogue
 
+## `origin/main` is the repository; local `main` is a snapshot
+
+Several sessions work here at once and every change lands as a merged PR on the remote, so local `main` is behind almost always — nothing pulls it. Fetch first, then read the remote-tracking ref: `git fetch origin main`, then `git log origin/main`, `git diff origin/main...HEAD`, `git show origin/main:<path>`. A bare `main`, a bare `git log`, or a file read from the main checkout (rather than from your worktree, which was cut from the fetched tip) answers from whenever this disk last caught up, and nothing about the answer says it is old. Worktrees are cut from `origin/main` for the same reason; the guard says so at the start of every session.
+
 ## Agent skills
 
 ### Issue tracker
