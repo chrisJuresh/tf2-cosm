@@ -104,12 +104,14 @@ its icon, which is what production does for an unrendered Cosmetic too.
 - `src/components/cosmetic-list.tsx` — the list, a client component fed the
   Cosmetics it is to draw and nothing about why those are the ones. Its rows are
   virtualised, so eighteen hundred of them with a picture each scroll without the
-  browser holding eighteen hundred rows. A phone has room for four columns across
-  rather than five, so it carries the Metal Value on a second line under the
-  Cosmetic's name instead of dropping it. A row opens in place, one at a time;
-  because an open row is taller by an amount that depends on how its panel wraps,
-  rows are measured rather than assumed and the fixed height is only the estimate
-  the list starts from.
+  browser holding eighteen hundred rows. A row draws its picture at the size an
+  open row draws it — the picture is the only thing in the row that says which
+  hat this is — which leaves a phone about two hundred pixels for the rest, so a
+  phone stacks the name and the three figures beside the picture rather than
+  across from it. Nothing is dropped at either width. A row opens in place, one
+  at a time; because an open row is taller by an amount that depends on how its
+  panel wraps, rows are measured rather than assumed and the fixed height is only
+  the estimate the list starts from.
 - `src/components/cosmetic-detail.tsx` — what an open row shows: the larger Worn
   Render with its two controls, the Price Spread, the Reference Variant the
   figure is for, when the source last repriced it, who can wear it, and the

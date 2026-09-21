@@ -51,14 +51,27 @@ import {
 /** What a figure reads as when there is nothing to put there. */
 const NOTHING = "—";
 
-/** Tall enough for the picture; a collapsed row is always exactly this. */
-const ROW_HEIGHT = 56;
+/**
+ * Tall enough for the picture. It is the phone's row height and the estimate the
+ * virtualiser starts every row from; from `sm` up the picture is larger and the
+ * row with it, which the list measures rather than being told (`ROW_CLASSES`).
+ */
+const ROW_HEIGHT = 144;
+
+/** What the summary row is actually tall: the picture, plus room to breathe. */
+const ROW_CLASSES = "h-36 sm:h-44";
 
 /**
  * How big the list draws a Cosmetic, and which derivative it asks for. A
  * collapsed row shows the catalogue's own default look on RED: the Style and the
  * Team are what an open row lets a viewer change, and eighteen hundred rows each
  * remembering their own would be eighteen hundred pictures nobody asked to see.
+ *
+ * The picture is drawn at the size the open row draws it. It is the only thing in
+ * the row that says which hat this is — the name is a pun as often as not — and
+ * at a thumbnail's size a Worn Render is a class in a hat rather than the hat, so
+ * the list is scrolled past rather than read. The derivative is the next size up
+ * from the box, so a high-density screen has pixels to spend.
  */
 const LIST_SIZE = 256;
 
@@ -76,37 +89,53 @@ interface Column {
  * it happens to fall — so the header and the row cannot drift apart, and a column
  * can move without every column after it shifting a track.
  *
- * A phone has room for four columns across, not five, so it keeps the Metal Value
- * on a second line under the Cosmetic's name instead of dropping it: below a Key
- * the Metal Value is word for word the Trader Notation, but above one it is the
- * figure that makes two Cosmetics comparable, and a phone viewer wants it too.
+ * The picture's track is as wide as the picture, which on a phone is most of what
+ * the width buys. That is the trade the size is worth — the row is a picture with
+ * its price beside it rather than a line of figures with a stamp at the end — but
+ * it leaves a phone about two hundred pixels for everything else, and four figures
+ * will not sit across two hundred pixels. So a phone stacks them beside the
+ * picture instead: the name, the Trader Notation under it, and the Metal Value and
+ * the dollars sharing the line below that. Nothing is dropped — below a Key the
+ * Metal Value is word for word the Trader Notation, but above one it is the figure
+ * that makes two Cosmetics comparable, and a phone viewer wants it too.
  */
 const COLUMNS: readonly Column[] = [
-  { label: "Icon", className: "col-start-1 row-start-1 row-span-2 sm:row-span-1 justify-self-center", unlabelled: true },
-  { label: "Cosmetic", className: "col-start-2 row-start-1 truncate font-medium self-end sm:self-center" },
+  {
+    label: "Icon",
+    className: "col-start-1 row-start-1 row-end-4 justify-self-center self-center sm:row-end-2",
+    unlabelled: true,
+  },
+  {
+    label: "Cosmetic",
+    className: "col-start-2 col-end-4 row-start-1 min-w-0 truncate font-medium self-end sm:col-end-3 sm:self-center",
+  },
   {
     label: "Trader Notation",
-    className: "col-start-3 row-start-1 row-span-2 self-center text-right tabular-nums sm:row-span-1",
+    className:
+      "col-start-2 col-end-4 row-start-2 text-left tabular-nums" +
+      " sm:col-start-3 sm:col-end-4 sm:row-start-1 sm:text-right sm:self-center",
   },
   {
     label: "Metal Value",
     className:
-      "col-start-2 row-start-2 text-left text-[0.6875rem] self-start tabular-nums text-black/55 dark:text-white/55" +
+      "col-start-2 row-start-3 text-left text-[0.6875rem] self-start tabular-nums text-black/55 dark:text-white/55" +
       " sm:col-start-4 sm:row-start-1 sm:self-center sm:text-right sm:text-sm sm:text-black/60 sm:dark:text-white/60",
   },
   {
     label: "Dollars",
-    className: "col-start-4 row-start-1 row-span-2 self-center text-right tabular-nums sm:col-start-5 sm:row-span-1",
+    className:
+      "col-start-3 row-start-3 self-start text-right tabular-nums" +
+      " sm:col-start-5 sm:row-start-1 sm:self-center",
   },
 ];
 
 /**
- * The grid the header and every row's summary are laid on: four columns over two
- * rows on a phone, five columns over one from `sm` up.
+ * The grid the header and every row's summary are laid on: three columns over
+ * three rows on a phone, five columns over one from `sm` up.
  */
 const GRID =
-  "grid grid-cols-[2.25rem_minmax(0,1fr)_7.5rem_4.25rem] grid-rows-[1fr_1fr] content-center gap-x-2 px-2" +
-  " sm:grid-cols-[3rem_minmax(0,1fr)_9rem_6rem_5rem] sm:grid-rows-1 sm:items-center sm:gap-x-3 sm:px-3";
+  "grid grid-cols-[8.5rem_minmax(0,1fr)_auto] grid-rows-[auto_auto_auto] content-center gap-x-2 px-2" +
+  " sm:grid-cols-[10.5rem_minmax(0,1fr)_9rem_6rem_5rem] sm:grid-rows-[1fr] sm:items-center sm:gap-x-3 sm:px-3";
 
 export interface CosmeticListProps {
   readonly cosmetics: readonly Cosmetic[];
@@ -258,8 +287,7 @@ function CosmeticRow({
         role="row"
         aria-rowindex={rowIndex}
         data-slug={slug}
-        style={{ height: ROW_HEIGHT }}
-        className={`${GRID} cursor-pointer border-b border-black/5 text-xs sm:text-sm dark:border-white/10 ${
+        className={`${GRID} ${ROW_CLASSES} cursor-pointer border-b border-black/5 text-xs sm:text-sm dark:border-white/10 ${
           expanded ? "border-transparent bg-black/[0.03] dark:border-transparent dark:bg-white/[0.04]" : ""
         }`}
         onClick={onRowClick}
@@ -272,8 +300,10 @@ function CosmeticRow({
             team={DEFAULT_TEAM}
             style={DEFAULT_STYLE}
             size={LIST_SIZE}
-            icon="small"
-            className="max-h-8 max-w-8 object-contain sm:max-h-10 sm:max-w-10"
+            // Drawn at 128 pixels and up, so the fallback is the 512 icon: the
+            // 64 one would be upscaled in the only place it shows.
+            icon="large"
+            className="max-h-32 max-w-32 object-contain sm:max-h-40 sm:max-w-40"
           />
         </Cell>
         <Cell column={1}>
@@ -426,7 +456,8 @@ export function CosmeticList({ cosmetics, manifest, classView, keyRate, basis }:
         <div
           role="row"
           aria-rowindex={1}
-          className={`${GRID} h-10 text-xs uppercase tracking-wide text-black/60 dark:text-white/60`}
+          // Three stacked headings on a phone, one row of five from `sm` up.
+          className={`${GRID} py-1.5 text-xs uppercase tracking-wide text-black/60 sm:h-10 sm:py-0 dark:text-white/60`}
         >
           {COLUMNS.map((column) => (
             <div key={column.label} role="columnheader" className={column.className}>

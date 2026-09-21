@@ -221,6 +221,21 @@ add-on and must stay replaceable, so nothing is changed inside it.
    the last component the way `pathlib` does; `with_suffix` is built on it and is fixed too.
    The `TextureCachePath` we set was always correct — it is a directory, and the add-on
    reads it as one.
+4. **`uv.output` — the one that cost us a fifth of the catalogue.** `VertexLitGeneric.create_nodes`
+   writes `uv_out=uv.output[0]` twice, where the attribute is `outputs` and `uv` is `None`
+   unless the material carries a `$basetexturetransform`. Either way it raises, the add-on
+   catches it a frame up and logs `Failed to load material`, and the half-built material is
+   left with its Material Output unconnected — which Blender renders as flat, unlit black.
+   The first of the two lines is reached by the commonest TF2 material there is, a
+   `$phongexponenttexture` with no `$phongexponent`, so roughly one Cosmetic in five came out
+   of the first full run as a black silhouette on a correctly lit class: Smissmas Caribou, Le
+   Professionnel, A Rather Festive Tree and about three hundred more. The value the parameter
+   wants when there is no transform is `None` — that is what the add-on passes everywhere
+   else — so there is nothing to invent. There is no seam inside a three-hundred-line method,
+   so we take it as text, correct both lines, and compile it against the add-on's own module
+   globals; nothing on disk is touched, and a version that has fixed the typo is left alone.
+   The symptom to watch for is `Failed to load material` in a run's log: a material that logs
+   it is a material that will render black.
 
 None of these is ours to fix upstream from here; all are worth reporting.
 
