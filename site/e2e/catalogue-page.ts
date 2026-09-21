@@ -99,10 +99,15 @@ export async function slugs(page: Page): Promise<string[]> {
   return cards(page).evaluateAll((elements) => elements.map((element) => element.getAttribute("data-slug") ?? ""));
 }
 
-/** Open a card from the keyboard's point of view — by pressing its toggle. */
+/** Open a Cosmetic from the keyboard's point of view — by pressing its control. */
 export async function openCard(page: Page, slug: string) {
   await card(page, slug).getByRole("button").click();
   const detail = page.locator(`#cosmetic-detail-${slug}`);
   await expect(detail).toBeVisible();
   return detail;
+}
+
+/** The modal a Cosmetic opens in, whichever Cosmetic that is. */
+export function modal(page: Page) {
+  return page.getByRole("dialog");
 }

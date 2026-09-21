@@ -3,8 +3,9 @@
 /**
  * The catalogue as a grid: every Cosmetic a card, as many cards across as the
  * screen is wide, each with its picture, its name, its price in Trader Notation
- * and as a Metal Value, and what that comes to in dollars. A card opens in place
- * to show where its one figure came from.
+ * and as a Metal Value, and what that comes to in dollars. A card opens over the
+ * page, as a modal, to show where its one figure came from — see
+ * `@/components/cosmetic-modal`.
  *
  * A grid rather than a list because of what the picture costs. A Worn Render
  * only says which hat this is at something like the size a hand holds it, and at
@@ -19,9 +20,9 @@
  * single media query. Everything else is the same problem the row list had:
  * eighteen hundred cards with a picture each only scroll smoothly if the browser
  * is holding a screenful rather than all of them, so the grid is virtualised a
- * row of cards at a time, and an open card's panel makes its row taller by an
- * amount that depends on how the panel wraps, so rows are measured rather than
- * assumed.
+ * row of cards at a time. Opening a Cosmetic leaves the grid exactly as it was:
+ * the modal is over the page rather than in it, so no row changes height and
+ * nothing a viewer was looking at moves.
  *
  * The markup carries its list roles explicitly — absolutely positioned rows of
  * cards are not a `<ul>`, but they are still a list of eighteen hundred things
@@ -34,18 +35,9 @@
  */
 import type { ClassName, Cosmetic, Metal } from "@tf2-cosm/data/catalogue";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import {
-  type CSSProperties,
-  type KeyboardEvent,
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { type CSSProperties, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
-import { CosmeticDetail } from "@/components/cosmetic-detail";
+import { CosmeticModal } from "@/components/cosmetic-modal";
 import { WornRender } from "@/components/worn-render";
 import type { RenderManifest } from "@/renders/manifest";
 import { DEFAULT_STYLE, DEFAULT_TEAM, displayedClass } from "@/renders/select";
@@ -186,20 +178,15 @@ function figuresFor(cosmetic: Cosmetic, keyRate: Metal | null, basis: DollarBasi
   };
 }
 
-/** The id the card's toggle points `aria-controls` at. */
-function detailId(slug: string): string {
-  return `cosmetic-detail-${slug}`;
-}
-
 /** The slug in the address bar, if there is one. Empty means no Cosmetic named. */
 function slugInHash(): string {
   return decodeURIComponent(window.location.hash.replace(/^#/, ""));
 }
 
 /**
- * Put the expanded Cosmetic in the address bar, so the page can be linked to. It
- * replaces rather than pushes: expanding a card is reading, not navigating, and a
- * viewer who opened six cards wants Back to leave the site rather than to close
+ * Put the open Cosmetic in the address bar, so the page can be linked to. It
+ * replaces rather than pushes: opening a Cosmetic is reading, not navigating,
+ * and a viewer who opened six wants Back to leave the site rather than to close
  * them one at a time.
  */
 function writeHash(slug: string | null): void {
@@ -234,9 +221,8 @@ interface CosmeticCardProps {
   /** Which of the whole catalogue this card is, since only a screenful exists. */
   position: number;
   total: number;
-  expanded: boolean;
-  onToggle: (slug: string) => void;
-  /** Hands the card's toggle to the grid, which focuses it when a link opens the card. */
+  onOpen: (slug: string) => void;
+  /** Hands the card's control to the grid, which focuses it when the modal closes. */
   registerToggle: (slug: string, toggle: HTMLButtonElement | null) => void;
 }
 
@@ -247,8 +233,7 @@ function CosmeticCard({
   gameClass,
   position,
   total,
-  expanded,
-  onToggle,
+  onOpen,
   registerToggle,
 }: CosmeticCardProps) {
   const { slug } = cosmetic;
@@ -267,11 +252,10 @@ function CosmeticCard({
       // `relative`, because the toggle below stretches over the whole card: the
       // name is what a screen reader should hear the control called, and the
       // picture is what a viewer aims at.
-      className={`relative flex flex-col overflow-hidden rounded-lg border p-2 text-sm ${
-        expanded
-          ? "border-black/25 bg-black/[0.04] dark:border-white/30 dark:bg-white/[0.06]"
-          : "border-black/10 hover:bg-black/[0.03] dark:border-white/15 dark:hover:bg-white/[0.05]"
-      }`}
+      className={
+        "relative flex flex-col overflow-hidden rounded-lg border border-black/10 p-2 text-sm" +
+        " hover:bg-black/[0.03] dark:border-white/15 dark:hover:bg-white/[0.05]"
+      }
     >
       <div className="flex h-40 items-center justify-center">
         <WornRender
@@ -295,9 +279,10 @@ function CosmeticCard({
         <button
           type="button"
           ref={toggleRef}
-          aria-expanded={expanded}
-          aria-controls={expanded ? detailId(slug) : undefined}
-          onClick={() => onToggle(slug)}
+          // What the control does is open a modal, which is what a screen
+          // reader should hear before it is pressed rather than after.
+          aria-haspopup="dialog"
+          onClick={() => onOpen(slug)}
           // The pseudo-element is the click target: the whole card takes a click
           // that way, without the picture and the figures having to live inside
           // the control and be read out as part of its name.
@@ -329,9 +314,9 @@ function CosmeticCard({
 export function CosmeticGrid({ cosmetics, manifest, classView, keyRate, basis }: CosmeticGridProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const toggles = useRef(new Map<string, HTMLButtonElement>());
-  const [expandedSlug, setExpandedSlug] = useState<string | null>(null);
-  /** A card a link asked for, waiting for its toggle to exist so it can take focus. */
-  const [pendingFocus, setPendingFocus] = useState<string | null>(null);
+  const [openSlug, setOpenSlug] = useState<string | null>(null);
+  /** A card a link asked for, waiting to be scrolled to once its row is known. */
+  const [pendingScroll, setPendingScroll] = useState<string | null>(null);
 
   const columns = useColumns(scrollRef);
   const rowCount = Math.ceil(cosmetics.length / columns);
@@ -342,12 +327,8 @@ export function CosmeticGrid({ cosmetics, manifest, classView, keyRate, basis }:
     return index;
   }, [cosmetics]);
 
-  /** Which row of cards the open one sits in; its panel hangs under that row. */
-  const expandedRow = useMemo(() => {
-    if (expandedSlug === null) return null;
-    const index = indexBySlug.get(expandedSlug);
-    return index === undefined ? null : Math.floor(index / columns);
-  }, [expandedSlug, indexBySlug, columns]);
+  /** The Cosmetic the modal is showing, or undefined when none is open. */
+  const open = openSlug === null ? undefined : cosmetics.find((cosmetic) => cosmetic.slug === openSlug);
 
   const virtualiser = useVirtualizer({
     count: rowCount,
@@ -366,34 +347,21 @@ export function CosmeticGrid({ cosmetics, manifest, classView, keyRate, basis }:
     else toggles.current.set(slug, toggle);
   }, []);
 
-  const collapse = useCallback(
-    (slug: string) => {
-      if (expandedSlug !== slug) return;
-      setExpandedSlug(null);
-      writeHash(null);
-      toggles.current.get(slug)?.focus();
-    },
-    [expandedSlug],
-  );
+  // Closing puts the focus back on the card that opened the Cosmetic, wherever
+  // the modal happened to leave it: a viewer who arrived by keyboard carries on
+  // from the card they were on rather than from the top of the page.
+  const close = useCallback(() => {
+    const slug = openSlug;
+    setOpenSlug(null);
+    writeHash(null);
+    if (slug !== null) toggles.current.get(slug)?.focus();
+  }, [openSlug]);
 
-  // Only ever one slug, so opening a card closes whichever one was open.
-  const toggle = useCallback(
-    (slug: string) => {
-      const next = expandedSlug === slug ? null : slug;
-      setExpandedSlug(next);
-      writeHash(next);
-    },
-    [expandedSlug],
-  );
-
-  // Escape closes the open card from anywhere inside the grid, which is where
-  // the focus is whenever a card is open: opening one always leaves the focus on
-  // its toggle.
-  const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.key !== "Escape" || expandedSlug === null) return;
-    event.stopPropagation();
-    collapse(expandedSlug);
-  };
+  // Only ever one slug, so the modal is only ever one Cosmetic.
+  const openCosmetic = useCallback((slug: string) => {
+    setOpenSlug(slug);
+    writeHash(slug);
+  }, []);
 
   // A link to a Cosmetic opens it: on arrival, and again whenever the hash
   // changes underneath us, which is what an in-page link to another card does.
@@ -403,36 +371,28 @@ export function CosmeticGrid({ cosmetics, manifest, classView, keyRate, basis }:
     const follow = () => {
       const slug = slugInHash();
       if (slug === "") {
-        setExpandedSlug(null);
+        setOpenSlug(null);
         return;
       }
       if (!indexBySlug.has(slug)) return;
-      setExpandedSlug(slug);
-      setPendingFocus(slug);
+      setOpenSlug(slug);
+      setPendingScroll(slug);
     };
     follow();
     window.addEventListener("hashchange", follow);
     return () => window.removeEventListener("hashchange", follow);
   }, [indexBySlug]);
 
-  // Bring the linked card into view. Only the scroll: the card it scrolls to may
-  // not be mounted yet, so taking focus is the effect below's job.
+  // Bring the linked card into view behind the modal. The focus belongs to the
+  // modal, which takes it on the way in; the scroll is so that closing the modal
+  // lands the viewer on the Cosmetic they linked to rather than at the top of
+  // the grid, and so that the card whose control takes the focus back exists.
   useEffect(() => {
-    if (pendingFocus === null) return;
-    const index = indexBySlug.get(pendingFocus);
-    if (index === undefined) setPendingFocus(null);
-    else virtualiser.scrollToIndex(Math.floor(index / columns), { align: "start" });
-  }, [pendingFocus, indexBySlug, columns, virtualiser]);
-
-  // Deliberately every render: scrolling to a card renders it, and this is the
-  // first pass after that render where its toggle exists to be focused.
-  useEffect(() => {
-    if (pendingFocus === null) return;
-    const toggleForCard = toggles.current.get(pendingFocus);
-    if (toggleForCard === undefined) return;
-    toggleForCard.focus();
-    setPendingFocus(null);
-  });
+    if (pendingScroll === null) return;
+    const index = indexBySlug.get(pendingScroll);
+    if (index !== undefined) virtualiser.scrollToIndex(Math.floor(index / columns), { align: "start" });
+    setPendingScroll(null);
+  }, [pendingScroll, indexBySlug, columns, virtualiser]);
 
   const row: CSSProperties = {
     position: "absolute",
@@ -449,7 +409,7 @@ export function CosmeticGrid({ cosmetics, manifest, classView, keyRate, basis }:
   };
 
   return (
-    <div ref={scrollRef} onKeyDown={onKeyDown} className="min-h-0 flex-1 overflow-y-auto pb-3">
+    <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto pb-3">
       {/* A grid narrowed to nothing has to say so: an empty scroller reads as a
           page that has broken rather than as a filter that matched nothing. */}
       {cosmetics.length === 0 ? (
@@ -465,7 +425,6 @@ export function CosmeticGrid({ cosmetics, manifest, classView, keyRate, basis }:
         {virtualiser.getVirtualItems().map((item) => {
           const first = item.index * columns;
           const shown = cosmetics.slice(first, first + columns);
-          const open = expandedRow === item.index ? shown.find((one) => one.slug === expandedSlug) : undefined;
           return (
             // Presentational, so the cards below are the list's own items rather
             // than something nested inside one.
@@ -485,33 +444,23 @@ export function CosmeticGrid({ cosmetics, manifest, classView, keyRate, basis }:
                   gameClass={displayedClass(cosmetic, classView)}
                   position={first + offset + 1}
                   total={cosmetics.length}
-                  expanded={cosmetic.slug === expandedSlug}
-                  onToggle={toggle}
+                  onOpen={openCosmetic}
                   registerToggle={registerToggle}
                 />
               ))}
-              {open === undefined ? null : (
-                // An item of its own, across every column, which is what the
-                // panel is: it belongs to the card above it but it is not inside
-                // it, and a card is one of a row of equal boxes.
-                <div
-                  role="listitem"
-                  style={{ gridColumn: "1 / -1" }}
-                  className="rounded-lg border border-black/10 bg-black/[0.03] text-sm dark:border-white/15 dark:bg-white/[0.05]"
-                >
-                  <CosmeticDetail
-                    cosmetic={open}
-                    keyRate={keyRate}
-                    manifest={manifest}
-                    gameClass={displayedClass(open, classView)}
-                    id={detailId(open.slug)}
-                  />
-                </div>
-              )}
             </div>
           );
         })}
       </div>
+      {open === undefined ? null : (
+        <CosmeticModal
+          cosmetic={open}
+          keyRate={keyRate}
+          manifest={manifest}
+          gameClass={displayedClass(open, classView)}
+          onClose={close}
+        />
+      )}
     </div>
   );
 }

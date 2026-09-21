@@ -1,7 +1,7 @@
 /**
  * The pictures, as a viewer meets them: the Worn Render on a card, the icon
  * where there is no render, the Class the picture shows following the Class
- * View, and the Style switcher and Team toggle on an open card.
+ * View, and the Style switcher and Team toggle in the open Cosmetic's modal.
  *
  * Driven by the fixture manifest, which the render job itself wrote — see
  * `tests/fixtures.ts`. Nothing here asserts how the fallback chain is walked;
@@ -58,11 +58,11 @@ function pictureIn(slug: string): HTMLImageElement {
 
 function panelFor(slug: string): HTMLElement {
   const panel = document.getElementById(`cosmetic-detail-${slug}`);
-  if (panel === null) throw new Error(`${slug} is not expanded`);
+  if (panel === null) throw new Error(`${slug} is not open`);
   return panel;
 }
 
-/** The picture in an open card's panel, which is the larger one. */
+/** The picture in the open Cosmetic's modal, which is the larger one. */
 function pictureInPanel(slug: string): HTMLImageElement {
   return within(panelFor(slug)).getByRole("img");
 }
@@ -276,7 +276,9 @@ describe("the open card", () => {
     await user.click(screen.getByRole("button", { name: "Tin Pot" }));
     await user.click(within(panelFor("tin-pot")).getByRole("button", { name: "Open" }));
 
-    await user.click(screen.getByRole("button", { name: "Tin Pot" }));
+    // Closed and opened again: the Style a viewer was looking at last time is
+    // not what they asked for this time.
+    await user.keyboard("{Escape}");
     await user.click(screen.getByRole("button", { name: "Tin Pot" }));
     expect(pictureInPanel("tin-pot")).toHaveAttribute("src", "/renders/web/tin-pot/soldier-red-0@512.webp");
   });

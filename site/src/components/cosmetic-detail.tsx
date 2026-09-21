@@ -1,17 +1,22 @@
 /**
- * What an expanded row shows: the context behind the one figure the collapsed
- * row gives.
+ * What the open Cosmetic shows: the context behind the one figure its card
+ * gives.
  *
- * A row says a Cosmetic is worth "2 keys, 19.66 ref". That is a midpoint of a
+ * A card says a Cosmetic is worth "2 keys, 19.66 ref". That is a midpoint of a
  * Price Spread, for one Reference Variant, quoted on some day, by a source that
  * may not have looked since — every one of which changes what the figure is
  * worth knowing. This panel is those four facts plus who can wear the thing.
  *
- * It also shows the Cosmetic bigger than the row can: the larger Worn Render,
- * with a Style switcher and a Team toggle where there is more than one look to
- * see. Those two are the only state the panel holds, and it holds them rather
- * than the list because they are how this Cosmetic is being looked at right now
- * — closing the row is done looking, and the next one opens on its own default.
+ * It also shows the Cosmetic as big as the screen allows: the larger Worn
+ * Render, with a Style switcher and a Team toggle where there is more than one
+ * look to see. Those two are the only state the panel holds, and it holds them
+ * rather than the grid because they are how this Cosmetic is being looked at
+ * right now — closing it is done looking, and the next one opens on its own
+ * default.
+ *
+ * It is drawn inside the modal (`@/components/cosmetic-modal`), which is what
+ * gives it the room: the picture is the point of opening a Cosmetic, so it takes
+ * the width it can get and the fields sit beside it rather than under it.
  */
 "use client";
 
@@ -26,7 +31,7 @@ import { WornRender } from "@/components/worn-render";
 import type { RenderManifest, Team } from "@/renders/manifest";
 import { DEFAULT_STYLE, DEFAULT_TEAM, hasBluRender } from "@/renders/select";
 
-/** How big the open row draws the Cosmetic, and which derivative it asks for. */
+/** How big the modal draws the Cosmetic, and which derivative it asks for. */
 const DETAIL_SIZE = 512;
 
 /** The Price Spread's three ends, in the order a trader reads them. */
@@ -53,9 +58,9 @@ export interface CosmeticDetailProps {
   readonly keyRate: Metal | null;
   /** Which Worn Renders exist; empty when no run has produced any. */
   readonly manifest: RenderManifest;
-  /** The Class the picture shows — settled by the list, so the row and the panel agree. */
+  /** The Class the picture shows — settled by the grid, so the card and the panel agree. */
   readonly gameClass: ClassName;
-  /** What the row's toggle points `aria-controls` at. */
+  /** What the panel is called on the page, which is how a test and a link find it. */
   readonly id: string;
 }
 
@@ -68,8 +73,8 @@ export function CosmeticDetail({ cosmetic, keyRate, manifest, gameClass, id }: C
   const teamed = hasBluRender(manifest, cosmetic.slug, gameClass);
 
   return (
-    <div id={id} className="flex flex-col gap-3 p-3 sm:flex-row sm:gap-5 sm:p-4">
-      <div className="flex flex-col items-center gap-2 sm:items-start">
+    <div id={id} className="mt-3 flex flex-col gap-4 sm:flex-row sm:gap-6">
+      <div className="flex shrink-0 flex-col items-center gap-2">
         <WornRender
           cosmetic={cosmetic}
           manifest={manifest}
@@ -78,12 +83,14 @@ export function CosmeticDetail({ cosmetic, keyRate, manifest, gameClass, id }: C
           style={style}
           size={DETAIL_SIZE}
           icon="large"
-          className="h-32 w-32 object-contain sm:h-40 sm:w-40"
+          // As big as the modal can give it without the fields beside it
+          // wrapping: the picture is what a viewer opened the Cosmetic for.
+          className="h-56 w-56 object-contain sm:h-72 sm:w-72"
         />
         <StyleSwitcher styles={cosmetic.styles} chosen={style} onChoose={setStyle} />
         {teamed ? <TeamToggle chosen={team} onChoose={setTeam} /> : null}
       </div>
-      <dl className="grid min-w-0 flex-1 gap-x-6 gap-y-3 text-xs sm:grid-cols-2 sm:text-sm lg:grid-cols-3">
+      <dl className="grid min-w-0 flex-1 content-start gap-x-6 gap-y-3 text-xs sm:text-sm">
         {/* The three states a price is in, said once: a snapshot built without a
             price source at all, a source that has no price for this Cosmetic, and
             a price. */}
