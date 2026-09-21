@@ -143,9 +143,20 @@ exactly the paths the manifest records.
 ## After a re-render
 
 `resolve` → `batch` → `derive` → `publish`, and only the last one has anything new to say:
-a re-derived image is a different number of bytes, so the next publish replaces it. The keys
-are not content-hashed, so a browser can hold the old picture for as long as the
-`Cache-Control` says — a week by default, `--cache-control` to change it.
+a re-derived image is a different number of bytes, so the next publish replaces it.
+
+The keys are not content-hashed, so the object at a key changes while its key does not, and
+`Cache-Control` is a week. What stands between that and a stale picture on the page is the
+*site*, not the bucket: it stamps every image URL with the render's own `rendered_at`
+(`site/src/renders/base-url.ts`), so a re-rendered image is a URL no cache has seen and an
+untouched one keeps its week. The stamp comes from the manifest, so it only reaches the page
+when the manifest is committed and the site rebuilt — which is the same deploy that would be
+needed for a new Cosmetic to appear at all.
+
+Skip that and the failure is a quiet one: Cloudflare expires each object on its own schedule,
+so one Cosmetic showed the old framing at 256 and the new framing at 512 on the same page for
+the better part of a day, with the bucket holding the right bytes for both the whole time
+(#87).
 
 Nothing prunes. An object whose Cosmetic has been renamed keeps its old key and is simply
 never asked for again; deleting it is a manual job in the dashboard, and 4 KB.

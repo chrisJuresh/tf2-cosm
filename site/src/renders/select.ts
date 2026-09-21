@@ -40,6 +40,12 @@ export interface ChosenRender {
   readonly team: Team;
   readonly style: number;
   readonly variant: Variant;
+  /**
+   * When the render behind this image was made. Carried out of the manifest
+   * because the URL is stamped with it, so that a re-rendered image is a new URL
+   * rather than the old one a CDN is still holding — see `renderVersion`.
+   */
+  readonly renderedAt: string;
   /** True when this is not the render that was asked for, but one further down the chain. */
   readonly fellBack: boolean;
 }
@@ -75,8 +81,13 @@ function pictureAt(
   team: Team,
   style: number,
   variant: Variant,
-): RenderPicture | undefined {
-  return manifest.renders[slug]?.[gameClass]?.[team]?.[String(style)]?.[variant] ?? undefined;
+): { picture: RenderPicture; renderedAt: string } | undefined {
+  const entry = manifest.renders[slug]?.[gameClass]?.[team]?.[String(style)];
+  const picture = entry?.[variant];
+  if (entry === undefined || picture === undefined || picture === null) return undefined;
+  // When the render was made belongs to the job, not the picture: the two
+  // pictures of one job come out of one run, and the URL wants the moment.
+  return { picture, renderedAt: entry.rendered_at };
 }
 
 /**
@@ -98,14 +109,15 @@ export function pickRender(
   const teams: Team[] = asked.team === DEFAULT_TEAM ? [asked.team] : [asked.team, DEFAULT_TEAM];
   for (const team of teams) {
     for (const style of styles) {
-      const picture = pictureAt(manifest, asked.slug, asked.gameClass, team, style, variant);
-      if (picture === undefined) continue;
+      const rung = pictureAt(manifest, asked.slug, asked.gameClass, team, style, variant);
+      if (rung === undefined) continue;
       return {
-        image: imageAt(picture, size),
+        image: imageAt(rung.picture, size),
         gameClass: asked.gameClass,
         team,
         style,
         variant,
+        renderedAt: rung.renderedAt,
         fellBack: team !== asked.team || style !== asked.style,
       };
     }

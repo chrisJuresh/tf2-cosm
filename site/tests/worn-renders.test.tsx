@@ -22,6 +22,7 @@ import {
 
 import { CatalogueBrowser } from "@/components/catalogue-browser";
 import { CosmeticGrid } from "@/components/cosmetic-grid";
+import { renderVersion } from "@/renders/base-url";
 
 function renderList(overrides: Partial<Parameters<typeof CosmeticGrid>[0]> = {}) {
   return render(
@@ -64,6 +65,16 @@ function pictureIn(slug: string): HTMLImageElement {
   return within(cardFor(slug)).getByRole("img");
 }
 
+/**
+ * Which picture an `<img>` is showing, with the version the URL is stamped with
+ * left off. Nearly everything below is about which image the chain chose, and
+ * reads better for not repeating when it was rendered; that the stamp is there
+ * at all is its own test.
+ */
+function pictureSrc(image: HTMLImageElement): string {
+  return image.getAttribute("src")?.split("?")[0] ?? "";
+}
+
 function panelFor(slug: string): HTMLElement {
   const panel = document.getElementById(`cosmetic-detail-${slug}`);
   if (panel === null) throw new Error(`${slug} is not open`);
@@ -88,7 +99,18 @@ afterEach(() => {
 describe("the picture a card shows", () => {
   it("shows the Worn Render where the manifest has one, at the grid's size", () => {
     renderList();
-    expect(pictureIn("team-captain")).toHaveAttribute("src", "/renders/web/team-captain/soldier-red-0@256.webp");
+    expect(pictureSrc(pictureIn("team-captain"))).toBe("/renders/web/team-captain/soldier-red-0@256.webp");
+  });
+
+  it("stamps the picture with when it was rendered, so a re-render is a new URL", () => {
+    // Without it, a re-rendered image keeps the path it had and a CDN goes on
+    // serving last week's bytes until each object expires on its own schedule —
+    // which is how one Cosmetic showed two different framings at two sizes.
+    renderList();
+    const made = fixtureManifest().renders["team-captain"]!.soldier!.red!["0"]!.rendered_at;
+    expect(pictureIn("team-captain").getAttribute("src")).toBe(
+      `/renders/web/team-captain/soldier-red-0@256.webp?v=${renderVersion(made)}`,
+    );
   });
 
   it("names the Cosmetic and the Class wearing it, so the picture reads aloud", () => {
@@ -118,10 +140,7 @@ describe("the picture a card shows", () => {
 
   it("shows the master when the derive step has not made a web size yet", () => {
     renderList();
-    expect(pictureIn("baronial-badge")).toHaveAttribute(
-      "src",
-      "/renders/masters/baronial-badge/engineer-red-0.png",
-    );
+    expect(pictureSrc(pictureIn("baronial-badge"))).toBe("/renders/masters/baronial-badge/engineer-red-0.png");
   });
 
   it("falls back to the icon when a render that ought to exist will not load", () => {
@@ -175,7 +194,7 @@ describe("the picture a card shows", () => {
       ),
     );
     for (const picture of screen.getAllByRole("img")) {
-      const src = picture.getAttribute("src") ?? "";
+      const src = pictureSrc(picture as HTMLImageElement);
       expect(paths.has(src) || icons.has(src.replace("https://", "http://")) || icons.has(src)).toBe(true);
     }
   });
@@ -187,21 +206,21 @@ describe("the Class the picture shows", () => {
     const picker = screen.getByRole("combobox", { name: "Class" });
 
     await user.selectOptions(picker, "scout");
-    expect(pictureIn("ghastly-gibus")).toHaveAttribute("src", "/renders/web/ghastly-gibus/scout-red-0@256.webp");
+    expect(pictureSrc(pictureIn("ghastly-gibus"))).toBe("/renders/web/ghastly-gibus/scout-red-0@256.webp");
 
     await user.selectOptions(picker, "heavy");
-    expect(pictureIn("ghastly-gibus")).toHaveAttribute("src", "/renders/web/ghastly-gibus/heavy-red-0@256.webp");
+    expect(pictureSrc(pictureIn("ghastly-gibus"))).toBe("/renders/web/ghastly-gibus/heavy-red-0@256.webp");
     expect(pictureIn("ghastly-gibus")).toHaveAccessibleName("Ghastly Gibus worn by the Heavy");
   });
 
   it("shows an All-Class Cosmetic on its own first Class with no Class chosen", () => {
     renderList();
-    expect(pictureIn("ghastly-gibus")).toHaveAttribute("src", "/renders/web/ghastly-gibus/scout-red-0@256.webp");
+    expect(pictureSrc(pictureIn("ghastly-gibus"))).toBe("/renders/web/ghastly-gibus/scout-red-0@256.webp");
   });
 
   it("shows a Multi-Class Cosmetic on the chosen Class when that Class can wear it", () => {
     renderList({ classView: "demoman" });
-    expect(pictureIn("team-captain")).toHaveAttribute("src", "/renders/web/team-captain/demoman-red-0@256.webp");
+    expect(pictureSrc(pictureIn("team-captain"))).toBe("/renders/web/team-captain/demoman-red-0@256.webp");
   });
 
   it("falls back to the Backpack Icon for a Class of an All-Class Cosmetic nobody has rendered", () => {
@@ -218,10 +237,7 @@ describe("the open card", () => {
     const user = userEvent.setup();
     renderList();
     await user.click(screen.getByRole("button", { name: "Team Captain" }));
-    expect(pictureInPanel("team-captain")).toHaveAttribute(
-      "src",
-      "/renders/web/team-captain/soldier-red-0@512.webp",
-    );
+    expect(pictureSrc(pictureInPanel("team-captain"))).toBe("/renders/web/team-captain/soldier-red-0@512.webp");
   });
 
   it("offers a Style switcher for a Cosmetic with Styles, and changes the picture with it", async () => {
@@ -232,7 +248,7 @@ describe("the open card", () => {
     expect(within(styles).getAllByRole("button").map((button) => button.textContent)).toEqual(["Closed", "Open"]);
 
     await user.click(within(styles).getByRole("button", { name: "Open" }));
-    expect(pictureInPanel("tin-pot")).toHaveAttribute("src", "/renders/web/tin-pot/soldier-red-1@512.webp");
+    expect(pictureSrc(pictureInPanel("tin-pot"))).toBe("/renders/web/tin-pot/soldier-red-1@512.webp");
     expect(within(styles).getByRole("button", { name: "Open" })).toHaveAttribute("aria-pressed", "true");
   });
 
@@ -251,10 +267,7 @@ describe("the open card", () => {
     expect(within(teams).getAllByRole("button").map((button) => button.textContent)).toEqual(["RED", "BLU"]);
 
     await user.click(within(teams).getByRole("button", { name: "BLU" }));
-    expect(pictureInPanel("team-captain")).toHaveAttribute(
-      "src",
-      "/renders/web/team-captain/soldier-blu-0@512.webp",
-    );
+    expect(pictureSrc(pictureInPanel("team-captain"))).toBe("/renders/web/team-captain/soldier-blu-0@512.webp");
   });
 
   it("offers no Team toggle for a Cosmetic rendered on RED alone", async () => {
@@ -278,7 +291,7 @@ describe("the open card", () => {
     const panel = panelFor("tin-pot");
     await user.click(within(panel).getByRole("button", { name: "Open" }));
     await user.click(within(panel).getByRole("button", { name: "BLU" }));
-    expect(pictureInPanel("tin-pot")).toHaveAttribute("src", "/renders/web/tin-pot/soldier-blu-0@512.webp");
+    expect(pictureSrc(pictureInPanel("tin-pot"))).toBe("/renders/web/tin-pot/soldier-blu-0@512.webp");
   });
 
   it("opens the next Cosmetic on its own default rather than the last one's Style", async () => {
@@ -291,7 +304,7 @@ describe("the open card", () => {
     // not what they asked for this time.
     await user.keyboard("{Escape}");
     await user.click(screen.getByRole("button", { name: "Tin Pot" }));
-    expect(pictureInPanel("tin-pot")).toHaveAttribute("src", "/renders/web/tin-pot/soldier-red-0@512.webp");
+    expect(pictureSrc(pictureInPanel("tin-pot"))).toBe("/renders/web/tin-pot/soldier-red-0@512.webp");
   });
 
   it("offers a View toggle where the Cosmetic was rendered on its own, and takes the Class out", async () => {
@@ -305,10 +318,7 @@ describe("the open card", () => {
     ]);
 
     await user.click(within(view).getByRole("button", { name: "On its own" }));
-    expect(pictureInPanel("team-captain")).toHaveAttribute(
-      "src",
-      "/renders/web/team-captain/soldier-red-0-alone@512.webp",
-    );
+    expect(pictureSrc(pictureInPanel("team-captain"))).toBe("/renders/web/team-captain/soldier-red-0-alone@512.webp");
     // The Class is out of the picture, so it is out of what the picture is called.
     expect(pictureInPanel("team-captain")).toHaveAccessibleName("Team Captain, on its own");
   });
@@ -322,10 +332,7 @@ describe("the open card", () => {
     await user.click(within(view).getByRole("button", { name: "On its own" }));
     await user.click(within(view).getByRole("button", { name: "On the Class" }));
 
-    expect(pictureInPanel("team-captain")).toHaveAttribute(
-      "src",
-      "/renders/web/team-captain/soldier-red-0@512.webp",
-    );
+    expect(pictureSrc(pictureInPanel("team-captain"))).toBe("/renders/web/team-captain/soldier-red-0@512.webp");
     expect(within(view).getByRole("button", { name: "On the Class" })).toHaveAttribute(
       "aria-pressed",
       "true",
@@ -341,10 +348,7 @@ describe("the open card", () => {
     await user.click(within(panel).getByRole("button", { name: "Open" }));
     await user.click(within(panel).getByRole("button", { name: "On its own" }));
 
-    expect(pictureInPanel("tin-pot")).toHaveAttribute(
-      "src",
-      "/renders/web/tin-pot/soldier-red-1-alone@512.webp",
-    );
+    expect(pictureSrc(pictureInPanel("tin-pot"))).toBe("/renders/web/tin-pot/soldier-red-1-alone@512.webp");
   });
 
   it("offers no View toggle for a Cosmetic nobody has rendered on its own", async () => {
@@ -363,10 +367,7 @@ describe("the open card", () => {
     await user.keyboard("{Escape}");
     await user.click(screen.getByRole("button", { name: "Team Captain" }));
 
-    expect(pictureInPanel("team-captain")).toHaveAttribute(
-      "src",
-      "/renders/web/team-captain/soldier-red-0@512.webp",
-    );
+    expect(pictureSrc(pictureInPanel("team-captain"))).toBe("/renders/web/team-captain/soldier-red-0@512.webp");
   });
 
   it("shows the Backpack Icon in the panel too when there is no render at all", async () => {

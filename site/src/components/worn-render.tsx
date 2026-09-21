@@ -59,7 +59,7 @@ function wornRender(props: WornRenderProps): Picture | null {
   const chosen = pickRender(manifest, { slug: cosmetic.slug, gameClass, team, style, variant }, size);
   if (chosen === null) return null;
   return {
-    src: renderUrl(chosen.image.path),
+    src: renderUrl(chosen.image.path, chosen.renderedAt),
     // What the picture is of, which is the whole difference between the two: a
     // screen reader is told the Class only when the Class is in the picture.
     alt:
