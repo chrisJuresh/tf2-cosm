@@ -13,13 +13,13 @@
  * jsdom lays nothing out at all, so this is the only place that layout, or the
  * click target stretched over a whole card, is ever exercised.
  */
-import { expect, expectClean, openCard, card, cards, slugs, test } from "./catalogue-page";
+import { expect, expectClean, modal, openCard, card, cards, slugs, test } from "./catalogue-page";
 
 /** From the golden catalogue: one Cosmetic of each of the three kinds. */
 const DEMOMAN_ONLY = "scotsman-s-stove-pipe";
 const MULTI_CLASS = "team-captain";
 const ALL_CLASS = "ghastly-gibus";
-/** Two Styles, both Teams, and a render for each — the one row that exercises every control. */
+/** Two Styles, both Teams, and a render for each — the one Cosmetic that exercises every control. */
 const STYLED = "tin-pot";
 /** The fixture's Event-Only Cosmetic, which the page opens with hidden. */
 const EVENT_ONLY = "crocodile-smile";
@@ -84,23 +84,25 @@ test("the Class filter narrows the grid to what that Class can wear", async ({ c
   expectClean(faults);
 });
 
-test("a click anywhere on a card opens it, and puts the focus on its control", async ({
+test("a click anywhere on a card opens the Cosmetic, and the space around it closes again", async ({
   catalogue: { page, faults },
 }) => {
-  // The whole card is the control: a viewer aims at the picture, not at the
-  // name under it. It is a pseudo-element stretched over the card, so this is
-  // the only suite that can see it at all — and the focus landing on the
-  // control is what leaves the viewer something to press Escape on.
-  // The middle of the card, which is the middle of the picture. Playwright
-  // clicks what is actually painted there, so a card whose overlay had not
-  // taken would open nothing, and one with the header spilling over it would
-  // refuse the click outright.
+  // Two things only a real browser can answer. The whole card is the control: a
+  // viewer aims at the picture, not at the name under it, and that target is a
+  // pseudo-element stretched over the card, which jsdom neither paints nor
+  // hit-tests. Playwright clicks what is actually painted in the middle of the
+  // card, so a card whose overlay had not taken would open nothing, and one
+  // with the header spilling over it would refuse the click outright.
   await card(page, STYLED).click();
-  await expect(page.locator(`#cosmetic-detail-${STYLED}`)).toBeVisible();
-  await expect(card(page, STYLED).getByRole("button")).toBeFocused();
+  await expect(modal(page)).toBeVisible();
+  await expect(modal(page)).toBeFocused();
 
-  await page.keyboard.press("Escape");
-  await expect(page.locator(`#cosmetic-detail-${STYLED}`)).toHaveCount(0);
+  // The empty space around the modal is the other: a click in the corner of the
+  // viewport lands on the backdrop rather than on the modal, which is what
+  // makes that space a way out rather than a margin.
+  await page.mouse.click(4, 4);
+  await expect(modal(page)).toHaveCount(0);
+  await expect(card(page, STYLED).getByRole("button")).toBeFocused();
 
   expectClean(faults);
 });
@@ -128,13 +130,13 @@ test("the search narrows the grid as it is typed", async ({ catalogue: { page, f
   expectClean(faults);
 });
 
-test("an expanded card shows the Worn Render, its Styles and both Teams", async ({
+test("the open Cosmetic shows the Worn Render, its Styles and both Teams", async ({
   catalogue: { page, faults },
 }) => {
   const detail = await openCard(page, STYLED);
 
   // The picture is a render served by the site, not the Backpack Icon: the
-  // larger derivative, which is what an open card asks for.
+  // larger derivative, which is what the modal asks for.
   const picture = detail.locator("img");
   await expect(picture).toHaveAttribute("src", /\/renders\/web\/tin-pot\/soldier-red-0@512\.webp$/);
 
@@ -145,11 +147,11 @@ test("an expanded card shows the Worn Render, its Styles and both Teams", async 
   await detail.getByRole("group", { name: "Team" }).getByRole("button", { name: "BLU" }).click();
   await expect(picture).toHaveAttribute("src", /soldier-blu-0@512\.webp$/);
 
-  // The context the figure needed, which is why the card opens at all.
+  // The context the figure needed, which is why the Cosmetic opens at all.
   await expect(detail).toContainText("Price Spread");
   await expect(detail).toContainText("Reference Variant");
 
-  // Opened cards are linkable: the slug is the hash (ADR-0003).
+  // An open Cosmetic is linkable: the slug is the hash (ADR-0003).
   expect(new URL(page.url()).hash).toBe(`#${STYLED}`);
 
   expectClean(faults);

@@ -105,7 +105,7 @@ its icon, which is what production does for an unrendered Cosmetic too.
 - `src/components/worn-render.tsx` — the picture itself: the chain, plus the
   runtime fall back to the icon when an image will not load.
 - `src/components/render-controls.tsx` — the Style switcher and the Team toggle
-  an open row gains. Each appears only where it has something to offer: a
+  the open Cosmetic gains. Each appears only where it has something to offer: a
   Cosmetic with one look has no Style to switch, and one rendered on RED alone
   has no BLU to toggle to.
 - `src/prices/format.ts` — the pure price module: Trader Notation, the Metal
@@ -128,20 +128,25 @@ its icon, which is what production does for an unrendered Cosmetic too.
   a picture each scroll without the browser holding eighteen hundred of them.
   Each card carries the name of every figure on it for a screen reader, because
   a grid has nowhere to put the column heading a list could label all eighteen
-  hundred with at once. A card opens in place, one at a time, and its panel
-  hangs under the row of cards it is in rather than inside it — a card is one of
-  a row of equal boxes and the panel is wider than any of them. Because that
-  makes the row taller by an amount that depends on how the panel wraps, rows
-  are measured rather than assumed and the fixed height is only the estimate the
-  grid starts from. The whole card is the control that opens it, by way of a
-  pseudo-element stretched over it: a viewer aims at the picture, and a screen
-  reader still hears the control called by the Cosmetic's name alone.
-- `src/components/cosmetic-detail.tsx` — what an open card shows: the larger Worn
+  hundred with at once. A card opens as a modal over the page, one at a time,
+  and the grid behind it does not move at all. The whole card is the control
+  that opens it, by way of a pseudo-element stretched over it: a viewer aims at
+  the picture, and a screen reader still hears the control called by the
+  Cosmetic's name alone.
+- `src/components/cosmetic-modal.tsx` — the open Cosmetic, over the page: a
+  portal into `<body>` with the backdrop, the focus, the Tab trap and the ways
+  out. `<dialog>` would give the first three for free in a browser, but jsdom
+  implements neither `showModal` nor the top layer, so what a viewer does could
+  not be driven by the suite. The space around the card is a control rather than
+  a margin — clicking it closes the Cosmetic, as do Escape and the Close button,
+  and each of the three puts the focus back on the card that opened it.
+- `src/components/cosmetic-detail.tsx` — what the modal shows: the larger Worn
   Render with its two controls, the Price Spread, the Reference Variant the
   figure is for, when the source last repriced it, who can wear it, and the
-  defindexes ADR-0003 folded into it. The chosen Style and Team live here, not in
-  the grid: closing a card is done looking, and the next one opens on its own
-  default.
+  defindexes ADR-0003 folded into it. The modal is what gives the picture its
+  room, so the picture takes the width it can get and the fields sit beside it.
+  The chosen Style and Team live here, not in the grid: closing a Cosmetic is
+  done looking, and the next one opens on its own default.
 - `src/components/dollar-basis-switch.tsx` — the switch, as native radios so a
   keyboard walks it and a screen reader announces it without being told to. Each
   option carries its own rate, because that is the whole point of the choice.
@@ -248,16 +253,17 @@ working page.
   fault in its own right — the site is meant to have no server, no analytics and
   no third party but that CDN — and this is the one place that can check it.
 - `e2e/smoke.spec.ts` does what a viewer does: loads the page, filters to a
-  Class, types a search, opens a card and works its Style switcher and Team
-  toggle. It also checks the two things only a laid-out page has: that the
-  cards sit side by side rather than one to a line, and that a click on the
-  middle of a card — the picture, not the name — opens it and leaves the focus
-  on its control. Every test also asserts the browser logged nothing and that
+  Class, types a search, opens a Cosmetic and works its Style switcher and Team
+  toggle. It also checks the three things only a laid-out page has: that the
+  cards sit side by side rather than one to a line, that a click on the middle
+  of a card — the picture, not the name — opens it, and that a click on the
+  space around the modal closes it again. Every test also asserts the browser logged nothing and that
   every picture actually decoded.
-- `e2e/accessibility.spec.ts` runs axe over the grid, over an open card, and over
-  both again in dark mode, and then asks the question axe cannot: whether the
-  bar can be *worked* from the keyboard — every control named, reached by Tab,
-  and visibly focused, and a card that opens, closes and hands the focus back.
+- `e2e/accessibility.spec.ts` runs axe over the grid, over an open Cosmetic, and
+  over both again in dark mode, and then asks the question axe cannot: whether
+  the bar can be *worked* from the keyboard — every control named, reached by
+  Tab, and visibly focused, and a Cosmetic that opens, closes and hands the
+  focus back.
 - `e2e/build-validation.spec.ts` runs `next build` against a broken catalogue and
   a broken manifest and reads what it printed. `tests/source.test.ts` says the
   loader throws; this says the build does.

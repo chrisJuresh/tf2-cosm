@@ -5,21 +5,22 @@
  * the first. axe finds the faults that are mechanical — an unlabelled control,
  * an image with no alt text, a contrast ratio below the threshold, a role used
  * where its required children are missing — and it is run over the grid and
- * over an open row, because the open card is markup that does not exist until a
- * viewer asks for it and so is exactly the markup nobody looks at.
+ * over an open Cosmetic, because the modal is markup that does not exist until
+ * a viewer asks for it and so is exactly the markup nobody looks at.
  *
  * The second question is the one axe cannot answer: whether the page can be
  * *worked* without a mouse. That is asked directly — every control in the bar
- * named, reachable by Tab, and visibly focused when it gets there, and a card
- * that opens, closes and hands the focus back from the keyboard alone.
+ * named, reachable by Tab, and visibly focused when it gets there, and a
+ * Cosmetic that opens, closes and hands the focus back from the keyboard
+ * alone.
  *
  * Like the smoke suite, this runs on a desktop and on a phone.
  */
 import AxeBuilder from "@axe-core/playwright";
 
-import { expect, expectClean, openCard, card, test } from "./catalogue-page";
+import { expect, expectClean, modal, openCard, card, test } from "./catalogue-page";
 
-/** Two Styles, both Teams: the open card with the most in it to get wrong. */
+/** Two Styles, both Teams: the open Cosmetic with the most in it to get wrong. */
 const STYLED = "tin-pot";
 
 /**
@@ -41,7 +42,7 @@ test("the grid has no automatically detectable accessibility faults", async ({ c
   expectClean(faults);
 });
 
-test("an open card has none either", async ({ catalogue: { page, faults } }) => {
+test("an open Cosmetic has none either", async ({ catalogue: { page, faults } }) => {
   await openCard(page, STYLED);
   expect(await axeFaults(page)).toEqual([]);
   expectClean(faults);
@@ -87,33 +88,48 @@ test("the controls are reachable from the keyboard, and visible once focused", a
   expect(reached).toEqual([...CONTROLS]);
 
   // And focus is something you can see, on every control the page has and not
-  // only on the bar: the Dollar Basis switch, and the two an open card gains.
-  // Tailwind draws it as an outline; what matters is that the browser computes
-  // one rather than `none`. The Dollar Basis radios are `sr-only` and their
-  // label carries the outline, which is why the check walks up from whatever
-  // has the focus rather than reading only that element.
-  await openCard(page, STYLED);
-  const focusable = [
+  // only on the bar: the Dollar Basis switch, the card itself, and the ones the
+  // modal brings with it. Tailwind draws it as an outline; what matters is that
+  // the browser computes one rather than `none`. The Dollar Basis radios are
+  // `sr-only` and their label carries the outline, which is why the check walks
+  // up from whatever has the focus rather than reading only that element.
+  await checkFocusIsVisible(page, [
     page.getByLabel("Search by name", { exact: true }),
     page.getByLabel("Sort by", { exact: true }),
     page.getByRole("radiogroup", { name: "Dollar Basis" }).getByRole("radio").first(),
     card(page, STYLED).getByRole("button"),
+  ]);
+
+  // The modal's own, which exist only while it is open — and which are all a
+  // keyboard can reach at that point, since the modal keeps the Tab inside it.
+  await openCard(page, STYLED);
+  await checkFocusIsVisible(page, [
+    // Exactly "Close": this Cosmetic's own Styles are Closed and Open.
+    modal(page).getByRole("button", { name: "Close", exact: true }),
     page.getByRole("group", { name: "Style" }).getByRole("button", { name: "Open" }),
     page.getByRole("group", { name: "Team" }).getByRole("button", { name: "BLU" }),
-  ];
-  for (const control of focusable) {
-    // Focused *as a keyboard viewer focuses it*, because that is the whole
-    // distinction `:focus-visible` draws: a programmatic focus on a radio or a
-    // button does not match it, and the outline a mouse user is spared is
-    // exactly the outline this test is here to find. Tabbing away and back is
-    // the shortest way to arrive by keyboard at an arbitrary control.
+  ]);
+});
+
+/**
+ * Each control arrived at *as a keyboard viewer arrives at it*, because that is
+ * the whole distinction `:focus-visible` draws: a programmatic focus on a radio
+ * or a button does not match it, and the outline a mouse user is spared is
+ * exactly the outline this is here to find. Tabbing away and back is the
+ * shortest way to reach an arbitrary control by keyboard.
+ */
+async function checkFocusIsVisible(
+  page: import("@playwright/test").Page,
+  controls: readonly import("@playwright/test").Locator[],
+): Promise<void> {
+  for (const control of controls) {
     await control.focus();
     await page.keyboard.press("Tab");
     await page.keyboard.press("Shift+Tab");
     await expect(control).toBeFocused();
     expect(await visibleFocus(page), await control.evaluate((element) => element.outerHTML)).toBe(true);
   }
-});
+}
 
 /**
  * Whether the focus can be seen: an outline the browser actually computes, on
@@ -133,18 +149,20 @@ async function visibleFocus(page: import("@playwright/test").Page): Promise<bool
   });
 }
 
-test("a card opens, closes and gives the focus back, without a mouse", async ({ catalogue: { page } }) => {
-  const toggle = card(page, STYLED).getByRole("button");
-  await toggle.focus();
+test("a Cosmetic opens, closes and gives the focus back, without a mouse", async ({ catalogue: { page } }) => {
+  const control = card(page, STYLED).getByRole("button");
+  await control.focus();
   await page.keyboard.press("Enter");
-  await expect(toggle).toHaveAttribute("aria-expanded", "true");
-  await expect(page.locator(`#cosmetic-detail-${STYLED}`)).toBeVisible();
+  await expect(modal(page)).toBeVisible();
+  // The modal takes the focus, so the keys that work it land on it rather than
+  // on the grid behind it.
+  await expect(modal(page)).toBeFocused();
 
   // Escape closes it from wherever inside it the focus has got to, and the
   // focus comes back to the card that was opened rather than to the body.
   await page.keyboard.press("Escape");
-  await expect(toggle).toHaveAttribute("aria-expanded", "false");
-  await expect(toggle).toBeFocused();
+  await expect(modal(page)).toHaveCount(0);
+  await expect(control).toBeFocused();
 });
 
 /**
