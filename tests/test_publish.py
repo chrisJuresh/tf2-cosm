@@ -19,7 +19,18 @@ from render.bucket import (
 )
 from render.manifest import Manifest
 from render.output import OutputLayout
-from render.publish import derivative_paths, main, plan_publish, publish
+from render.publish import (
+    DEFAULT_MAX_BUCKET_BYTES,
+    FREE_TIER_BYTES,
+    OverBudget,
+    check_budget,
+    derivative_paths,
+    format_bytes,
+    main,
+    plan_publish,
+    project_bucket_bytes,
+    publish,
+)
 
 AT = "2026-09-20T12:00:00+00:00"
 
@@ -312,3 +323,64 @@ def test_an_unknown_file_type_is_not_published_as_a_guess():
 
 def test_a_master_would_be_served_as_a_png():
     assert content_type_for("masters/team-captain/soldier-red-0.png") == "image/png"
+
+
+def test_a_run_inside_the_budget_says_what_it_would_leave(tmp_path):
+    layout = a_layout(tmp_path)
+    settings = BucketSettings.from_env(ENV)
+    relpath = "web/team-captain/soldier-red-0@256.webp"
+    write_image(layout, relpath, b"1234")
+    remote = {"web/somebody-elses-file": 1000}
+
+    plan = plan_publish([relpath], layout, settings, remote)
+
+    assert check_budget(plan, remote, DEFAULT_MAX_BUCKET_BYTES) == 1004
+
+
+def test_a_run_that_would_cross_the_budget_sends_nothing(tmp_path):
+    layout = a_layout(tmp_path)
+    settings = BucketSettings.from_env(ENV)
+    relpath = "web/team-captain/soldier-red-0@256.webp"
+    write_image(layout, relpath, b"12345678")
+
+    plan = plan_publish([relpath], layout, settings, {})
+
+    with pytest.raises(OverBudget) as refused:
+        check_budget(plan, {}, 4)
+    assert "nothing was uploaded" in str(refused.value)
+
+
+def test_replacing_an_object_counts_its_new_bytes_not_both(tmp_path):
+    """A re-derived image is not growth, and a guard that called it growth would refuse a
+    run that costs nothing."""
+    layout = a_layout(tmp_path)
+    settings = BucketSettings.from_env(ENV)
+    relpath = "web/team-captain/soldier-red-0@256.webp"
+    write_image(layout, relpath, b"1234")
+    remote = {relpath: 1000}
+
+    plan = plan_publish([relpath], layout, settings, remote)
+
+    assert project_bucket_bytes(plan, remote) == 4
+
+
+def test_no_budget_at_all_is_a_budget_of_zero(tmp_path):
+    layout = a_layout(tmp_path)
+    settings = BucketSettings.from_env(ENV)
+    relpath = "web/team-captain/soldier-red-0@256.webp"
+    write_image(layout, relpath, b"12345678")
+
+    plan = plan_publish([relpath], layout, settings, {})
+
+    assert check_budget(plan, {}, 0) == 8
+
+
+def test_the_default_budget_leaves_headroom_under_the_free_tier():
+    assert DEFAULT_MAX_BUCKET_BYTES < FREE_TIER_BYTES
+
+
+def test_a_size_is_reported_in_the_units_a_bill_counts():
+    assert format_bytes(465_000_000) == "465 MB"
+    assert format_bytes(9_000_000_000) == "9 GB"
+    assert format_bytes(1_234_567_890) == "1.23 GB"
+    assert format_bytes(512) == "512 bytes"
