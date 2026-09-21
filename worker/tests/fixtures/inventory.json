@@ -1,0 +1,149 @@
+{
+  "_comment": [
+    "A Steam inventory, in the shape steamcommunity.com/inventory/<id64>/440/2?l=english",
+    "answers in, trimmed to the fields this Worker reads and to the cases worth",
+    "holding it to. Written by hand from recorded responses rather than lifted from",
+    "a real person's backpack: the shape is what is under test, and nobody's",
+    "inventory belongs in a repository.",
+    "",
+    "It covers a Unique craftable copy, a non-craftable one, a Genuine (which Steam",
+    "calls rarity1), an Unusual (rarity4) with its effect, an Unusual with none —",
+    "a few items really are Unusual and not on fire — a Strange, two assets of one",
+    "description, a stackable with an amount above one, a weapon that is not a",
+    "Cosmetic and is passed through anyway, an item whose wiki link is missing, and",
+    "an asset pointing at a description that never arrived."
+  ],
+  "assets": [
+    { "appid": 440, "contextid": "2", "assetid": "1", "classid": "100", "instanceid": "0", "amount": "1" },
+    { "appid": 440, "contextid": "2", "assetid": "2", "classid": "100", "instanceid": "0", "amount": "1" },
+    { "appid": 440, "contextid": "2", "assetid": "3", "classid": "101", "instanceid": "0", "amount": "1" },
+    { "appid": 440, "contextid": "2", "assetid": "4", "classid": "102", "instanceid": "11", "amount": "1" },
+    { "appid": 440, "contextid": "2", "assetid": "5", "classid": "103", "instanceid": "22", "amount": "1" },
+    { "appid": 440, "contextid": "2", "assetid": "6", "classid": "104", "instanceid": "0", "amount": "1" },
+    { "appid": 440, "contextid": "2", "assetid": "7", "classid": "105", "instanceid": "0", "amount": "1" },
+    { "appid": 440, "contextid": "2", "assetid": "8", "classid": "106", "instanceid": "0", "amount": "3" },
+    { "appid": 440, "contextid": "2", "assetid": "9", "classid": "107", "instanceid": "0", "amount": "1" },
+    { "appid": 440, "contextid": "2", "assetid": "10", "classid": "999", "instanceid": "0", "amount": "1" },
+    { "appid": 440, "contextid": "2", "assetid": "11", "classid": "108", "instanceid": "0", "amount": "1" }
+  ],
+  "descriptions": [
+    {
+      "classid": "100",
+      "instanceid": "0",
+      "name": "Team Captain",
+      "tradable": 1,
+      "actions": [{ "link": "http://wiki.teamfortress.com/scripts/itemredirect.php?id=378&lang=en_US", "name": "Item Wiki Page..." }],
+      "tags": [
+        { "category": "Quality", "internal_name": "Unique", "localized_tag_name": "Unique" },
+        { "category": "Type", "internal_name": "misc", "localized_tag_name": "Cosmetic" }
+      ]
+    },
+    {
+      "classid": "101",
+      "instanceid": "0",
+      "name": "Team Captain",
+      "tradable": 0,
+      "actions": [{ "link": "http://wiki.teamfortress.com/scripts/itemredirect.php?id=378&lang=en_US", "name": "Item Wiki Page..." }],
+      "descriptions": [
+        { "value": "It's good to be the king." },
+        { "value": " " },
+        { "value": "( Not Usable in Crafting )" }
+      ],
+      "tags": [
+        { "category": "Quality", "internal_name": "Unique", "localized_tag_name": "Unique" },
+        { "category": "Type", "internal_name": "misc", "localized_tag_name": "Cosmetic" }
+      ]
+    },
+    {
+      "classid": "102",
+      "instanceid": "11",
+      "name": "Genuine Tin Pot",
+      "tradable": 1,
+      "actions": [{ "link": "http://wiki.teamfortress.com/scripts/itemredirect.php?id=844&lang=en_US", "name": "Item Wiki Page..." }],
+      "tags": [
+        { "category": "Quality", "internal_name": "rarity1", "localized_tag_name": "Genuine" },
+        { "category": "Type", "internal_name": "misc", "localized_tag_name": "Cosmetic" }
+      ]
+    },
+    {
+      "classid": "103",
+      "instanceid": "22",
+      "name": "Unusual Team Captain",
+      "tradable": 1,
+      "actions": [{ "link": "http://wiki.teamfortress.com/scripts/itemredirect.php?id=378&lang=en_US", "name": "Item Wiki Page..." }],
+      "descriptions": [
+        { "value": "★ Unusual Effect: Burning Flames", "color": "ffd700" }
+      ],
+      "tags": [
+        { "category": "Quality", "internal_name": "rarity4", "localized_tag_name": "Unusual" },
+        { "category": "Type", "internal_name": "misc", "localized_tag_name": "Cosmetic" }
+      ]
+    },
+    {
+      "classid": "104",
+      "instanceid": "0",
+      "name": "Strange Bolt Boy",
+      "tradable": 1,
+      "actions": [{ "link": "http://wiki.teamfortress.com/scripts/itemredirect.php?id=30027&lang=en_US", "name": "Item Wiki Page..." }],
+      "descriptions": [
+        { "value": "( Not Tradable, Marketable, Usable in Crafting, or Gift Wrappable )" }
+      ],
+      "tags": [
+        { "category": "Quality", "internal_name": "strange", "localized_tag_name": "Strange" },
+        { "category": "Type", "internal_name": "misc", "localized_tag_name": "Cosmetic" }
+      ]
+    },
+    {
+      "classid": "105",
+      "instanceid": "0",
+      "name": "Rocket Launcher",
+      "tradable": 1,
+      "actions": [{ "link": "http://wiki.teamfortress.com/scripts/itemredirect.php?id=18&lang=en_US", "name": "Item Wiki Page..." }],
+      "tags": [
+        { "category": "Quality", "internal_name": "Unique", "localized_tag_name": "Unique" },
+        { "category": "Type", "internal_name": "primary", "localized_tag_name": "Primary weapon" }
+      ]
+    },
+    {
+      "classid": "106",
+      "instanceid": "0",
+      "name": "Refined Metal",
+      "tradable": 1,
+      "actions": [{ "link": "http://wiki.teamfortress.com/scripts/itemredirect.php?id=5002&lang=en_US", "name": "Item Wiki Page..." }],
+      "tags": [
+        { "category": "Quality", "internal_name": "Unique", "localized_tag_name": "Unique" },
+        { "category": "Type", "internal_name": "Craft Item", "localized_tag_name": "Craft Item" }
+      ]
+    },
+    {
+      "classid": "108",
+      "instanceid": "0",
+      "name": "Unusual Horseless Headless Horsemann's Headtaker",
+      "tradable": 0,
+      "actions": [{ "link": "http://wiki.teamfortress.com/scripts/itemredirect.php?id=266&lang=en_US", "name": "Item Wiki Page..." }],
+      "descriptions": [
+        { "value": "No random critical hits" },
+        { "value": " " },
+        { "value": "( Not Tradable, Marketable, Usable in Crafting, or Gift Wrappable )" }
+      ],
+      "tags": [
+        { "category": "Quality", "internal_name": "rarity4", "localized_tag_name": "Unusual" },
+        { "category": "Type", "internal_name": "melee", "localized_tag_name": "Melee weapon" }
+      ]
+    },
+    {
+      "classid": "107",
+      "instanceid": "0",
+      "name": "Something With No Wiki Link",
+      "tradable": 1,
+      "actions": [{ "link": "steam://rungame/440/76561202255233023/+tf_econ_item_preview", "name": "Inspect in Game..." }],
+      "tags": [
+        { "category": "Quality", "internal_name": "Unique", "localized_tag_name": "Unique" },
+        { "category": "Type", "internal_name": "misc", "localized_tag_name": "Cosmetic" }
+      ]
+    }
+  ],
+  "total_inventory_count": 11,
+  "success": 1,
+  "rwgrsn": -2
+}

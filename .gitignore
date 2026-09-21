@@ -19,6 +19,14 @@ jobs.json
 .env.*
 !.env.example
 
+# wrangler's local state: the workerd runtime's own scratch, and the per-machine
+# secrets file. The inventory proxy has no secrets (ADR-0006) and `.dev.vars` is
+# ignored anyway, because "the Worker that has none" is a property worth keeping
+# a checkout from quietly losing.
+.wrangler/
+.dev.vars
+.dev.vars.*
+
 # Rendered images and extracted game assets never enter the repo (ADR-0001). `/renders/` is
 # the default output root and covers every image the job writes there; point the root
 # somewhere else and it is that folder's job to be ignored. Neither `*.png` nor `*.webp` is

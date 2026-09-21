@@ -1,0 +1,19 @@
+{
+  "name": "@tf2-cosm/inventory-proxy",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "~5.20260831.1",
+    "@tf2-cosm/data": "workspace:*",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.1",
+    "wrangler": "^4.42.0"
+  }
+}
