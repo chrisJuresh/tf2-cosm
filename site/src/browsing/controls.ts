@@ -106,6 +106,16 @@ export interface BrowsingControls {
   readonly slot: CosmeticSlot | null;
   readonly hideUnpriced: boolean;
   /**
+   * The cheapest and dearest Metal Value shown, in scrap, or null at either end
+   * for no bound there. They are kept in scrap rather than as slider notches
+   * because a bound is a fact about prices and a notch is a fact about a
+   * slider — the rule here should not have to know how wide the control that
+   * set it was, and a bound remembered from an older snapshot should still mean
+   * the price it meant then.
+   */
+  readonly minScrap: number | null;
+  readonly maxScrap: number | null;
+  /**
    * Whether the catalogue is narrowed to what the viewer owns. On by default,
    * which costs a viewer with no Inventory nothing: it has nothing to narrow
    * until an Inventory has been read, so it does nothing before then — and once
@@ -146,6 +156,8 @@ export const DEFAULT_CONTROLS: BrowsingControls = {
   hideAllClass: false,
   slot: null,
   hideUnpriced: false,
+  minScrap: null,
+  maxScrap: null,
   onlyOwned: true,
   hideUntradable: false,
   hideEventOnly: true,
@@ -187,11 +199,11 @@ function isUnpriced(cosmetic: Cosmetic): boolean {
 }
 
 /**
- * The Metal Value the value sorts run on, in scrap, or null when there is no
- * figure to sort by — an Unpriced Cosmetic, or a snapshot taken without a price
- * source at all.
+ * The Metal Value the value sorts and the price filter run on, in scrap, or null
+ * when there is no figure at all — an Unpriced Cosmetic, or a snapshot taken
+ * without a price source.
  */
-function metalValueOf(cosmetic: Cosmetic): number | null {
+export function metalValueOf(cosmetic: Cosmetic): number | null {
   const { price } = cosmetic;
   if (price === null || price.state === "unpriced") return null;
   return price.spread.mid.metal.scrap;
@@ -243,7 +255,9 @@ export function visibleCosmetics(
   controls: BrowsingControls,
   owned: ReadonlySet<string> | null = null,
 ): Cosmetic[] {
-  const { classFilter, hideAllClass, slot, hideUnpriced, onlyOwned, hideEventOnly, search } = controls;
+  const { classFilter, hideAllClass, slot, hideUnpriced, minScrap, maxScrap, onlyOwned, hideEventOnly, search } =
+    controls;
+  const bounded = minScrap !== null || maxScrap !== null;
   const term = search.trim().toLowerCase();
 
   const kept = cosmetics.filter((cosmetic) => {
@@ -251,6 +265,17 @@ export function visibleCosmetics(
     if (classFilter !== null && !passesClassFilter(cosmetic, classFilter, hideAllClass)) return false;
     if (slot !== null && cosmetic.slot !== slot) return false;
     if (hideUnpriced && isUnpriced(cosmetic)) return false;
+    // A Cosmetic with no figure is outside any price range a viewer asks for.
+    // Not because it is worth nothing — it is unknown, which is why the sorts
+    // put it last rather than first — but because "between 1 and 2 keys" is a
+    // question about a price, and this one has none to answer with. Untouched
+    // bounds ask no question, so they hide nothing.
+    if (bounded) {
+      const value = metalValueOf(cosmetic);
+      if (value === null) return false;
+      if (minScrap !== null && value < minScrap) return false;
+      if (maxScrap !== null && value > maxScrap) return false;
+    }
     if (hideEventOnly && isEventOnly(cosmetic)) return false;
     if (term !== "" && !cosmetic.name.toLowerCase().includes(term)) return false;
     return true;

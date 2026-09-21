@@ -7,7 +7,7 @@
  * is asserted here is the surface: that each control is labelled, reachable from
  * the keyboard, and wired to the rule it claims to be.
  */
-import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it } from "vitest";
 
@@ -16,6 +16,7 @@ import { fixtureBasis, fixtureCosmetics, fixtureKeyRate, fixtureSnapshotTakenAt 
 import { CatalogueBrowser } from "@/components/catalogue-browser";
 import { EMPTY_MANIFEST } from "@/renders/manifest";
 import { CONTROLS_STORAGE_KEY } from "@/browser/remembered-controls";
+import { PRICE_STEPS, priceCeiling, priceScale, stepForScrap } from "@/browsing/price-scale";
 
 afterEach(() => {
   localStorage.clear();
@@ -52,6 +53,8 @@ const SEARCH_BOX = { name: "Search by name" };
 const HIDE_ALL_CLASS = { name: "Hide All-Class Cosmetics" };
 const HIDE_UNPRICED = { name: "Hide Unpriced" };
 const HIDE_EVENT_ONLY = { name: "Hide Event-Only" };
+const MINIMUM_PRICE = { name: "Minimum" };
+const MAXIMUM_PRICE = { name: "Maximum" };
 
 describe("the Class View picker", () => {
   it("starts on the whole catalogue bar its Event-Only Cosmetics", async () => {
@@ -265,16 +268,108 @@ describe("what the browser remembers", () => {
   });
 });
 
+describe("the price sliders", () => {
+  /** The notches these sliders have, which are the ones the panel was handed. */
+  const scale = priceScale(priceCeiling(fixtureCosmetics()));
+
+  /** Drag a slider to the notch worth this many scrap. */
+  function dragTo(slider: HTMLElement, scrap: number): void {
+    fireEvent.change(slider, { target: { value: String(stepForScrap(scale, scrap)) } });
+  }
+
+  function minimum(): HTMLElement {
+    return screen.getByRole("slider", MINIMUM_PRICE);
+  }
+
+  function maximum(): HTMLElement {
+    return screen.getByRole("slider", MAXIMUM_PRICE);
+  }
+
+  it("starts at either end of the track, filtering nothing", async () => {
+    renderBrowser();
+    expect(minimum()).toHaveValue("0");
+    expect(maximum()).toHaveValue(String(PRICE_STEPS));
+    expect(screen.getByText("Any price")).toBeInTheDocument();
+    await waitFor(() => expect(namesShown()).toHaveLength(7));
+  });
+
+  it("drops the Cosmetics dearer than the ceiling the viewer drags to", () => {
+    renderBrowser();
+    // The Tin Pot is 174 scrap and the Team Captain 1593.
+    dragTo(maximum(), 174);
+    expect(namesShown()).toContain("Tin Pot");
+    expect(namesShown()).not.toContain("Team Captain");
+  });
+
+  it("drops the Cosmetics cheaper than the floor the viewer drags to", () => {
+    renderBrowser();
+    // The notch worth 151 scrap, which is under the Tin Pot and over the
+    // Baronial Badge at 55.
+    dragTo(minimum(), 151);
+    expect(namesShown().toSorted()).toEqual(["Team Captain", "Tin Pot"]);
+  });
+
+  it("says what the range it is on means, in the words the cards use", () => {
+    renderBrowser();
+    dragTo(minimum(), 151);
+    // 151 scrap, which the fixture's Key Rate of 78.66 ref leaves in Refined.
+    expect(screen.getByText("16.77 ref to any")).toBeInTheDocument();
+  });
+
+  it("carries the ceiling along rather than letting the floor cross it", () => {
+    renderBrowser();
+    dragTo(maximum(), 13);
+    fireEvent.change(minimum(), { target: { value: String(PRICE_STEPS) } });
+    expect(Number((minimum() as HTMLInputElement).value)).toBeLessThanOrEqual(
+      Number((maximum() as HTMLInputElement).value),
+    );
+    // And the range still means something: the floor's own Cosmetic, the
+    // dearest there is, rather than nothing at all.
+    expect(namesShown()).toEqual(["Team Captain"]);
+  });
+
+  it("carries the floor along rather than letting the ceiling cross it", () => {
+    renderBrowser();
+    dragTo(minimum(), 151);
+    dragTo(maximum(), 13);
+    expect(Number((minimum() as HTMLInputElement).value)).toBeLessThanOrEqual(
+      Number((maximum() as HTMLInputElement).value),
+    );
+    expect(namesShown()).toEqual(["Bolt Boy"]);
+  });
+
+  it("filters nothing again once it is dragged back to the end of its track", () => {
+    renderBrowser();
+    dragTo(minimum(), 174);
+    fireEvent.change(minimum(), { target: { value: "0" } });
+    expect(screen.getByText("Any price")).toBeInTheDocument();
+    expect(namesShown()).toHaveLength(7);
+  });
+
+  it("is where the viewer left it next visit", async () => {
+    renderBrowser();
+    dragTo(maximum(), 174);
+    await waitFor(() => expect(localStorage.getItem(CONTROLS_STORAGE_KEY)).toContain("maxScrap"));
+    cleanup();
+
+    renderBrowser();
+    await waitFor(() => expect(namesShown()).not.toContain("Team Captain"));
+    expect(maximum()).toHaveValue(String(stepForScrap(scale, 174)));
+  });
+});
+
 describe("working the controls from the keyboard", () => {
   it("reaches every one of them by tabbing, in the order they are read", async () => {
     const user = renderBrowser();
-    // In a Class View, where all seven are live.
+    // In a Class View, where all nine are live.
     await user.selectOptions(screen.getByRole("combobox", CLASS_PICKER), "soldier");
     (document.activeElement as HTMLElement | null)?.blur();
     const inTabOrder = [
       screen.getByRole("searchbox", SEARCH_BOX),
       screen.getByRole("combobox", CLASS_PICKER),
       screen.getByRole("combobox", SLOT_PICKER),
+      screen.getByRole("slider", MINIMUM_PRICE),
+      screen.getByRole("slider", MAXIMUM_PRICE),
       screen.getByRole("combobox", SORT_PICKER),
       screen.getByRole("checkbox", HIDE_ALL_CLASS),
       screen.getByRole("checkbox", HIDE_UNPRICED),

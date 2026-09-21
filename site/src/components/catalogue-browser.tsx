@@ -18,7 +18,8 @@ import { useMemo } from "react";
 
 import { viewedClass, visibleCosmetics } from "@/browsing/controls";
 import { useRememberedControls } from "@/browser/remembered-controls";
-import { BrowsingControlsBar } from "@/components/browsing-controls";
+import { priceCeiling, priceScale } from "@/browsing/price-scale";
+import { BrowsingControlsPanel } from "@/components/browsing-controls";
 import { CosmeticGrid } from "@/components/cosmetic-grid";
 import { InventoryControls } from "@/components/inventory-controls";
 import { inventoryApiUrl } from "@/inventory/load";
@@ -58,6 +59,10 @@ export function CatalogueBrowser({ cosmetics, manifest, keyRate, basis, snapshot
     [cosmetics, controls, inventory.ownedSlugs],
   );
 
+  // What each notch of the price sliders is worth. The catalogue never changes
+  // while the page is open, so the scale is built once and not once a keystroke.
+  const scale = useMemo(() => priceScale(priceCeiling(cosmetics)), [cosmetics]);
+
   // What the viewer owns, by slug, so a card can show their own copy rather than
   // the Reference Price. Only built once there is an Inventory to build it from.
   const ownedBySlug = useMemo(
@@ -81,29 +86,39 @@ export function CatalogueBrowser({ cosmetics, manifest, keyRate, basis, snapshot
         basis={basis}
         shownOwned={controls.onlyOwned ? shownOwned : null}
       />
-      <BrowsingControlsBar
-        controls={controls}
-        onChange={change}
-        shown={visible.length}
-        total={cosmetics.length}
-        // The toggle has nothing to narrow until a backpack has been read, so it
-        // is disabled rather than left to tick and change nothing — the same
-        // rule the All-Class toggle follows outside a Class View.
-        ownedOffered={configured && inventory.ownedSlugs !== null}
-      />
-      {/* The Class View reaches the grid as well as the filter: it is what
-          decides which Class each picture shows, so an All-Class Cosmetic in a
-          Heavy's view is a Heavy wearing it. The Inventory reaches it for the
-          other reason — a card of a Cosmetic the viewer owns shows what their
-          copy is worth, not what the Cosmetic costs. */}
-      <CosmeticGrid
-        cosmetics={visible}
-        manifest={manifest}
-        classView={viewedClass(controls.classFilter)}
-        keyRate={keyRate}
-        basis={basis}
-        owned={ownedBySlug}
-      />
+      {/* Side by side wherever there is room: the controls down the right, the
+          grid taking everything left over. The controls come first in the
+          source and are drawn second, so a keyboard meets them before the
+          eighteen hundred cards they narrow. */}
+      <div className="flex min-h-0 flex-1 flex-col lg:flex-row-reverse lg:gap-4">
+        <BrowsingControlsPanel
+          controls={controls}
+          onChange={change}
+          shown={visible.length}
+          total={cosmetics.length}
+          priceScale={scale}
+          keyRate={keyRate}
+          // The toggle has nothing to narrow until a backpack has been read, so
+          // it is disabled rather than left to tick and change nothing — the
+          // same rule the All-Class toggle follows outside a Class View.
+          ownedOffered={configured && inventory.ownedSlugs !== null}
+        />
+        {/* The Class View reaches the grid as well as the filter: it is what
+            decides which Class each picture shows, so an All-Class Cosmetic in
+            a Heavy's view is a Heavy wearing it. The Inventory reaches it for
+            the other reason — a card of a Cosmetic the viewer owns shows what
+            their copy is worth, not what the Cosmetic costs. */}
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+          <CosmeticGrid
+            cosmetics={visible}
+            manifest={manifest}
+            classView={viewedClass(controls.classFilter)}
+            keyRate={keyRate}
+            basis={basis}
+            owned={ownedBySlug}
+          />
+        </div>
+      </div>
     </>
   );
 }

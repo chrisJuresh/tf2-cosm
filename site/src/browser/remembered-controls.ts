@@ -51,12 +51,32 @@ function asBoolean(value: unknown, fallback: boolean): boolean {
   return typeof value === "boolean" ? value : fallback;
 }
 
+/** A price bound: a whole scrap count, or null for no bound at that end. */
+function asBound(value: unknown): number | null {
+  return typeof value === "number" && Number.isInteger(value) && value >= 0 ? value : null;
+}
+
+/** Both price bounds, or neither — see the pair rule where they are read. */
+function priceBounds(stored: Record<string, unknown>): Pick<BrowsingControls, "minScrap" | "maxScrap"> {
+  const minScrap = asBound(stored["minScrap"]);
+  const maxScrap = asBound(stored["maxScrap"]);
+  if (minScrap !== null && maxScrap !== null && minScrap > maxScrap) {
+    return { minScrap: DEFAULT_CONTROLS.minScrap, maxScrap: DEFAULT_CONTROLS.maxScrap };
+  }
+  return { minScrap, maxScrap };
+}
+
 function rememberedFrom(stored: Record<string, unknown>): RememberedControls {
   return {
     classFilter: oneOf<ClassFilter>(CLASS_FILTERS, stored["classFilter"], DEFAULT_CONTROLS.classFilter),
     hideAllClass: asBoolean(stored["hideAllClass"], DEFAULT_CONTROLS.hideAllClass),
     slot: oneOf<CosmeticSlot>(COSMETIC_SLOTS, stored["slot"], DEFAULT_CONTROLS.slot),
     hideUnpriced: asBoolean(stored["hideUnpriced"], DEFAULT_CONTROLS.hideUnpriced),
+    // The two ends are read as a pair, because a pair is what they are: a floor
+    // above its own ceiling is not one salvageable bound and one bad one, it is
+    // a range that shows nothing, and a page that opens on an empty grid reads
+    // as broken. Neither is remembered rather than half of it.
+    ...priceBounds(stored),
     onlyOwned: asBoolean(stored["onlyOwned"], DEFAULT_CONTROLS.onlyOwned),
     hideUntradable: asBoolean(stored["hideUntradable"], DEFAULT_CONTROLS.hideUntradable),
     hideEventOnly: asBoolean(stored["hideEventOnly"], DEFAULT_CONTROLS.hideEventOnly),
@@ -118,8 +138,18 @@ export function useRememberedControls(): readonly [BrowsingControls, (change: Pa
   // Only the remembered fields are watched. The search is not one of them, and
   // waking this up on every keystroke to write the same bytes back is work for
   // nothing.
-  const { classFilter, hideAllClass, slot, hideUnpriced, onlyOwned, hideUntradable, hideEventOnly, sort } =
-    state.controls;
+  const {
+    classFilter,
+    hideAllClass,
+    slot,
+    hideUnpriced,
+    minScrap,
+    maxScrap,
+    onlyOwned,
+    hideUntradable,
+    hideEventOnly,
+    sort,
+  } = state.controls;
   useEffect(() => {
     if (!state.restored) return;
     writeControls(browserStorage(), {
@@ -128,12 +158,26 @@ export function useRememberedControls(): readonly [BrowsingControls, (change: Pa
       hideAllClass,
       slot,
       hideUnpriced,
+      minScrap,
+      maxScrap,
       onlyOwned,
       hideUntradable,
       hideEventOnly,
       sort,
     });
-  }, [state.restored, classFilter, hideAllClass, slot, hideUnpriced, onlyOwned, hideUntradable, hideEventOnly, sort]);
+  }, [
+    state.restored,
+    classFilter,
+    hideAllClass,
+    slot,
+    hideUnpriced,
+    minScrap,
+    maxScrap,
+    onlyOwned,
+    hideUntradable,
+    hideEventOnly,
+    sort,
+  ]);
 
   const change = useCallback((patch: Partial<BrowsingControls>) => {
     setState((previous) => ({ ...previous, controls: { ...previous.controls, ...patch } }));

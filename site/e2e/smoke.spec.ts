@@ -156,6 +156,32 @@ test("the search narrows the grid as it is typed", async ({ catalogue: { page, f
   expectClean(faults);
 });
 
+test("the price sliders narrow the grid, and take the arrow keys to do it", async ({
+  catalogue: { page, faults },
+}) => {
+  // A `range` is the one control on the page whose keyboard behaviour is the
+  // browser's own and not the page's, so this is the only place it can be
+  // checked at all — jsdom moves no thumb.
+  const maximum = page.getByLabel("Maximum", { exact: true });
+  await expect(page.getByText("Any price")).toBeVisible();
+
+  await maximum.focus();
+  await page.keyboard.press("ArrowLeft");
+
+  // One notch below the top of the scale is below the dearest Cosmetic there
+  // is, and above everything else the fixture prices.
+  await expect(card(page, MULTI_CLASS)).toHaveCount(0);
+  await expect(card(page, DEMOMAN_ONLY)).toBeVisible();
+  await expect(page.getByText("Any price")).toHaveCount(0);
+
+  // And back where it started, the range asks nothing again.
+  await page.keyboard.press("ArrowRight");
+  await expect(card(page, MULTI_CLASS)).toBeVisible();
+  await expect(page.getByText("Any price")).toBeVisible();
+
+  expectClean(faults);
+});
+
 test("the open Cosmetic takes the Class out of the picture and puts it back", async ({
   catalogue: { page, faults },
 }) => {
