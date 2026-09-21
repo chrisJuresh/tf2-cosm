@@ -27,7 +27,14 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Inventory } from "@/inventory/copies";
 import { fetchInventory, InventoryError, loadVariantPrices } from "@/inventory/load";
 import { profileFromSearch, searchWithProfile } from "@/inventory/profile-url";
-import { inventoryTotal, type InventoryTotal, ownedCosmetics, type OwnedCosmetic, ownedSlugs } from "@/inventory/owned";
+import {
+  inventoryTotal,
+  type InventoryTotal,
+  ownedCosmetics,
+  type OwnedCosmetic,
+  ownedSlugs,
+  withoutUntradable,
+} from "@/inventory/owned";
 import type { VariantPrices } from "@/prices/variant-prices";
 
 export const PROFILE_STORAGE_KEY = "tf2-cosm.steam-profile.v1";
@@ -88,6 +95,12 @@ export interface InventoryState {
   readonly ownedSlugs: ReadonlySet<string> | null;
   readonly total: InventoryTotal | null;
   /**
+   * How many copies the untradable toggle is keeping out of everything above.
+   * Zero when it is off. The page says the number rather than quietly showing a
+   * smaller backpack than the one it read.
+   */
+  readonly hiddenUntradable: number;
+  /**
    * Whether the copies could be priced at all. False when the Variant Prices did
    * not load, which leaves the Inventory perfectly usable as a filter and
    * without figures — and says so rather than showing everything as worthless.
@@ -110,6 +123,13 @@ export interface InventoryActions {
 export function useInventory(
   cosmetics: readonly Cosmetic[],
   snapshotTakenAt: string,
+  /**
+   * Whether the viewer has asked for their untradable copies to be left out.
+   * It is applied here rather than where the grid is narrowed, because what it
+   * drops is copies: a Cosmetic the viewer owns no tradable copy of is one this
+   * Inventory no longer holds, and every other control follows from that.
+   */
+  hideUntradable = false,
 ): readonly [InventoryState, InventoryActions] {
   const [profile, setProfile] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -186,9 +206,18 @@ export function useInventory(
 
   useEffect(() => () => request.current?.abort(), []);
 
-  const owned = useMemo(
+  const held = useMemo(
     () => (inventory === null ? [] : ownedCosmetics(cosmetics, inventory.copies, prices)),
     [cosmetics, inventory, prices],
+  );
+
+  const owned = useMemo(() => (hideUntradable ? withoutUntradable(held) : held), [held, hideUntradable]);
+
+  // Counted off everything they hold, not off what is left, so the number is
+  // how many copies the toggle is hiding rather than how many survived it.
+  const hiddenUntradable = useMemo(
+    () => (hideUntradable ? inventoryTotal(held).untradable : 0),
+    [held, hideUntradable],
   );
 
   const state: InventoryState = {
@@ -199,6 +228,7 @@ export function useInventory(
     owned,
     ownedSlugs: inventory === null ? null : ownedSlugs(owned),
     total: inventory === null ? null : inventoryTotal(owned),
+    hiddenUntradable,
     priced: prices !== null,
   };
   return [state, { look, clear }] as const;

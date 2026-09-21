@@ -19,7 +19,9 @@ const STOVE_PIPE = 111;
 /** The fixture Team Captain. */
 const TEAM_CAPTAIN = 102;
 
-function backpack(copies: { defindex: number; quality?: string; count?: number; effect?: string }[]) {
+function backpack(
+  copies: { defindex: number; quality?: string; tradable?: boolean; count?: number; effect?: string }[],
+) {
   return {
     steamId: "76561197960435530",
     takenAt: "2026-09-21T02:51:51.168Z",
@@ -27,7 +29,7 @@ function backpack(copies: { defindex: number; quality?: string; count?: number; 
       defindex: one.defindex,
       quality: one.quality ?? "unique",
       craftable: true,
-      tradable: true,
+      tradable: one.tradable ?? true,
       count: one.count ?? 1,
       ...(one.effect === undefined ? {} : { effect: one.effect }),
     })),
@@ -86,6 +88,31 @@ test("says an Unusual is priced by its effect rather than showing a figure for i
   // And the total says out loud that it left the Unusual out, rather than
   // quietly reporting a backpack worth nothing.
   await expect(page.getByText(/leaving out 1 Unusual priced by its effect/)).toBeVisible();
+
+  expectClean(faults);
+});
+
+test("shows an untradable copy at $0, and hides it when the viewer asks", async ({ catalogue }) => {
+  const { page, faults, serveInventory } = catalogue;
+  serveInventory({
+    status: 200,
+    body: backpack([{ defindex: TEAM_CAPTAIN }, { defindex: STOVE_PIPE, tradable: false }]),
+  });
+
+  await page.getByLabel("Your Steam profile").fill("robinwalker");
+  await page.getByRole("button", { name: "Show what I own" }).click();
+
+  await expect(card(page, "scotsmans-stove-pipe").getByText("Untradable")).toBeVisible();
+  await expect(card(page, "scotsmans-stove-pipe").getByText("$0.00")).toBeVisible();
+  await expect(page.getByText(/1 untradable at \$0/)).toBeVisible();
+
+  // Ticked, the copy leaves the Inventory, and with it the only Cosmetic the
+  // viewer holds no tradable copy of.
+  await page.getByLabel("Only what I own").check();
+  await expect(cards(page)).toHaveCount(2);
+  await page.getByLabel("Hide untradable").check();
+  await expect(cards(page)).toHaveCount(1);
+  await expect(page.getByText(/1 untradable copy hidden/)).toBeVisible();
 
   expectClean(faults);
 });

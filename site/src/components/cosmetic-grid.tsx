@@ -189,6 +189,18 @@ function ownedFigures(
 
   const said = `${qualityRead(best.quality)}${best.craftable ? "" : ", non-craftable"}${held}`;
   if (best.price === null) {
+    // An untradable copy is not a copy the snapshot has no figure for: nobody
+    // can be handed it, so nobody would give anything for it, and the card says
+    // that with the figure rather than with a blank.
+    if (best.noPrice === "untradable") {
+      const nothing: Metal = { scrap: 0, refined: 0, notation: "" };
+      return {
+        notation: "Untradable",
+        reason: said,
+        metalValue: formatMetalValue(nothing),
+        dollars: basis === null ? NOTHING : formatDollars(0),
+      };
+    }
     return {
       notation: best.noPrice === "priced-per-effect" ? "Priced by its effect" : "No price for that Quality",
       reason: best.effect === undefined ? said : `${said} · ${best.effect}`,

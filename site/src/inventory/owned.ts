@@ -16,9 +16,10 @@
  * that Cosmetic.
  *
  * **What a copy is worth.** Its own Variant Price, not the Cosmetic's Reference
- * Price. A Genuine copy is worth the Genuine figure. This is the whole point of
- * the Inventory view: a viewer looking at their own backpack has already done
- * the choosing the Reference Variant rule exists to do for them.
+ * Price. A Genuine copy is worth the Genuine figure, and an untradable copy is
+ * worth nothing whatever Quality it is in. This is the whole point of the
+ * Inventory view: a viewer looking at their own backpack has already done the
+ * choosing the Reference Variant rule exists to do for them.
  */
 import type { Cosmetic } from "@tf2-cosm/data/catalogue";
 
@@ -26,11 +27,17 @@ import type { OwnedCopy } from "@/inventory/copies";
 import { type VariantPrice, type VariantPrices, variantPriceFor } from "@/prices/variant-prices";
 
 /**
- * Why a copy has no figure. Both are ordinary states rather than failures, and
- * the page says which, because "no price" and "priced by its effect" are
- * different things to a viewer holding an Unusual.
+ * Why a copy has no figure. All three are ordinary states rather than failures,
+ * and the page says which, because "no price", "priced by its effect" and
+ * "worth nothing" are three different things to the viewer holding the copy.
+ *
+ * `untradable` is the odd one of the three: it is not a figure the snapshot
+ * failed to find, it is the figure. A copy that cannot leave the backpack it is
+ * in cannot be sold for anything, so it is worth nothing — which is why the page
+ * shows it at $0 rather than blank, and why a total counts it at nothing rather
+ * than at what a tradable copy of the same thing would fetch.
  */
-export type NoPriceReason = "priced-per-effect" | "no-variant-price";
+export type NoPriceReason = "untradable" | "priced-per-effect" | "no-variant-price";
 
 /** One copy a viewer holds, with what that copy is worth. */
 export interface PricedCopy {
@@ -77,6 +84,12 @@ function byDefindex(cosmetics: readonly Cosmetic[]): Map<number, Cosmetic> {
 /**
  * The copy, priced.
  *
+ * An untradable copy is worth nothing, and that is settled before anything else
+ * is asked about it. A price is what somebody would give for the thing, and
+ * nobody gives anything for an item they cannot be handed; the Quality it
+ * happens to be in does not change that, so an untradable Unusual is worth
+ * nothing on the same terms as an untradable craft hat.
+ *
  * An Unusual is never priced, and is told apart from a copy that simply has no
  * figure. A price source prices an Unusual by effect — one figure per
  * hat-and-effect pair — so there is no single Unusual figure for a Cosmetic and
@@ -91,6 +104,7 @@ function priceCopy(copy: OwnedCopy, slug: string, prices: VariantPrices | null):
     effect: copy.effect,
     count: copy.count,
   };
+  if (!copy.tradable) return { ...base, price: null, noPrice: "untradable" };
   if (copy.quality === "unusual") return { ...base, price: null, noPrice: "priced-per-effect" };
   const price = variantPriceFor(prices, slug, copy.quality, copy.craftable);
   return price === undefined
@@ -140,6 +154,34 @@ export function ownedCosmetics(
   return owned;
 }
 
+/**
+ * The same Inventory with the untradable copies taken out of it.
+ *
+ * A backpack is full of things its owner cannot do anything with — the
+ * achievement hats, the copies still on their trade hold, everything bought on
+ * the Store this week — and a viewer working out what they are holding usually
+ * means what they are holding that they could part with. The toggle is what says
+ * which of the two they meant; this is the whole of what it does.
+ *
+ * A Cosmetic the viewer owns no tradable copy of leaves the Inventory
+ * altogether, which is the point: with the grid narrowed to what they own, it is
+ * the Cosmetics they can trade that they wanted to see. The Metal Value never
+ * moves, because what is dropped was worth nothing.
+ */
+export function withoutUntradable(owned: readonly OwnedCosmetic[]): OwnedCosmetic[] {
+  const kept: OwnedCosmetic[] = [];
+  for (const one of owned) {
+    const copies = one.copies.filter((copy) => copy.noPrice !== "untradable");
+    if (copies.length === 0) continue;
+    kept.push({
+      ...one,
+      copies,
+      count: copies.reduce((total, copy) => total + copy.count, 0),
+    });
+  }
+  return kept;
+}
+
 /** The slugs of what a viewer owns, which is what narrows the grid to it. */
 export function ownedSlugs(owned: readonly OwnedCosmetic[]): Set<string> {
   return new Set(owned.map((one) => one.cosmetic.slug));
@@ -151,6 +193,12 @@ export interface InventoryTotal {
   readonly scrap: number;
   /** How many copies that figure counts. */
   readonly counted: number;
+  /**
+   * Copies worth nothing because they cannot be traded. They are not left out —
+   * they are in the figure, at the nothing they are worth — and they are counted
+   * on their own so the page can say how much of a backpack is untradable.
+   */
+  readonly untradable: number;
   /** Copies left out because a price source prices them by effect. */
   readonly pricedPerEffect: number;
   /** Copies left out because the source has no figure for their Quality. */
@@ -168,6 +216,7 @@ export interface InventoryTotal {
 export function inventoryTotal(owned: readonly OwnedCosmetic[]): InventoryTotal {
   let scrap = 0;
   let counted = 0;
+  let untradable = 0;
   let pricedPerEffect = 0;
   let unpriced = 0;
   for (const one of owned) {
@@ -175,6 +224,8 @@ export function inventoryTotal(owned: readonly OwnedCosmetic[]): InventoryTotal 
       if (copy.price !== null) {
         scrap += copy.price.scrap.mid * copy.count;
         counted += copy.count;
+      } else if (copy.noPrice === "untradable") {
+        untradable += copy.count;
       } else if (copy.noPrice === "priced-per-effect") {
         pricedPerEffect += copy.count;
       } else {
@@ -182,5 +233,5 @@ export function inventoryTotal(owned: readonly OwnedCosmetic[]): InventoryTotal 
       }
     }
   }
-  return { scrap, counted, pricedPerEffect, unpriced };
+  return { scrap, counted, untradable, pricedPerEffect, unpriced };
 }

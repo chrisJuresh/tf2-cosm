@@ -69,6 +69,17 @@ function Total({ state, keyRate, basis }: { state: InventoryState; keyRate: Meta
     total.unpriced > 0 ? `${total.unpriced} with no price for that Quality` : null,
   ].filter((one): one is string => one !== null);
 
+  // The untradable copies are said separately from those, because they are not
+  // left out of the figure — they are in it, at the nothing they are worth — and
+  // when the toggle is on they are not in the backpack the rest of the line is
+  // about at all.
+  const untradable =
+    state.hiddenUntradable > 0
+      ? `${state.hiddenUntradable.toLocaleString("en-US")} untradable ${state.hiddenUntradable === 1 ? "copy" : "copies"} hidden`
+      : total.untradable > 0
+        ? `${total.untradable.toLocaleString("en-US")} untradable at $0`
+        : null;
+
   return (
     <p className="text-sm">
       <span className="text-black/60 dark:text-white/60">
@@ -78,6 +89,7 @@ function Total({ state, keyRate, basis }: { state: InventoryState; keyRate: Meta
       <span className="font-medium tabular-nums">{metal.notation}</span>
       <span className="text-black/60 dark:text-white/60"> · {formatMetalValue(metal)}</span>
       {dollars === null ? null : <span className="text-black/60 dark:text-white/60"> · {formatDollars(dollars)}</span>}
+      {untradable === null ? null : <span className="text-black/55 dark:text-white/55"> · {untradable}</span>}
       {left.length === 0 ? null : (
         <span className="text-black/55 dark:text-white/55"> · leaving out {left.join(" and ")}</span>
       )}
@@ -144,10 +156,20 @@ export function InventoryControls({ state, actions, configured, keyRate, basis, 
         ) : state.loading ? (
           <p className="text-sm text-black/60 dark:text-white/60">Reading that backpack…</p>
         ) : state.inventory === null ? null : state.owned.length === 0 ? (
-          <p className="text-sm text-black/60 dark:text-white/60">
-            That backpack has {state.inventory.counts.items.toLocaleString("en-US")} items in it and none of them is a
-            Cosmetic.
-          </p>
+          // Nothing left can mean two different things, and a viewer who has
+          // just ticked a toggle should not be told their backpack has no
+          // Cosmetics in it when what it has is no tradable ones.
+          state.hiddenUntradable > 0 ? (
+            <p className="text-sm text-black/60 dark:text-white/60">
+              Every Cosmetic in that backpack is untradable, and the toggle above is hiding all{" "}
+              {state.hiddenUntradable.toLocaleString("en-US")} copies.
+            </p>
+          ) : (
+            <p className="text-sm text-black/60 dark:text-white/60">
+              That backpack has {state.inventory.counts.items.toLocaleString("en-US")} items in it and none of them is a
+              Cosmetic.
+            </p>
+          )
         ) : (
           <>
             <Total state={state} keyRate={keyRate} basis={basis} />
