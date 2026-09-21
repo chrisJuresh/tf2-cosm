@@ -4,7 +4,7 @@ import { buildCatalogue } from "../src/catalogue/build.ts";
 import type { Price } from "../src/catalogue/schema.ts";
 import { refinedToScrap } from "../src/prices/metal.ts";
 import type { PricedVariant, Quality, Rates } from "../src/prices/price-source.ts";
-import { priceOf } from "../src/prices/price-spread.ts";
+import { priceOf, variantPricesOf } from "../src/prices/price-spread.ts";
 import { chooseReferenceVariant, type ReferenceVariantContext } from "../src/prices/reference-variant.ts";
 import { fixtureInputs, fixturePricedInputs } from "./fixtures.ts";
 
@@ -133,6 +133,54 @@ describe("the price snapshot's header", () => {
     const { catalogue } = buildCatalogue(fixtureInputs());
     expect(catalogue.header.prices).toBeNull();
     expect(catalogue.cosmetics.every((one) => one.price === null)).toBe(true);
+  });
+});
+
+/**
+ * The second document the run writes. It is the same price list reduced the
+ * other way: not the one figure that stands for a Cosmetic, but every figure a
+ * copy somebody holds could be worth.
+ */
+describe("the Variant Prices document", () => {
+  it("is keyed by the catalogue's own slug, and carries what the Reference Price left behind", async () => {
+    const { variantPrices } = buildCatalogue(await fixturePricedInputs());
+    // The Crocodile Smile takes its blanket Unique figure as the Reference
+    // Price, so its Genuine price is nowhere in the catalogue — and it is what
+    // a Genuine copy of it is worth.
+    expect(variantPrices?.bySlug["crocodile-smile"]).toMatchObject([
+      { quality: "genuine", craftable: true, blanket: false },
+      { quality: "unique", craftable: true, blanket: true },
+    ]);
+  });
+
+  it("repeats the catalogue's snapshot time and Key Rate, so a reader can see they are one run", async () => {
+    const { catalogue, variantPrices } = buildCatalogue(await fixturePricedInputs());
+    expect(variantPrices?.header.snapshotTakenAt).toBe(catalogue.header.snapshotTakenAt);
+    expect(variantPrices?.header.keyRate).toEqual(catalogue.header.prices?.keyRate);
+  });
+
+  it("counts every Quality a copy can be held in, which is more than the Reference Variants", async () => {
+    const { variantPrices } = buildCatalogue(await fixturePricedInputs());
+    // The rule only ever picks one. The Crocodile Smile and the Stove Pipe are
+    // priced Genuine as well as Unique; the Baronial Badge keeps the blanket
+    // Unique figure ADR-0004 refused to let stand for it; the Team Captain is
+    // priced non-craftable as well. Unusual is never counted — the Tin Pot has
+    // two effects priced and neither is a figure for the Cosmetic.
+    expect(variantPrices?.header.counts).toEqual({
+      cosmetics: 7,
+      variants: 11,
+      byVariant: { "genuine-craftable": 4, "unique-craftable": 5, "unique-non-craftable": 2 },
+    });
+  });
+
+  it("leaves out a Cosmetic with no Variant Price rather than writing it empty", async () => {
+    const { variantPrices } = buildCatalogue(await fixturePricedInputs());
+    // The one the fixture price list never mentions.
+    expect(variantPrices?.bySlug["dead-of-night"]).toBeUndefined();
+  });
+
+  it("is not written at all when the run had no price source", () => {
+    expect(buildCatalogue(fixtureInputs()).variantPrices).toBeNull();
   });
 });
 
@@ -316,5 +364,99 @@ describe("a Blanket Price", () => {
     const price = priceOf([blanket], cosmetic("unique", false), RATES);
     expect(price).toMatchObject({ state: "priced", blanket: true });
     expect(priceOf([genuine], cosmetic("unique", false), RATES)).toMatchObject({ blanket: false });
+  });
+});
+
+/**
+ * The Variant Prices: what a copy somebody actually owns is worth. The Reference
+ * Variant rule answers "what does this Cosmetic cost"; this answers "what is my
+ * copy worth", and those are different questions with different answers.
+ */
+describe("the Variant Prices", () => {
+  const anyUnique = variant({ quality: "unique", low: 1.33, high: 1.55 });
+  const anyGenuine = variant({ quality: "genuine", low: 18.66, high: 20 });
+
+  it("prices every Quality the source listed, not only the Reference Variant", () => {
+    const prices = variantPricesOf([anyUnique, anyGenuine], RATES);
+    expect(prices.map((one) => `${one.quality}-${one.craftable}`)).toEqual(["genuine-true", "unique-true"]);
+  });
+
+  it("keeps the Reference Variant among them rather than holding it out", () => {
+    const chosen = chooseReferenceVariant([anyUnique, anyGenuine], cosmetic("unique", true), RATES);
+    if ("unpriced" in chosen) throw new Error("unreachable");
+    const mine = variantPricesOf([anyUnique, anyGenuine], RATES).find(
+      (one) => one.quality === chosen.variant.quality && one.craftable === chosen.variant.craftable,
+    );
+    expect(mine).toBeDefined();
+  });
+
+  it("comes to the same Metal Values the Reference Price would have been written at", () => {
+    // The point of the lean shape: it drops what a reader can recompute, never
+    // what the figure is. The scrap counts have to be the Reference Price's.
+    const reference = priceOf([anyGenuine], cosmetic("genuine", true), RATES);
+    if (reference.state !== "priced") throw new Error("unreachable");
+    const [only] = variantPricesOf([anyGenuine], RATES);
+    expect(only?.scrap).toEqual({
+      low: reference.spread.low.metal.scrap,
+      mid: reference.spread.mid.metal.scrap,
+      high: reference.spread.high.metal.scrap,
+    });
+    expect(only?.lastUpdatedAt).toBe(reference.lastUpdatedAt);
+  });
+
+  it("converts a figure in Keys at the snapshot's own Key Rate, as the Reference Price does", () => {
+    const inKeys = variant({ quality: "strange", currency: "keys", low: 2, high: 2.5 });
+    const [only] = variantPricesOf([inKeys], RATES);
+    // 2 and 2.5 Keys at 708 scrap a Key, and the midpoint of the two.
+    expect(only?.scrap).toEqual({ low: 1416, mid: 1593, high: 1770 });
+  });
+
+  it("leaves out an Unusual, which is priced by its effect and not as one figure", () => {
+    const unusual = variant({ quality: "unusual", currency: "keys", low: 29 });
+    expect(variantPricesOf([anyUnique, unusual], RATES).map((one) => one.quality)).toEqual(["unique"]);
+  });
+
+  it("leaves out a figure quoted in a currency the snapshot has no rate for", () => {
+    const inDollars = variant({ quality: "vintage", currency: "usd", low: 3 });
+    expect(variantPricesOf([anyUnique, inDollars], RATES).map((one) => one.quality)).toEqual(["unique"]);
+  });
+
+  it("marks a Blanket Price as one on the variant that carries it", () => {
+    const blanket = variant({ currency: "hat", low: 1, high: 1 });
+    expect(variantPricesOf([blanket], RATES)).toMatchObject([{ quality: "unique", blanket: true }]);
+  });
+
+  it("keeps a blanket Unique that ADR-0004 refused to let stand for a Promo-Only Cosmetic", () => {
+    // The two rules part company here, and on purpose. ADR-0004 is about which
+    // figure stands for a Cosmetic nobody owns a particular copy of; it does not
+    // say the source never quoted one. A Unique copy of a Promo-Only Cosmetic
+    // was never issued, so no Inventory holds one and nothing is ever shown at
+    // this figure — but inventing an absence here would be this file editing the
+    // source rather than reporting it.
+    const blanket = variant({ currency: "hat", low: 1, high: 1 });
+    const promo = variant({ quality: "genuine", low: 18.66, high: 20 });
+    expect(priceOf([blanket, promo], cosmetic("unique", false), RATES)).toMatchObject({
+      referenceVariant: { quality: "genuine" },
+    });
+    expect(variantPricesOf([blanket, promo], RATES).map((one) => one.quality)).toEqual(["genuine", "unique"]);
+  });
+
+  it("has nothing to say about a Cosmetic the source never listed", () => {
+    expect(variantPricesOf(undefined, RATES)).toEqual([]);
+  });
+
+  it("orders itself, so two runs over one price list write the same bytes", () => {
+    const shuffled = [
+      variant({ quality: "unique", craftable: false }),
+      variant({ quality: "genuine" }),
+      variant({ quality: "unique" }),
+      variant({ quality: "genuine", craftable: false }),
+    ];
+    expect(variantPricesOf(shuffled, RATES).map((one) => `${one.quality}-${one.craftable}`)).toEqual([
+      "genuine-true",
+      "genuine-false",
+      "unique-true",
+      "unique-false",
+    ]);
   });
 });

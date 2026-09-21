@@ -22,6 +22,7 @@ import {
   DEFAULT_WRITE_GUARD_LIMITS,
   writeRefusal,
 } from "./catalogue/write-guard.ts";
+import { VARIANT_PRICES_SCHEMA_VERSION, variantPricesJsonSchema } from "./catalogue/variant-prices.ts";
 import { loadDotEnv, requireEnv } from "./env.ts";
 import type { MarketKeyPrice } from "./prices/dollar-basis.ts";
 import type { PriceList } from "./prices/price-source.ts";
@@ -212,7 +213,7 @@ async function main(): Promise<number> {
   // A Dollar Basis is anchored to the Key Rate, so with no prices there is none to fetch.
   const marketKeyPrice = prices === undefined ? undefined : await loadMarketKeyPrice(options, runWarnings);
 
-  const { catalogue, exclusions, warnings: buildWarnings } = buildCatalogue({
+  const { catalogue, variantPrices, exclusions, warnings: buildWarnings } = buildCatalogue({
     itemsGame: definitions.itemsGame,
     webApiItems: webApi.items,
     englishTokens: definitions.englishTokens,
@@ -271,6 +272,17 @@ async function main(): Promise<number> {
     }
   }
 
+  if (variantPrices !== null) {
+    // What a viewer's own copy can be priced in, which is more than the
+    // Reference Variants because that rule only ever picks one. Unusual is
+    // absent by design: it is priced by effect and carries no single figure.
+    const { counts } = variantPrices.header;
+    console.log(`  Variant Prices     ${counts.variants} over ${counts.cosmetics} Cosmetics`);
+    for (const [variant, count] of Object.entries(counts.byVariant)) {
+      console.log(`    ${variant.padEnd(24)} ${count}`);
+    }
+  }
+
   const bases = catalogue.header.dollarBases;
   if (bases === null) {
     console.log("  Dollar Bases       none (no Key Rate to anchor them to)");
@@ -302,12 +314,27 @@ async function main(): Promise<number> {
   });
   if (refusal !== undefined) throw new Error(refusal);
 
-  await mkdir(dirname(options.out), { recursive: true });
+  const folder = dirname(options.out);
+  await mkdir(folder, { recursive: true });
   await writeFile(options.out, `${JSON.stringify(catalogue, null, 2)}\n`, "utf8");
-  const schemaPath = join(dirname(options.out), `catalogue.v${CATALOGUE_SCHEMA_VERSION}.schema.json`);
+  const schemaPath = join(folder, `catalogue.v${CATALOGUE_SCHEMA_VERSION}.schema.json`);
   await writeFile(schemaPath, `${JSON.stringify(catalogueJsonSchema(), null, 2)}\n`, "utf8");
   console.log(`wrote ${options.out}`);
   console.log(`wrote ${schemaPath}`);
+
+  // The second document of the run. It is written after the catalogue and under
+  // the same guard: a run refused for losing Cosmetics never reaches here, so
+  // the committed pair can never be half of one snapshot and half of another.
+  // A run with no price source writes neither the prices nor this, and leaves
+  // whatever is committed alone rather than replacing it with an empty file.
+  if (variantPrices !== null) {
+    const variantsPath = join(folder, "variant-prices.json");
+    const variantsSchemaPath = join(folder, `variant-prices.v${VARIANT_PRICES_SCHEMA_VERSION}.schema.json`);
+    await writeFile(variantsPath, `${JSON.stringify(variantPrices, null, 2)}\n`, "utf8");
+    await writeFile(variantsSchemaPath, `${JSON.stringify(variantPricesJsonSchema(), null, 2)}\n`, "utf8");
+    console.log(`wrote ${variantsPath}`);
+    console.log(`wrote ${variantsSchemaPath}`);
+  }
   return 0;
 }
 
