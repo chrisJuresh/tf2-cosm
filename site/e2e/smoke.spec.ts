@@ -113,9 +113,13 @@ test("a drag across a Cosmetic's name selects the name and opens nothing", async
   // real browser selects anything, so this is the only suite that can ask.
   const name = card(page, STYLED).getByRole("button");
   const wanted = (await name.textContent())?.trim() ?? "";
-  // On a short phone the controls above the grid leave the first row's names
-  // under the footer, and a drag there selects the footer instead.
-  await name.scrollIntoViewIfNeeded();
+  // The mouse goes to raw coordinates and scrolls nothing, and the box is where
+  // the name is laid out whether or not the grid's own scroller shows it. On a
+  // phone the grid is the strip under the bar, and this name starts out clipped
+  // under its bottom edge — where the footer is what the mouse would drag over.
+  // Into the middle of the strip, not merely into it: a drag along the edge of a
+  // scroller scrolls it, and the selection runs on into the next card.
+  await name.evaluate((element) => element.scrollIntoView({ block: "center" }));
   const box = await name.boundingBox();
   expect(box).not.toBeNull();
 
