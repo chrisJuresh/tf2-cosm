@@ -12,7 +12,9 @@
  * the Class, or the Cosmetic on its own — where there is more than one look to
  * see. Those three are the only state the panel holds, and it holds them rather
  * than the grid because they are how this Cosmetic is being looked at right now
- * — closing it is done looking, and the next one opens on its own default.
+ * — closing it is done looking, and the next one opens on its own default. The
+ * View's default is the picture the grid is showing, chosen in the sidebar: a
+ * viewer browsing the Cosmetics on their own opens one on its own.
  *
  * It is drawn inside the modal (`@/components/cosmetic-modal`), which is what
  * gives it the room: the picture is the point of opening a Cosmetic, so it takes
@@ -70,15 +72,17 @@ export interface CosmeticDetailProps {
   readonly manifest: RenderManifest;
   /** The Class the picture shows — settled by the grid, so the card and the panel agree. */
   readonly gameClass: ClassName;
+  /** The picture the grid is showing, and so the one the panel opens on. */
+  readonly view?: Variant | undefined;
   /** What the panel is called on the page, which is how a test and a link find it. */
   readonly id: string;
 }
 
-export function CosmeticDetail({ cosmetic, keyRate, manifest, gameClass, id }: CosmeticDetailProps) {
+export function CosmeticDetail({ cosmetic, keyRate, manifest, gameClass, view = DEFAULT_VARIANT, id }: CosmeticDetailProps) {
   const { price } = cosmetic;
   const [style, setStyle] = useState(DEFAULT_STYLE);
   const [team, setTeam] = useState<Team>(DEFAULT_TEAM);
-  const [variant, setVariant] = useState<Variant>(DEFAULT_VARIANT);
+  const [variant, setVariant] = useState<Variant>(view);
   // Both asked of the Class on show: an All-Class Cosmetic can have a BLU render
   // on one Class and only RED on another, or have been rendered on its own for
   // one Class and not yet for the next, and the toggles answer for this picture.

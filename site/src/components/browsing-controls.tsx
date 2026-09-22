@@ -2,7 +2,8 @@
 
 /**
  * The panel the catalogue is browsed with: a name search, the Class picker, the
- * slot filter, the price range, the sort, and the four toggles.
+ * slot filter, the price range, the sort, which picture the cards show, and the
+ * toggles.
  *
  * It is a column down the right-hand side wherever there is room for one, and a
  * wrapping bar above the grid where there is not. The reason is the grid: every
@@ -33,6 +34,8 @@ import {
   type SortOrder,
 } from "@/browsing/controls";
 import { PriceRange } from "@/components/price-range";
+import { ViewToggle } from "@/components/render-controls";
+import type { Variant } from "@/renders/manifest";
 
 /**
  * How a control sits in the panel: side by side with the others while they are
@@ -156,6 +159,13 @@ export interface BrowsingControlsPanelProps {
    * where the site was built with no inventory proxy configured at all.
    */
   readonly ownedOffered: boolean;
+  /**
+   * Which picture every card shows: the Cosmetic on the Class, or on its own.
+   * Not one of the `BrowsingControls`, because it changes how the Cosmetics look
+   * and not which ones are shown or in what order.
+   */
+  readonly view: Variant;
+  readonly onView: (view: Variant) => void;
 }
 
 export function BrowsingControlsPanel({
@@ -166,6 +176,8 @@ export function BrowsingControlsPanel({
   priceScale,
   keyRate,
   ownedOffered,
+  view,
+  onView,
 }: BrowsingControlsPanelProps) {
   const count = shown === total ? `${total.toLocaleString("en-US")} Cosmetics` : `${shown.toLocaleString("en-US")} of ${total.toLocaleString("en-US")} Cosmetics`;
 
@@ -248,6 +260,10 @@ export function BrowsingControlsPanel({
             ))}
           </select>
         </Field>
+
+        {/* Under the sort, because it is the other control that changes how the
+            grid reads rather than what is in it. */}
+        <ViewToggle label="Pictures" chosen={view} onChoose={onView} layout="field" />
       </div>
 
       {/* As a bar the toggles sit on the controls' own line, level with the

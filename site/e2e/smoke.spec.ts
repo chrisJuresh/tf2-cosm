@@ -113,6 +113,9 @@ test("a drag across a Cosmetic's name selects the name and opens nothing", async
   // real browser selects anything, so this is the only suite that can ask.
   const name = card(page, STYLED).getByRole("button");
   const wanted = (await name.textContent())?.trim() ?? "";
+  // On a short phone the controls above the grid leave the first row's names
+  // under the footer, and a drag there selects the footer instead.
+  await name.scrollIntoViewIfNeeded();
   const box = await name.boundingBox();
   expect(box).not.toBeNull();
 

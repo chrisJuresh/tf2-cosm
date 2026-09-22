@@ -41,8 +41,8 @@ import { qualityRead } from "@/catalogue/describe";
 import { CosmeticModal } from "@/components/cosmetic-modal";
 import { WornRender } from "@/components/worn-render";
 import type { OwnedCosmetic } from "@/inventory/owned";
-import type { RenderManifest } from "@/renders/manifest";
-import { DEFAULT_STYLE, DEFAULT_TEAM, displayedClass } from "@/renders/select";
+import type { RenderManifest, Variant } from "@/renders/manifest";
+import { DEFAULT_STYLE, DEFAULT_TEAM, DEFAULT_VARIANT, displayedClass } from "@/renders/select";
 
 import {
   approximately,
@@ -142,6 +142,13 @@ export interface CosmeticGridProps {
    * an All-Class Cosmetic is concerned; the Class filter itself is #13.
    */
   readonly classView: ClassName | null;
+  /**
+   * Whether every card shows the Cosmetic on the Class or on its own, and which
+   * of the two an opened Cosmetic starts on. On the Class when left out. A card
+   * asked for a picture its Cosmetic has not been rendered in shows the Backpack
+   * Icon, as `pickRender` says, rather than the other picture.
+   */
+  readonly view?: Variant | undefined;
   /** The snapshot's Key Rate, or null when it carried no prices. */
   readonly keyRate: Metal | null;
   /** The active Dollar Basis, or null when no dollar figure can be computed. */
@@ -315,6 +322,8 @@ interface CosmeticCardProps {
   manifest: RenderManifest;
   /** The Class this card's picture shows, settled once by the grid. */
   gameClass: ClassName;
+  /** Whether the picture has the Class in it, chosen once for every card. */
+  view: Variant;
   /** Which of the whole catalogue this card is, since only a screenful exists. */
   position: number;
   total: number;
@@ -329,6 +338,7 @@ function CosmeticCard({
   owned,
   manifest,
   gameClass,
+  view,
   position,
   total,
   onOpen,
@@ -394,6 +404,7 @@ function CosmeticCard({
           gameClass={gameClass}
           team={DEFAULT_TEAM}
           style={DEFAULT_STYLE}
+          variant={view}
           size={CARD_RENDER_SIZE}
           // Drawn at 160 pixels, so the fallback is the 512 icon: the 64 one
           // would be upscaled in the only place it shows.
@@ -458,6 +469,7 @@ export function CosmeticGrid({
   cosmetics,
   manifest,
   classView,
+  view = DEFAULT_VARIANT,
   keyRate,
   basis,
   owned = NOTHING_OWNED,
@@ -596,6 +608,7 @@ export function CosmeticGrid({
                   owned={owned.get(cosmetic.slug)}
                   manifest={manifest}
                   gameClass={displayedClass(cosmetic, classView)}
+                  view={view}
                   position={first + offset + 1}
                   total={cosmetics.length}
                   onOpen={openCosmetic}
@@ -612,6 +625,7 @@ export function CosmeticGrid({
           keyRate={keyRate}
           manifest={manifest}
           gameClass={displayedClass(open, classView)}
+          view={view}
           onClose={close}
         />
       )}

@@ -8,7 +8,7 @@
  * `tests/fixtures.ts`. Nothing here asserts how the fallback chain is walked;
  * that is `renders.test.ts`. These are what ends up on the page.
  */
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
@@ -20,7 +20,7 @@ import {
   fixtureSnapshotTakenAt,
 } from "./fixtures.ts";
 
-import { CatalogueBrowser } from "@/components/catalogue-browser";
+import { CatalogueBrowser, PICTURES_STORAGE_KEY } from "@/components/catalogue-browser";
 import { CosmeticGrid } from "@/components/cosmetic-grid";
 import { renderVersion } from "@/renders/base-url";
 
@@ -376,5 +376,81 @@ describe("the open card", () => {
     await user.click(screen.getByRole("button", { name: "Dead of Night" }));
     // The large icon, since the panel draws the Cosmetic bigger than a row does.
     expect(pictureInPanel("dead-of-night").getAttribute("src")).toContain("dead_of_night_large");
+  });
+});
+
+describe("the sidebar's Pictures switch", () => {
+  /** The switch in the sidebar, as opposed to the View toggle an open Cosmetic has. */
+  function pictures(): HTMLElement {
+    return within(screen.getByRole("region", { name: "Browsing controls" })).getByRole("group", {
+      name: "Pictures",
+    });
+  }
+
+  it("starts on the Class, and offers the same two pictures the open Cosmetic does", () => {
+    renderBrowser();
+    expect(within(pictures()).getAllByRole("button").map((button) => button.textContent)).toEqual([
+      "On the Class",
+      "On its own",
+    ]);
+    expect(within(pictures()).getByRole("button", { name: "On the Class" })).toHaveAttribute("aria-pressed", "true");
+    expect(pictureSrc(pictureIn("team-captain"))).toBe("/renders/web/team-captain/soldier-red-0@256.webp");
+  });
+
+  it("takes the Class out of every card at once", async () => {
+    const user = renderBrowser();
+    await user.click(within(pictures()).getByRole("button", { name: "On its own" }));
+
+    expect(pictureSrc(pictureIn("team-captain"))).toBe("/renders/web/team-captain/soldier-red-0-alone@256.webp");
+    expect(pictureSrc(pictureIn("tin-pot"))).toBe("/renders/web/tin-pot/soldier-red-0-alone@256.webp");
+    expect(pictureIn("team-captain")).toHaveAccessibleName("Team Captain, on its own");
+  });
+
+  it("shows the Backpack Icon for a Cosmetic nobody has rendered on its own, not the Class wearing it", async () => {
+    // The Gibus has Worn Renders and no Item Render. The icon is the Cosmetic on
+    // its own; the Worn Render is the Class the viewer just took out.
+    const user = renderBrowser();
+    await user.click(within(pictures()).getByRole("button", { name: "On its own" }));
+    expect(pictureIn("ghastly-gibus").getAttribute("src")).not.toContain("/renders/");
+  });
+
+  it("opens a Cosmetic on the picture the grid is showing, and its own toggle still works", async () => {
+    const user = renderBrowser();
+    await user.click(within(pictures()).getByRole("button", { name: "On its own" }));
+    await user.click(screen.getByRole("button", { name: "Team Captain" }));
+    expect(pictureSrc(pictureInPanel("team-captain"))).toBe("/renders/web/team-captain/soldier-red-0-alone@512.webp");
+
+    await user.click(within(panelFor("team-captain")).getByRole("button", { name: "On the Class" }));
+    expect(pictureSrc(pictureInPanel("team-captain"))).toBe("/renders/web/team-captain/soldier-red-0@512.webp");
+    // The modal's choice is about the one Cosmetic, and leaves the grid alone.
+    expect(pictureSrc(pictureIn("team-captain"))).toBe("/renders/web/team-captain/soldier-red-0-alone@256.webp");
+  });
+
+  it("opens a Cosmetic with no Item Render on the Class, since that is the picture there is", async () => {
+    const user = renderBrowser();
+    await user.click(within(pictures()).getByRole("button", { name: "On its own" }));
+    await user.click(screen.getByRole("button", { name: "Ghastly Gibus" }));
+    const shown = pictureSrc(pictureInPanel("ghastly-gibus"));
+    expect(shown).toMatch(/^\/renders\/web\/ghastly-gibus\/[a-z]+-red-0@512\.webp$/);
+  });
+
+  it("is where the viewer left it next visit", async () => {
+    const user = renderBrowser();
+    await user.click(within(pictures()).getByRole("button", { name: "On its own" }));
+    cleanup();
+
+    renderBrowser();
+    await waitFor(() =>
+      expect(within(pictures()).getByRole("button", { name: "On its own" })).toHaveAttribute("aria-pressed", "true"),
+    );
+    expect(pictureSrc(pictureIn("team-captain"))).toBe("/renders/web/team-captain/soldier-red-0-alone@256.webp");
+  });
+
+  it("falls back to the Class for a remembered picture this build does not offer", async () => {
+    localStorage.setItem(PICTURES_STORAGE_KEY, "sideways");
+    renderBrowser();
+    await waitFor(() =>
+      expect(within(pictures()).getByRole("button", { name: "On the Class" })).toHaveAttribute("aria-pressed", "true"),
+    );
   });
 });

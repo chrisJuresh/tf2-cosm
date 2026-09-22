@@ -25,7 +25,7 @@ import { type KeyboardEvent, type MouseEvent, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 
 import { CosmeticDetail } from "@/components/cosmetic-detail";
-import type { RenderManifest } from "@/renders/manifest";
+import type { RenderManifest, Variant } from "@/renders/manifest";
 
 /** What a screen reader hears the modal called, and where the heading lives. */
 function titleId(slug: string): string {
@@ -43,11 +43,13 @@ export interface CosmeticModalProps {
   readonly manifest: RenderManifest;
   /** The Class the picture shows — settled by the grid, so the card and the modal agree. */
   readonly gameClass: ClassName;
+  /** The picture the grid is showing, which is the one the modal opens on. */
+  readonly view?: Variant | undefined;
   /** Closing: the grid takes the slug out of the address and refocuses the card. */
   readonly onClose: () => void;
 }
 
-export function CosmeticModal({ cosmetic, keyRate, manifest, gameClass, onClose }: CosmeticModalProps) {
+export function CosmeticModal({ cosmetic, keyRate, manifest, gameClass, view, onClose }: CosmeticModalProps) {
   const card = useRef<HTMLDivElement>(null);
 
   // The modal takes the focus on the way in. Without it the focus would still be
@@ -152,6 +154,7 @@ export function CosmeticModal({ cosmetic, keyRate, manifest, gameClass, onClose 
           keyRate={keyRate}
           manifest={manifest}
           gameClass={gameClass}
+          view={view}
           id={`cosmetic-detail-${cosmetic.slug}`}
         />
       </div>

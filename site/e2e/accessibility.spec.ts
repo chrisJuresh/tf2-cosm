@@ -32,6 +32,9 @@ const STYLED = "tin-pot";
  * untradable" — are not here, because with no Inventory they are disabled and a
  * keyboard correctly walks past them. They are named and worked in
  * `inventory.spec.ts`, where there is a backpack for them to act on.
+ *
+ * The two Pictures buttons are named by their own text, as a button is, rather
+ * than by a label tied to them.
  */
 const CONTROLS = [
   "Search by name",
@@ -40,6 +43,8 @@ const CONTROLS = [
   "Minimum",
   "Maximum",
   "Sort by",
+  "On the Class",
+  "On its own",
   "Hide All-Class Cosmetics",
   "Hide Unpriced",
   "Hide Event-Only",
@@ -72,7 +77,8 @@ test("every browsing control is named, and says so to a screen reader", async ({
   const panel = page.getByRole("region", { name: "Browsing controls" });
   await expect(panel).toBeVisible();
   for (const name of CONTROLS) {
-    await expect(panel.getByLabel(name, { exact: true })).toBeVisible();
+    const labelled = panel.getByLabel(name, { exact: true });
+    await expect(labelled.or(panel.getByRole("button", { name, exact: true }))).toBeVisible();
   }
 });
 
@@ -86,7 +92,7 @@ test("the controls are reachable from the keyboard, and visible once focused", a
   await search.focus();
 
   // Tab walks the panel in the order it is written: search, Class, slot, the
-  // two price sliders, the sort, then the toggles. Anything that cannot be tabbed to is a control a
+  // two price sliders, the sort, the Pictures switch, then the toggles. Anything that cannot be tabbed to is a control a
   // keyboard viewer does not have.
   const reached: string[] = [];
   for (let step = 0; step < CONTROLS.length; step += 1) {
