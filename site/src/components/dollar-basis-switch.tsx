@@ -53,7 +53,7 @@ export function DollarBasisSwitch({ offered, active, onChoose }: DollarBasisSwit
       //
       // In the sidebar it is the other way round — height to spare and no
       // width — so there the options stack, each with its rate under its name.
-      className="relative flex max-w-full shrink-0 gap-1 overflow-x-auto rounded-lg bg-black/5 p-1 dark:bg-white/10 lg:flex-col lg:overflow-x-visible"
+      className="relative flex max-w-full shrink-0 gap-1 overflow-x-auto rounded-md border border-line bg-well p-1 lg:flex-col lg:overflow-x-visible"
     >
       {offered.map((basis) => {
         const checked = basis.id === active.id;
@@ -62,13 +62,15 @@ export function DollarBasisSwitch({ offered, active, onChoose }: DollarBasisSwit
             key={basis.id}
             ref={checked ? activeRef : null}
             title={basis.source}
+            // The option in force is lit the way the game lights the tab you
+            // are on: an orange edge down its side on a lifted slot.
             className={
-              "flex cursor-pointer items-baseline gap-1.5 whitespace-nowrap rounded-md px-2.5 py-1 text-xs" +
+              "flex cursor-pointer items-baseline gap-1.5 whitespace-nowrap rounded-sm border-l-[3px] px-2.5 py-1 text-xs" +
               " lg:flex-col lg:items-start lg:gap-0" +
-              " has-focus-visible:outline-2 has-focus-visible:outline-offset-2 sm:text-sm" +
+              " has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-accent sm:text-sm" +
               (checked
-                ? " bg-white font-medium shadow-sm dark:bg-white/15"
-                : " text-black/60 hover:text-black dark:text-white/60 dark:hover:text-white")
+                ? " border-accent bg-slot font-semibold text-ink shadow-sm"
+                : " border-transparent text-ink-muted hover:bg-slot-hover hover:text-ink")
             }
           >
             <input
@@ -80,12 +82,10 @@ export function DollarBasisSwitch({ offered, active, onChoose }: DollarBasisSwit
               className="sr-only"
             />
             <span>{basis.label}</span>
-            {/* The rate is secondary to the name beside it, but it is secondary
-                on a lifted surface rather than on the page: in dark mode the
-                chosen option is two washes of white above the background, and a
-                grey that reads against #101214 does not read against that. So
-                the dark half is less faint than the light half, deliberately. */}
-            <span className="tabular-nums text-black/55 dark:text-white/70">
+            {/* Secondary to the name beside it. The muted ink is checked against
+                the lifted slot the chosen option sits on as well as the well
+                behind the others, so it reads on both. */}
+            <span className="font-normal tabular-nums text-ink-muted">
               {formatDollars(basis.usdPerKey)} a Key
             </span>
           </label>

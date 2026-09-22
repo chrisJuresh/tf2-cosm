@@ -41,7 +41,7 @@ export interface SiteFooterProps {
 
 export function SiteFooter({ provenance }: SiteFooterProps = {}) {
   return (
-    <footer className="w-full shrink-0 px-3 py-2 text-xs text-black/55 sm:px-4 dark:text-white/55">
+    <footer className="w-full shrink-0 border-t border-line bg-panel px-3 py-2 text-xs text-ink-muted sm:px-4">
       {provenance === undefined ? null : <p className="pb-1">{provenance}</p>}
       <ul className="flex flex-wrap gap-x-4 gap-y-1">
         {CREDITS.map((credit) => (
@@ -52,7 +52,7 @@ export function SiteFooter({ provenance }: SiteFooterProps = {}) {
               // The page carries nothing about the viewer, and an outbound click
               // should not start carrying something either.
               rel="noreferrer noopener"
-              className="underline decoration-dotted underline-offset-2 hover:text-black dark:hover:text-white"
+              className="font-semibold text-ink underline decoration-line-strong decoration-dotted underline-offset-2 hover:text-accent hover:decoration-accent focus-visible:outline-2 focus-visible:outline-accent"
             >
               {credit.name}
             </a>

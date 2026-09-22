@@ -55,10 +55,8 @@ const SPREAD_ENDS = [
 
 function Field({ term, children }: { term: string; children: ReactNode }) {
   return (
-    <div className="flex flex-col gap-0.5">
-      <dt className="text-[0.625rem] uppercase tracking-wide text-black/55 sm:text-[0.6875rem] dark:text-white/55">
-        {term}
-      </dt>
+    <div className="flex flex-col gap-0.5 border-b border-line pb-2.5 last:border-b-0 last:pb-0">
+      <dt className="tf-caption">{term}</dt>
       <dd>{children}</dd>
     </div>
   );
@@ -88,26 +86,31 @@ export function CosmeticDetail({ cosmetic, keyRate, manifest, gameClass, id }: C
   const alone = hasItemRender(manifest, cosmetic.slug, gameClass);
 
   return (
-    <div id={id} className="mt-3 flex flex-col gap-4 sm:flex-row sm:gap-6">
-      <div className="flex shrink-0 flex-col items-center gap-2">
-        <WornRender
-          cosmetic={cosmetic}
-          manifest={manifest}
-          gameClass={gameClass}
-          team={teamed ? team : DEFAULT_TEAM}
-          style={style}
-          variant={alone ? variant : DEFAULT_VARIANT}
-          size={DETAIL_SIZE}
-          icon="large"
-          // As big as the modal can give it without the fields beside it
-          // wrapping: the picture is what a viewer opened the Cosmetic for.
-          className="h-56 w-56 object-contain sm:h-72 sm:w-72"
-        />
+    <div id={id} className="mt-4 flex flex-col gap-4 sm:flex-row sm:gap-6">
+      <div className="flex shrink-0 flex-col items-center gap-2.5">
+        {/* The stage the Cosmetic stands on: a sunk well with the inspect
+            panel's spotlight in it, so a render and a Backpack Icon both have
+            somewhere to stand. */}
+        <div className="tf-spotlight grid place-items-center rounded-md border border-line bg-well p-2 shadow-[inset_0_2px_8px_#00000033]">
+          <WornRender
+            cosmetic={cosmetic}
+            manifest={manifest}
+            gameClass={gameClass}
+            team={teamed ? team : DEFAULT_TEAM}
+            style={style}
+            variant={alone ? variant : DEFAULT_VARIANT}
+            size={DETAIL_SIZE}
+            icon="large"
+            // As big as the modal can give it without the fields beside it
+            // wrapping: the picture is what a viewer opened the Cosmetic for.
+            className="h-56 w-56 object-contain drop-shadow-[0_10px_8px_#00000040] sm:h-72 sm:w-72"
+          />
+        </div>
         <StyleSwitcher styles={cosmetic.styles} chosen={style} onChoose={setStyle} />
         {teamed ? <TeamToggle chosen={team} onChoose={setTeam} /> : null}
         {alone ? <ViewToggle chosen={variant} onChoose={setVariant} /> : null}
       </div>
-      <dl className="grid min-w-0 flex-1 content-start gap-x-6 gap-y-3 text-xs sm:text-sm">
+      <dl className="grid min-w-0 flex-1 content-start gap-y-2.5 rounded-md sm:self-start border border-line bg-slot p-3 text-xs sm:p-4 sm:text-sm">
         {/* The three states a price is in, said once: a snapshot built without a
             price source at all, a source that has no price for this Cosmetic, and
             a price. */}
@@ -120,7 +123,7 @@ export function CosmeticDetail({ cosmetic, keyRate, manifest, gameClass, id }: C
                 {SPREAD_ENDS.map((end, index) => (
                   <span key={end.key}>
                     {index === 0 ? null : " · "}
-                    <span className="text-black/55 dark:text-white/55">{end.label}</span>{" "}
+                    <span className="text-ink-muted">{end.label}</span>{" "}
                     {formatTraderNotation(price.spread[end.key].metal, keyRate)}
                   </span>
                 ))}

@@ -54,7 +54,7 @@ function Field({
 }) {
   return (
     <div className={`flex min-w-0 flex-col gap-1 ${className ?? ""}`}>
-      <label htmlFor={htmlFor} className="text-[0.6875rem] uppercase tracking-wide text-black/55 dark:text-white/55">
+      <label htmlFor={htmlFor} className="tf-caption">
         {label}
       </label>
       {children}
@@ -62,10 +62,8 @@ function Field({
   );
 }
 
-const CONTROL =
-  "h-9 min-w-0 rounded-md border border-black/15 bg-white/70 px-2 text-sm" +
-  " focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current" +
-  " dark:border-white/20 dark:bg-white/5";
+/** Every box and select in the panel: see `.tf-field` in the global stylesheet. */
+const CONTROL = "tf-field";
 
 /**
  * A filter that is either one value or no filter at all. Both the Class View and
@@ -128,7 +126,7 @@ function Toggle({
   return (
     <label
       htmlFor={id}
-      className={`flex items-center gap-2 py-1 text-sm ${disabled ? "cursor-default opacity-50" : "cursor-pointer"}`}
+      className={`flex items-center gap-2 py-1 text-sm ${disabled ? "cursor-default opacity-50" : "cursor-pointer hover:text-accent"}`}
     >
       <input
         id={id}
@@ -136,7 +134,7 @@ function Toggle({
         checked={checked}
         disabled={disabled}
         onChange={(event: ChangeEvent<HTMLInputElement>) => onChange(event.target.checked)}
-        className="size-4 accent-current focus-visible:outline-2 focus-visible:outline-offset-2"
+        className="tf-check"
       />
       {label}
     </label>
@@ -178,7 +176,7 @@ export function BrowsingControlsPanel({
       aria-label="Browsing controls"
       className={
         "flex shrink-0 flex-wrap items-end gap-x-3 gap-y-2 pt-1 pb-2" +
-        " lg:flex-col lg:flex-nowrap lg:items-stretch lg:gap-y-3 lg:pt-0 lg:pb-0"
+        " lg:flex-col lg:flex-nowrap lg:items-stretch lg:gap-y-3 lg:border-t lg:border-line lg:pt-4 lg:pb-0"
       }
     >
       {/* The search is first because it is the control most often wanted, and a
@@ -255,7 +253,7 @@ export function BrowsingControlsPanel({
       {/* As a bar the toggles sit on the controls' own line, level with the
           boxes rather than with the labels above them; as a column they are the
           bottom of the panel. */}
-      <div className="flex w-full flex-wrap items-center gap-x-5 gap-y-1 sm:w-auto sm:pb-1 lg:flex-col lg:items-start lg:gap-y-0 lg:pb-0">
+      <div className="flex w-full flex-wrap items-center gap-x-5 gap-y-1 sm:w-auto sm:pb-1 lg:flex-col lg:items-start lg:gap-y-0.5 lg:border-t lg:border-line lg:pt-3 lg:pb-0">
         {/* The toggle focuses a Class View, so outside one there is nothing for
             it to do; it is disabled rather than left to tick and change nothing. */}
         <Toggle
@@ -300,7 +298,7 @@ export function BrowsingControlsPanel({
         />
         {/* Announced when it changes, so a viewer working the controls from the
             keyboard hears what a sighted viewer sees the grid do. */}
-        <p role="status" className="ml-auto text-sm tabular-nums text-black/60 dark:text-white/60 lg:mt-2 lg:ml-0">
+        <p role="status" className="ml-auto text-sm font-semibold tabular-nums text-ink-muted lg:mt-3 lg:ml-0">
           {count}
         </p>
       </div>
