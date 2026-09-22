@@ -92,7 +92,7 @@ test("says an Unusual is priced by its effect rather than showing a figure for i
   expectClean(faults);
 });
 
-test("shows an untradable copy at $0, and hides it when the viewer asks", async ({ catalogue }) => {
+test("hides an untradable copy by default, and shows it at $0 when the viewer asks", async ({ catalogue }) => {
   const { page, faults, serveInventory } = catalogue;
   serveInventory({
     status: 200,
@@ -102,17 +102,17 @@ test("shows an untradable copy at $0, and hides it when the viewer asks", async 
   await page.getByLabel("Your Steam profile").fill("robinwalker");
   await page.getByRole("button", { name: "Show what I own" }).click();
 
+  // Ticked from the start, the copy is out of the Inventory, and with it the
+  // only Cosmetic the viewer holds no tradable copy of.
+  await expect(page.getByLabel("Hide untradable")).toBeChecked();
+  await expect(page.getByText(/1 untradable copy hidden/)).toBeVisible();
+  await expect(cards(page)).toHaveCount(1);
+
+  await page.getByLabel("Hide untradable").uncheck();
+  await expect(cards(page)).toHaveCount(2);
   await expect(card(page, "scotsmans-stove-pipe").getByText("Untradable")).toBeVisible();
   await expect(card(page, "scotsmans-stove-pipe").getByText("$0.00")).toBeVisible();
   await expect(page.getByText(/1 untradable at \$0/)).toBeVisible();
-
-  // Ticked, the copy leaves the Inventory, and with it the only Cosmetic the
-  // viewer holds no tradable copy of.
-  await page.getByLabel("Only what I own").check();
-  await expect(cards(page)).toHaveCount(2);
-  await page.getByLabel("Hide untradable").check();
-  await expect(cards(page)).toHaveCount(1);
-  await expect(page.getByText(/1 untradable copy hidden/)).toBeVisible();
 
   expectClean(faults);
 });
