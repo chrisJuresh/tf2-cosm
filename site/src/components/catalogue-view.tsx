@@ -11,14 +11,15 @@
  * each card's dollar figure is that same rate applied to that card's Metal
  * Value. Nothing is computed twice: the basis is picked once and handed down.
  *
- * The header is one line and the controls under it are one line, because
- * everything either of them takes is a row of Cosmetics the grid below does not
- * get. The two dates go to the footer for the same reason, and because that is
- * where the rest of where-this-came-from already lives — they are provenance,
- * not a figure anybody reads off the page.
+ * The header heads the sidebar rather than spanning the page, because every
+ * line it takes across the top is a row of Cosmetics the grid does not get, and
+ * on a wide screen there is width to spare and height there is not. The two
+ * dates go to the footer for the same reason, and because that is where the rest
+ * of where-this-came-from already lives — they are provenance, not a figure
+ * anybody reads off the page.
  *
- * Which Cosmetics the grid shows, and in what order, is the browser below the
- * header — see `@/components/catalogue-browser`.
+ * Which Cosmetics the grid shows, and in what order, is the browser the header
+ * is handed to — see `@/components/catalogue-browser`.
  */
 import type { Catalogue } from "@tf2-cosm/data/catalogue";
 
@@ -67,40 +68,42 @@ export function CatalogueView({ catalogue, manifest }: CatalogueViewProps) {
   const basis = chooseBasis(offered, remembered);
   const keyRate = header.prices?.keyRate ?? null;
 
+  // Still the page's banner, though it heads the sidebar: the sidebar is a plain
+  // column rather than an `aside`, and a header inside an `aside` or a `main`
+  // stops being one.
+  const masthead = (
+    <header className="flex w-full flex-wrap items-baseline justify-between gap-x-4 gap-y-1 pb-2 lg:flex-col lg:items-stretch lg:gap-y-2 lg:pb-0">
+      <div className="flex min-w-0 flex-wrap items-baseline gap-x-3">
+        <h1 className="text-base font-semibold sm:text-lg">TF2 Cosmetics Catalogue</h1>
+        <p className="text-sm text-black/60 dark:text-white/60">
+          {header.counts.cosmetics.toLocaleString("en-US")} Cosmetics
+          {keyRate === null ? null : <> · a Key is {formatMetalValue(keyRate)}</>}
+          {/* On a phone this says exactly what the switch below it says, and
+              a phone has two lines to spare for a whole row of Cosmetics. */}
+          {basis === null ? null : (
+            <span className="hidden sm:inline">
+              {" "}
+              · {formatDollars(basis.usdPerKey)} a Key at the {basis.label}
+            </span>
+          )}
+        </p>
+      </div>
+      {basis === null ? null : (
+        <DollarBasisSwitch offered={offered} active={basis} onChoose={(chosen) => remember(chosen.id)} />
+      )}
+    </header>
+  );
+
   return (
     <>
-      {/* `shrink-0`, because the grid below takes every pixel it is offered: a
-          flex column would otherwise squeeze the header to less than its own
-          text is tall and let that text spill over the first row of cards. */}
-      <header className="flex w-full shrink-0 flex-wrap items-baseline justify-between gap-x-4 gap-y-1 px-3 pt-3 pb-2 sm:px-4">
-        <div className="flex min-w-0 flex-wrap items-baseline gap-x-3">
-          <h1 className="text-base font-semibold sm:text-lg">TF2 Cosmetics Catalogue</h1>
-          <p className="text-sm text-black/60 dark:text-white/60">
-            {header.counts.cosmetics.toLocaleString("en-US")} Cosmetics
-            {keyRate === null ? null : <> · a Key is {formatMetalValue(keyRate)}</>}
-            {/* On a phone this says exactly what the switch below it says, and
-                a phone has two lines to spare for a whole row of Cosmetics. */}
-            {basis === null ? null : (
-              <span className="hidden sm:inline">
-                {" "}
-                · {formatDollars(basis.usdPerKey)} a Key at the {basis.label}
-              </span>
-            )}
-          </p>
-        </div>
-        {basis === null ? null : (
-          <DollarBasisSwitch offered={offered} active={basis} onChoose={(chosen) => remember(chosen.id)} />
-        )}
-      </header>
-      <main className="flex w-full min-h-0 flex-1 flex-col px-3 sm:px-4">
-        <CatalogueBrowser
-          cosmetics={catalogue.cosmetics}
-          manifest={manifest}
-          keyRate={keyRate}
-          basis={basis}
-          snapshotTakenAt={header.snapshotTakenAt}
-        />
-      </main>
+      <CatalogueBrowser
+        masthead={masthead}
+        cosmetics={catalogue.cosmetics}
+        manifest={manifest}
+        keyRate={keyRate}
+        basis={basis}
+        snapshotTakenAt={header.snapshotTakenAt}
+      />
       <SiteFooter
         provenance={
           <>

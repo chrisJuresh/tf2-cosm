@@ -111,15 +111,20 @@ export function InventoryControls({ state, actions, configured, keyRate, basis, 
   if (!configured) return null;
 
   return (
-    <section aria-label="Your Steam inventory" className="flex shrink-0 flex-wrap items-center gap-x-3 gap-y-2 pb-2">
+    <section
+      aria-label="Your Steam inventory"
+      className="flex shrink-0 flex-wrap items-center gap-x-3 gap-y-2 pb-2 lg:flex-col lg:items-stretch lg:pb-0"
+    >
+      {/* In the sidebar the box takes the column's whole width and the buttons
+          wrap under it, since a profile URL is wider than the column is. */}
       <form
-        className="flex items-end gap-2"
+        className="flex items-end gap-2 lg:flex-wrap"
         onSubmit={(event) => {
           event.preventDefault();
           actions.look(value);
         }}
       >
-        <div className="flex min-w-0 flex-col gap-1">
+        <div className="flex min-w-0 flex-col gap-1 lg:w-full">
           <label htmlFor={id} className="text-[0.6875rem] uppercase tracking-wide text-black/55 dark:text-white/55">
             Your Steam profile
           </label>
@@ -131,7 +136,7 @@ export function InventoryControls({ state, actions, configured, keyRate, basis, 
             autoComplete="off"
             spellCheck={false}
             onChange={(event) => setTyped(event.target.value)}
-            className={`${CONTROL} w-full sm:w-72`}
+            className={`${CONTROL} w-full sm:w-72 lg:w-full`}
           />
         </div>
         <button
@@ -161,7 +166,7 @@ export function InventoryControls({ state, actions, configured, keyRate, basis, 
           // Cosmetics in it when what it has is no tradable ones.
           state.hiddenUntradable > 0 ? (
             <p className="text-sm text-black/60 dark:text-white/60">
-              Every Cosmetic in that backpack is untradable, and the toggle above is hiding all{" "}
+              Every Cosmetic in that backpack is untradable, and Hide untradable is hiding all{" "}
               {state.hiddenUntradable.toLocaleString("en-US")} copies.
             </p>
           ) : (
@@ -175,7 +180,7 @@ export function InventoryControls({ state, actions, configured, keyRate, basis, 
             <Total state={state} keyRate={keyRate} basis={basis} />
             {shownOwned === null || shownOwned === state.owned.length ? null : (
               <p className="text-[0.6875rem] text-black/55 dark:text-white/55">
-                {shownOwned.toLocaleString("en-US")} of them shown; the rest are hidden by the controls above.
+                {shownOwned.toLocaleString("en-US")} of them shown; the rest are hidden by the browsing controls.
               </p>
             )}
           </>

@@ -50,7 +50,10 @@ export function DollarBasisSwitch({ offered, active, onChoose }: DollarBasisSwit
       // radio is `sr-only`, which is absolutely positioned; with no positioned
       // ancestor the ones scrolled out of view are laid out against the page
       // instead, and the page grows sideways to hold them.
-      className="relative flex max-w-full shrink-0 gap-1 overflow-x-auto rounded-lg bg-black/5 p-1 dark:bg-white/10"
+      //
+      // In the sidebar it is the other way round — height to spare and no
+      // width — so there the options stack, each with its rate under its name.
+      className="relative flex max-w-full shrink-0 gap-1 overflow-x-auto rounded-lg bg-black/5 p-1 dark:bg-white/10 lg:flex-col lg:overflow-x-visible"
     >
       {offered.map((basis) => {
         const checked = basis.id === active.id;
@@ -61,6 +64,7 @@ export function DollarBasisSwitch({ offered, active, onChoose }: DollarBasisSwit
             title={basis.source}
             className={
               "flex cursor-pointer items-baseline gap-1.5 whitespace-nowrap rounded-md px-2.5 py-1 text-xs" +
+              " lg:flex-col lg:items-start lg:gap-0" +
               " has-focus-visible:outline-2 has-focus-visible:outline-offset-2 sm:text-sm" +
               (checked
                 ? " bg-white font-medium shadow-sm dark:bg-white/15"

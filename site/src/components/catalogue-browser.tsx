@@ -14,7 +14,7 @@
  * result rather than the reason.
  */
 import type { Cosmetic, Metal } from "@tf2-cosm/data/catalogue";
-import { useMemo } from "react";
+import { type ReactNode, useMemo } from "react";
 
 import { viewedClass, visibleCosmetics } from "@/browsing/controls";
 import { useRememberedControls } from "@/browser/remembered-controls";
@@ -28,6 +28,8 @@ import type { DollarBasis } from "@/prices/format";
 import type { RenderManifest } from "@/renders/manifest";
 
 export interface CatalogueBrowserProps {
+  /** What heads the sidebar: the page's title and the Dollar Basis in force. */
+  readonly masthead?: ReactNode;
   readonly cosmetics: readonly Cosmetic[];
   /** Which Worn Renders exist; empty when no run has produced any. */
   readonly manifest: RenderManifest;
@@ -42,7 +44,7 @@ export interface CatalogueBrowserProps {
   readonly snapshotTakenAt: string;
 }
 
-export function CatalogueBrowser({ cosmetics, manifest, keyRate, basis, snapshotTakenAt }: CatalogueBrowserProps) {
+export function CatalogueBrowser({ masthead, cosmetics, manifest, keyRate, basis, snapshotTakenAt }: CatalogueBrowserProps) {
   const [controls, change] = useRememberedControls();
   // The untradable toggle goes in here rather than into the filter below: it
   // takes copies out of the Inventory, and the owned set every other control
@@ -77,20 +79,30 @@ export function CatalogueBrowser({ cosmetics, manifest, keyRate, basis, snapshot
     : visible.filter((cosmetic) => ownedBySlug.has(cosmetic.slug)).length;
 
   return (
-    <>
-      <InventoryControls
-        state={inventory}
-        actions={inventoryActions}
-        configured={configured}
-        keyRate={keyRate}
-        basis={basis}
-        shownOwned={controls.onlyOwned ? shownOwned : null}
-      />
-      {/* Side by side wherever there is room: the controls down the right, the
-          grid taking everything left over. The controls come first in the
-          source and are drawn second, so a keyboard meets them before the
-          eighteen hundred cards they narrow. */}
-      <div className="flex min-h-0 flex-1 flex-col lg:flex-row-reverse lg:gap-4">
+    // Side by side wherever there is room: the sidebar down the right, the grid
+    // taking everything left over. The sidebar comes first in the source and is
+    // drawn second, so a keyboard meets it before the eighteen hundred cards it
+    // narrows. On a phone it is the bar above the grid it always was.
+    <div className="flex w-full min-h-0 flex-1 flex-col px-3 pt-3 sm:px-4 lg:flex-row-reverse lg:gap-4">
+      {/* `shrink-0`, because the grid beside it takes every pixel it is offered
+          and a squeezed sidebar spills over the cards. As a column it scrolls
+          on its own, so a short screen cannot cut the last toggle off with no
+          way to reach it. */}
+      <div
+        className={
+          "flex shrink-0 flex-col" +
+          " lg:w-64 lg:min-h-0 lg:gap-y-4 lg:overflow-y-auto lg:border-l lg:border-black/10 lg:pb-3 lg:pl-4 lg:dark:border-white/15"
+        }
+      >
+        {masthead}
+        <InventoryControls
+          state={inventory}
+          actions={inventoryActions}
+          configured={configured}
+          keyRate={keyRate}
+          basis={basis}
+          shownOwned={controls.onlyOwned ? shownOwned : null}
+        />
         <BrowsingControlsPanel
           controls={controls}
           onChange={change}
@@ -103,22 +115,22 @@ export function CatalogueBrowser({ cosmetics, manifest, keyRate, basis, snapshot
           // same rule the All-Class toggle follows outside a Class View.
           ownedOffered={configured && inventory.ownedSlugs !== null}
         />
-        {/* The Class View reaches the grid as well as the filter: it is what
-            decides which Class each picture shows, so an All-Class Cosmetic in
-            a Heavy's view is a Heavy wearing it. The Inventory reaches it for
-            the other reason — a card of a Cosmetic the viewer owns shows what
-            their copy is worth, not what the Cosmetic costs. */}
-        <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-          <CosmeticGrid
-            cosmetics={visible}
-            manifest={manifest}
-            classView={viewedClass(controls.classFilter)}
-            keyRate={keyRate}
-            basis={basis}
-            owned={ownedBySlug}
-          />
-        </div>
       </div>
-    </>
+      {/* The Class View reaches the grid as well as the filter: it is what
+          decides which Class each picture shows, so an All-Class Cosmetic in
+          a Heavy's view is a Heavy wearing it. The Inventory reaches it for
+          the other reason — a card of a Cosmetic the viewer owns shows what
+          their copy is worth, not what the Cosmetic costs. */}
+      <main className="flex min-h-0 min-w-0 flex-1 flex-col">
+        <CosmeticGrid
+          cosmetics={visible}
+          manifest={manifest}
+          classView={viewedClass(controls.classFilter)}
+          keyRate={keyRate}
+          basis={basis}
+          owned={ownedBySlug}
+        />
+      </main>
+    </div>
   );
 }

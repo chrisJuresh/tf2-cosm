@@ -172,16 +172,13 @@ export function BrowsingControlsPanel({
   const count = shown === total ? `${total.toLocaleString("en-US")} Cosmetics` : `${shown.toLocaleString("en-US")} of ${total.toLocaleString("en-US")} Cosmetics`;
 
   return (
-    // `shrink-0` for the same reason the header has it: the grid beside it takes
-    // every pixel it is offered, and a squeezed panel spills over the cards. As
-    // a column it scrolls on its own, so a short screen cannot cut the last
-    // toggle off with no way to reach it.
+    // The column it sits in, and the scrolling, are the sidebar's — see
+    // `@/components/catalogue-browser`.
     <section
       aria-label="Browsing controls"
       className={
         "flex shrink-0 flex-wrap items-end gap-x-3 gap-y-2 pt-1 pb-2" +
-        " lg:w-56 lg:min-h-0 lg:flex-col lg:flex-nowrap lg:items-stretch lg:gap-y-3" +
-        " lg:overflow-y-auto lg:border-l lg:border-black/10 lg:pt-0 lg:pb-3 lg:pl-4 lg:dark:border-white/15"
+        " lg:flex-col lg:flex-nowrap lg:items-stretch lg:gap-y-3 lg:pt-0 lg:pb-0"
       }
     >
       {/* The search is first because it is the control most often wanted, and a
