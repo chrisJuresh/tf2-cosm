@@ -193,8 +193,17 @@ test("the open Cosmetic takes the Class out of the picture and puts it back", as
   // The version the URL is stamped with follows the file name — see `renderVersion`.
   await expect(picture).toHaveAttribute("src", /soldier-red-0-alone@512\.webp\?v=\d+$/);
   // The picture really loads: an Item Render is a file of its own, published
-  // separately, and a broken one falls back to the icon without a trace.
-  expect(await picture.evaluate((image) => (image as HTMLImageElement).naturalWidth)).toBeGreaterThan(0);
+  // separately, and a broken one falls back to the icon without a trace. The
+  // attribute changes before the file arrives, so wait for the decode, and ask
+  // which file decoded: the icon it falls back to has a natural size too.
+  await expect
+    .poll(() =>
+      picture.evaluate((element) => {
+        const image = element as HTMLImageElement;
+        return image.complete && image.naturalWidth > 0 ? image.currentSrc : "";
+      }),
+    )
+    .toMatch(/soldier-red-0-alone@512\.webp\?v=\d+$/);
 
   await view.getByRole("button", { name: "On the Class" }).click();
   await expect(picture).toHaveAttribute("src", /soldier-red-0@512\.webp\?v=\d+$/);
