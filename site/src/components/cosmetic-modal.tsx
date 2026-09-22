@@ -108,9 +108,11 @@ export function CosmeticModal({ cosmetic, keyRate, manifest, gameClass, onClose 
     <div
       // Padding rather than a margin, so the space that closes the Cosmetic is
       // part of the backdrop and takes the click.
-      className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/60 p-4 sm:p-8"
+      className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-[#0d0b0acc] p-4 backdrop-blur-[3px] sm:p-8"
       onClick={onBackdropClick}
     >
+      {/* The item inspect panel: the same board as the sidebar, with the orange
+          edge along its top and the name in a Unique item's gold. */}
       <div
         ref={card}
         role="dialog"
@@ -119,12 +121,15 @@ export function CosmeticModal({ cosmetic, keyRate, manifest, gameClass, onClose 
         tabIndex={-1}
         onKeyDown={onKeyDown}
         className={
-          "max-h-full w-full max-w-3xl overflow-y-auto rounded-xl border border-black/10 bg-white p-4 shadow-2xl" +
-          " focus:outline-none sm:p-5 dark:border-white/15 dark:bg-neutral-900"
+          "max-h-full w-full max-w-3xl overflow-y-auto rounded-md border border-t-4 border-line-strong border-t-accent" +
+          " bg-panel p-4 shadow-[0_24px_64px_-16px_#000000b3] focus:outline-none sm:p-6"
         }
       >
-        <div className="flex items-start justify-between gap-3">
-          <h2 id={titleId(cosmetic.slug)} className="text-base font-semibold sm:text-lg">
+        <div className="flex items-start justify-between gap-3 border-b border-line pb-3">
+          <h2
+            id={titleId(cosmetic.slug)}
+            className="font-display text-xl leading-tight tracking-wide text-unique sm:text-2xl"
+          >
             {cosmetic.name}
           </h2>
           {/* Named rather than an unlabelled ×, and first in the tab order after
@@ -134,8 +139,9 @@ export function CosmeticModal({ cosmetic, keyRate, manifest, gameClass, onClose 
             onClick={onClose}
             aria-label="Close"
             className={
-              "-mt-1 -mr-1 shrink-0 rounded px-2 py-1 text-lg leading-none text-black/55 hover:bg-black/5" +
-              " focus-visible:outline-2 focus-visible:outline-offset-1 dark:text-white/55 dark:hover:bg-white/10"
+              "-mt-0.5 -mr-1 grid size-8 shrink-0 place-items-center rounded-sm border border-line text-xl leading-none" +
+              " text-ink-muted hover:border-accent hover:bg-accent hover:text-accent-ink" +
+              " focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent"
             }
           >
             ×

@@ -308,8 +308,19 @@ The open Cosmetic's slug is the URL hash, so a card can be linked to, and every
 card carries its slug in `data-slug` — the hook the later wishlist and per-item
 pages hang off (ADR-0003).
 
-Styling is Tailwind utilities. Light and dark both follow the system colour
-scheme; there is no switch and nothing is stored.
+Styling is Tailwind utilities over a TF2 theme defined once in
+`src/app/globals.css`. Dark is the in-game backpack (warm charcoal, TF2 cream,
+item names in Unique gold) and light is Mann Co. parchment; both follow the
+system colour scheme, with no switch and nothing stored. Components name a colour
+by its role (`ink`, `ink-muted`, `slot`, `panel`, `line`, `accent`, `unique`,
+`red`, `blu`) and never by scheme, so there are no `dark:` variants. The controls
+that need more than utilities (`.tf-field`, `.tf-button`, `.tf-check`,
+`.tf-range`, `.tf-caption`, `.tf-spotlight`) are component classes in the same
+file. Every text colour pair meets WCAG AA in both schemes, and the axe pass in
+`pnpm test-e2e` checks it. The faces are Lilita One (for TF2 Build: the title,
+item names, buttons) and Barlow (everything else), both OFL. `next/font`
+self-hosts them, so the build needs the network once but a viewer's browser
+never asks Google for anything.
 
 ## Tests
 

@@ -39,16 +39,36 @@ const VARIANT_LABELS: Record<Variant, string> = { worn: "On the Class", alone: "
 /** What the default Style is called when the Cosmetic's own list does not name it. */
 const DEFAULT_STYLE_LABEL = "Default";
 
-function Choice({ label, chosen, onChoose }: { label: string; chosen: boolean; onChoose: () => void }) {
+/**
+ * What a chosen button is lit in: the page's orange, or a Team's own colour for
+ * the Team it picks, so RED reads as RED before the label is read at all.
+ */
+const CHOSEN = {
+  accent: "border-accent bg-accent text-accent-ink",
+  red: "border-red bg-red text-team-ink",
+  blu: "border-blu bg-blu text-team-ink",
+} as const;
+
+function Choice({
+  label,
+  chosen,
+  tone = "accent",
+  onChoose,
+}: {
+  label: string;
+  chosen: boolean;
+  tone?: keyof typeof CHOSEN;
+  onChoose: () => void;
+}) {
   return (
     <button
       type="button"
       aria-pressed={chosen}
       onClick={onChoose}
-      className={`rounded border px-2 py-0.5 text-xs focus-visible:outline-2 focus-visible:outline-offset-1 ${
+      className={`rounded-sm border px-2.5 py-1 text-xs font-semibold tracking-wide uppercase transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent ${
         chosen
-          ? "border-black/30 bg-black/10 font-medium dark:border-white/30 dark:bg-white/15"
-          : "border-black/15 hover:bg-black/5 dark:border-white/20 dark:hover:bg-white/10"
+          ? `${CHOSEN[tone]} shadow-[inset_0_-2px_0_#0000002e]`
+          : "border-line-strong bg-well text-ink hover:border-accent"
       }`}
     >
       {label}
@@ -58,8 +78,8 @@ function Choice({ label, chosen, onChoose }: { label: string; chosen: boolean; o
 
 function Switcher({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <div role="group" aria-label={label} className="flex flex-wrap items-center gap-1">
-      <span aria-hidden className="pr-1 text-[0.625rem] uppercase tracking-wide text-black/55 dark:text-white/55">
+    <div role="group" aria-label={label} className="flex flex-wrap items-center justify-center gap-1">
+      <span aria-hidden className="tf-caption pr-1">
         {label}
       </span>
       {children}
@@ -110,7 +130,13 @@ export function TeamToggle({ chosen, onChoose }: TeamToggleProps) {
   return (
     <Switcher label="Team">
       {(["red", "blu"] as const).map((team) => (
-        <Choice key={team} label={TEAM_LABELS[team]} chosen={team === chosen} onChoose={() => onChoose(team)} />
+        <Choice
+          key={team}
+          label={TEAM_LABELS[team]}
+          chosen={team === chosen}
+          tone={team}
+          onChoose={() => onChoose(team)}
+        />
       ))}
     </Switcher>
   );

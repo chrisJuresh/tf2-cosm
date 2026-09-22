@@ -75,8 +75,9 @@ const GAP = 8;
 
 /**
  * A card is always exactly this tall, in pixels: the picture, two lines for the
- * name, and the three figures under it. Fixed, so a row of cards is one height
- * rather than the tallest name in it, and so the figures line up across the row.
+ * name, the rule under it, and the three figures below that. Fixed, so a row of
+ * cards is one height rather than the tallest name in it, and so the figures
+ * line up across the row.
  */
 const CARD_HEIGHT = 256;
 
@@ -358,21 +359,27 @@ function CosmeticCard({
       // and so that the name is text a viewer can drag over and copy, which it
       // would not be under a click target stretched over the card.
       onClick={onCardClick}
+      // A backpack slot: lifted a shade off the page, lit along its top edge,
+      // and outlined in orange under the pointer or the keyboard the way the
+      // game outlines the item you are about to pick up.
       className={
-        "flex cursor-pointer flex-col overflow-hidden rounded-lg border border-black/10 p-2 text-sm" +
-        " hover:bg-black/[0.03] dark:border-white/15 dark:hover:bg-white/[0.05]"
+        "group flex cursor-pointer flex-col overflow-hidden rounded-md border border-line bg-slot p-2 text-sm" +
+        " shadow-[inset_0_1px_0_light-dark(#ffffffb3,#ffffff0f),0_2px_4px_-2px_#00000040]" +
+        " transition-[border-color,background-color,translate] duration-150" +
+        " hover:-translate-y-0.5 hover:border-accent hover:bg-slot-hover hover:ring-1 hover:ring-accent" +
+        " focus-within:border-accent focus-within:ring-1 focus-within:ring-accent"
       }
     >
       {/* A corner mark rather than a line of its own: a card is a fixed height
           and every pixel the mark took would come off the picture. It carries
           its own words for a screen reader, because "×2" over a picture is not
           a sentence. */}
-      <div className="relative flex h-40 items-center justify-center">
+      <div className="tf-spotlight relative flex h-40 items-center justify-center rounded-sm">
         {owned === undefined ? null : (
           <span
             className={
-              "absolute top-0 right-0 rounded-full bg-black/75 px-1.5 py-0.5 text-[0.625rem]" +
-              " font-medium text-white dark:bg-white/85 dark:text-black"
+              "absolute top-0 right-0 z-10 rounded-sm bg-accent px-1.5 pt-0.5 font-display text-[0.6875rem]" +
+              " leading-tight tracking-wide text-accent-ink uppercase shadow-[inset_0_-2px_0_#0000002e]"
             }
           >
             <span aria-hidden="true">{owned.count === 1 ? "Owned" : `Owned ×${owned.count}`}</span>
@@ -391,14 +398,18 @@ function CosmeticCard({
           // Drawn at 160 pixels, so the fallback is the 512 icon: the 64 one
           // would be upscaled in the only place it shows.
           icon="large"
-          className="max-h-40 max-w-full object-contain"
+          // Standing on the slot rather than printed on it.
+          className={
+            "max-h-40 max-w-full object-contain drop-shadow-[0_6px_5px_#00000040]" +
+            " transition-transform duration-150 group-hover:scale-[1.04]"
+          }
         />
       </div>
       {/* Two lines whether the name needs them or not, so the figures line up
           across a row of cards rather than floating up under the short names.
           Not a heading: eighteen hundred of them would be a heading outline
           nobody could navigate, and the card is a list item already. */}
-      <div className="mt-1.5 h-9 leading-tight font-medium">
+      <div className="mt-1 h-9 font-display text-[0.9375rem] leading-[1.15] tracking-[0.01em] text-unique">
         <button
           type="button"
           ref={toggleRef}
@@ -417,24 +428,24 @@ function CosmeticCard({
           // keyboard, which is what the name being the control buys.
           className={
             "line-clamp-2 select-text text-left" +
-            " focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current"
+            " focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           }
         >
           {cosmetic.name}
         </button>
       </div>
-      <dl className="mt-0.5 grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-2">
-        <Figure term="Trader Notation" value={figures.notation} className="col-span-2 truncate" />
+      <dl className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-2 border-t border-line pt-0.5">
+        <Figure term="Trader Notation" value={figures.notation} className="col-span-2 truncate font-semibold" />
         {figures.reason === null ? null : (
           <>
             <dt className="sr-only">Why</dt>
-            <dd className="col-span-2 truncate text-[0.6875rem] leading-tight text-black/55 dark:text-white/55">
+            <dd className="col-span-2 truncate text-[0.6875rem] leading-tight text-ink-muted">
               {figures.reason}
             </dd>
           </>
         )}
-        <Figure term="Metal Value" value={figures.metalValue} className="text-xs text-black/60 dark:text-white/60" />
-        <Figure term="Dollars" value={figures.dollars} className="justify-self-end text-xs" />
+        <Figure term="Metal Value" value={figures.metalValue} className="text-xs text-ink-muted" />
+        <Figure term="Dollars" value={figures.dollars} className="justify-self-end text-xs font-semibold" />
       </dl>
     </div>
   );
@@ -552,7 +563,7 @@ export function CosmeticGrid({
       {/* A grid narrowed to nothing has to say so: an empty scroller reads as a
           page that has broken rather than as a filter that matched nothing. */}
       {cosmetics.length === 0 ? (
-        <p className="px-3 py-8 text-center text-sm text-black/60 dark:text-white/60">
+        <p className="mx-auto mt-6 max-w-sm rounded-md border border-dashed border-line-strong bg-panel px-4 py-6 text-center font-display text-lg tracking-wide text-ink-muted uppercase">
           No Cosmetic matches these controls.
         </p>
       ) : null}

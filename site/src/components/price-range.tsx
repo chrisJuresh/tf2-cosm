@@ -35,8 +35,7 @@ export interface PriceRangeProps {
 }
 
 const SLIDER =
-  "h-5 w-full min-w-0 cursor-pointer accent-current" +
-  " focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current";
+  "tf-range w-full min-w-0";
 
 /** The notch a bound sits at, with the untouched ends at the ends of the track. */
 function notchFor(scale: readonly number[], scrap: number | null, whenUnbounded: number): number {
@@ -80,7 +79,7 @@ function Slider({
     <div className="flex min-w-0 flex-1 items-center gap-2 lg:flex-none">
       <label
         htmlFor={id}
-        className="sr-only shrink-0 text-[0.6875rem] text-black/55 lg:not-sr-only lg:w-14 dark:text-white/55"
+        className="sr-only shrink-0 text-xs text-ink-muted lg:not-sr-only lg:w-16"
       >
         {label}
       </label>
@@ -115,11 +114,11 @@ export function PriceRange({ scale, minScrap, maxScrap, keyRate, onChange }: Pri
     // what it is the maximum of.
     <div role="group" aria-label="Price" className="flex min-w-0 flex-col gap-1">
       <div className="flex items-baseline justify-between gap-2">
-        <span className="text-[0.6875rem] uppercase tracking-wide text-black/55 dark:text-white/55">Price</span>
+        <span className="tf-caption">Price</span>
         {/* Not a live region: the count below the controls already announces
             what the grid did, and a second one firing on every notch of a drag
             would talk over it. */}
-        <span className="truncate text-xs tabular-nums text-black/70 dark:text-white/70">{readout}</span>
+        <span className="truncate text-xs font-semibold tabular-nums rounded-sm bg-accent-soft px-1.5 py-px text-ink">{readout}</span>
       </div>
 
       <div className="flex min-w-0 gap-2 lg:flex-col lg:gap-1">

@@ -72,10 +72,23 @@ export function CatalogueView({ catalogue, manifest }: CatalogueViewProps) {
   // column rather than an `aside`, and a header inside an `aside` or a `main`
   // stops being one.
   const masthead = (
-    <header className="flex w-full flex-wrap items-baseline justify-between gap-x-4 gap-y-1 pb-2 lg:flex-col lg:items-stretch lg:gap-y-2 lg:pb-0">
-      <div className="flex min-w-0 flex-wrap items-baseline gap-x-3">
-        <h1 className="text-base font-semibold sm:text-lg">TF2 Cosmetics Catalogue</h1>
-        <p className="text-sm text-black/60 dark:text-white/60">
+    <header className="flex w-full flex-wrap items-center justify-between gap-x-4 gap-y-1.5 pb-2 lg:flex-col lg:items-stretch lg:gap-y-3 lg:pb-0">
+      <div className="flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-1 lg:flex-col lg:gap-y-2">
+        {/* The game's own wordmark order: TF2 on its orange plate, then what
+            this is. One heading whatever it looks like, so it is still read
+            as "TF2 Cosmetics Catalogue". */}
+        <h1 className="font-display text-lg leading-none tracking-wide uppercase sm:text-2xl lg:text-[1.75rem] lg:leading-[1.05]">
+          <span
+            className={
+              "mr-1.5 inline-block -skew-x-6 rounded-sm bg-accent px-1.5 pt-1 pb-0.5 text-accent-ink" +
+              " shadow-[inset_0_-3px_0_#0000002e]"
+            }
+          >
+            TF2
+          </span>{" "}
+          <span className="[text-shadow:0_2px_0_light-dark(#0000001a,#00000080)]">Cosmetics Catalogue</span>
+        </h1>
+        <p className="text-sm text-ink-muted">
           {header.counts.cosmetics.toLocaleString("en-US")} Cosmetics
           {keyRate === null ? null : <> · a Key is {formatMetalValue(keyRate)}</>}
           {/* On a phone this says exactly what the switch below it says, and
