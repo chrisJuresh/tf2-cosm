@@ -371,6 +371,8 @@ describe("working the controls from the keyboard", () => {
       screen.getByRole("slider", MINIMUM_PRICE),
       screen.getByRole("slider", MAXIMUM_PRICE),
       screen.getByRole("combobox", SORT_PICKER),
+      screen.getByRole("button", { name: "On the Class" }),
+      screen.getByRole("button", { name: "On its own" }),
       screen.getByRole("checkbox", HIDE_ALL_CLASS),
       screen.getByRole("checkbox", HIDE_UNPRICED),
       screen.getByRole("checkbox", HIDE_EVENT_ONLY),

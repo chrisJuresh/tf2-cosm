@@ -12,11 +12,16 @@
  * The viewer's own Inventory lives here too, for the same reason and on the same
  * terms: it is another thing that narrows the list, and the grid is handed the
  * result rather than the reason.
+ *
+ * Which picture the cards show — the Cosmetic on the Class, or on its own —
+ * lives here as well, beside the controls rather than among them: it changes
+ * how every card looks and not which cards there are.
  */
 import type { Cosmetic, Metal } from "@tf2-cosm/data/catalogue";
 import { type ReactNode, useMemo } from "react";
 
 import { viewedClass, visibleCosmetics } from "@/browsing/controls";
+import { useRememberedChoice } from "@/browser/remembered";
 import { useRememberedControls } from "@/browser/remembered-controls";
 import { priceCeiling, priceScale } from "@/browsing/price-scale";
 import { BrowsingControlsPanel } from "@/components/browsing-controls";
@@ -25,7 +30,16 @@ import { InventoryControls } from "@/components/inventory-controls";
 import { inventoryApiUrl } from "@/inventory/load";
 import { useInventory } from "@/inventory/use-inventory";
 import type { DollarBasis } from "@/prices/format";
-import type { RenderManifest } from "@/renders/manifest";
+import { type RenderManifest, type Variant, VARIANTS } from "@/renders/manifest";
+import { DEFAULT_VARIANT } from "@/renders/select";
+
+/** Where this browser remembers which picture the viewer browses the cards in. */
+export const PICTURES_STORAGE_KEY = "tf2-cosm.pictures";
+
+/** The remembered picture, or the default for one this build no longer offers. */
+function asVariant(remembered: string | null): Variant {
+  return (VARIANTS as readonly string[]).includes(remembered ?? "") ? (remembered as Variant) : DEFAULT_VARIANT;
+}
 
 export interface CatalogueBrowserProps {
   /** What heads the sidebar: the page's title and the Dollar Basis in force. */
@@ -46,6 +60,8 @@ export interface CatalogueBrowserProps {
 
 export function CatalogueBrowser({ masthead, cosmetics, manifest, keyRate, basis, snapshotTakenAt }: CatalogueBrowserProps) {
   const [controls, change] = useRememberedControls();
+  const [rememberedView, rememberView] = useRememberedChoice(PICTURES_STORAGE_KEY);
+  const view = asVariant(rememberedView);
   // The untradable toggle goes in here rather than into the filter below: it
   // takes copies out of the Inventory, and the owned set every other control
   // reads is what is left of it.
@@ -121,6 +137,8 @@ export function CatalogueBrowser({ masthead, cosmetics, manifest, keyRate, basis
           // it is disabled rather than left to tick and change nothing — the
           // same rule the All-Class toggle follows outside a Class View.
           ownedOffered={configured && inventory.ownedSlugs !== null}
+          view={view}
+          onView={rememberView}
         />
       </div>
       {/* The Class View reaches the grid as well as the filter: it is what
@@ -133,6 +151,7 @@ export function CatalogueBrowser({ masthead, cosmetics, manifest, keyRate, basis
           cosmetics={visible}
           manifest={manifest}
           classView={viewedClass(controls.classFilter)}
+          view={view}
           keyRate={keyRate}
           basis={basis}
           owned={ownedBySlug}

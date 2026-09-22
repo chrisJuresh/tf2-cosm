@@ -14,6 +14,10 @@
  * picture. The View toggle is asked of the manifest for the same reason: until
  * a run has rendered this Cosmetic on its own, there is nothing to switch to.
  *
+ * The View toggle is also the one of the three the sidebar has, for the whole
+ * grid at once: a viewer who wants every hat without a Class under it should
+ * not have to open eighteen hundred of them to get it.
+ *
  * They are buttons rather than a select because there are two or three of each
  * and a viewer comparing looks wants them all visible at once. `aria-pressed`
  * is what says which one is showing.
@@ -76,10 +80,32 @@ function Choice({
   );
 }
 
-function Switcher({ label, children }: { label: string; children: ReactNode }) {
+/**
+ * Where a switcher sits. Centred under the picture in the modal. In the browsing
+ * panel it is laid out like the fields around it: in line while the panel is a
+ * bar, and as a column the caption over the buttons, which share the width
+ * between them, since a column has no room for the caption beside them.
+ */
+type SwitcherLayout = "centred" | "field";
+
+const SWITCHER_LAYOUT: Record<SwitcherLayout, { group: string; caption: string }> = {
+  centred: { group: "justify-center", caption: "" },
+  field: { group: "justify-start lg:w-full lg:[&>button]:flex-1", caption: "lg:basis-full lg:pb-0.5" },
+};
+
+function Switcher({
+  label,
+  layout = "centred",
+  children,
+}: {
+  label: string;
+  layout?: SwitcherLayout | undefined;
+  children: ReactNode;
+}) {
+  const { group, caption } = SWITCHER_LAYOUT[layout];
   return (
-    <div role="group" aria-label={label} className="flex flex-wrap items-center justify-center gap-1">
-      <span aria-hidden className="tf-caption pr-1">
+    <div role="group" aria-label={label} className={`flex flex-wrap items-center gap-1 ${group}`}>
+      <span aria-hidden className={`tf-caption pr-1 ${caption}`}>
         {label}
       </span>
       {children}
@@ -145,16 +171,26 @@ export function TeamToggle({ chosen, onChoose }: TeamToggleProps) {
 export interface ViewToggleProps {
   readonly chosen: Variant;
   readonly onChoose: (variant: Variant) => void;
+  /**
+   * What the group is called. "View" in the modal, where it is about the one
+   * picture above it; the sidebar's is about every card, and is called
+   * something that cannot be mistaken for the Class View above it.
+   */
+  readonly label?: string;
+  readonly layout?: SwitcherLayout;
 }
 
 /**
  * The Cosmetic on the Class, or the Cosmetic on its own.
  *
- * Rendered only where an Item Render of its own exists — see `hasItemRender`.
+ * In the modal it is rendered only where an Item Render of its own exists — see
+ * `hasItemRender`. In the sidebar it is always there, because it answers for the
+ * whole grid rather than for one Cosmetic, and a card with no Item Render shows
+ * its Backpack Icon, which is the Cosmetic on its own as well.
  */
-export function ViewToggle({ chosen, onChoose }: ViewToggleProps) {
+export function ViewToggle({ chosen, onChoose, label = "View", layout }: ViewToggleProps) {
   return (
-    <Switcher label="View">
+    <Switcher label={label} layout={layout}>
       {VARIANTS.map((variant) => (
         <Choice
           key={variant}
