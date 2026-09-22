@@ -80,7 +80,7 @@ export function CatalogueView({ catalogue, manifest }: CatalogueViewProps) {
         <h1 className="font-display text-lg leading-none tracking-wide uppercase sm:text-2xl lg:text-[1.75rem] lg:leading-[1.05]">
           <span
             className={
-              "mr-1.5 inline-block -skew-x-6 rounded-sm bg-accent px-1.5 pt-1 pb-0.5 text-accent-ink" +
+              "inline-block -skew-x-6 rounded-sm bg-accent px-1.5 pt-1 pb-0.5 text-accent-ink" +
               " shadow-[inset_0_-3px_0_#0000002e]"
             }
           >
