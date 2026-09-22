@@ -117,7 +117,7 @@ _Avoid_: backpack (in code; it is what players say and what Steam's own URLs do 
 One kind of item in an Inventory, and how many of it the viewer has: a defindex, a Quality, a craftability and whether it can be traded. A viewer may own several Owned Copies of one Cosmetic, each in a different Quality and each worth a different Variant Price. An Owned Copy that matches no Cosmetic in the catalogue is not a Cosmetic — which is how weapons, taunts, tools, crates and Medals are left out, without a second rule deciding it.
 
 **Untradable Copy**:
-An Owned Copy its owner cannot trade or sell — an achievement hat, a Store purchase still on its hold, anything Steam marks as not tradable. It is worth nothing rather than worth an unknown amount: the site prices it at $0 whatever Quality it is in, and a viewer can leave the untradable copies out of their Inventory altogether. Untradable Copies are still copies of Cosmetics; an item _no_ copy of which can ever be traded is not a Cosmetic at all.
+An Owned Copy its owner cannot trade or sell — an achievement hat, a Store purchase still on its hold, anything Steam marks as not tradable. It is worth nothing rather than worth an unknown amount: the site prices it at $0 whatever Quality it is in, and leaves the untradable copies out of a viewer's Inventory unless they ask for them. Untradable Copies are still copies of Cosmetics; an item _no_ copy of which can ever be traded is not a Cosmetic at all.
 
 ### Images
 

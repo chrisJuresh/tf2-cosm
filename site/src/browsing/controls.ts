@@ -123,7 +123,12 @@ export interface BrowsingControls {
    */
   readonly onlyOwned: boolean;
   /**
-   * Whether the viewer's untradable copies are left out of their Inventory.
+   * Whether the viewer's untradable copies are left out of their Inventory. On
+   * by default: an untradable copy is worth $0 and cannot be sold or swapped, so
+   * a viewer adding up their backpack is adding up what they could trade, and a
+   * card for an achievement hat is one more thing between them and that. Like
+   * "Only what I own" it does nothing before an Inventory is read, and the
+   * Inventory line says how many copies it is keeping out.
    *
    * It narrows copies rather than Cosmetics, so it is the one control here that
    * `visibleCosmetics` never reads: it is applied to the Inventory before the
@@ -149,7 +154,7 @@ export interface BrowsingControls {
 /**
  * Where a viewer arrives, and where clearing the browser's storage returns them:
  * the catalogue bar its Event-Only Cosmetics, most valuable first — and, the
- * moment an Inventory is read, only what that Inventory holds.
+ * moment an Inventory is read, only the tradable copies that Inventory holds.
  */
 export const DEFAULT_CONTROLS: BrowsingControls = {
   classFilter: null,
@@ -159,7 +164,7 @@ export const DEFAULT_CONTROLS: BrowsingControls = {
   minScrap: null,
   maxScrap: null,
   onlyOwned: true,
-  hideUntradable: false,
+  hideUntradable: true,
   hideEventOnly: true,
   sort: "metal-value-high",
   search: "",

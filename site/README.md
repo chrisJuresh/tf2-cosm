@@ -104,10 +104,12 @@ An untradable copy is worth $0. That is a figure, not a gap: nobody can be hande
 the thing, so nobody would give anything for it, and the card says so rather than
 showing what a tradable copy of the same hat fetches. It holds whatever Quality
 the copy is in — an untradable Unusual is worth nothing too. The **Hide
-untradable** toggle leaves those copies out of the Inventory altogether, which is
-usually what a viewer adding up their backpack means; a Cosmetic they own no
-tradable copy of then drops out of what they own, and the total does not move,
-because what it dropped was worth nothing.
+untradable** toggle, which starts ticked, leaves those copies out of the
+Inventory altogether, because that is usually what a viewer adding up their
+backpack means; a Cosmetic they own no tradable copy of drops out of what they
+own, the total does not move, because what it dropped was worth nothing, and the
+Inventory line says how many copies are hidden. Clearing it brings them back at
+$0.
 
 Two things make it work and neither of them is on the page.
 
